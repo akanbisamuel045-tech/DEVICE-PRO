@@ -1,0 +1,738 @@
+/**
+ * DEVICE PRO — Solutions & Service Pages Stylesheet
+ * Architectural engineering aesthetics conforming to DEVICE_PRO_ARCHITECTURE.md
+ */
+
+/* =============================================================================
+   1. SOLUTIONS HERO SECTION
+   ============================================================================= */
+.solutions-page-body {
+  background-color: #FFFFFF;
+}
+
+.solutions-hero-banner {
+  background: 
+    radial-gradient(120% 100% at 50% 0%, #102644 0%, #061C35 60%, #041224 100%);
+  color: #FFFFFF;
+  padding: 48px 0 64px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.solutions-hero-container {
+  max-width: 1280px;
+}
+
+.solutions-hero-banner .products-breadcrumb {
+  margin-bottom: 16px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.solutions-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 196, 0, 0.12);
+  border: 1px solid rgba(255, 196, 0, 0.32);
+  color: var(--p-yellow);
+  font-size: 0.78125rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+  letter-spacing: 0.2px;
+}
+
+.badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--p-yellow);
+}
+
+.solutions-hero-title {
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 900;
+  line-height: 1.15;
+  color: #FFFFFF;
+  margin: 0 0 16px;
+  letter-spacing: -0.02em;
+}
+
+.solutions-hero-desc {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  max-width: 760px;
+  margin: 0 0 36px;
+}
+
+/* Solutions Metrics Strip */
+.solutions-hero-metrics {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 16px 28px;
+  backdrop-filter: blur(8px);
+  flex-wrap: wrap;
+}
+
+.metric-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-number {
+  font-size: 1.625rem;
+  font-weight: 900;
+  color: var(--p-yellow);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.metric-sep {
+  width: 1px;
+  height: 32px;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* =============================================================================
+   2. QUICK SECTOR NAV STRIP
+   ============================================================================= */
+.sector-quick-nav-section {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--p-border);
+  position: sticky;
+  top: 74px;
+  z-index: 800;
+  box-shadow: 0 2px 10px rgba(8, 45, 80, 0.04);
+}
+
+.sector-nav-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 12px 0;
+}
+
+.sector-nav-track::-webkit-scrollbar {
+  display: none;
+}
+
+.sector-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  background-color: var(--p-surface);
+  border: 1px solid var(--p-border);
+  color: var(--p-text);
+  font-size: 0.84375rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.sector-nav-btn:hover {
+  background-color: #EBF3FB;
+  border-color: #CBDCEE;
+  color: var(--p-blue-brand);
+}
+
+.sector-nav-btn.active {
+  background-color: var(--p-navy);
+  border-color: var(--p-navy);
+  color: #FFFFFF;
+}
+
+.sector-nav-icon {
+  font-size: 1rem;
+}
+
+/* =============================================================================
+   3. SOLUTION PILLAR SHOWCASE SECTIONS
+   ============================================================================= */
+.solution-pillar-section {
+  padding: 80px 0;
+  border-bottom: 1px solid #EEF3F8;
+}
+
+.solution-pillar-section.alt-bg {
+  background-color: #F8FAFC;
+}
+
+.pillar-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.pillar-grid.reverse {
+  grid-template-columns: 1fr 1.15fr;
+}
+
+.pillar-grid.reverse .pillar-image-col {
+  order: 2;
+}
+
+.pillar-grid.reverse .pillar-text-col {
+  order: 1;
+}
+
+.pillar-image-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 12px 36px rgba(8, 45, 80, 0.1);
+  border: 1px solid var(--p-border);
+}
+
+.pillar-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  aspect-ratio: 16 / 11;
+  transition: transform 0.4s ease;
+}
+
+.pillar-image-card:hover .pillar-img {
+  transform: scale(1.02);
+}
+
+.pillar-overlay-badge {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  background-color: rgba(6, 28, 53, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 8px 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(8px);
+}
+
+.pillar-kicker {
+  font-size: 0.78125rem;
+  font-weight: 800;
+  color: var(--p-blue-brand);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.pillar-title {
+  font-size: clamp(1.625rem, 2.5vw, 2.125rem);
+  font-weight: 800;
+  color: var(--p-text);
+  line-height: 1.25;
+  margin: 0 0 16px;
+  letter-spacing: -0.015em;
+}
+
+.pillar-desc {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--p-muted);
+  margin: 0 0 24px;
+}
+
+.pillar-specs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--p-border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 28px;
+}
+
+.solution-pillar-section.alt-bg .pillar-specs-grid {
+  background-color: #FFFFFF;
+}
+
+.pillar-spec-item strong {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--p-navy);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.pillar-spec-item span {
+  font-size: 0.8125rem;
+  color: var(--p-muted);
+  line-height: 1.45;
+}
+
+.pillar-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn-pillar-primary {
+  background-color: var(--p-yellow);
+  color: var(--p-navy);
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 12px 22px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 8px rgba(255, 196, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-pillar-primary:hover {
+  background-color: var(--p-yellow-hover);
+  transform: translateY(-1px);
+}
+
+.btn-pillar-outline {
+  background-color: transparent;
+  color: var(--p-navy);
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 11px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1.5px solid var(--p-navy);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.btn-pillar-outline:hover {
+  background-color: var(--p-surface);
+}
+
+/* =============================================================================
+   4. ANATOMY OF A COMPLETE SOLAR SYSTEM
+   ============================================================================= */
+.anatomy-section {
+  padding: 80px 0;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--p-border);
+}
+
+.section-title-centered {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 48px;
+}
+
+.sub-heading-pill {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--p-blue-brand);
+  background-color: var(--p-badge-bg);
+  border: 1px solid rgba(1, 87, 162, 0.15);
+  padding: 4px 12px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+
+.section-heading-dark {
+  font-size: clamp(1.75rem, 2.8vw, 2.25rem);
+  font-weight: 800;
+  color: var(--p-text);
+  line-height: 1.25;
+  margin: 0 0 12px;
+  letter-spacing: -0.015em;
+}
+
+.section-subtext {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--p-muted);
+  margin: 0;
+}
+
+.anatomy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.anatomy-card {
+  background-color: var(--p-surface);
+  border: 1px solid var(--p-border);
+  border-radius: 12px;
+  padding: 28px 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.anatomy-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(8, 45, 80, 0.08);
+  border-color: #CBDCEE;
+}
+
+.anatomy-step-badge {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: rgba(8, 45, 80, 0.12);
+  line-height: 1;
+}
+
+.anatomy-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  border: 1px solid var(--p-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.anatomy-card-title {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--p-text);
+  margin: 0 0 8px;
+}
+
+.anatomy-card-text {
+  font-size: 0.84375rem;
+  line-height: 1.55;
+  color: var(--p-muted);
+  margin: 0 0 18px;
+  flex: 1;
+}
+
+.anatomy-link {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--p-blue-brand);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.anatomy-link:hover {
+  color: var(--p-navy);
+  text-decoration: underline;
+}
+
+/* =============================================================================
+   5. TURNKEY 7-STAGE PROCESS TIMELINE
+   ============================================================================= */
+.process-section {
+  padding: 80px 0;
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--p-border);
+}
+
+.process-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.process-step-item {
+  background-color: #FFFFFF;
+  border: 1px solid var(--p-border);
+  border-radius: 10px;
+  padding: 22px 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.step-bubble {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--p-navy);
+  color: var(--p-yellow);
+  font-size: 0.875rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.step-title {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--p-text);
+  margin: 0 0 8px;
+}
+
+.step-desc {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--p-muted);
+  margin: 0;
+}
+
+/* =============================================================================
+   6. SOLUTIONS CONSULTATION FORM
+   ============================================================================= */
+.solutions-form-section {
+  padding: 80px 0;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--p-border);
+}
+
+.solutions-form-card {
+  background-color: var(--p-surface);
+  border: 1px solid var(--p-border);
+  border-radius: 14px;
+  padding: 44px;
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.form-heading {
+  font-size: clamp(1.625rem, 2.5vw, 2.125rem);
+  font-weight: 800;
+  color: var(--p-text);
+  line-height: 1.25;
+  margin: 10px 0 12px;
+}
+
+.form-subtext {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--p-muted);
+  margin: 0 0 24px;
+}
+
+.form-perks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.form-perk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.84375rem;
+  font-weight: 600;
+  color: var(--p-text);
+}
+
+.perk-check {
+  color: var(--p-green-stock);
+  font-weight: 900;
+}
+
+.direct-contact-box {
+  background-color: #FFFFFF;
+  border: 1px solid var(--p-border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-lbl {
+  font-size: 0.78125rem;
+  color: var(--p-muted);
+}
+
+.wa-direct-btn {
+  color: #15803D;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.wa-direct-btn:hover {
+  text-decoration: underline;
+}
+
+/* Form Inputs */
+.solutions-quote-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--p-text);
+}
+
+.field-input,
+.field-select,
+.field-textarea {
+  background-color: #FFFFFF;
+  border: 1px solid var(--p-border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 0.875rem;
+  color: var(--p-text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.field-input:focus,
+.field-select:focus,
+.field-textarea:focus {
+  border-color: var(--p-blue-brand);
+  box-shadow: 0 0 0 3px rgba(1, 87, 162, 0.12);
+}
+
+.field-textarea {
+  resize: vertical;
+}
+
+.btn-submit-proposal {
+  background-color: var(--p-yellow);
+  color: var(--p-navy);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 3px 10px rgba(255, 196, 0, 0.3);
+  transition: all 0.2s ease;
+  margin-top: 6px;
+}
+
+.btn-submit-proposal:hover {
+  background-color: var(--p-yellow-hover);
+  transform: translateY(-1px);
+}
+
+.form-feedback-msg {
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 0.84375rem;
+  font-weight: 600;
+}
+
+.form-feedback-msg.success {
+  background-color: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #15803D;
+}
+
+.form-feedback-msg.error {
+  background-color: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #B91C1C;
+}
+
+/* =============================================================================
+   7. SOLUTIONS FAQS
+   ============================================================================= */
+.solutions-faqs-section {
+  padding: 80px 0;
+  background-color: #F8FAFC;
+}
+
+/* =============================================================================
+   RESPONSIVE DESIGN BREAKPOINTS
+   ============================================================================= */
+@media (max-width: 1024px) {
+  .pillar-grid,
+  .pillar-grid.reverse {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .pillar-grid.reverse .pillar-image-col {
+    order: 1;
+  }
+  .pillar-grid.reverse .pillar-text-col {
+    order: 2;
+  }
+  .anatomy-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .process-timeline-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .solutions-form-card {
+    grid-template-columns: 1fr;
+    padding: 32px;
+  }
+}
+
+@media (max-width: 640px) {
+  .solutions-hero-metrics {
+    gap: 16px;
+    padding: 14px 18px;
+  }
+  .metric-sep {
+    display: none;
+  }
+  .anatomy-grid,
+  .process-timeline-grid {
+    grid-template-columns: 1fr;
+  }
+  .pillar-specs-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-group-row {
+    grid-template-columns: 1fr;
+  }
+}

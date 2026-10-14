@@ -1,0 +1,1766 @@
+/**
+ * DEVICE PRO — Elevated Architectural Solar Design Stylesheet
+ * Incorporates:
+ * - Solara-inspired Cinematic Hero with custom generated solar technician on rooftop
+ * - Sleek floating pill navbar & high-contrast display typography
+ * - Blueprint Architectural Solar Design section featuring custom CAD wireframe ground array with transmission pylon
+ * - Reduced side margins (1560px max width) for expansive, modern display
+ * - Asymmetric Bento Grid for Solar Production, Smart Storage & Agro-systems
+ * - 3 Floating feature cards with clean circular icon badges
+ * - High-impact deep navy CTA block with consultation timeline perks
+ * - Clean white modern footer with subtle background watermark
+ * - WCAG 2.1 AA accessible contrast & zero horizontal overflow
+ */
+
+/* ==========================================================================
+   1. GLOBAL PAGE BASICS & RESET ENHANCEMENTS
+   ========================================================================== */
+
+:root {
+  --site-max-width: 1560px;
+  --header-height: 84px;
+  --color-border-subtle: rgba(0, 0, 0, 0.07);
+  --color-border-card: rgba(0, 0, 0, 0.08);
+  --shadow-bento: 0 16px 40px -12px rgba(10, 18, 31, 0.08), 0 2px 8px rgba(10, 18, 31, 0.04);
+  --shadow-floating: 0 24px 50px -10px rgba(10, 18, 31, 0.12), 0 4px 12px rgba(10, 18, 31, 0.04);
+}
+
+/* Universal Reset & Box-Sizing */
+html {
+  box-sizing: border-box;
+  overflow-x: hidden;
+  max-width: 100vw;
+  scroll-behavior: smooth;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+/* Visually Hidden Screen Reader Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+body.devicepro-body {
+  margin: 0;
+  padding: 0;
+  background-color: #FFFFFF;
+  color: #101B2E;
+  font-family: var(--font-family-body, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Reduced Side Margins Layout Container */
+.layout-container {
+  width: 100%;
+  max-width: var(--site-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(1rem, 2.5vw, 2.25rem);
+  padding-right: clamp(1rem, 2.5vw, 2.25rem);
+}
+
+/* ==========================================================================
+   2. REUSABLE PILL BADGES & BUTTON PRIMITIVES
+   ========================================================================== */
+
+/* Floating Pill Badge */
+.sunfold-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 9999px;
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+}
+
+.sunfold-pill-badge .pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EBB531;
+  box-shadow: 0 0 10px rgba(235, 181, 49, 0.8);
+  display: inline-block;
+}
+
+.sunfold-pill-badge-subtle {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #274B84;
+  margin-bottom: 1rem;
+}
+
+/* Solara-Style Yellow Pill Button with Circle Arrow */
+.hero-solara-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: #FFB90C;
+  color: #0157A2;
+  padding: 8px 10px 8px 24px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(255, 185, 12, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #FFB90C;
+  cursor: pointer;
+}
+
+.hero-solara-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(255, 185, 12, 0.5);
+  background: #E6A300;
+  border-color: #E6A300;
+  color: #0157A2;
+}
+
+.btn-circle-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #0157A2;
+  color: #FFB90C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.hero-solara-btn:hover .btn-circle-arrow {
+  transform: translateX(3px);
+  background: #01437D;
+}
+
+/* Blue Pill Button with Yellow Text */
+.sunfold-btn-black {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #0157A2;
+  color: #FFB90C;
+  padding: 8px 14px 8px 22px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  box-shadow: 0 8px 24px rgba(1, 87, 162, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: 1px solid #0157A2;
+}
+
+.sunfold-btn-black:hover {
+  background: #01437D;
+  border-color: #01437D;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(1, 87, 162, 0.38);
+  color: #FFD452;
+}
+
+.sunfold-btn-black .btn-pill-tag {
+  background: rgba(255, 185, 12, 0.2);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  color: #FFB90C;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.sunfold-btn-black .arrow {
+  display: inline-block;
+  color: #FFB90C;
+  transition: transform 0.2s ease;
+}
+
+.sunfold-btn-black:hover .arrow {
+  transform: translateX(3px);
+  color: #FFD452;
+}
+
+/* Secondary Blue Pill Button with Yellow Text */
+.sunfold-btn-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #0157A2;
+  color: #FFB90C;
+  padding: 10px 24px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  border: 1px solid #0157A2;
+  box-shadow: 0 4px 16px rgba(1, 87, 162, 0.25);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.sunfold-btn-glass:hover {
+  background: #01437D;
+  border-color: #01437D;
+  transform: translateY(-2px);
+  color: #FFD452;
+}
+
+/* CTA Blue Button with Yellow Text */
+.sunfold-btn-white {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: #0157A2;
+  color: #FFB90C;
+  padding: 8px 10px 8px 22px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(1, 87, 162, 0.3);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  border: 1px solid #0157A2;
+}
+
+.sunfold-btn-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(1, 87, 162, 0.45);
+  background: #01437D;
+  border-color: #01437D;
+  color: #FFD452;
+}
+
+.sunfold-btn-white .pill-tag-dark {
+  background: rgba(255, 185, 12, 0.2);
+  color: #FFB90C;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.sunfold-btn-white .arrow {
+  color: #FFB90C;
+}
+
+/* Bento Card Small Blue Pill Button with Yellow Text */
+.sunfold-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #0157A2;
+  color: #FFB90C;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: fit-content;
+  border: 1px solid #0157A2;
+  box-shadow: 0 4px 12px rgba(1, 87, 162, 0.2);
+}
+
+.sunfold-pill-btn:hover {
+  background: #01437D;
+  border-color: #01437D;
+  color: #FFD452;
+  transform: translateY(-1px);
+}
+
+.sunfold-pill-btn .arrow {
+  display: inline-block;
+  color: #FFB90C;
+  transition: transform 0.2s ease;
+}
+
+.sunfold-pill-btn:hover .arrow {
+  transform: translateX(3px);
+  color: #FFD452;
+}
+
+/* ==========================================================================
+   3. FLOATING PILL HEADER & NAVIGATION (SOLARA STYLE)
+   ========================================================================== */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  z-index: 1000;
+  padding-top: 14px;
+  pointer-events: none;
+}
+
+.header-inner {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 9999px;
+  padding: 0 20px 0 24px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.site-header.scrolled .header-inner {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.brand-logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brand-logo-img {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-link {
+  color: #334155;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 7px 16px;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #0A121F;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.nav-link.active {
+  color: #0A121F;
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  color: #334155;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.header-icon-btn:hover {
+  background: #F8F9FA;
+  color: #0A121F;
+  border-color: rgba(0, 0, 0, 0.16);
+  transform: translateY(-1px);
+}
+
+.cart-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background-color: #EBB531;
+  color: #0A121F;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #0A121F;
+  cursor: pointer;
+  padding: 6px;
+}
+
+/* ==========================================================================
+   4. HERO SECTION (SOLARA CINEMATIC ROOFTOP INSTALLATION)
+   ========================================================================== */
+
+.hero-solara-section {
+  position: relative;
+  min-height: 860px;
+  display: flex;
+  align-items: center;
+  background-color: #0A121F;
+  background-image: 
+    linear-gradient(to right, 
+      rgba(10, 18, 31, 0.94) 0%, 
+      rgba(10, 18, 31, 0.88) 32%, 
+      rgba(10, 18, 31, 0.55) 55%, 
+      rgba(10, 18, 31, 0.18) 75%, 
+      transparent 100%),
+    url('../images/hero-solar-black-technician.jpg');
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+  padding-top: calc(var(--header-height) + 3.5rem);
+  padding-bottom: 4.5rem;
+  overflow: hidden;
+}
+
+.hero-solara-content {
+  position: relative;
+  z-index: 10;
+  max-width: 680px;
+}
+
+.hero-solara-title {
+  font-size: clamp(2.75rem, 5.5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #FFFFFF;
+  margin-bottom: 1.5rem;
+}
+
+.hero-solara-desc {
+  font-size: clamp(1rem, 1.6vw, 1.1875rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 520px;
+  margin-bottom: 2.25rem;
+}
+
+.hero-solara-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Solara Bottom Metrics Bar */
+.hero-solara-metrics {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  margin-top: 4.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  max-width: 560px;
+}
+
+.hero-metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hero-metric-val {
+  font-size: clamp(2.25rem, 4vw, 3rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.hero-metric-lbl {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 500;
+}
+
+.hero-metric-sep {
+  width: 1px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ==========================================================================
+   5. SOLAR DESIGN BLUEPRINT & GRID INTEGRATION SECTION
+   ========================================================================== */
+
+.solar-design-section {
+  padding: 6.5rem 0 5.5rem;
+  background-color: #FFFFFF;
+}
+
+.solar-design-header {
+  text-align: center;
+  max-width: 860px;
+  margin: 0 auto 3.5rem;
+}
+
+.solar-design-title {
+  font-size: clamp(2.25rem, 4vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0A121F;
+  margin: 0 0 1rem;
+}
+
+.solar-design-desc {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: #556274;
+}
+
+/* Blueprint Schematic Frame */
+.solar-design-schematic-wrap {
+  width: 100%;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 24px 60px -15px rgba(10, 18, 31, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+  padding: 1.5rem;
+  margin-bottom: 3.5rem;
+}
+
+.solar-schematic-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* 3 Blueprint Features */
+.solar-blueprint-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.solar-blueprint-card {
+  background: #F8FAFC;
+  border-radius: 20px;
+  border: 1px solid var(--color-border-card);
+  padding: 2.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.3s ease;
+}
+
+.solar-blueprint-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(39, 75, 132, 0.25);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.08);
+  background: #FFFFFF;
+}
+
+.blueprint-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #EBF5FF;
+  color: #274B84;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blueprint-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0A121F;
+}
+
+.blueprint-card-desc {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #556274;
+}
+
+/* ==========================================================================
+   6. BRAND PARTNERS & AUTHORIZED DISTRIBUTOR SHOWCASE
+   ========================================================================== */
+
+.brand-showcase-section {
+  padding: 5.5rem 0 5rem;
+  background-color: #FFFFFF;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.brand-showcase-header {
+  text-align: center;
+  max-width: 860px;
+  margin: 0 auto 3rem;
+}
+
+.brand-showcase-title {
+  font-size: clamp(2.25rem, 3.8vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0A121F;
+  margin: 0 0 1rem;
+}
+
+.brand-showcase-desc {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: #556274;
+}
+
+/* Infinite Brand Logo Marquee Track */
+.brand-marquee-wrap {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 1.5rem 0 3.5rem;
+  user-select: none;
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+
+.brand-marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 3.5rem;
+  width: max-content;
+  animation: brand-scroll 35s linear infinite;
+}
+
+.brand-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes brand-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.brand-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+  height: 56px;
+}
+
+.brand-marquee-item:hover {
+  transform: scale(1.08);
+  border: none;
+  box-shadow: none;
+}
+
+.brand-marquee-item img {
+  height: 48px;
+  width: auto;
+  max-width: 210px;
+  object-fit: contain;
+  display: block;
+}
+
+/* 12 Brands Grid Showcase */
+.brand-showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1200px) {
+  .brand-showcase-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .brand-showcase-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .brand-showcase-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.brand-card {
+  background: #F8FAFC;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 20px;
+  padding: 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.25rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.brand-card:hover {
+  background: #FFFFFF;
+  border-color: rgba(1, 87, 162, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px -12px rgba(10, 18, 31, 0.08);
+}
+
+.brand-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand-card-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: rgba(1, 87, 162, 0.08);
+  color: #0157A2;
+}
+
+.brand-card-badge.gold {
+  background: rgba(255, 185, 12, 0.15);
+  color: #B45309;
+}
+
+.brand-card-badge.green {
+  background: rgba(16, 138, 68, 0.1);
+  color: #108A44;
+}
+
+.brand-card-logo-wrap {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.brand-card-logo-wrap img {
+  height: 38px;
+  max-width: 190px;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.brand-card-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0A121F;
+}
+
+.brand-card-desc {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #64748B;
+}
+
+.brand-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.875rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0157A2;
+}
+
+
+/* ==========================================================================
+   7. BENTO GRID ("OUR EXPERTISE")
+   ========================================================================== */
+
+.sunfold-bento-section {
+  padding: 5.5rem 0 6rem;
+  background-color: #F8FAFC;
+}
+
+.sunfold-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.sunfold-bento-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid var(--color-border-card);
+  box-shadow: var(--shadow-bento);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sunfold-bento-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-floating);
+  border-color: rgba(39, 75, 132, 0.2);
+}
+
+.bento-card-content {
+  padding: 2.5rem 2.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bento-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #274B84;
+}
+
+.bento-title {
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-weight: 700;
+  color: #0A121F;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.bento-desc {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #556274;
+  margin-bottom: 0.75rem;
+}
+
+.bento-card-visual {
+  width: 100%;
+  height: 320px;
+  background: #F1F5F9;
+  overflow: hidden;
+  position: relative;
+}
+
+.bento-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.sunfold-bento-card:hover .bento-img {
+  transform: scale(1.03);
+}
+
+/* Wide Bento Card (Spanning 2 columns) */
+.bento-card-wide {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  align-items: center;
+}
+
+.bento-card-wide .bento-card-content {
+  padding: 3.5rem;
+}
+
+.bento-card-visual-wide {
+  height: 100%;
+  min-height: 360px;
+}
+
+/* ==========================================================================
+   8. "TAILORED TO YOUR NEEDS" 3 FLOATING CARDS & ARRAY
+   ========================================================================== */
+
+.sunfold-features-section {
+  padding: 6.5rem 0 5rem;
+  background-color: #FFFFFF;
+}
+
+.sunfold-features-header {
+  text-align: center;
+  max-width: 780px;
+  margin: 0 auto 3.5rem;
+}
+
+.sunfold-features-title {
+  font-size: clamp(2rem, 3.8vw, 3.25rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0A121F;
+  margin: 0 0 1rem;
+}
+
+.sunfold-features-subtitle {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: #556274;
+}
+
+.sunfold-features-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+}
+
+.sunfold-feature-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  border: 1px solid var(--color-border-card);
+  padding: 2.25rem 2rem;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: all 0.3s ease;
+}
+
+.sunfold-feature-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(39, 75, 132, 0.25);
+  box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #EBF5FF;
+  color: #274B84;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0A121F;
+}
+
+.feature-card-desc {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #556274;
+}
+
+.sunfold-array-frame {
+  width: 100%;
+  height: 380px;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: var(--shadow-bento);
+}
+
+.array-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ==========================================================================
+   9. HIGH-IMPACT NAVY / BLUE CTA BLOCK
+   ========================================================================== */
+
+.sunfold-cta-block-section {
+  padding: 3rem 0 6rem;
+  background-color: #FFFFFF;
+}
+
+.sunfold-cta-box {
+  background: linear-gradient(145deg, #0A162B 0%, #081020 100%);
+  border-radius: 32px;
+  padding: clamp(3rem, 6vw, 5rem);
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  box-shadow: 0 30px 60px -12px rgba(10, 22, 43, 0.4);
+  color: #FFFFFF;
+}
+
+.sunfold-cta-title {
+  font-size: clamp(2rem, 3.8vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #FFFFFF;
+  margin: 0 0 1.25rem;
+}
+
+.sunfold-cta-desc {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: #94A3B8;
+  margin-bottom: 2.5rem;
+  max-width: 520px;
+}
+
+.sunfold-cta-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sunfold-perk-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.sunfold-perk-card:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(4px);
+}
+
+.perk-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: rgba(39, 75, 132, 0.4);
+  color: #EBB531;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.perk-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.perk-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.perk-sub {
+  font-size: 0.8125rem;
+  color: #94A3B8;
+}
+
+/* ==========================================================================
+   10. HARDWARE PRODUCTS GRID
+   ========================================================================== */
+
+.categories-section {
+  padding: 5rem 0 6rem;
+  background-color: #F8FAFC;
+}
+
+.categories-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+}
+
+.categories-title {
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #0A121F;
+  margin: 0 0 0.75rem;
+}
+
+.categories-subtitle {
+  font-size: 1rem;
+  color: #64748B;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.category-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  border: 1px solid var(--color-border-card);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-bento);
+  border-color: rgba(39, 75, 132, 0.25);
+}
+
+.category-card-img-wrap {
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: #F1F5F9;
+}
+
+.category-card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.category-card:hover .category-card-img-wrap img {
+  transform: scale(1.05);
+}
+
+.category-card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.category-card-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0A121F;
+  margin: 0 0 6px;
+}
+
+.category-card-desc {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #64748B;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.category-card-link {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #FFB90C;
+  background: #0157A2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  width: fit-content;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid #0157A2;
+  box-shadow: 0 4px 12px rgba(1, 87, 162, 0.2);
+}
+
+.category-card-link:hover {
+  background: #01437D;
+  border-color: #01437D;
+  color: #FFD452;
+}
+
+.category-card-link .arrow {
+  color: #FFB90C;
+  transition: transform 0.2s ease;
+}
+
+.category-card:hover .category-card-link .arrow {
+  transform: translateX(4px);
+  color: #FFD452;
+}
+
+/* ==========================================================================
+   11. CONSULTATION BOOKING SECTION
+   ========================================================================== */
+
+.consultation-section {
+  padding: 5.5rem 0 6rem;
+  background-color: #FFFFFF;
+}
+
+.consultation-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.consultation-visual-col {
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-bento);
+  position: relative;
+  height: 520px;
+}
+
+.consultation-visual-col img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.consultation-visual-badge {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0A121F;
+}
+
+.consultation-form-card {
+  background: #F8FAFC;
+  border-radius: 24px;
+  border: 1px solid var(--color-border-card);
+  padding: 3rem;
+  box-shadow: var(--shadow-bento);
+}
+
+.consultation-title {
+  font-size: clamp(1.75rem, 2.8vw, 2.35rem);
+  font-weight: 800;
+  color: #0A121F;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.025em;
+}
+
+.consultation-subtitle {
+  font-size: 0.9375rem;
+  color: #64748B;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #CBD5E1;
+  background: #FFFFFF;
+  color: #0A121F;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: #274B84;
+  box-shadow: 0 0 0 3px rgba(39, 75, 132, 0.15);
+}
+
+.form-btn-submit {
+  width: 100%;
+  padding: 14px;
+  border-radius: 9999px;
+  background: #0157A2;
+  color: #FFB90C;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  border: 1px solid #0157A2;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 18px rgba(1, 87, 162, 0.25);
+}
+
+.form-btn-submit:hover {
+  background: #01437D;
+  border-color: #01437D;
+  color: #FFD452;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   12. DEEP BLUE PREMIUM FOOTER (CINEMATIC ARCHITECTURAL FINISH)
+   ========================================================================== */
+
+.sunfold-footer {
+  background: linear-gradient(180deg, #071C3A 0%, #041224 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5rem 0 3.5rem;
+  position: relative;
+  overflow: hidden;
+  color: #E2E8F0;
+}
+
+.footer-top-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 4rem;
+  margin-bottom: 3.5rem;
+  padding-bottom: 3.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-brand-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.footer-contact-details {
+  font-size: 0.9375rem;
+  color: #94A3B8;
+  line-height: 1.65;
+}
+
+.footer-contact-details p {
+  margin: 0 0 6px;
+}
+
+.footer-contact-details a {
+  color: #FFB90C;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.footer-contact-details a:hover {
+  color: #FFD452;
+  text-decoration: underline;
+}
+
+.footer-newsletter-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-col-label {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.footer-col-desc {
+  font-size: 0.875rem;
+  color: #94A3B8;
+  margin-bottom: 0.75rem;
+}
+
+.footer-pill-subscribe {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 9999px;
+  padding: 4px 6px 4px 18px;
+  max-width: 480px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.footer-pill-subscribe:focus-within {
+  border-color: #FFB90C;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.footer-pill-subscribe input {
+  flex-grow: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.9375rem;
+  color: #FFFFFF;
+  outline: none;
+  font-family: inherit;
+}
+
+.footer-pill-subscribe input::placeholder {
+  color: #94A3B8;
+}
+
+.footer-pill-subscribe .subscribe-btn {
+  background: #0157A2;
+  color: #FFB90C;
+  border: 1px solid #0157A2;
+  padding: 8px 20px;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.footer-pill-subscribe .subscribe-btn:hover {
+  background: #01437D;
+  border-color: #01437D;
+  color: #FFD452;
+}
+
+.footer-mid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  margin-bottom: 4rem;
+}
+
+.hours-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.hours-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 24px;
+  font-size: 0.875rem;
+  color: #94A3B8;
+}
+
+.hours-grid span:nth-child(odd) {
+  color: #CBD5E1;
+  font-weight: 500;
+}
+
+.footer-links-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  align-items: center;
+}
+
+.footer-links-block a {
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.footer-links-block a:hover {
+  color: #FFB90C;
+}
+
+.footer-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.875rem;
+  color: #64748B;
+}
+
+.footer-bottom-row p {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+}
+
+.footer-watermark {
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(4.5rem, 12vw, 10.5rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.045);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.065);
+  pointer-events: none;
+  white-space: nowrap;
+  user-select: none;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   13. ACCESSIBLE DIALOGS & DRAWERS
+   ========================================================================== */
+
+dialog {
+  border: none;
+  border-radius: 20px;
+  padding: 0;
+  background: #FFFFFF;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35);
+  color: #0A121F;
+  max-width: 90vw;
+}
+
+dialog::backdrop {
+  background: rgba(10, 18, 31, 0.65);
+  backdrop-filter: blur(8px);
+}
+
+.modal-inner {
+  padding: 2.25rem;
+  position: relative;
+  max-width: 560px;
+  width: 100%;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #E2E8F0;
+  background: #FFFFFF;
+  color: #64748B;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  background: #F1F5F9;
+  color: #0A121F;
+}
+
+/* Off-canvas Drawers */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(420px, 100vw);
+  height: 100vh;
+  background: #FFFFFF;
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
+}
+
+.drawer.open {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.drawer-header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.drawer-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.drawer-footer {
+  padding: 1.5rem;
+  border-top: 1px solid #E2E8F0;
+  background: #F8FAFC;
+}
+
+/* Search Modal Form */
+.search-dialog-inner {
+  padding: 2rem;
+  width: min(600px, 90vw);
+}
+
+.search-input-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #F1F5F9;
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid #CBD5E1;
+}
+
+.search-input-box input {
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-size: 1.0625rem;
+  color: #0A121F;
+  outline: none;
+  font-family: inherit;
+}
+
+/* ==========================================================================
+   14. RESPONSIVE BREAKPOINT AUDIT
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .hero-solara-section {
+    min-height: 720px;
+    background-position: 70% center;
+  }
+
+  .solar-blueprint-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sunfold-bento-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .bento-card-wide {
+    grid-template-columns: 1fr;
+  }
+  
+  .bento-card-wide .bento-card-content {
+    padding: 2.5rem;
+  }
+
+  .sunfold-features-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sunfold-cta-box {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 3rem 2rem;
+  }
+
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .consultation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-top-row, .footer-mid-row {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-nav {
+    display: none;
+  }
+
+  .mobile-nav-toggle {
+    display: inline-flex;
+  }
+
+  .hero-solara-section {
+    min-height: 640px;
+    padding-top: calc(var(--header-height) + 2rem);
+  }
+
+  .hero-solara-title {
+    font-size: 2.35rem;
+  }
+
+  .hero-solara-metrics {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .hero-metric-sep {
+    display: none;
+  }
+
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .consultation-form-card {
+    padding: 1.75rem;
+  }
+
+  .footer-bottom-row {
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+}

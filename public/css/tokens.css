@@ -1,0 +1,203 @@
+/**
+ * DEVICE PRO — Design Tokens (Cinematic Dark-First Engineering System)
+ * Inspired by reference solar energy architecture (solarworldelectric.com)
+ * Original DEVICE PRO Brand Identity - WCAG 2.1 / 2.2 AA Verified
+ */
+
+:root {
+  /* ==========================================================================
+     1. COLOR PALETTE (CINEMATIC DARK-FIRST + SOLAR RADIANCE)
+     ========================================================================== */
+
+  /* Reference Brand Colors (Exact Sampled from Official Device Pro Logo) */
+  --color-brand-yellow: #FFB90C;        /* Primary Golden Yellow Accent (from Device Pro Logo) */
+  --color-brand-yellow-hover: #E6A300;  /* Slightly deeper on hover */
+  --color-brand-yellow-light: #FFCA40;  /* Light tint for subtle glow */
+  --color-brand-navy: #0A121F;          /* Foundation Night Navy (Section 3, 6, 9, 10) */
+  --color-brand-navy-deep: #060B14;     /* Deepest Navy for high contrast */
+  --color-brand-navy-alt: #0B132B;      /* Editorial Navy */
+  --color-brand-blue: #0157A2;          /* Official Device Pro Brand Blue */
+  --color-brand-blue-section: #0157A2;  /* Vibrant Royal Blue */
+  --color-brand-blue-hover: #01437D;    /* Darker interactive blue */
+
+  /* Surface Ramps */
+  --color-surface-white: #FFFFFF;       /* Clean White (Section 7) */
+  --color-surface-light: #F8F9FA;       /* Light Neutral (Section 5) */
+  --color-surface-cream: #F5F4F0;       /* Warm Editorial Cream (Section 8) */
+  --color-surface-pill: #F0F4F8;        /* Soft Tinted Subnav Strip */
+  --color-card-border: #E8ECEF;         /* Subtle border for light cards */
+  --color-divider-dark: rgba(255, 255, 255, 0.12); /* Dividers on navy */
+  --color-divider-light: rgba(0, 0, 0, 0.08);       /* Dividers on light */
+
+  /* Solar Energy Glow Accents */
+  --color-solar-gold: #EBB531;          /* Primary Solar Gold */
+  --color-solar-gold-light: #F4C44E;    /* Solar Gold Highlight */
+  --color-solar-gold-deep: #D8A222;     /* Deep Solar Gold */
+  --color-solar-orange: #F7931A;        /* Solar Warmth / Sunset Energy */
+  --color-solar-green: #32B768;         /* Renewable Green */
+  --color-electric-blue: #274B84;       /* Flow Blue */
+
+  /* Cinematic Foundation */
+  --color-ink-000: #0A121F;             /* Primary Page Base */
+  --color-ink-050: #080E18;
+  --color-ink-100: #0B132B;
+  --color-ink-200: #101B2E;
+  --color-ink-300: #1A2844;
+  --color-ink-400: #25395E;
+  --color-ink-500: #39507D;
+
+  /* Clean Paper Ramp */
+  --color-paper: #FFFFFF;
+  --color-paper-2: #F8F9FA;
+  --color-paper-3: #F5F4F0;
+
+  /* Text & Typography (Dark Surfaces - Default) */
+  --color-d-text: #EEF1F8;              /* Ultra-crisp high-contrast text */
+  --color-d-text-muted: rgba(238, 241, 248, 0.72); /* 72% opacity supporting text */
+  --color-d-text-subtle: rgba(238, 241, 248, 0.48);/* 48% caption/meta text */
+
+  /* Text & Typography (Light Surfaces) */
+  --color-text-primary: #0C1023;        /* Deep Slate Navy text on white */
+  --color-text-secondary: #5A6484;      /* Slate secondary on white */
+  --color-text-tertiary: #7C86A6;       /* Slate muted on white */
+
+  /* Borders & Glassmorphic Hairlines */
+  --color-d-hair: rgba(255, 255, 255, 0.08);       /* Subtle glass hairline */
+  --color-d-hair-strong: rgba(255, 255, 255, 0.18);/* Card hover boundary */
+  --color-d-hair-glow: rgba(249, 176, 0, 0.40);    /* Solar gold edge glow */
+  --color-d-glass: rgba(255, 255, 255, 0.04);      /* Primary dark glass card */
+  --color-d-glass-elevated: rgba(255, 255, 255, 0.075); /* Hover glass card */
+  --color-d-glass-nav: rgba(5, 7, 15, 0.82);       /* Frosted glass header */
+
+  /* Gradients */
+  --gradient-solar-gold: linear-gradient(135deg, #FFD25E 0%, #F9B000 45%, #F7931A 100%);
+  --gradient-solar-green: linear-gradient(135deg, #4FE08C 0%, #32B768 100%);
+  --gradient-electric-blue: linear-gradient(135deg, #00D2FF 0%, #1D68E2 100%);
+  --gradient-night: linear-gradient(165deg, #111730 0%, #0B0F1E 55%, #05070F 100%);
+  --gradient-aurora: radial-gradient(120% 100% at 50% 0%, #1B2450 0%, #0B0F1E 55%, #05070F 100%);
+  --gradient-card-glow: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 100%);
+  --gradient-text-solar: linear-gradient(135deg, #FFD25E 10%, #F9B000 60%, #F7931A 100%);
+
+  /* Status & Alerts */
+  --color-success: #32B768;
+  --color-success-bg: rgba(50, 183, 104, 0.12);
+  --color-success-border: rgba(50, 183, 104, 0.35);
+
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-warning-border: rgba(245, 158, 11, 0.35);
+
+  --color-danger: #EF4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.12);
+  --color-danger-border: rgba(239, 68, 68, 0.35);
+
+  --color-info: #00D2FF;
+  --color-info-bg: rgba(0, 210, 255, 0.12);
+  --color-info-border: rgba(0, 210, 255, 0.35);
+
+  /* WhatsApp Official */
+  --color-whatsapp: #25D366;
+  --color-whatsapp-hover: #1EBE5D;
+
+  /* ==========================================================================
+     2. TYPOGRAPHY SYSTEM
+     ========================================================================== */
+
+  /* Type Families */
+  --font-family-display: 'Sora', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'Space Grotesk', 'JetBrains Mono', ui-monospace, monospace;
+
+  /* Fluid Type Scale */
+  --font-size-xs: 0.75rem;     /* 12px - Badges, micro data */
+  --font-size-sm: 0.875rem;    /* 14px - Navigation, captions, meta */
+  --font-size-base: 1rem;      /* 16px - Standard body text */
+  --font-size-md: 1.125rem;    /* 18px - Lead paragraphs */
+  --font-size-lg: 1.25rem;     /* 20px - Subheadings, card titles */
+  --font-size-xl: 1.5rem;      /* 24px - Section H3 */
+  --font-size-2xl: clamp(1.75rem, 3vw, 2.25rem);  /* 28px - 36px - Section H2 */
+  --font-size-3xl: clamp(2.25rem, 4.5vw, 3.25rem);/* 36px - 52px - Large Section H2 */
+  --font-size-4xl: clamp(2.75rem, 6.5vw, 4.75rem);/* 44px - 76px - Cinematic Hero H1 */
+
+  /* Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* Line Heights */
+  --line-height-tight: 1.12;
+  --line-height-snug: 1.3;
+  --line-height-normal: 1.55;
+  --line-height-relaxed: 1.7;
+
+  /* ==========================================================================
+     3. SPACING & CONTAINERS
+     ========================================================================== */
+
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  --container-max-width: 1560px;
+  --container-wide: 1640px;
+  --container-narrow-width: 960px;
+  --nav-height: 76px;
+  --page-gutter: clamp(1rem, 2.5vw, 2.25rem);
+  --section-padding-y: clamp(3.5rem, 6vw, 6rem);
+
+  /* ==========================================================================
+     4. ELEVATION, GLOWS & FOCUS
+     ========================================================================== */
+
+  --shadow-xs: 0 1px 2px rgba(5, 7, 15, 0.3);
+  --shadow-sm: 0 4px 16px rgba(5, 7, 15, 0.4);
+  --shadow-md: 0 12px 32px rgba(5, 7, 15, 0.5);
+  --shadow-lg: 0 24px 64px rgba(5, 7, 15, 0.65);
+  --shadow-gold-glow: 0 12px 36px rgba(249, 176, 0, 0.32);
+  --shadow-cyan-glow: 0 12px 36px rgba(0, 210, 255, 0.25);
+  --shadow-green-glow: 0 12px 36px rgba(50, 183, 104, 0.28);
+
+  --focus-ring: 0 0 0 3px rgba(249, 176, 0, 0.45);
+  --focus-ring-cyan: 0 0 0 3px rgba(0, 210, 255, 0.45);
+
+  /* ==========================================================================
+     5. GEOMETRY & RADIUS
+     ========================================================================== */
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 30px;
+  --radius-pill: 9999px;
+
+  /* ==========================================================================
+     6. TRANSITIONS & TIMING
+     ========================================================================== */
+
+  --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-spring: 360ms cubic-bezier(0.34, 1.42, 0.44, 1);
+
+  /* ==========================================================================
+     7. Z-INDEX SCALE
+     ========================================================================== */
+
+  --z-index-base: 1;
+  --z-index-sticky: 100;
+  --z-index-dropdown: 200;
+  --z-index-drawer: 300;
+  --z-index-modal: 400;
+  --z-index-toast: 500;
+}

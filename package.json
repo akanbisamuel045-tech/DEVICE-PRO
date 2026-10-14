@@ -1,0 +1,23 @@
+{
+  "name": "device-pro",
+  "version": "1.0.0",
+  "description": "DEVICE PRO Solar Energy Systems website & commerce platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "solar",
+    "energy",
+    "devicepro",
+    "nigeria",
+    "inverter",
+    "battery"
+  ],
+  "author": "DEVICE PRO",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
