@@ -916,9 +916,186 @@ function getProductById(id) {
   return stmt.get(id);
 }
 
+// Comprehensive turnkey package engineering metadata
+const PACKAGE_METADATA = {
+  '2kva-starter-solar-backup-package': {
+    system_type: 'Solar Backup / Micro-Hybrid',
+    intended_audience: '1–2 Bedroom Apartment, Small Shop, or Home Office',
+    power_kw: '2.0 kW',
+    battery_kwh: '2.56 kWh',
+    solar_kwp: '1.1 kWp',
+    daily_yield: '4.5 – 5.5 kWh/day',
+    inverter_detail: '2kVA 24V Pure Sine Wave Smart Hybrid Inverter with 40A MPPT',
+    battery_detail: '2.56kWh 25.6V 100Ah Grade-A LiFePO4 Lithium Battery (6,000 cycles)',
+    panels_detail: '2× 550W Tier-1 Monocrystalline Half-Cell Bifacial Panels',
+    bos_detail: 'DC/AC Breakers, Surge Protectors (SPD), 16mm² Battery Cables, 4mm² Solar PV Cables',
+    supported_loads: [
+      { appliance: '1× Refrigerator (Medium Inverter)', runtime: 'Continuous 24/7' },
+      { appliance: '2× Ceiling / Standing Fans', runtime: '12 – 16 Hours' },
+      { appliance: '1× 55" Smart TV + Decoder', runtime: '8 – 10 Hours' },
+      { appliance: 'All LED Lighting & Phone Charging', runtime: 'Continuous' },
+      { appliance: 'Laptops & WiFi Router', runtime: 'Continuous' }
+    ],
+    load_exclusions_note: 'Air conditioners, electric water heaters, boiling kettles, and pumping machines are excluded from this tier.',
+    installation_scope: 'Standard installation included within Lagos, Abuja, and Port Harcourt. Includes rooftop mounting, DB hookup, and commissioning.',
+    warranty_terms: '25-Year Panel Linear Output, 5-Year Inverter Warranty, 5-Year Battery Warranty, 12-Month Workmanship.',
+    price_effective_date: 'Effective October 2026'
+  },
+  '3-5kva-essential-home-solar-package': {
+    system_type: 'Hybrid Residential System',
+    intended_audience: '2–3 Bedroom Flat or Medium Business Office',
+    power_kw: '3.5 kW',
+    battery_kwh: '5.12 kWh',
+    solar_kwp: '2.2 kWp',
+    daily_yield: '9.0 – 11.0 kWh/day',
+    inverter_detail: '3.5kVA 48V Pure Sine Wave Hybrid Inverter with 60A MPPT & WiFi telemetry',
+    battery_detail: '5.12kWh 51.2V 100Ah Wall-Mount LiFePO4 Lithium Battery with Smart BMS',
+    panels_detail: '4× 550W Tier-1 Monocrystalline Bifacial PV Panels (2,200W total)',
+    bos_detail: 'Anodized Aluminum Rails, DC Combiner Box, 63A AC Changeover, Copper Earth Rod',
+    supported_loads: [
+      { appliance: '1× 1.0HP Inverter Air Conditioner', runtime: '4 – 6 Hours Daytime' },
+      { appliance: '1× Deep Freezer + 1× Refrigerator', runtime: 'Continuous 24/7' },
+      { appliance: '4× Ceiling Fans + 1× 65" TV & Soundbar', runtime: '10 – 14 Hours' },
+      { appliance: 'Water Dispenser / Microwave (Intermittent)', runtime: 'As needed' },
+      { appliance: 'All Home Lighting & Computing', runtime: 'Continuous 24/7' }
+    ],
+    load_exclusions_note: 'Heavy non-inverter air conditioners and water heaters must remain on bypass or generator.',
+    installation_scope: 'Complete certified installation including rooftop railing, cable conduit trunking, testing, and client orientation.',
+    warranty_terms: '25-Year Panel Performance, 5-Year Inverter Warranty, 10-Year Lithium Battery Warranty.',
+    price_effective_date: 'Effective October 2026'
+  },
+  '5kva-premium-duplex-solar-package': {
+    system_type: 'High-Yield Hybrid Solar',
+    intended_audience: '4-Bedroom Duplex, Medical Clinic, or Professional Studio',
+    power_kw: '5.0 kW',
+    battery_kwh: '10.24 kWh',
+    solar_kwp: '4.4 kWp',
+    daily_yield: '18.0 – 22.0 kWh/day',
+    inverter_detail: '5kW 48V Deye/Growatt Smart Hybrid Inverter with Dual MPPT & Generator Auto-Start',
+    battery_detail: '2× 5.12kWh (10.24kWh total) 48V 200Ah LiFePO4 Rack/Wall Batteries',
+    panels_detail: '8× 550W Tier-1 Mono Bifacial Panels (4,400W total array)',
+    bos_detail: 'Pre-wired IP65 DC Combiner, Type-II AC/DC Surge Arresters, Heavy Copper Earthing',
+    supported_loads: [
+      { appliance: '2× 1.5HP Inverter Air Conditioners', runtime: '6 – 8 Hours Day & Night' },
+      { appliance: '1× Deep Freezer + 1× Double-Door Fridge', runtime: 'Continuous 24/7' },
+      { appliance: '0.75HP–1.0HP Submersible Water Pump', runtime: 'Daytime Filling (1–2 hrs)' },
+      { appliance: 'Multiple TVs, Gaming Consoles, CCTV & NVR', runtime: 'Continuous 24/7' },
+      { appliance: 'Washing Machine (Daytime cycle)', runtime: '2 – 3 Cycles/week' }
+    ],
+    load_exclusions_note: 'Electric vehicle high-speed chargers and commercial welding equipment exceed this rating.',
+    installation_scope: 'Turnkey certified installation, comprehensive load balancing across consumer unit DB boards, mobile app monitoring setup.',
+    warranty_terms: '25-Year Panel Performance, 5-Year Inverter Warranty, 10-Year Battery Warranty, 12-Month Workmanship.',
+    price_effective_date: 'Effective October 2026'
+  },
+  '7-5kva-executive-villa-solar-package': {
+    system_type: 'Extended Resilience Hybrid',
+    intended_audience: '5-Bedroom Detached Villa, Boutique Hotel, or Mini-Hospital',
+    power_kw: '7.5 kW',
+    battery_kwh: '15.36 kWh',
+    solar_kwp: '6.6 kWp',
+    daily_yield: '27.0 – 33.0 kWh/day',
+    inverter_detail: '7.5kW Heavy-Duty Smart Hybrid Inverter with Dual MPPT & Dry Contact ATS',
+    battery_detail: '3× 5.12kWh (15.36kWh total) 48V LiFePO4 Modular Rack Battery System',
+    panels_detail: '12× 550W Monocrystalline Half-Cut Solar Modules (6,600W total)',
+    bos_detail: 'Heavy-Duty Aluminum Railing System, Dual String Protection, Lightning Protection Terminal',
+    supported_loads: [
+      { appliance: '3× 1.5HP or 2× 2.0HP Inverter ACs', runtime: '8 – 12 Hours' },
+      { appliance: '1.5HP Deep Well Water Pump', runtime: 'Scheduled Day Operation' },
+      { appliance: '2× Large Freezers + 2× Refrigerators', runtime: 'Continuous 24/7' },
+      { appliance: 'Full Villa Lighting, CCTV, Electric Fence, Gate Motor', runtime: 'Continuous 24/7' },
+      { appliance: 'Kitchen Appliances (Microwave, Blender, Washing Machine)', runtime: 'As needed' }
+    ],
+    load_exclusions_note: 'Central industrial chillers require 3-phase 15kVA+ systems.',
+    installation_scope: 'Full turnkey structural rooftop assembly, DB rewiring and phase separation, earthing resistivity measurement (<5 ohms), cloud telemetry integration.',
+    warranty_terms: '25-Year Linear Panel Output, 5-Year Inverter Warranty, 10-Year Battery Warranty, 2-Year Complimentary Servicing.',
+    price_effective_date: 'Effective October 2026'
+  },
+  '10kva-executive-residence-solar-package': {
+    system_type: 'Estate-Grade Hybrid Microgrid',
+    intended_audience: 'Luxury Residence, Embassy Residence, or Commercial Facility',
+    power_kw: '10.0 kW',
+    battery_kwh: '20.48 kWh',
+    solar_kwp: '8.8 kWp',
+    daily_yield: '36.0 – 44.0 kWh/day',
+    inverter_detail: '10kW Single/Three-Phase Smart Hybrid Inverter with Generator Synchronization',
+    battery_detail: '4× 5.12kWh (20.48kWh total) Server-Rack LiFePO4 System with Master BMS',
+    panels_detail: '16× 550W Tier-1 Monocrystalline Bifacial Modules (8,800W total)',
+    bos_detail: 'Custom Industrial DC Combiner, Class-I/II Surge Arresters, Double Insulated Solar Cabling',
+    supported_loads: [
+      { appliance: '4× 1.5HP or 3× 2.0HP Inverter ACs', runtime: 'Continuous Day / 10h Night' },
+      { appliance: '2.0HP Submersible Borehole Pump', runtime: 'Daytime Regular' },
+      { appliance: 'Multiple Freezers, Coolers & Refrigerator Banks', runtime: 'Continuous 24/7' },
+      { appliance: 'Entire Estate Security, Perimeter Lighting, Server Room', runtime: 'Continuous 24/7' },
+      { appliance: 'Swimming Pool Circulation Pump (Daytime)', runtime: '4 – 6 Hours' }
+    ],
+    load_exclusions_note: 'Heavy 3-phase machinery (above 15kW start) requires custom commercial engineering.',
+    installation_scope: 'Complete turnkey delivery, certified electrical engineers on-site, structural roof engineering review, thermal imaging of connections, 24/7 remote monitoring setup.',
+    warranty_terms: '25-Year Panel Performance, 5-Year Inverter Warranty, 10-Year Battery Warranty, 24-Month Full Support.',
+    price_effective_date: 'Effective October 2026'
+  },
+  '15kva-commercial-office-solar-package': {
+    system_type: '3-Phase Commercial Microgrid',
+    intended_audience: 'Corporate HQ, Health Centre / Laboratory, or Light Manufacturing',
+    power_kw: '15.0 kW (3-Phase)',
+    battery_kwh: '30.72 kWh',
+    solar_kwp: '13.2 kWp',
+    daily_yield: '54.0 – 66.0 kWh/day',
+    inverter_detail: '15kW 3-Phase 400V Smart Hybrid Inverter with Quad MPPT & Dual ATS generator controls',
+    battery_detail: '6× 5.12kWh (30.72kWh total) Commercial Rack-Mounted LiFePO4 Energy Storage',
+    panels_detail: '24× 550W Tier-1 High-Efficiency Bifacial Solar Panels (13,200W total)',
+    bos_detail: 'Industrial Metal Enclosures, Motorized ATS, Complete Class-I Lightning Dissipation System',
+    supported_loads: [
+      { appliance: '6× 1.5HP or 4× 2.5HP Inverter Air Conditioners', runtime: 'Full Business Hours 8am–6pm' },
+      { appliance: '30+ Workstations, Desktop PCs, Servers & Printers', runtime: 'Continuous Business Hours' },
+      { appliance: 'Medical / Cold-Chain Laboratory Refrigeration', runtime: 'Continuous 24/7' },
+      { appliance: 'Commercial Water Pumping & Treatment System', runtime: 'Automated Day Operation' },
+      { appliance: 'Office Elevators / Booster Pumps (soft-start)', runtime: 'Standard Operation' }
+    ],
+    load_exclusions_note: 'Factory induction furnaces and heavy stamping presses require customized megawatt BESS.',
+    installation_scope: 'Complete commercial installation, 3-phase load rebalancing, industrial cable tray routing, full commissioning documentation, and operator training.',
+    warranty_terms: '25-Year Performance, 5-Year Inverter, 10-Year Battery, 2-Year SLA with quarterly preventative maintenance.',
+    price_effective_date: 'Effective October 2026'
+  }
+};
+
+/**
+ * Get all turnkey solar packages ordered by price
+ */
+function getPackages() {
+  const stmt = db.prepare(`
+    SELECT * FROM products 
+    WHERE category = 'solar-packages' AND published = 1 
+    ORDER BY price_ngn ASC
+  `);
+  const packages = stmt.all();
+  return packages.map(pkg => ({
+    ...pkg,
+    details: PACKAGE_METADATA[pkg.slug] || {}
+  }));
+}
+
+/**
+ * Get single turnkey solar package by slug
+ */
+function getPackageBySlug(slug) {
+  const stmt = db.prepare(`
+    SELECT * FROM products 
+    WHERE category = 'solar-packages' AND slug = ? AND published = 1
+  `);
+  const pkg = stmt.get(slug);
+  if (!pkg) return null;
+  return {
+    ...pkg,
+    details: PACKAGE_METADATA[pkg.slug] || {}
+  };
+}
+
 module.exports = {
   db,
   getProducts,
   getProductBySlug,
-  getProductById
+  getProductById,
+  getPackages,
+  getPackageBySlug
 };
+

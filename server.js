@@ -1,6 +1,6 @@
 const express = require('express');
 const path = require('path');
-const { getProducts, getProductBySlug, getProductById, db } = require('./db/database');
+const { getProducts, getProductBySlug, getProductById, getPackages, getPackageBySlug, db } = require('./db/database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -114,7 +114,54 @@ app.post('/api/quote', (req, res) => {
   });
 });
 
+// API: Turnkey Solar Packages
+app.get('/api/packages', (req, res) => {
+  try {
+    const packages = getPackages();
+    res.json({
+      success: true,
+      count: packages.length,
+      packages
+    });
+  } catch (error) {
+    console.error('[API PACKAGES ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to retrieve packages' });
+  }
+});
+
+app.get('/api/packages/:slug', (req, res) => {
+  try {
+    const pkg = getPackageBySlug(req.params.slug);
+    if (!pkg) {
+      return res.status(404).json({ success: false, error: 'Package not found' });
+    }
+    res.json({
+      success: true,
+      package: pkg
+    });
+  } catch (error) {
+    console.error('[API PACKAGE DETAIL ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to retrieve package detail' });
+  }
+});
+
 // Specific HTML Page Routes
+app.get('/packages', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'packages.html'));
+});
+
+app.get('/packages.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'packages.html'));
+});
+
+app.get('/pricing', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'packages.html'));
+});
+
+app.get('/pricing.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'packages.html'));
+});
+
 app.get('/solutions', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'solutions.html'));
 });
