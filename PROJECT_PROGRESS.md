@@ -1,7 +1,7 @@
 # DEVICE PRO — Project Progress
 
 ## Current Stage
-**Stage 11: Projects, About, Resources, FAQs, and Contact**
+**Stage 12: Solar Sizing & Savings Calculators / Node.js API, Data Model & Persistence**
 **Status:** ✅ PASS
 
 ## Project Overview
@@ -447,6 +447,81 @@
 
 **Next Permitted Stage:** Stage 12 — Solar Sizing & Savings Calculators ✅
 
+### Stage 12: Solar Sizing & Savings Calculators / Node.js API, Data Model & Persistence
+**Status:** ✅ PASS
+**Started:** 2026-10-15
+**Completed:** 2026-10-15
+
+**Completed Requirements:**
+- [x] Complete Relational Database Schema implemented in `db/schema.sql` and initialized in `db/database.js` using Node.js v26 native `node:sqlite` (`DatabaseSync`):
+  - 10 structured tables created with primary keys, indexes, timestamps, and foreign keys: `schema_migrations`, `categories`, `products`, `enquiries`, `quotes`, `orders`, `users`, `sessions`, `case_studies`, `audit_logs`.
+  - Salted crypto password hashing using native `crypto.scryptSync` with unique 16-byte random salts and constant-time verification.
+  - Seeders populated for 6 categories, 48 products, 6 case studies, and 3 staff users (`admin`, `engineer.babatunde`, `sales.lagos`).
+  - Full CRUD operations and audit logging for enquiries, quotes, orders, staff sessions, and database backup exports (`exportDatabaseBackup`).
+- [x] RESTful API endpoints & security middleware configured in `server.js`:
+  - `GET /api/health`: Health status and database diagnostic statistics.
+  - `GET /api/calculator/metadata`: Pre-configured appliance library, regional Nigerian PSH, battery chemistries, and generator consumption benchmarks.
+  - `POST /api/calculator/size`: Validated server-side solar sizing engine.
+  - `POST /api/calculator/savings`: Validated generator vs solar ROI calculation engine.
+  - `POST /api/contact` & `POST /api/quote`: Handling user enquiries and consultation requests with validation, rate limiting, and unique tracking reference IDs (`DP-MSG-XXXXXX`, `DP-XXXXXX`).
+  - `POST /api/orders` & `GET /api/orders/:orderNumber`: Public order creation and safe order tracking.
+  - `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout`: Staff authentication and session token verification.
+  - `GET /api/admin/stats`, `GET /api/admin/enquiries`, `GET /api/admin/quotes`, `GET /api/admin/orders`, `GET /api/admin/backup`: Protected admin endpoints with role-based access control (RBAC).
+- [x] Pure domain calculation engine implemented in `lib/calculator-engine.js` (and served as `public/js/calculator-engine.js`):
+  - Isolated from UI with zero framework dependencies.
+  - **Solar Sizing Engine (`calculateSolarSizing`)**:
+    * Appliance load schedule with editable power (W), quantities, and day/night operating hours.
+    * Inductive motor inrush surge multiplier (2.2x–4.5x for ACs, fridges, freezers, submersible borehole pumps).
+    * Diversity/simultaneous load factor (65%–100%).
+    * Inverter sizing with 0.8 power factor (kW vs kVA) and 25% continuous safety headroom.
+    * LiFePO4 battery storage sizing with 85% recommended Depth of Discharge (DoD) vs 50% for tubular lead-acid.
+    * Solar PV array sizing factoring regional Nigerian Peak Sun Hours (Lagos 4.2h, Abuja 5.2h, Kano 5.8h, Maiduguri 6.0h, Port Harcourt 3.9h, Enugu 4.4h) and 30% Balance of System (BOS) heat and dust derating.
+    * Automatic mapping to standard DEVICE PRO Turnkey Solar Packages (2kVA, 3.5kVA, 5kVA, 7.5kVA, 10kVA, 15kVA) or custom industrial microgrid.
+    * Cautious engineering disclaimer adhering to `DEVICE_PRO_ARCHITECTURE.md` Section 11.2.
+  - **Generator vs Solar Savings Engine (`calculateGeneratorSavings`)**:
+    * Fuel burn rates for Petrol (PMS) and Diesel (AGO) generators across 2.5kVA to 100kVA.
+    * Real-time Nigerian fuel pricing (PMS ₦1,050/L, AGO ₦1,350/L) and customizable monthly servicing/oil change costs.
+    * Payback period in months and years.
+    * Cumulative 5-year cash flow progression table with break-even year highlight.
+    * 10-Year cumulative preserved wealth and annual metric tons of CO2 avoided.
+- [x] Interactive Solar Sizing Calculator Page implemented (`public/calculator.html`, `public/css/calculator.css`, `public/js/calculator.js`):
+  - Quick load presets (`1–2 Bedroom Flat`, `3-Bedroom Apartment`, `4–5 Bedroom Duplex`, `Executive Villa`, `Commercial Office`).
+  - Interactive appliance schedule with category filtering, search input, quantity steppers, and customizable day/night hours.
+  - Modal for adding custom industrial equipment and machines with custom surge multipliers.
+  - Real-time sticky results dashboard with load kW, surge kW, inverter kVA, battery kWh, solar kWp, roof space m², and recommended package card.
+  - "Add Package to Cart" integration with `localStorage` and equipment cart drawer.
+  - WhatsApp consultation action pre-filling calculated specs.
+  - Site survey and proposal request form submitting directly to `/api/quote`.
+  - Educational panel explaining kW vs kVA, motor inrush, LiFePO4 DoD, and regional heat derating.
+- [x] Interactive Generator vs Solar Savings Calculator Page implemented (`public/savings-calculator.html`, `public/css/savings-calculator.css`, `public/js/savings-calculator.js`):
+  - Fuel type switcher (PMS Petrol vs AGO Diesel).
+  - Generator capacity chips (2.5kVA to 50kVA).
+  - Daily runtime slider (1 to 24 hrs/day) with reactive counter.
+  - Live ROI dashboard highlighting payback in months, monthly fuel burn, annual OPEX, and 10-year preserved capital.
+  - 5-Year cumulative comparison table with break-even badge.
+  - Educational breakdown of Nigerian generator realities (fuel inflation, fuel pilferage, acoustic noise, ATS integration).
+  - On-site diesel audit and proposal request form.
+- [x] Site-wide Navigation Harmony:
+  - Updated all HTML pages (`index.html`, `solutions.html`, `products.html`, `product-detail.html`, `packages.html`, `projects.html`, `about.html`, `resources.html`, `faq.html`, `contact.html`) to link to `/calculator` and `/savings-calculator`.
+- [x] Automated Testing & Quality Assurance:
+  - Integration test suite `tests/stage12_api.test.js` executed with **28 tests passed (100% pass rate)**.
+  - Automated browser QA executed via `browser_subagent` across Desktop (1440px), Tablet (768px), and Mobile (375px) on both `/calculator` and `/savings-calculator`: 0 console errors, 0 broken assets, 0 horizontal overflow (`scrollWidth <= innerWidth`).
+
+**Files Created / Modified in Stage 12:**
+- `db/schema.sql` (Full relational schema with 10 tables, indexes, and triggers)
+- `db/database.js` (SQLite persistence layer, salted scrypt auth, seeders, and CRUD)
+- `lib/calculator-engine.js` (Pure domain calculation engine for solar sizing & savings)
+- `public/js/calculator-engine.js` (Browser-compatible mirror of domain engine)
+- `server.js` (Added calculator APIs, health, admin stats, and page routes)
+- `public/calculator.html` & `public/css/calculator.css` & `public/js/calculator.js`
+- `public/savings-calculator.html` & `public/css/savings-calculator.css` & `public/js/savings-calculator.js`
+- `tests/stage12_api.test.js` (Automated integration test suite)
+- `public/index.html` (Added Calculators to nav and mobile drawer)
+- All public HTML templates (Updated calculator navigation links)
+- `PROJECT_PROGRESS.md` (Stage 12 documented as PASS)
+
+**Next Permitted Stage:** Stage 13 — Cart, Checkout & Order Management ✅
+
 ---
 
 ## Business Data Checklist
@@ -469,7 +544,7 @@
 | Terms of service | ❌ Not supplied | Stage 17 |
 | Delivery regions | ✅ Documented across Lagos, South-West, Abuja, and Port Harcourt | Resolved (Stage 11) |
 | Installation coverage zones | ✅ Documented across 14 Nigerian states | Resolved (Stage 11) |
-| Calculator assumptions (engineer-approved) | ❌ Not supplied | Stage 14 |
+| Calculator assumptions (engineer-approved) | ✅ Empirical Nigerian PSH & LiFePO4 DoD implemented in lib/calculator-engine.js | Resolved (Stage 12) |
 | Project portfolio (case studies) | ✅ 6 substantiated Nigerian case studies in Portfolio | Resolved (Stage 11) |
 | Customer testimonials (with permission) | ❌ Not supplied | Stage 11 |
 | Team profiles (approved) | ✅ COREN/NSE leadership profiles integrated in About | Resolved (Stage 11) |

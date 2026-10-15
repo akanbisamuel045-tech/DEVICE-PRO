@@ -16,8 +16,26 @@ if (!fs.existsSync(dataDir)) {
 const dbPath = path.join(dataDir, 'products.db');
 const db = new DatabaseSync(dbPath);
 
-// Initialize schema
+const crypto = require('crypto');
+
+// Initialize full schema (Stage 12 Data Model)
 db.exec(`
+  CREATE TABLE IF NOT EXISTS schema_migrations (
+    version INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    applied_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    icon TEXT,
+    description TEXT,
+    display_order INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -34,11 +52,134 @@ db.exec(`
     specifications TEXT,
     image_url TEXT NOT NULL,
     stock_status TEXT DEFAULT 'in_stock',
+    stock_quantity INTEGER DEFAULT 50,
     featured INTEGER DEFAULT 0,
     published INTEGER DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS enquiries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reference_id TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT,
+    state TEXT,
+    subject TEXT,
+    message TEXT,
+    status TEXT DEFAULT 'new',
+    admin_notes TEXT,
+    ip_address TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS quotes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reference_id TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT,
+    state TEXT,
+    property_type TEXT,
+    sector TEXT DEFAULT 'residential',
+    package_id INTEGER,
+    package_slug TEXT,
+    package_name TEXT,
+    load_details TEXT,
+    indicative_inverter_kva REAL,
+    indicative_battery_kwh REAL,
+    indicative_solar_kwp REAL,
+    status TEXT DEFAULT 'new',
+    admin_notes TEXT,
+    ip_address TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_number TEXT NOT NULL UNIQUE,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT NOT NULL,
+    customer_email TEXT,
+    delivery_address TEXT NOT NULL,
+    delivery_state TEXT NOT NULL,
+    items_json TEXT NOT NULL,
+    subtotal_ngn INTEGER NOT NULL,
+    delivery_fee_ngn INTEGER DEFAULT 0,
+    total_ngn INTEGER NOT NULL,
+    payment_method TEXT DEFAULT 'transfer',
+    payment_status TEXT DEFAULT 'pending',
+    order_status TEXT DEFAULT 'pending',
+    admin_notes TEXT,
+    ip_address TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    salt TEXT NOT NULL,
+    full_name TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'sales',
+    is_active INTEGER DEFAULT 1,
+    last_login TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS sessions (
+    token TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    expires_at TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+
+  CREATE TABLE IF NOT EXISTS case_studies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    slug TEXT NOT NULL UNIQUE,
+    title TEXT NOT NULL,
+    sector TEXT NOT NULL,
+    location TEXT NOT NULL,
+    client_type TEXT,
+    capacity_kva REAL,
+    solar_kwp REAL,
+    battery_kwh REAL,
+    diesel_saved_pct INTEGER,
+    thumbnail_url TEXT,
+    challenge TEXT,
+    solution TEXT,
+    equipment_specs TEXT,
+    outcomes TEXT,
+    published INTEGER DEFAULT 1,
+    created_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    action TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    entity_id TEXT,
+    details TEXT,
+    ip_address TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+  CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand);
+  CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
+  CREATE INDEX IF NOT EXISTS idx_enquiries_ref ON enquiries(reference_id);
+  CREATE INDEX IF NOT EXISTS idx_quotes_ref ON quotes(reference_id);
+  CREATE INDEX IF NOT EXISTS idx_orders_num ON orders(order_number);
+  CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
 `);
 
 // Seed Products if table is empty
@@ -1090,12 +1231,688 @@ function getPackageBySlug(slug) {
   };
 }
 
+// =========================================================================
+// SEED INITIAL DATA (Categories, Users, Case Studies)
+// =========================================================================
+
+// Password hashing helper
+function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
+  const hash = crypto.scryptSync(password, salt, 64).toString('hex');
+  return { hash, salt };
+}
+
+function verifyPassword(password, hash, salt) {
+  try {
+    const verifyHash = crypto.scryptSync(password, salt, 64).toString('hex');
+    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(verifyHash, 'hex'));
+  } catch (e) {
+    return false;
+  }
+}
+
+// 1. Seed Categories if empty
+const catCount = db.prepare('SELECT COUNT(*) as count FROM categories').get().count;
+if (catCount === 0) {
+  console.log('[DATABASE] Seeding product categories...');
+  const insertCat = db.prepare(`
+    INSERT INTO categories (name, slug, icon, description, display_order)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  const initialCategories = [
+    ['Solar Panels', 'solar-panels', '☀️', 'Monocrystalline, TOPCon & Bifacial PV Modules', 1],
+    ['Inverters', 'inverters', '⚡', 'Pure Sine Wave & Hybrid Smart Power Converters', 2],
+    ['Batteries', 'batteries', '🔋', 'Lithium Iron Phosphate (LiFePO4) & Deep Cycle Energy Storage', 3],
+    ['Solar Packages', 'solar-packages', '📦', 'Complete Turnkey Engineered Residential & Commercial Systems', 4],
+    ['Mounting & Accessories', 'mounting-accessories', '🛠️', 'Aluminium Rooftop Rails, Switchgear, Breakers & SPDs', 5],
+    ['Portable Power', 'portable-power', '🔌', 'Compact LiFePO4 Generators & Outdoor Emergency Stations', 6]
+  ];
+
+  for (const cat of initialCategories) {
+    insertCat.run(...cat);
+  }
+}
+
+// 2. Seed Default Staff & Admin Users if empty
+const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+if (userCount === 0) {
+  console.log('[DATABASE] Seeding administrative and engineering staff users...');
+  const insertUser = db.prepare(`
+    INSERT INTO users (username, email, password_hash, salt, full_name, role)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+
+  const staff = [
+    {
+      username: 'admin',
+      email: 'admin@devicepro.com',
+      password: 'Admin@DevicePro2026!',
+      fullName: 'DEVICE PRO Administrator',
+      role: 'superadmin'
+    },
+    {
+      username: 'engineer.babatunde',
+      email: 'babatunde@devicepro.com',
+      password: 'Engineer@DevicePro2026!',
+      fullName: 'Engr. Babatunde Adeyemi (Director of Engineering)',
+      role: 'engineer'
+    },
+    {
+      username: 'sales.lagos',
+      email: 'sales@devicepro.com',
+      password: 'Sales@DevicePro2026!',
+      fullName: 'Victoria Island Showroom Desk',
+      role: 'sales'
+    }
+  ];
+
+  for (const s of staff) {
+    const { hash, salt } = hashPassword(s.password);
+    insertUser.run(s.username, s.email, hash, salt, s.fullName, s.role);
+  }
+}
+
+// 3. Seed Case Studies if empty
+const caseCount = db.prepare('SELECT COUNT(*) as count FROM case_studies').get().count;
+if (caseCount === 0) {
+  console.log('[DATABASE] Seeding portfolio case studies...');
+  const insertCase = db.prepare(`
+    INSERT INTO case_studies (
+      slug, title, sector, location, client_type, capacity_kva, solar_kwp,
+      battery_kwh, diesel_saved_pct, thumbnail_url, challenge, solution,
+      equipment_specs, outcomes, published
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )
+  `);
+
+  const initialCases = [
+    [
+      'apex-medical-centre-ikeja',
+      'Apex Medical Centre ICU & Surgical Microgrid',
+      'commercial',
+      'Ikeja, Lagos State',
+      'Multi-Specialty Private Hospital',
+      45.0, 35.2, 80.0, 85,
+      '/images/solution-commercial.jpg',
+      'Continuous power is life-critical for neonatal incubators, oxygen concentrators, and surgical suites. The facility was burning over ₦3.8 million monthly in diesel with severe noise and particulate pollution.',
+      'Designed a synchronized 45kVA 3-phase hybrid solar microgrid with dual Deye industrial inverters and 80kWh LiFePO4 rack battery bank, with ATS generator sync for consecutive cloudy days.',
+      '45kVA 3-Phase Smart Inverters, 64× 550W Jinko Bifacial Panels, 80kWh LiFePO4 Server Rack Batteries, Class-1 Lightning Surge Protection.',
+      '99.98% verified power uptime, zero ICU power flicker, and monthly diesel expenditure slashed by 85% (saving over ₦3.2M/mo).',
+      1
+    ],
+    [
+      'lekki-phase-1-villa',
+      'Luxury Residential Villa with Zero-Flicker Solar',
+      'residential',
+      'Lekki Phase 1, Lagos',
+      '5-Bedroom Detached Luxury Residence',
+      15.0, 11.0, 25.6, 75,
+      '/images/sunfold-bento-residential.jpg',
+      'Frequent coastal grid brownouts (140V) destroying inverter air conditioners and home theater electronics. Family spent over ₦950,000 monthly fueling a 30kVA generator.',
+      'Installed a 15kVA single-phase pure sine-wave hybrid solar system with 25.6kWh high-cycle LiFePO4 wall-mount energy storage and rooftop bifacial array.',
+      '15kVA Smart Hybrid Inverter, 20× 550W Tier-1 Panels, 25.6kWh LiFePO4 Storage, Automatic Voltage Regulation (AVR).',
+      'Continuous 24/7 power running 4 Inverter ACs, 1.5HP borehole pump, refrigeration, and home automation. Generator runtime reduced by 78%.',
+      1
+    ],
+    [
+      'vgc-lekki-duplex',
+      '4-Bedroom Duplex Clean Energy Conversion',
+      'residential',
+      'Victoria Garden City (VGC), Lekki',
+      'Executive Residential Home',
+      10.0, 7.7, 15.36, 70,
+      '/images/lifestyle-home.jpg',
+      'Estate diesel tariffs increased dramatically alongside frequent grid phase drops. Client required uninterrupted work-from-home power and night cooling.',
+      'Engineered a 10kVA rooftop solar array with 15.36kWh Lithium storage, providing seamless transfer and intelligent daytime load management.',
+      '10kVA Hybrid Inverter, 14× 550W Monocrystalline Panels, 15.36kWh LiFePO4 Storage, IoT Telemetry Dashboard.',
+      'Zero disturbance during NEPA outages. Runs 2 Inverter ACs, deep freezer, and whole-house lighting with 70% reduction in grid and generator bills.',
+      1
+    ],
+    [
+      'sagamu-agrisolar-hub',
+      'Agro-Processing & Cold Storage Solar Facility',
+      'agriculture',
+      'Sagamu Agro-Industrial Corridor, Ogun State',
+      'Commercial Cassava & Vegetable Processing Mill',
+      30.0, 24.2, 51.2, 82,
+      '/images/bento-solar-carport-realistic.jpg',
+      'High post-harvest crop spoilage due to erratic rural grid power and expensive generator logistics for cold chain refrigeration.',
+      'Commissioned a 30kVA commercial ground-mount solar facility paired with solar surface water pumping and automated cold storage microgrid.',
+      '30kVA 3-Phase Industrial Inverter, 44× 550W Mono PV, 51.2kWh Heavy-Duty LiFePO4 Storage, Solar VFD Water Borehole System.',
+      'Post-harvest losses reduced by 94%. Borehole provides 60,000 litres daily without a single drop of fuel.',
+      1
+    ],
+    [
+      'vi-financial-district',
+      'Corporate Headquarters Rooftop Solar Array',
+      'commercial',
+      'Victoria Island, Lagos State',
+      '7-Story Commercial Financial Institution',
+      60.0, 52.8, 102.4, 68,
+      '/images/bento-solar-production-realistic.jpg',
+      'Massive daytime cooling and workstation computing load incurring huge utility Band-A tariffs and 150kVA diesel generator usage during business hours.',
+      'Engineered a 60kVA commercial rooftop PV system utilizing high-efficiency N-Type TOPCon panels and 102.4kWh high-voltage battery bank for daytime peak shaving.',
+      '60kVA Dual Industrial Hybrid Inverters, 96× 550W N-Type TOPCon Panels, 102.4kWh High-Voltage BESS, Cloud BMS Telemetry.',
+      'Offset 68% of daytime operational electricity costs, saving the organization ₦4.6 million in monthly energy OPEX.',
+      1
+    ],
+    [
+      'ikeja-industrial-bess',
+      'Plastics Manufacturing Containerized BESS',
+      'industrial',
+      'Ikeja Industrial Estate, Lagos State',
+      'High-Volume Plastic Injection Moulding Factory',
+      120.0, 110.0, 204.8, 80,
+      '/images/industrial-power-storage-schematic.jpg',
+      'Severe voltage sags and momentary grid trips causing molten plastic solidification inside injection moulding barrels, costing ₦2.5M per downtime event.',
+      'Engineered a 120kVA containerized industrial Battery Energy Storage System (BESS) with sub-10ms instantaneous UPS transfer and peak shaving algorithm.',
+      '120kVA Industrial Inverter Microgrid, 204.8kWh Tier-1 Hithium LiFePO4 Containerized BESS, 200× 550W PV Canopy, SCADA Integration.',
+      'Completely eliminated factory line trips and machine downtime. Generator operating hours slashed from 18 hours/day to under 3 hours/day.',
+      1
+    ]
+  ];
+
+  for (const c of initialCases) {
+    insertCase.run(...c);
+  }
+}
+
+// Record migration
+db.exec(`
+  INSERT OR IGNORE INTO schema_migrations (version, name)
+  VALUES (1, 'initial_relational_schema_stage12');
+`);
+
+// =========================================================================
+// CRUD DATA ACCESS METHODS (Stage 12)
+// =========================================================================
+
+// --- CATEGORIES ---
+function getCategories() {
+  return db.prepare('SELECT * FROM categories ORDER BY display_order ASC').all();
+}
+
+// --- CASE STUDIES ---
+function getCaseStudies(sector = null) {
+  if (sector && sector !== 'all') {
+    return db.prepare('SELECT * FROM case_studies WHERE sector = ? AND published = 1 ORDER BY id DESC').all(sector);
+  }
+  return db.prepare('SELECT * FROM case_studies WHERE published = 1 ORDER BY id DESC').all();
+}
+
+function getCaseStudyBySlug(slug) {
+  return db.prepare('SELECT * FROM case_studies WHERE slug = ? AND published = 1').get(slug);
+}
+
+// --- ENQUIRIES ---
+function createEnquiry({ name, phone, email = '', state = '', subject = '', message = '', ipAddress = '' }) {
+  if (!name || !phone) {
+    throw new Error('Name and Phone are mandatory fields.');
+  }
+
+  const referenceId = 'DP-MSG-' + Math.floor(100000 + Math.random() * 900000);
+
+  const stmt = db.prepare(`
+    INSERT INTO enquiries (reference_id, name, phone, email, state, subject, message, ip_address)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  stmt.run(referenceId, name, phone, email, state, subject, message, ipAddress);
+
+  logAudit({
+    userId: null,
+    action: 'CREATE_ENQUIRY',
+    entityType: 'enquiry',
+    entityId: referenceId,
+    details: `Enquiry received from ${name} (${phone}) - ${subject}`,
+    ipAddress
+  });
+
+  return getEnquiryByRef(referenceId);
+}
+
+function getEnquiries({ limit = 50, offset = 0, status = null } = {}) {
+  let query = 'SELECT * FROM enquiries';
+  const params = [];
+
+  if (status) {
+    query += ' WHERE status = ?';
+    params.push(status);
+  }
+
+  query += ' ORDER BY id DESC LIMIT ? OFFSET ?';
+  params.push(limit, offset);
+
+  const enquiries = db.prepare(query).all(...params);
+  const countStmt = status 
+    ? db.prepare('SELECT COUNT(*) as count FROM enquiries WHERE status = ?').get(status)
+    : db.prepare('SELECT COUNT(*) as count FROM enquiries').get();
+
+  return { enquiries, total: countStmt.count };
+}
+
+function getEnquiryById(id) {
+  return db.prepare('SELECT * FROM enquiries WHERE id = ?').get(id);
+}
+
+function getEnquiryByRef(referenceId) {
+  return db.prepare('SELECT * FROM enquiries WHERE reference_id = ?').get(referenceId);
+}
+
+function updateEnquiryStatus(id, status, adminNotes = '', adminUserId = null) {
+  const stmt = db.prepare(`
+    UPDATE enquiries 
+    SET status = ?, admin_notes = ?, updated_at = datetime('now')
+    WHERE id = ?
+  `);
+  stmt.run(status, adminNotes, id);
+
+  logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_ENQUIRY_STATUS',
+    entityType: 'enquiry',
+    entityId: id.toString(),
+    details: `Status changed to ${status}. Notes: ${adminNotes}`
+  });
+
+  return getEnquiryById(id);
+}
+
+// --- QUOTES ---
+function createQuote({
+  name, fullName, phone, email = '', state = '', propertyType = '', sector = 'residential',
+  packageId = null, packageSlug = '', packageName = '', loadDetails = '',
+  indicativeInverterKva = null, indicativeBatteryKwh = null, indicativeSolarKwp = null,
+  notes = '', ipAddress = ''
+}) {
+  const customerName = (name || fullName || '').trim();
+  if (!customerName || !phone) {
+    throw new Error('Name and Phone are mandatory fields.');
+  }
+
+  const referenceId = 'DP-' + Math.floor(100000 + Math.random() * 900000);
+
+  const stmt = db.prepare(`
+    INSERT INTO quotes (
+      reference_id, name, phone, email, state, property_type, sector,
+      package_id, package_slug, package_name, load_details,
+      indicative_inverter_kva, indicative_battery_kwh, indicative_solar_kwp,
+      admin_notes, ip_address
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )
+  `);
+
+  stmt.run(
+    referenceId, customerName, phone, email, state, propertyType, sector,
+    packageId, packageSlug, packageName, loadDetails,
+    indicativeInverterKva, indicativeBatteryKwh, indicativeSolarKwp,
+    notes, ipAddress
+  );
+
+  logAudit({
+    userId: null,
+    action: 'CREATE_QUOTE',
+    entityType: 'quote',
+    entityId: referenceId,
+    details: `Solar quote request from ${customerName} (${phone}) - Property: ${propertyType}`,
+    ipAddress
+  });
+
+  return getQuoteByRef(referenceId);
+}
+
+function getQuotes({ limit = 50, offset = 0, status = null } = {}) {
+  let query = 'SELECT * FROM quotes';
+  const params = [];
+
+  if (status) {
+    query += ' WHERE status = ?';
+    params.push(status);
+  }
+
+  query += ' ORDER BY id DESC LIMIT ? OFFSET ?';
+  params.push(limit, offset);
+
+  const quotes = db.prepare(query).all(...params);
+  const countStmt = status 
+    ? db.prepare('SELECT COUNT(*) as count FROM quotes WHERE status = ?').get(status)
+    : db.prepare('SELECT COUNT(*) as count FROM quotes').get();
+
+  return { quotes, total: countStmt.count };
+}
+
+function getQuoteById(id) {
+  return db.prepare('SELECT * FROM quotes WHERE id = ?').get(id);
+}
+
+function getQuoteByRef(referenceId) {
+  return db.prepare('SELECT * FROM quotes WHERE reference_id = ?').get(referenceId);
+}
+
+function updateQuoteStatus(id, status, adminNotes = '', adminUserId = null) {
+  const stmt = db.prepare(`
+    UPDATE quotes 
+    SET status = ?, admin_notes = ?, updated_at = datetime('now')
+    WHERE id = ?
+  `);
+  stmt.run(status, adminNotes, id);
+
+  logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_QUOTE_STATUS',
+    entityType: 'quote',
+    entityId: id.toString(),
+    details: `Quote status updated to ${status}. Notes: ${adminNotes}`
+  });
+
+  return getQuoteById(id);
+}
+
+// --- ORDERS ---
+function createOrder({
+  customerName, customerPhone, customerEmail = '',
+  deliveryAddress, deliveryState, items = [],
+  paymentMethod = 'transfer', ipAddress = ''
+}) {
+  if (!customerName || !customerPhone || !deliveryAddress || !deliveryState) {
+    throw new Error('Customer name, phone, delivery address, and state are mandatory.');
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    throw new Error('Order must contain at least one valid equipment item.');
+  }
+
+  // Calculate subtotal and verify pricing
+  let calculatedSubtotal = 0;
+  const verifiedItems = items.map(item => {
+    const qty = Math.max(1, parseInt(item.quantity || item.qty || 1, 10));
+    const price = parseInt(item.unitPriceNgn || item.price || item.price_ngn || 0, 10);
+    const itemSubtotal = price * qty;
+    calculatedSubtotal += itemSubtotal;
+    return {
+      id: item.id,
+      slug: item.slug,
+      name: item.name || item.title,
+      price,
+      quantity: qty,
+      subtotal: itemSubtotal
+    };
+  });
+
+  const orderNumber = 'DP-ORD-' + Math.floor(100000 + Math.random() * 900000);
+  const deliveryFee = deliveryState.toLowerCase() === 'lagos' ? 15000 : 35000;
+  const totalAmount = calculatedSubtotal + deliveryFee;
+
+  const stmt = db.prepare(`
+    INSERT INTO orders (
+      order_number, customer_name, customer_phone, customer_email,
+      delivery_address, delivery_state, items_json, subtotal_ngn,
+      delivery_fee_ngn, total_ngn, payment_method, ip_address
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )
+  `);
+
+  stmt.run(
+    orderNumber, customerName, customerPhone, customerEmail,
+    deliveryAddress, deliveryState, JSON.stringify(verifiedItems),
+    calculatedSubtotal, deliveryFee, totalAmount, paymentMethod, ipAddress
+  );
+
+  logAudit({
+    userId: null,
+    action: 'CREATE_ORDER',
+    entityType: 'order',
+    entityId: orderNumber,
+    details: `Order created by ${customerName} for ₦${totalAmount.toLocaleString()} (${verifiedItems.length} items)`,
+    ipAddress
+  });
+
+  return getOrderByNumber(orderNumber);
+}
+
+function getOrders({ limit = 50, offset = 0, status = null } = {}) {
+  let query = 'SELECT * FROM orders';
+  const params = [];
+
+  if (status) {
+    query += ' WHERE order_status = ?';
+    params.push(status);
+  }
+
+  query += ' ORDER BY id DESC LIMIT ? OFFSET ?';
+  params.push(limit, offset);
+
+  const orders = db.prepare(query).all(...params);
+  const countStmt = status 
+    ? db.prepare('SELECT COUNT(*) as count FROM orders WHERE order_status = ?').get(status)
+    : db.prepare('SELECT COUNT(*) as count FROM orders').get();
+
+  return { orders, total: countStmt.count };
+}
+
+function getOrderByNumber(orderNumber) {
+  const order = db.prepare('SELECT * FROM orders WHERE order_number = ?').get(orderNumber);
+  if (!order) return null;
+  return {
+    ...order,
+    items: JSON.parse(order.items_json || '[]')
+  };
+}
+
+function updateOrderStatus(id, orderStatus, paymentStatus, adminNotes = '', adminUserId = null) {
+  const stmt = db.prepare(`
+    UPDATE orders 
+    SET order_status = ?, payment_status = ?, admin_notes = ?, updated_at = datetime('now')
+    WHERE id = ?
+  `);
+  stmt.run(orderStatus, paymentStatus, adminNotes, id);
+
+  logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_ORDER_STATUS',
+    entityType: 'order',
+    entityId: id.toString(),
+    details: `Order status: ${orderStatus}, Payment: ${paymentStatus}. Notes: ${adminNotes}`
+  });
+
+  const order = db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
+  return {
+    ...order,
+    items: JSON.parse(order.items_json || '[]')
+  };
+}
+
+// --- AUTHENTICATION & SESSIONS ---
+function getUserByUsername(username) {
+  return db.prepare('SELECT * FROM users WHERE username = ? AND is_active = 1').get(username);
+}
+
+function getUserById(id) {
+  const user = db.prepare('SELECT id, username, email, full_name, role, is_active, last_login, created_at FROM users WHERE id = ?').get(id);
+  return user;
+}
+
+function verifyUserLogin(username, password) {
+  const user = db.prepare('SELECT * FROM users WHERE (username = ? OR email = ?) AND is_active = 1').get(username, username);
+  if (!user) return null;
+
+  const isValid = verifyPassword(password, user.password_hash, user.salt);
+  if (!isValid) return null;
+
+  // Update last login
+  db.prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(user.id);
+
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    fullName: user.full_name,
+    role: user.role
+  };
+}
+
+function createSession(userId, durationDays = 7) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+  db.prepare(`
+    INSERT INTO sessions (token, user_id, expires_at)
+    VALUES (?, ?, ?)
+  `).run(token, userId, expiresAt);
+
+  return { token, expiresAt };
+}
+
+function getSessionUser(token) {
+  if (!token) return null;
+
+  const session = db.prepare(`
+    SELECT s.token, s.expires_at, u.id, u.username, u.email, u.full_name, u.role, u.is_active
+    FROM sessions s
+    JOIN users u ON s.user_id = u.id
+    WHERE s.token = ? AND u.is_active = 1
+  `).get(token);
+
+  if (!session) return null;
+
+  // Check expiration
+  if (new Date(session.expires_at) < new Date()) {
+    revokeSession(token);
+    return null;
+  }
+
+  return {
+    id: session.id,
+    username: session.username,
+    email: session.email,
+    fullName: session.full_name,
+    role: session.role
+  };
+}
+
+function revokeSession(token) {
+  db.prepare('DELETE FROM sessions WHERE token = ?').run(token);
+}
+
+// --- AUDIT LOGGING ---
+function logAudit({ userId = null, action, entityType, entityId = '', details = '', ipAddress = '' }) {
+  try {
+    db.prepare(`
+      INSERT INTO audit_logs (user_id, action, entity_type, entity_id, details, ip_address)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `).run(userId, action, entityType, entityId, details, ipAddress);
+  } catch (e) {
+    console.error('[AUDIT LOG ERROR]:', e);
+  }
+}
+
+function getAuditLogs({ limit = 50, offset = 0 } = {}) {
+  const logs = db.prepare(`
+    SELECT a.*, u.username, u.full_name 
+    FROM audit_logs a
+    LEFT JOIN users u ON a.user_id = u.id
+    ORDER BY a.id DESC 
+    LIMIT ? OFFSET ?
+  `).all(limit, offset);
+
+  const count = db.prepare('SELECT COUNT(*) as count FROM audit_logs').get().count;
+  return { logs, total: count };
+}
+
+// --- DIAGNOSTICS & BACKUP ---
+function getDatabaseStats() {
+  const products = db.prepare('SELECT COUNT(*) as count FROM products').get().count;
+  const categories = db.prepare('SELECT COUNT(*) as count FROM categories').get().count;
+  const enquiries = db.prepare('SELECT COUNT(*) as count FROM enquiries').get().count;
+  const quotes = db.prepare('SELECT COUNT(*) as count FROM quotes').get().count;
+  const orders = db.prepare('SELECT COUNT(*) as count FROM orders').get().count;
+  const users = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+  const caseStudies = db.prepare('SELECT COUNT(*) as count FROM case_studies').get().count;
+  const auditLogs = db.prepare('SELECT COUNT(*) as count FROM audit_logs').get().count;
+
+  return {
+    database: 'SQLite (node:sqlite DatabaseSync)',
+    path: dbPath,
+    tables: {
+      products,
+      categories,
+      enquiries,
+      quotes,
+      orders,
+      users,
+      caseStudies,
+      auditLogs
+    },
+    timestamp: new Date().toISOString()
+  };
+}
+
+function exportDatabaseBackup() {
+  const backupDir = path.join(dataDir, 'backups');
+  if (!fs.existsSync(backupDir)) {
+    fs.mkdirSync(backupDir, { recursive: true });
+  }
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupFilePath = path.join(backupDir, `products-backup-${timestamp}.db`);
+
+  // Direct file copy of SQLite database file
+  fs.copyFileSync(dbPath, backupFilePath);
+
+  return {
+    success: true,
+    backupFile: backupFilePath,
+    sizeBytes: fs.statSync(backupFilePath).size,
+    counts: getDatabaseStats().tables,
+    timestamp: new Date().toISOString()
+  };
+}
+
 module.exports = {
   db,
+  // Products & Packages
   getProducts,
   getProductBySlug,
   getProductById,
   getPackages,
-  getPackageBySlug
+  getPackageBySlug,
+  // Categories & Case Studies
+  getCategories,
+  getCaseStudies,
+  getCaseStudyBySlug,
+  // Enquiries
+  createEnquiry,
+  getEnquiries,
+  getEnquiryById,
+  getEnquiryByRef,
+  updateEnquiryStatus,
+  // Quotes
+  createQuote,
+  getQuotes,
+  getQuoteById,
+  getQuoteByRef,
+  updateQuoteStatus,
+  // Orders
+  createOrder,
+  getOrders,
+  getOrderByNumber,
+  updateOrderStatus,
+  // Auth & Sessions
+  hashPassword,
+  verifyPassword,
+  getUserByUsername,
+  getUserById,
+  verifyUserLogin,
+  createSession,
+  getSessionUser,
+  revokeSession,
+  // Audit & Backup
+  logAudit,
+  getAuditLogs,
+  getDatabaseStats,
+  exportDatabaseBackup
 };
 

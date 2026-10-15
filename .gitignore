@@ -10,6 +10,7 @@ yarn-error.log*
 # Database & generated data
 data/*.db
 data/*.sqlite
+data/backups/
 
 # Environment variables
 .env

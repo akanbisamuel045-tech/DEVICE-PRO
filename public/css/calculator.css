@@ -1,0 +1,896 @@
+/* =========================================================================
+   DEVICE PRO — Solar Sizing Calculator Stylesheet
+   Architecture Reference: DEVICE_PRO_ARCHITECTURE.md (Sections 6.8, 11.1, 11.2)
+   ========================================================================= */
+
+/* Calculator Layout & Container */
+.calculator-main {
+  padding-bottom: 5rem;
+  background-color: #F8FAFC;
+}
+
+/* Calculator Hero */
+.calc-hero {
+  position: relative;
+  background: linear-gradient(135deg, #061C35 0%, #0A2544 50%, #103463 100%);
+  color: #FFFFFF;
+  padding: 3.5rem 0 4rem;
+  overflow: hidden;
+}
+
+.calc-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(255, 196, 0, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.calc-hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+}
+
+.calc-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #94A3B8;
+  margin-bottom: 1.25rem;
+}
+
+.calc-breadcrumbs a {
+  color: #CBD5E1;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.calc-breadcrumbs a:hover {
+  color: #FFC400;
+}
+
+.calc-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 196, 0, 0.15);
+  border: 1px solid rgba(255, 196, 0, 0.35);
+  color: #FFC400;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.825rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 1rem;
+}
+
+.calc-hero-title {
+  font-size: clamp(2rem, 3.8vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.calc-hero-title span {
+  color: #FFC400;
+}
+
+.calc-hero-desc {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #CBD5E1;
+  max-width: 850px;
+  margin-bottom: 2rem;
+}
+
+.calc-hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.calc-trust-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0.5rem 0.875rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #F1F5F9;
+  backdrop-filter: blur(8px);
+}
+
+.calc-trust-pill svg {
+  color: #FFC400;
+}
+
+/* Quick Profiles Strip */
+.calc-presets-section {
+  margin-top: -2rem;
+  position: relative;
+  z-index: 5;
+  margin-bottom: 2.5rem;
+}
+
+.calc-presets-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(6, 28, 53, 0.08), 0 8px 10px -6px rgba(6, 28, 53, 0.04);
+  padding: 1.5rem;
+  border: 1px solid #E2E8F0;
+}
+
+.calc-presets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.calc-presets-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #061C35;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calc-presets-desc {
+  font-size: 0.85rem;
+  color: #64748B;
+}
+
+.calc-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.calc-preset-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.875rem 1rem;
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.calc-preset-btn:hover {
+  background: #F0F7FF;
+  border-color: #93C5FD;
+}
+
+.calc-preset-btn.active {
+  background: #EFF6FF;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.preset-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 0.25rem;
+}
+
+.preset-sub {
+  font-size: 0.75rem;
+  color: #64748B;
+}
+
+/* Two-Column App Workspace Layout */
+.calc-workspace-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .calc-workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Parameters Configuration Panel */
+.calc-section-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+  padding: 1.75rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.calc-section-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #061C35;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calc-params-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.calc-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.calc-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1E293B;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calc-select, .calc-input {
+  width: 100%;
+  padding: 0.75rem 0.875rem;
+  background: #F8FAFC;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #0F172A;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calc-select:focus, .calc-input:focus {
+  outline: none;
+  border-color: #061C35;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(6, 28, 53, 0.12);
+}
+
+.calc-field-hint {
+  font-size: 0.75rem;
+  color: #64748B;
+  line-height: 1.4;
+}
+
+/* Appliance Category Filter Pills & Search */
+.appliance-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.appliance-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.app-pill-btn {
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  border-radius: 9999px;
+  padding: 0.4rem 0.875rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.app-pill-btn:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+.app-pill-btn.active {
+  background: #061C35;
+  border-color: #061C35;
+  color: #FFFFFF;
+}
+
+.app-search-wrap {
+  position: relative;
+  min-width: 200px;
+}
+
+.app-search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem 0.5rem 2rem;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.app-search-icon {
+  position: absolute;
+  left: 0.65rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+/* Appliance List Table/Cards */
+.appliances-table-wrap {
+  overflow-x: auto;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  background: #FFFFFF;
+}
+
+.appliances-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.appliances-table th {
+  background: #F8FAFC;
+  color: #475569;
+  font-weight: 700;
+  padding: 0.875rem 1rem;
+  border-bottom: 1.5px solid #E2E8F0;
+  white-space: nowrap;
+}
+
+.appliances-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #F1F5F9;
+  vertical-align: middle;
+}
+
+.appliances-table tr:hover td {
+  background: #F8FAFC;
+}
+
+.app-meta-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.app-title {
+  font-weight: 700;
+  color: #0F172A;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.app-surge-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.app-notes {
+  font-size: 0.75rem;
+  color: #64748B;
+}
+
+/* Wattage edit input */
+.app-watt-input {
+  width: 80px;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #CBD5E1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* Quantity Stepper */
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 8px;
+  background: #FFFFFF;
+  overflow: hidden;
+}
+
+.qty-step-btn {
+  background: #F8FAFC;
+  border: none;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #1E293B;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.qty-step-btn:hover {
+  background: #E2E8F0;
+}
+
+.qty-step-btn:active {
+  background: #CBD5E1;
+}
+
+.qty-number {
+  width: 36px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0F172A;
+}
+
+/* Operating hours slider / input combo */
+.hours-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 130px;
+}
+
+.hours-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.hours-input {
+  width: 48px;
+  padding: 0.2rem 0.4rem;
+  border: 1px solid #CBD5E1;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.app-subtotal-cell {
+  font-weight: 700;
+  color: #061C35;
+  white-space: nowrap;
+}
+
+/* Custom Appliance Trigger */
+.add-custom-wrap {
+  margin-top: 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-add-custom {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #F1F5F9;
+  border: 1.5px dashed #94A3B8;
+  color: #334155;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-add-custom:hover {
+  background: #E2E8F0;
+  border-color: #64748B;
+  color: #0F172A;
+}
+
+/* Sticky Results Summary Sidebar */
+.calc-results-sidebar {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.calc-summary-card {
+  background: #061C35;
+  color: #FFFFFF;
+  border-radius: 20px;
+  padding: 1.75rem;
+  box-shadow: 0 20px 25px -5px rgba(6, 28, 53, 0.2), 0 8px 10px -6px rgba(6, 28, 53, 0.15);
+  border: 1px solid #1E3A5F;
+}
+
+.calc-summary-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.calc-summary-badge {
+  display: inline-block;
+  background: rgba(255, 196, 0, 0.15);
+  color: #FFC400;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.calc-summary-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+/* Core Results Grid */
+.summary-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.875rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-metric-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #94A3B8;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+.metric-val {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.1;
+}
+
+.metric-val.highlight {
+  color: #FFC400;
+}
+
+.metric-sub {
+  font-size: 0.7rem;
+  color: #94A3B8;
+  margin-top: 0.25rem;
+}
+
+/* Matched Package Card in Summary */
+.summary-package-box {
+  background: linear-gradient(135deg, rgba(255, 196, 0, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border: 1.5px solid rgba(255, 196, 0, 0.4);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-pkg-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #FFC400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+}
+
+.summary-pkg-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+}
+
+.summary-pkg-price {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #FFC400;
+  margin-bottom: 0.75rem;
+}
+
+.summary-pkg-ideal {
+  font-size: 0.75rem;
+  color: #CBD5E1;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+}
+
+.summary-actions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.btn-calc-cta {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-calc-primary {
+  background: #FFC400;
+  color: #061C35;
+}
+
+.btn-calc-primary:hover {
+  background: #FFD033;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 196, 0, 0.35);
+}
+
+.btn-calc-secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-calc-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-calc-whatsapp {
+  background: #25D366;
+  color: #FFFFFF;
+}
+
+.btn-calc-whatsapp:hover {
+  background: #20BD5A;
+}
+
+/* Warnings Container */
+.calc-warnings-wrap {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.calc-alert {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.calc-alert-warning {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #FDE68A;
+}
+
+.calc-alert-warning svg {
+  color: #F59E0B;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.calc-disclaimer-note {
+  margin-top: 1.25rem;
+  font-size: 0.7rem;
+  color: #94A3B8;
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+/* Engineering Transparency Accordion & Details */
+.calc-engineering-section {
+  margin-top: 3.5rem;
+}
+
+.engineering-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #E2E8F0;
+  padding: 2.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.engineering-header {
+  margin-bottom: 1.75rem;
+}
+
+.engineering-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #061C35;
+  margin-bottom: 0.5rem;
+}
+
+.engineering-desc {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.engineering-rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.rule-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.rule-box-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: #061C35;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.rule-box-header svg {
+  color: #0284C7;
+}
+
+.rule-box-body {
+  font-size: 0.85rem;
+  color: #64748B;
+  line-height: 1.5;
+}
+
+/* Cross-Link Banner to Savings Calculator */
+.calc-switch-banner {
+  margin-top: 3rem;
+  background: linear-gradient(135deg, #0A2544 0%, #061C35 100%);
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  box-shadow: 0 10px 25px -5px rgba(6, 28, 53, 0.15);
+}
+
+.switch-banner-text {
+  max-width: 650px;
+}
+
+.switch-banner-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+}
+
+.switch-banner-desc {
+  font-size: 0.95rem;
+  color: #CBD5E1;
+  line-height: 1.5;
+}
+
+.btn-switch-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #FFC400;
+  color: #061C35;
+  padding: 0.875rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-switch-cta:hover {
+  background: #FFD033;
+  transform: translateY(-2px);
+}
+
+/* Modal for Custom Appliance */
+.custom-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(6, 28, 53, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.custom-modal-backdrop.open {
+  display: flex;
+}
+
+.custom-modal-dialog {
+  background: #FFFFFF;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.custom-modal-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #061C35;
+  margin-bottom: 1.25rem;
+}
+
+.custom-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .calc-hero {
+    padding: 2.5rem 0 3rem;
+  }
+  .appliances-table th, .appliances-table td {
+    padding: 0.75rem 0.5rem;
+  }
+  .calc-switch-banner {
+    padding: 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
