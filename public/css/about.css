@@ -1,0 +1,839 @@
+/* =========================================================================
+   DEVICE PRO — ABOUT US STYLESHEET (about.css)
+   Engineering-First Aesthetic, Rigour Pillars, Leadership & Regional Hubs
+   ========================================================================= */
+
+.about-page-body {
+  background-color: #F8FAFD;
+  color: #1F2937;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+/* =========================================================================
+   SECTION 3: EDITORIAL HERO BANNER
+   ========================================================================= */
+.about-hero {
+  background: linear-gradient(135deg, #05182C 0%, #0A294A 100%);
+  color: #FFFFFF;
+  padding: 2.5rem 0 4rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-hero::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(255, 196, 0, 0.08) 0%, rgba(5, 24, 44, 0) 70%);
+  pointer-events: none;
+}
+
+.about-hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.p-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 2rem;
+}
+
+.p-breadcrumbs a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.p-breadcrumbs a:hover {
+  color: #FFC400;
+}
+
+.breadcrumb-separator {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.about-hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.about-hero-heading {
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 1rem 0 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.about-hero-lead {
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: #D1D5DB;
+  margin-bottom: 2rem;
+  max-width: 620px;
+}
+
+.about-hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero-image-frame {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.hero-featured-img {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-stat-floating {
+  position: absolute;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  right: 1.25rem;
+  background: rgba(6, 28, 53, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 196, 0, 0.3);
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hero-stat-floating .stat-number {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #FFC400;
+}
+
+.hero-stat-floating .stat-label {
+  font-size: 0.825rem;
+  line-height: 1.35;
+  color: #F3F4F6;
+  font-weight: 500;
+}
+
+/* =========================================================================
+   SECTION 4: METRICS TICKER SECTION
+   ========================================================================= */
+.metrics-ticker-section {
+  background: #FFFFFF;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 2.5rem 0;
+  position: relative;
+  z-index: 3;
+}
+
+.metrics-ticker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.metric-card {
+  text-align: center;
+  padding: 1rem;
+  border-right: 1px solid #E5E7EB;
+}
+
+.metric-card:last-child {
+  border-right: none;
+}
+
+.metric-value {
+  font-size: clamp(1.85rem, 2.5vw, 2.25rem);
+  font-weight: 800;
+  color: #061C35;
+  margin-bottom: 0.25rem;
+  letter-spacing: -0.01em;
+}
+
+.metric-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #D97706;
+  margin-bottom: 0.25rem;
+}
+
+.metric-sub {
+  font-size: 0.8rem;
+  color: #6B7280;
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* =========================================================================
+   SECTION 5: STORY & FOUNDING REALITY
+   ========================================================================= */
+.story-section {
+  padding: 5rem 0;
+  background: #F8FAFD;
+}
+
+.story-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.story-images {
+  position: relative;
+}
+
+.story-img-main img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.story-img-secondary {
+  position: absolute;
+  bottom: -2rem;
+  right: -2rem;
+  width: 55%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.15);
+  border: 4px solid #FFFFFF;
+}
+
+.story-img-secondary img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+.story-text {
+  padding-left: 1rem;
+}
+
+.section-pill {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  background: #EBF3FB;
+  color: #082D50;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 20px;
+  margin-bottom: 0.85rem;
+}
+
+.section-title-dark {
+  font-size: clamp(1.85rem, 3vw, 2.4rem);
+  font-weight: 800;
+  color: #061C35;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+
+.story-paragraph {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #4B5563;
+  margin-bottom: 1.25rem;
+}
+
+.highlight-quote {
+  padding: 1.25rem 1.5rem;
+  background: #EBF3FB;
+  border-left: 4px solid #FFC400;
+  color: #061C35;
+  font-weight: 600;
+  font-style: italic;
+  border-radius: 0 8px 8px 0;
+  margin: 1.75rem 0;
+}
+
+.story-core-pillars {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.pillar-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #374151;
+}
+
+.pillar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #FFC400;
+  color: #061C35;
+  font-weight: 800;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* =========================================================================
+   SECTION 6: 4 PILLARS OF TECHNICAL RIGOUR
+   ========================================================================= */
+.pillars-section {
+  padding: 5rem 0;
+  background: #FFFFFF;
+}
+
+.section-header-center {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 3.5rem;
+}
+
+.section-subtitle {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #6B7280;
+  margin-top: 0.75rem;
+}
+
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.pillar-card {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 2.25rem;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+
+.pillar-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(6, 28, 53, 0.08);
+  border-color: #FFC400;
+}
+
+.pillar-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.pillar-number {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #D1D5DB;
+  font-family: monospace;
+}
+
+.pillar-icon-box {
+  width: 50px;
+  height: 50px;
+  background: #EBF3FB;
+  color: #082D50;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pillar-card-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #061C35;
+  margin-bottom: 0.85rem;
+}
+
+.pillar-card-desc {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #4B5563;
+  margin-bottom: 1.25rem;
+}
+
+.pillar-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pillar-features li {
+  position: relative;
+  padding-left: 1.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.pillar-features li::before {
+  content: "•";
+  position: absolute;
+  left: 0.25rem;
+  color: #FFC400;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* =========================================================================
+   SECTION 7: LEADERSHIP & CERTIFICATIONS
+   ========================================================================= */
+.leadership-section {
+  padding: 5rem 0;
+  background: #F8FAFD;
+}
+
+.leadership-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.leader-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.leader-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.leader-avatar-box {
+  margin-bottom: 1.25rem;
+}
+
+.avatar-initials {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #061C35, #082D50);
+  color: #FFC400;
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #EBF3FB;
+}
+
+.leader-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #061C35;
+  margin-bottom: 0.25rem;
+}
+
+.leader-role {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #D97706;
+  margin-bottom: 0.25rem;
+}
+
+.leader-creds {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #EBF3FB;
+  color: #082D50;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.leader-bio {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: #4B5563;
+  margin: 0;
+}
+
+/* =========================================================================
+   SECTION 8: REGIONAL HUBS & DEPLOYMENT CAPACITY
+   ========================================================================= */
+.locations-section {
+  padding: 5rem 0;
+  background: #FFFFFF;
+}
+
+.locations-card-wrapper {
+  background: linear-gradient(135deg, #061C35 0%, #0A294A 100%);
+  border-radius: 24px;
+  padding: 3.5rem;
+  color: #FFFFFF;
+}
+
+.locations-intro {
+  max-width: 680px;
+  margin-bottom: 3rem;
+}
+
+.section-pill-gold {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  background: rgba(255, 196, 0, 0.15);
+  color: #FFC400;
+  border: 1px solid rgba(255, 196, 0, 0.3);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 20px;
+  margin-bottom: 0.85rem;
+}
+
+.locations-heading-white {
+  font-size: clamp(1.85rem, 3vw, 2.35rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.locations-desc-white {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #D1D5DB;
+}
+
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.loc-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s, border-color 0.25s;
+}
+
+.loc-card:hover {
+  transform: translateY(-4px);
+  border-color: #FFC400;
+}
+
+.loc-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #FFC400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+.loc-city {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+}
+
+.loc-address {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #E5E7EB;
+  margin-bottom: 1.25rem;
+}
+
+.loc-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.825rem;
+  color: #9CA3AF;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+.loc-detail strong {
+  color: #FFFFFF;
+}
+
+/* =========================================================================
+   SECTION 9: BRAND ECOSYSTEM
+   ========================================================================= */
+.brands-ecosystem-section {
+  padding: 5rem 0;
+  background: #F8FAFD;
+}
+
+.ecosystem-brands-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.eco-brand-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.eco-brand-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  border-color: #082D50;
+}
+
+.eco-brand-name {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #061C35;
+  margin-bottom: 0.35rem;
+}
+
+.eco-brand-category {
+  display: block;
+  font-size: 0.85rem;
+  color: #4B5563;
+  margin-bottom: 0.75rem;
+}
+
+.eco-brand-tier {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: #FEF3C7;
+  color: #92400E;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+}
+
+/* =========================================================================
+   SECTION 10: CONSULTATION CTA BANNER
+   ========================================================================= */
+.consultation-banner-section {
+  padding: 5rem 0;
+  background: #FFFFFF;
+}
+
+.consultation-banner-card {
+  background: linear-gradient(135deg, #061C35 0%, #0A294A 100%);
+  border-radius: 20px;
+  padding: 4rem 3rem;
+  text-align: center;
+  color: #FFFFFF;
+  box-shadow: 0 16px 40px rgba(6, 28, 53, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.consultation-banner-content {
+  max-width: 720px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.consultation-banner-heading {
+  font-size: clamp(1.85rem, 3.2vw, 2.5rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 1.25rem 0 1.25rem;
+  line-height: 1.25;
+}
+
+.consultation-banner-desc {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #D1D5DB;
+  margin-bottom: 2.25rem;
+}
+
+.consultation-banner-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn-primary-yellow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFC400;
+  color: #061C35;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(255, 196, 0, 0.3);
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary-yellow:hover {
+  background: #E5B000;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 196, 0, 0.45);
+}
+
+.btn-outline-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 30px;
+  text-decoration: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-outline-white:hover {
+  border-color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* =========================================================================
+   RESPONSIVE DESIGN (TABLET & MOBILE)
+   ========================================================================= */
+@media (max-width: 1024px) {
+  .about-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .metrics-ticker-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .metric-card:nth-child(2) {
+    border-right: none;
+  }
+
+  .metric-card {
+    border-bottom: 1px solid #E5E7EB;
+    padding-bottom: 1.5rem;
+  }
+
+  .story-split-grid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .story-img-secondary {
+    right: 0;
+    bottom: -1.5rem;
+  }
+
+  .pillars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .leadership-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .locations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ecosystem-brands-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .about-hero {
+    padding: 1.5rem 0 3rem;
+  }
+
+  .about-hero-actions {
+    flex-direction: column;
+  }
+
+  .about-hero-actions .btn-primary-yellow,
+  .about-hero-actions .btn-outline-white {
+    width: 100%;
+  }
+
+  .hero-featured-img {
+    height: 260px;
+  }
+
+  .metrics-ticker-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-card {
+    border-right: none;
+  }
+
+  .story-img-secondary {
+    display: none;
+  }
+
+  .locations-card-wrapper {
+    padding: 2rem 1.5rem;
+  }
+
+  .consultation-banner-card {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .ecosystem-brands-grid {
+    grid-template-columns: 1fr;
+  }
+}

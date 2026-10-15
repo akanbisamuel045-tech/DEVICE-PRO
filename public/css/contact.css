@@ -1,0 +1,485 @@
+/* =========================================================================
+   DEVICE PRO — CONTACT & SHOWROOM STYLESHEET (contact.css)
+   Regional Depots, Showroom Hours, Interactive Inquiry Form & SLA
+   ========================================================================= */
+
+.contact-page-body {
+  background-color: #F8FAFD;
+  color: #1F2937;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+/* =========================================================================
+   SECTION 3: CONTACT HERO
+   ========================================================================= */
+.contact-hero {
+  background: linear-gradient(135deg, #05182C 0%, #0A294A 100%);
+  color: #FFFFFF;
+  padding: 2.5rem 0 3.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-hero::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 45vw;
+  height: 45vw;
+  background: radial-gradient(circle, rgba(255, 196, 0, 0.08) 0%, rgba(5, 24, 44, 0) 70%);
+  pointer-events: none;
+}
+
+.contact-hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.contact-hero-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.contact-hero-heading {
+  font-size: clamp(2rem, 3.6vw, 2.85rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 1rem 0 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.contact-hero-lead {
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: #D1D5DB;
+  margin-bottom: 2rem;
+  max-width: 620px;
+}
+
+.hero-hotlines {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.hotline-card {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  padding: 1.25rem;
+  backdrop-filter: blur(8px);
+}
+
+.hotline-title {
+  display: block;
+  font-size: 0.775rem;
+  font-weight: 700;
+  color: #FFC400;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.hotline-val {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  text-decoration: none;
+  margin-bottom: 0.25rem;
+  transition: color 0.2s;
+}
+
+.hotline-val:hover {
+  color: #FFC400;
+}
+
+.hotline-val.whatsapp-green {
+  color: #4ADE80;
+}
+
+.hotline-val.whatsapp-green:hover {
+  color: #22C55E;
+}
+
+.hotline-hours {
+  display: block;
+  font-size: 0.775rem;
+  color: #9CA3AF;
+}
+
+.contact-hero-image-box {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.showroom-photo {
+  width: 100%;
+  height: 380px;
+  object-fit: cover;
+  display: block;
+}
+
+/* =========================================================================
+   SECTION 4: REGIONAL SHOWROOMS
+   ========================================================================= */
+.showrooms-section {
+  padding: 5rem 0;
+  background: #FFFFFF;
+}
+
+.showrooms-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.showroom-card {
+  background: #F9FAFB;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 2.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+
+.showroom-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(6, 28, 53, 0.08);
+  border-color: #082D50;
+}
+
+.showroom-card.primary-hq {
+  border-color: #FFC400;
+  background: #FFFFFF;
+}
+
+.hq-ribbon {
+  display: inline-block;
+  background: #FFC400;
+  color: #061C35;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+  align-self: flex-start;
+}
+
+.hub-tag {
+  display: inline-block;
+  background: #EBF3FB;
+  color: #082D50;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+  align-self: flex-start;
+}
+
+.showroom-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #061C35;
+  margin-bottom: 0.5rem;
+}
+
+.showroom-address {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #4B5563;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.showroom-details {
+  border-top: 1px solid #E5E7EB;
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  font-size: 0.85rem;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.detail-label {
+  font-weight: 700;
+  color: #061C35;
+}
+
+.detail-val {
+  color: #4B5563;
+  line-height: 1.4;
+}
+
+.detail-val a {
+  color: #082D50;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.detail-val a:hover {
+  color: #D97706;
+}
+
+/* =========================================================================
+   SECTION 5: INTERACTIVE CONTACT FORM
+   ========================================================================= */
+.contact-form-section {
+  padding: 5rem 0;
+  background: #F8FAFD;
+}
+
+.contact-form-card {
+  max-width: 860px;
+  margin: 0 auto;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 20px;
+  padding: 3.5rem;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+}
+
+.form-intro {
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 3rem;
+}
+
+.form-main-heading {
+  font-size: clamp(1.85rem, 3vw, 2.35rem);
+  font-weight: 800;
+  color: #061C35;
+  line-height: 1.25;
+  margin: 0.75rem 0 0.85rem;
+}
+
+.form-sub-text {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #6B7280;
+}
+
+.inquiry-grid-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.form-group.full-span {
+  grid-column: span 2;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #061C35;
+}
+
+.form-group label .req {
+  color: #DC2626;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.85rem 1.1rem;
+  border: 1.5px solid #D1D5DB;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #111827;
+  background: #FFFFFF;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #082D50;
+  box-shadow: 0 0 0 3px rgba(8, 45, 80, 0.12);
+}
+
+.form-group.has-error input,
+.form-group.has-error select {
+  border-color: #DC2626;
+}
+
+.form-err-msg {
+  display: none;
+  font-size: 0.8rem;
+  color: #DC2626;
+  font-weight: 500;
+}
+
+.form-group.has-error .form-err-msg {
+  display: block;
+}
+
+.form-actions-row {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.form-actions-row .btn-primary-yellow {
+  align-self: flex-start;
+  font-size: 1.05rem;
+  padding: 1rem 2.25rem;
+}
+
+/* Feedback banner */
+.contact-feedback {
+  padding: 1.25rem 1.5rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.contact-feedback.success {
+  background: #F0FDF4;
+  border: 1px solid #86EFAC;
+  color: #166534;
+}
+
+.contact-feedback.error {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+}
+
+.ref-pill {
+  display: inline-block;
+  background: #15803D;
+  color: #FFFFFF;
+  font-family: monospace;
+  font-weight: 800;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+}
+
+/* =========================================================================
+   SECTION 6: EMERGENCY SLA BANNER
+   ========================================================================= */
+.support-sla-section {
+  padding: 4rem 0 5rem;
+  background: #FFFFFF;
+}
+
+.sla-banner {
+  background: linear-gradient(135deg, #061C35 0%, #0A294A 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  color: #FFFFFF;
+}
+
+.sla-icon {
+  font-size: 3.5rem;
+  flex-shrink: 0;
+}
+
+.sla-content {
+  flex-grow: 1;
+}
+
+.sla-title {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.5rem;
+}
+
+.sla-text {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #D1D5DB;
+  margin: 0;
+}
+
+.sla-action {
+  flex-shrink: 0;
+}
+
+/* =========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================= */
+@media (max-width: 1024px) {
+  .contact-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .showrooms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sla-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+
+  .sla-action {
+    width: 100%;
+  }
+
+  .sla-action .btn-outline-white {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero-hotlines {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-form-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .inquiry-grid-form {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group.full-span {
+    grid-column: span 1;
+  }
+
+  .form-actions-row .btn-primary-yellow {
+    width: 100%;
+    text-align: center;
+  }
+}

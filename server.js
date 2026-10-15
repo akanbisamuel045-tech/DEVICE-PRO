@@ -186,6 +186,61 @@ app.get('/product-detail.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'product-detail.html'));
 });
 
+// API: Contact enquiry submission
+app.post('/api/contact', (req, res) => {
+  const { name, phone, email, subject, message } = req.body;
+  if (!name || !phone) {
+    return res.status(400).json({ error: 'Name and Phone are required.' });
+  }
+  console.log(`[CONTACT INQUIRY RECEIVED] Name: ${name}, Phone: ${phone}, Email: ${email}, Subject: ${subject}`);
+  res.status(201).json({
+    success: true,
+    message: 'Your message has been received. A technical advisor will reach you via WhatsApp or email within 2 business hours.',
+    referenceId: 'DP-MSG-' + Math.floor(100000 + Math.random() * 900000)
+  });
+});
+
+// Specific HTML Page Routes
+app.get('/projects', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'projects.html'));
+});
+
+app.get('/projects.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'projects.html'));
+});
+
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'about.html'));
+});
+
+app.get('/about.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'about.html'));
+});
+
+app.get('/resources', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'resources.html'));
+});
+
+app.get('/resources.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'resources.html'));
+});
+
+app.get('/faq', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'faq.html'));
+});
+
+app.get('/faq.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'faq.html'));
+});
+
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
+
+app.get('/contact.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });

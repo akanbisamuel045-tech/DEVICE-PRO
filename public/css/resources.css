@@ -1,0 +1,499 @@
+/* =========================================================================
+   DEVICE PRO — RESOURCES & KNOWLEDGE BASE STYLESHEET (resources.css)
+   Technical Guides, TCO Comparison Matrix, and Reader Modal
+   ========================================================================= */
+
+.resources-page-body {
+  background-color: #F8FAFD;
+  color: #1F2937;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+/* =========================================================================
+   SECTION 3: HERO BANNER
+   ========================================================================= */
+.resources-hero {
+  background: linear-gradient(135deg, #05182C 0%, #0A294A 100%);
+  color: #FFFFFF;
+  padding: 2.5rem 0 3.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.resources-hero::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 45vw;
+  height: 45vw;
+  background: radial-gradient(circle, rgba(255, 196, 0, 0.08) 0%, rgba(5, 24, 44, 0) 70%);
+  pointer-events: none;
+}
+
+.resources-hero-inner {
+  position: relative;
+  z-index: 2;
+}
+
+.resources-hero-heading {
+  font-size: clamp(2rem, 3.6vw, 2.85rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: #FFFFFF;
+  margin: 1rem 0 1.25rem;
+  letter-spacing: -0.02em;
+  max-width: 820px;
+}
+
+.resources-hero-lead {
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: #D1D5DB;
+  margin-bottom: 2rem;
+  max-width: 740px;
+}
+
+.resources-quick-metrics {
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 1.5rem;
+}
+
+.quick-metric .qm-val {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #FFC400;
+}
+
+.quick-metric .qm-lbl {
+  font-size: 0.8rem;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* =========================================================================
+   SECTION 4: FILTER STRIP
+   ========================================================================= */
+.guides-filter-section {
+  background: #FFFFFF;
+  border-bottom: 1px solid #E5E7EB;
+  padding: 1.25rem 0;
+  position: sticky;
+  top: 72px;
+  z-index: 20;
+}
+
+.filter-strip {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.25rem 0;
+}
+
+.filter-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-pill {
+  padding: 0.55rem 1.2rem;
+  background: #F3F4F6;
+  color: #4B5563;
+  border: 1px solid transparent;
+  border-radius: 30px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.filter-pill:hover {
+  background: #EBF3FB;
+  color: #082D50;
+}
+
+.filter-pill.active {
+  background: #FFC400;
+  color: #061C35;
+  border-color: #E5B000;
+  font-weight: 700;
+}
+
+/* =========================================================================
+   SECTION 5: GUIDES CATALOG GRID
+   ========================================================================= */
+.guides-catalog-section {
+  padding: 4rem 0;
+  background: #F8FAFD;
+}
+
+.guides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 2rem;
+}
+
+.guide-card {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+}
+
+.guide-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(6, 28, 53, 0.08);
+  border-color: #FFC400;
+}
+
+.guide-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.guide-category-tag {
+  display: inline-block;
+  padding: 0.25rem 0.65rem;
+  background: #EBF3FB;
+  color: #082D50;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.guide-read-time {
+  font-size: 0.8rem;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.guide-card-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #061C35;
+  line-height: 1.35;
+  margin-bottom: 0.85rem;
+  letter-spacing: -0.01em;
+}
+
+.guide-card-excerpt {
+  font-size: 0.925rem;
+  line-height: 1.55;
+  color: #4B5563;
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.guide-takeaways-box {
+  background: #F9FAFB;
+  border-left: 3px solid #082D50;
+  padding: 0.85rem 1rem;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 1.5rem;
+}
+
+.guide-takeaways-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #082D50;
+  margin-bottom: 0.35rem;
+  letter-spacing: 0.04em;
+}
+
+.guide-takeaways-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.825rem;
+  line-height: 1.4;
+  color: #374151;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.guide-takeaways-list li::before {
+  content: "→ ";
+  color: #FFC400;
+  font-weight: 800;
+}
+
+.guide-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #F3F4F6;
+  padding-top: 1.25rem;
+}
+
+.guide-author {
+  font-size: 0.825rem;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.btn-read-guide {
+  background: transparent;
+  color: #082D50;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: color 0.2s, gap 0.2s;
+  padding: 0;
+}
+
+.btn-read-guide:hover {
+  color: #D97706;
+  gap: 0.55rem;
+}
+
+/* =========================================================================
+   SECTION 6: TCO COMPARISON MATRIX
+   ========================================================================= */
+.tco-comparison-section {
+  padding: 5rem 0;
+  background: #FFFFFF;
+}
+
+.tco-table-wrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+.tco-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.95rem;
+  min-width: 680px;
+}
+
+.tco-table th {
+  padding: 1.25rem 1.5rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: #061C35;
+  color: #FFFFFF;
+}
+
+.tco-table th.th-lead {
+  background: #1F2937;
+  color: #F3F4F6;
+}
+
+.tco-table th.th-lithium {
+  background: #082D50;
+  color: #FFC400;
+  border-bottom: 3px solid #FFC400;
+}
+
+.tco-table td {
+  padding: 1.15rem 1.5rem;
+  border-bottom: 1px solid #E5E7EB;
+  color: #4B5563;
+  line-height: 1.45;
+}
+
+.tco-table tr:last-child td {
+  border-bottom: none;
+}
+
+.tco-table .metric-name {
+  font-weight: 700;
+  color: #061C35;
+  background: #F9FAFB;
+  width: 28%;
+}
+
+.tco-table .td-highlight {
+  background: #F0FDF4;
+  color: #166534;
+  font-weight: 600;
+}
+
+.tco-table .td-winner {
+  background: #DCFCE7;
+  color: #14532D;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.tco-table .td-loss {
+  background: #FEF2F2;
+  color: #991B1B;
+  font-weight: 700;
+}
+
+/* =========================================================================
+   ARTICLE READER MODAL
+   ========================================================================= */
+.guide-modal {
+  width: 90%;
+  max-width: 800px;
+  border: none;
+  border-radius: 20px;
+  padding: 0;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background: #FFFFFF;
+}
+
+.guide-modal::backdrop {
+  background: rgba(6, 28, 53, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.guide-modal-content {
+  padding: 2.5rem;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.guide-modal-tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #FFC400;
+  color: #061C35;
+  font-size: 0.8rem;
+  font-weight: 800;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.guide-modal-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #061C35;
+  margin: 1rem 0 0.5rem;
+  line-height: 1.25;
+}
+
+.guide-modal-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: #6B7280;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.guide-modal-text {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #374151;
+}
+
+.guide-modal-text h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #061C35;
+  margin: 1.75rem 0 0.75rem;
+}
+
+.guide-modal-text p {
+  margin-bottom: 1rem;
+}
+
+.guide-modal-text ul {
+  margin: 0.75rem 0 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.guide-modal-text blockquote {
+  background: #F4F8FC;
+  border-left: 4px solid #082D50;
+  padding: 1rem 1.25rem;
+  font-style: italic;
+  color: #082D50;
+  margin: 1.5rem 0;
+  border-radius: 0 8px 8px 0;
+}
+
+.guide-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #E5E7EB;
+  flex-wrap: wrap;
+}
+
+.btn-outline-dark {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 1px solid #9CA3AF;
+  border-radius: 25px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-outline-dark:hover {
+  background: #F3F4F6;
+  border-color: #4B5563;
+}
+
+/* =========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================= */
+@media (max-width: 768px) {
+  .guides-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .resources-quick-metrics {
+    gap: 1.5rem;
+  }
+
+  .guide-modal-content {
+    padding: 1.5rem;
+  }
+
+  .guide-modal-title {
+    font-size: 1.45rem;
+  }
+
+  .guide-modal-footer {
+    flex-direction: column;
+  }
+
+  .guide-modal-footer .btn-primary-yellow,
+  .guide-modal-footer .btn-outline-dark {
+    width: 100%;
+    text-align: center;
+  }
+}
