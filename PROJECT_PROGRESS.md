@@ -1,7 +1,7 @@
 # DEVICE PRO — Project Progress
 
 ## Current Stage
-**Stage 15: Payment Gateway Integration & Transaction Verification**
+**Stage 17: Security, SEO, Accessibility, Performance & Full Regression**
 **Status:** ✅ PASS
 
 ## Project Overview
@@ -748,7 +748,56 @@
 - `tests/stage16_delivery_support.test.js` (14 automated tests for Stage 16)
 - `PROJECT_PROGRESS.md` (Stage 16 documented as PASS)
 
-**Next Permitted Stage:** Stage 17 — Performance Optimization, SEO & Production Readiness
+### Stage 17: Security, SEO, Accessibility, Performance & Full Regression
+**Status:** ✅ PASS
+**Started:** 2026-10-16
+**Completed:** 2026-10-16
+
+**Completed Requirements:**
+- [x] **SEO & Discoverability**:
+  - Implemented dynamic XML sitemap generator (`/sitemap.xml`) with exactly 75 URLs (15 static routes, 48 products, 6 turnkey packages, 6 case studies) with valid `lastmod`, `priority`, and `changefreq`.
+  - Created standard `public/robots.txt` with public crawl allowances and protected admin/checkout disallow rules.
+  - Injected Schema.org JSON-LD structured data: Organization, LocalBusiness, and WebSite (with SearchAction) on `index.html`; FAQPage on `faq.html`.
+- [x] **Legal & Regulatory Compliance Pages**:
+  - `public/privacy-policy.html`: Complete NDPR & NDPA 2023 compliance, DPO contact desk (`dpo@devicepro.ng`), logistics delivery tracking privacy, and explicit Zero Raw Card Storage guarantee.
+  - `public/terms.html`: Commercial solar hardware sales, Naira pricing validity (7-day FX window), COREN registered engineering supervision, NEMSA safety compliance, Tier-1 manufacturer warranties (25-yr panel, 10-yr battery, 5-yr inverter), and 24–48h rapid swap SLA.
+  - `public/shipping-policy.html`: Regional freight fulfillment hubs (Lagos Central, Abuja Northern, Port Harcourt South), transit lead times (Lagos 24–48h, Abuja/PH 3–5d), waybill tracking, and heavy equipment offloading safety protocols.
+  - Updated all site footers across all HTML pages to link directly to `/privacy-policy`, `/terms`, `/shipping-policy`.
+- [x] **Accessibility (WCAG 2.2 AA)**:
+  - Added accessible skip link (`.skip-to-content`) in `components.css` and all customer-facing HTML templates.
+  - Implemented brand solar yellow `:focus-visible` focus ring for accessible keyboard navigation.
+  - Added `.sr-only` accessibility utility and `@media (prefers-reduced-motion: reduce)` motion safety overrides.
+- [x] **Performance & Security Hardening**:
+  - Express `compression` (gzip) installed and active on all HTTP text/JSON responses.
+  - Static asset caching (`Cache-Control: public, max-age=86400`) on CSS, JS, fonts, and images.
+  - Modern security headers: HSTS (`max-age=31536000; includeSubDomains`), Content-Security-Policy (CSP), `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy`.
+  - Database health check (`PRAGMA integrity_check`) verified as clean ("ok") and automated backup verification confirmed.
+- [x] **Automated Regression**:
+  - Created `tests/stage17_security_seo_perf.test.js` (24/24 tests passed).
+  - Executed full regression suite across Stages 12 through 17:
+    - Stage 12 API: 28/28 PASSED
+    - Stage 13 Cart & Admin: 25/25 PASSED
+    - Stage 14 Search & UX: 29/29 PASSED
+    - Stage 15 Payment Gateway: 13/13 PASSED
+    - Stage 16 Delivery & Support: 14/14 PASSED
+    - Stage 17 Security, SEO & Perf: 24/24 PASSED
+    - **Total: 133 automated integration tests passed with 0 failures (100% pass rate)**.
+- [x] **Browser QA Walkthrough**:
+  - Verified `/robots.txt`, `/sitemap.xml`, `/privacy-policy`, `/terms`, `/shipping-policy`, and Tab key focus state.
+
+**Files Created / Modified in Stage 17:**
+- `public/privacy-policy.html` (NDPR & NDPA 2023 Privacy Policy)
+- `public/terms.html` (Commercial Terms of Service & Warranty Standards)
+- `public/shipping-policy.html` (Regional Freight & Offloading Policy)
+- `public/css/policy.css` (Styles for legal/policy documentation)
+- `public/css/components.css` (Added WCAG 2.2 AA skip links, :focus-visible, and reduced-motion)
+- `public/robots.txt` (Search crawler directives)
+- `public/sitemap.xml` (Static XML sitemap fallback)
+- `server.js` (Added compression, security headers, dynamic sitemap generator, policy routes)
+- `tests/stage17_security_seo_perf.test.js` (24 automated tests for Stage 17)
+- `PROJECT_PROGRESS.md` (Stage 17 documented as PASS)
+
+**Next Permitted Stage:** Stage 18 — Final Pre-Launch Audit, Deployment Readiness & Production Handoff
 
 ---
 
@@ -766,11 +815,11 @@
 | Business email | ✅ Verified info@devicepro.com deployed across all pages | Resolved |
 | Physical address(es) | ✅ Lagos HQ (Victoria Island), Abuja (CBD), Port Harcourt (Trans-Amadi) | Resolved (Stage 11) |
 | WhatsApp number | ✅ Configured direct WhatsApp link +234 803 123 4567 | Resolved (Stage 11) |
-| Warranty policy | ✅ Documented in Product Detail, Packages, About & FAQs | Resolved (Stage 11) |
-| Returns policy | ❌ Not supplied | Stage 17 |
-| Privacy policy | ❌ Not supplied | Stage 17 |
-| Terms of service | ❌ Not supplied | Stage 17 |
-| Delivery regions | ✅ Documented across Lagos, South-West, Abuja, and Port Harcourt | Resolved (Stage 11) |
+| Warranty policy | ✅ Documented in Terms of Service, Packages, About & FAQs | Resolved (Stage 17) |
+| Returns policy | ✅ Documented in Terms of Service & Shipping Policy | Resolved (Stage 17) |
+| Privacy policy | ✅ Full NDPR & NDPA 2023 Policy in `privacy-policy.html` | Resolved (Stage 17) |
+| Terms of service | ✅ Commercial EPC & Hardware Terms in `terms.html` | Resolved (Stage 17) |
+| Delivery regions | ✅ Documented in `shipping-policy.html` across Lagos, Abuja, PH, and nationwide | Resolved (Stage 17) |
 | Installation coverage zones | ✅ Documented across 14 Nigerian states | Resolved (Stage 11) |
 | Calculator assumptions (engineer-approved) | ✅ Empirical Nigerian PSH & LiFePO4 DoD implemented in lib/calculator-engine.js | Resolved (Stage 12) |
 | Project portfolio (case studies) | ✅ 6 substantiated Nigerian case studies in Portfolio | Resolved (Stage 11) |

@@ -18,6 +18,7 @@
   "author": "DEVICE PRO",
   "license": "ISC",
   "dependencies": {
+    "compression": "^1.8.2",
     "express": "^4.21.2"
   }
 }

@@ -1,0 +1,297 @@
+/* =============================================================================
+   DEVICE PRO Nigeria — Legal & Policy Pages Stylesheet
+   (Privacy Policy, Terms of Service, Shipping & Delivery Policy)
+   ============================================================================= */
+
+.policy-page-body {
+  background-color: var(--color-ink-000, #0A121F);
+  color: var(--color-d-text, #EEF1F8);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.65;
+  margin: 0;
+  padding: 0;
+}
+
+/* Page Hero Banner */
+.policy-hero {
+  background: radial-gradient(circle at 75% 20%, rgba(255, 185, 12, 0.08) 0%, transparent 60%),
+              linear-gradient(180deg, var(--color-ink-100, #0B132B) 0%, var(--color-ink-000, #0A121F) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: clamp(3rem, 6vw, 5rem) 0 clamp(2rem, 4vw, 3.5rem);
+  position: relative;
+  overflow: hidden;
+}
+
+.policy-hero-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 3vw, 2.5rem);
+}
+
+.policy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 185, 12, 0.12);
+  color: var(--color-brand-yellow, #FFB90C);
+  border: 1px solid rgba(255, 185, 12, 0.35);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  margin-bottom: 1.25rem;
+}
+
+.policy-title {
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.15;
+  margin: 0 0 1rem;
+  letter-spacing: -0.02em;
+}
+
+.policy-subtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: var(--color-d-text-muted, rgba(238, 241, 248, 0.72));
+  max-width: 800px;
+  margin: 0 0 1.5rem;
+}
+
+.policy-meta-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--color-d-text-subtle, rgba(238, 241, 248, 0.55));
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 1.25rem;
+}
+
+.policy-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Two-column layout */
+.policy-main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 5vw, 4rem) clamp(1rem, 3vw, 2.5rem);
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .policy-main-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar navigation */
+.policy-sidebar {
+  position: sticky;
+  top: 100px;
+  background: rgba(16, 27, 46, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(12px);
+}
+
+.policy-sidebar-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.policy-nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.policy-nav-link {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--color-d-text-muted, rgba(238, 241, 248, 0.72));
+  text-decoration: none;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  line-height: 1.4;
+}
+
+.policy-nav-link:hover,
+.policy-nav-link.active {
+  color: var(--color-brand-yellow, #FFB90C);
+  background: rgba(255, 185, 12, 0.08);
+  transform: translateX(3px);
+}
+
+/* Content Area */
+.policy-content {
+  color: var(--color-d-text, #EEF1F8);
+  font-size: 1rem;
+}
+
+.policy-section {
+  margin-bottom: 3.5rem;
+  scroll-margin-top: 120px;
+}
+
+.policy-section h2 {
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.policy-section h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--color-brand-yellow, #FFB90C);
+  margin: 1.75rem 0 0.75rem;
+}
+
+.policy-section p {
+  color: var(--color-d-text-muted, rgba(238, 241, 248, 0.85));
+  margin: 0 0 1rem;
+  line-height: 1.7;
+}
+
+.policy-section ul,
+.policy-section ol {
+  margin: 0 0 1.5rem 1.25rem;
+  padding: 0;
+  color: var(--color-d-text-muted, rgba(238, 241, 248, 0.85));
+}
+
+.policy-section li {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+
+.policy-section strong {
+  color: #FFFFFF;
+}
+
+/* Callout Card */
+.policy-callout {
+  background: linear-gradient(135deg, rgba(16, 27, 46, 0.9) 0%, rgba(11, 19, 43, 0.9) 100%);
+  border: 1px solid rgba(255, 185, 12, 0.3);
+  border-left: 4px solid var(--color-brand-yellow, #FFB90C);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.75rem 0;
+}
+
+.policy-callout.callout-success {
+  border-color: rgba(50, 183, 104, 0.3);
+  border-left-color: #32B768;
+}
+
+.policy-callout-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin: 0 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.policy-callout p {
+  margin: 0;
+  font-size: 0.925rem;
+}
+
+/* Table styling */
+.policy-table-wrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.policy-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.925rem;
+}
+
+.policy-table th {
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+  font-weight: 600;
+  padding: 0.9rem 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.policy-table td {
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--color-d-text-muted, rgba(238, 241, 248, 0.8));
+}
+
+.policy-table tr:last-child td {
+  border-bottom: none;
+}
+
+.policy-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Highlight badge */
+.tier-tag {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.tier-tag-gold {
+  background: rgba(255, 185, 12, 0.15);
+  color: #FFB90C;
+}
+
+.tier-tag-green {
+  background: rgba(50, 183, 104, 0.15);
+  color: #32B768;
+}
+
+/* Contact box */
+.policy-contact-box {
+  background: rgba(16, 27, 46, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.75rem;
+  margin-top: 2rem;
+}
+
+.policy-contact-box h3 {
+  color: #FFFFFF;
+  margin-top: 0;
+}

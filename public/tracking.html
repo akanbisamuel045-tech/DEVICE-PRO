@@ -12,12 +12,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/tokens.css?v=12">
+  <link rel="stylesheet" href="/css/components.css?v=17">
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="stylesheet" href="/css/search.css">
   <link rel="stylesheet" href="/css/tracking.css">
 </head>
 <body>
+
+  <!-- Accessible Skip Link (WCAG 2.2 AA) -->
+  <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
   <!-- Top Announcement / Hotline Bar -->
   <aside class="top-info-bar" role="complementary" aria-label="Customer Hotline and Location Bar">
@@ -77,7 +81,7 @@
   </header>
 
   <!-- Page Content -->
-  <main class="tracking-page-wrapper">
+  <main id="main-content" class="tracking-page-wrapper">
     <div class="tracking-container">
       
       <!-- Operations Hero Banner -->
@@ -805,11 +809,11 @@
           </span>
         </div>
         <div class="footer-policy-links">
-          <a href="/faq">Privacy Policy</a>
+          <a href="/privacy-policy">Privacy Policy</a>
           <span class="policy-sep">|</span>
-          <a href="/faq">Terms of Service</a>
+          <a href="/terms">Terms of Service</a>
           <span class="policy-sep">|</span>
-          <a href="/about#warranty">Warranty Policy</a>
+          <a href="/shipping-policy">Shipping Policy</a>
           <span class="policy-sep">|</span>
           <a href="/contact">Support</a>
         </div>

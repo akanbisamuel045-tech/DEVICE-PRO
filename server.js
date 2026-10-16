@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
+const compression = require('compression');
 const {
   getProducts, getProductBySlug, getProductById, updateProduct, createProduct, deleteProduct,
   getPackages, getPackageBySlug,
@@ -37,6 +39,9 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Enable gzip/deflate compression for all HTTP responses (Stage 17 Performance)
+app.use(compression());
+
 // Middleware for parsing JSON with raw body capture for webhook signature verification
 app.use(express.json({
   verify: (req, res, buf) => {
@@ -45,18 +50,33 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: true }));
 
-// Security & caching headers
+// Comprehensive Security Headers (Stage 17 Hardening)
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.paystack.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api.paystack.co; frame-src https://checkout.paystack.com;"
+  );
   next();
 });
 
-// Serve static assets from public directory without aggressive caching
+// Serve static assets from public directory with optimized caching for static files
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: 0,
-  etag: false
+  etag: true,
+  setHeaders: (res, filePath) => {
+    // Cache static images, fonts, and scripts for 24h
+    if (/\.(jpg|jpeg|png|gif|svg|webp|ico|css|js|woff|woff2)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+    } else {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
 }));
 
 // =========================================================================
@@ -1525,6 +1545,116 @@ app.delete('/api/admin/products/:id', requireAuth, (req, res) => {
 });
 
 // =========================================================================
+// SEO & DYNAMIC SITEMAP GENERATION (Stage 17)
+// =========================================================================
+function generateSitemapXml() {
+  const baseUrl = 'https://devicepro.ng';
+  const today = new Date().toISOString().split('T')[0];
+
+  const staticRoutes = [
+    { loc: '/', priority: '1.0', changefreq: 'daily' },
+    { loc: '/solutions', priority: '0.9', changefreq: 'weekly' },
+    { loc: '/products', priority: '0.9', changefreq: 'daily' },
+    { loc: '/packages', priority: '0.9', changefreq: 'weekly' },
+    { loc: '/projects', priority: '0.8', changefreq: 'weekly' },
+    { loc: '/calculator', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/savings-calculator', priority: '0.8', changefreq: 'monthly' },
+    { loc: '/about', priority: '0.7', changefreq: 'monthly' },
+    { loc: '/resources', priority: '0.7', changefreq: 'weekly' },
+    { loc: '/faq', priority: '0.7', changefreq: 'monthly' },
+    { loc: '/contact', priority: '0.7', changefreq: 'monthly' },
+    { loc: '/tracking', priority: '0.6', changefreq: 'monthly' },
+    { loc: '/privacy-policy', priority: '0.5', changefreq: 'monthly' },
+    { loc: '/terms', priority: '0.5', changefreq: 'monthly' },
+    { loc: '/shipping-policy', priority: '0.5', changefreq: 'monthly' }
+  ];
+
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"\n';
+  xml += '        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n';
+  xml += '        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">\n';
+
+  // 15 Static Routes
+  for (const route of staticRoutes) {
+    xml += '  <url>\n';
+    xml += `    <loc>${baseUrl}${route.loc}</loc>\n`;
+    xml += `    <lastmod>${today}</lastmod>\n`;
+    xml += `    <changefreq>${route.changefreq}</changefreq>\n`;
+    xml += `    <priority>${route.priority}</priority>\n`;
+    xml += '  </url>\n';
+  }
+
+  // 48 Dynamic Products
+  try {
+    const { products } = getProducts({ limit: 100 });
+    for (const prod of products) {
+      const lastmod = prod.updated_at ? prod.updated_at.split(' ')[0] : today;
+      xml += '  <url>\n';
+      xml += `    <loc>${baseUrl}/products/${encodeURIComponent(prod.slug)}</loc>\n`;
+      xml += `    <lastmod>${lastmod}</lastmod>\n`;
+      xml += '    <changefreq>weekly</changefreq>\n';
+      xml += '    <priority>0.8</priority>\n';
+      xml += '  </url>\n';
+    }
+  } catch (err) {
+    console.error('Error fetching products for sitemap:', err);
+  }
+
+  // 6 Dynamic Turnkey Packages
+  try {
+    const packages = getPackages();
+    for (const pkg of packages) {
+      const lastmod = pkg.updated_at ? pkg.updated_at.split(' ')[0] : today;
+      xml += '  <url>\n';
+      xml += `    <loc>${baseUrl}/packages/${encodeURIComponent(pkg.slug)}</loc>\n`;
+      xml += `    <lastmod>${lastmod}</lastmod>\n`;
+      xml += '    <changefreq>weekly</changefreq>\n';
+      xml += '    <priority>0.85</priority>\n';
+      xml += '  </url>\n';
+    }
+  } catch (err) {
+    console.error('Error fetching packages for sitemap:', err);
+  }
+
+  // 6 Dynamic Case Studies
+  try {
+    const caseStudies = getCaseStudies();
+    for (const cs of caseStudies) {
+      xml += '  <url>\n';
+      xml += `    <loc>${baseUrl}/projects/${encodeURIComponent(cs.slug)}</loc>\n`;
+      xml += `    <lastmod>${today}</lastmod>\n`;
+      xml += '    <changefreq>monthly</changefreq>\n';
+      xml += '    <priority>0.75</priority>\n';
+      xml += '  </url>\n';
+    }
+  } catch (err) {
+    console.error('Error fetching case studies for sitemap:', err);
+  }
+
+  xml += '</urlset>\n';
+  return xml;
+}
+
+// Generate and write static public/sitemap.xml on startup
+try {
+  const initialSitemap = generateSitemapXml();
+  fs.writeFileSync(path.join(__dirname, 'public', 'sitemap.xml'), initialSitemap, 'utf8');
+} catch (e) {
+  console.warn('Initial sitemap generation warning:', e.message);
+}
+
+// Sitemap endpoint
+app.get('/sitemap.xml', (req, res) => {
+  try {
+    const xml = generateSitemapXml();
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+    res.send(xml);
+  } catch (err) {
+    res.status(500).send('Error generating sitemap');
+  }
+});
+
+// =========================================================================
 // STATIC HTML PAGE ROUTES
 // =========================================================================
 app.get(['/checkout', '/checkout.html'], (req, res) => {
@@ -1555,6 +1685,10 @@ app.get(['/packages', '/packages.html', '/pricing', '/pricing.html'], (req, res)
   res.sendFile(path.join(__dirname, 'public', 'packages.html'));
 });
 
+app.get(['/packages/:slug'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'packages.html'));
+});
+
 app.get(['/solutions', '/solutions.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'solutions.html'));
 });
@@ -1568,6 +1702,10 @@ app.get(['/products/:slug', '/product-detail.html'], (req, res) => {
 });
 
 app.get(['/projects', '/projects.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'projects.html'));
+});
+
+app.get(['/projects/:slug'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'projects.html'));
 });
 
@@ -1585,6 +1723,18 @@ app.get(['/faq', '/faq.html'], (req, res) => {
 
 app.get(['/contact', '/contact.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'contact.html'));
+});
+
+app.get(['/privacy-policy', '/privacy-policy.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'privacy-policy.html'));
+});
+
+app.get(['/terms', '/terms.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
+});
+
+app.get(['/shipping-policy', '/shipping-policy.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'shipping-policy.html'));
 });
 
 app.get('/', (req, res) => {

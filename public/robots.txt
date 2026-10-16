@@ -1,0 +1,39 @@
+# DEVICE PRO Nigeria — Web Crawler & Search Engine Directives
+# Standard compliant robots.txt
+
+User-agent: *
+Allow: /
+Allow: /products
+Allow: /products/*
+Allow: /packages
+Allow: /packages/*
+Allow: /solutions
+Allow: /projects
+Allow: /calculator
+Allow: /savings-calculator
+Allow: /about
+Allow: /resources
+Allow: /faq
+Allow: /contact
+Allow: /tracking
+Allow: /privacy-policy
+Allow: /terms
+Allow: /shipping-policy
+Allow: /css/*
+Allow: /js/*
+Allow: /images/*
+
+# Disallow internal administrative and private checkout operations
+Disallow: /admin
+Disallow: /admin/*
+Disallow: /checkout
+Disallow: /checkout/*
+Disallow: /order-confirmation
+Disallow: /order-confirmation/*
+Disallow: /api/admin/*
+Disallow: /api/payments/*
+Disallow: /api/auth/*
+
+# Host & Sitemap location
+Host: https://devicepro.ng
+Sitemap: https://devicepro.ng/sitemap.xml

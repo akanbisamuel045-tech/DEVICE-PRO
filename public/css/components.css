@@ -891,3 +891,67 @@ select.form-control {
   font-size: var(--font-size-xs);
   color: var(--color-d-text-subtle);
 }
+
+/* ==========================================================================
+   14. ACCESSIBILITY (WCAG 2.2 AA) & REDUCED MOTION (STAGE 17)
+   ========================================================================== */
+
+/* Skip to Content Link */
+.skip-to-content {
+  position: absolute;
+  top: -120px;
+  left: 1.5rem;
+  z-index: 999999;
+  padding: 0.85rem 1.5rem;
+  background: var(--color-brand-yellow, #FFB90C);
+  color: #060B14 !important;
+  font-weight: 700;
+  font-size: var(--font-size-sm, 0.875rem);
+  text-decoration: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  transition: top 0.2s ease-in-out;
+}
+
+.skip-to-content:focus {
+  top: 0;
+  outline: 3px solid #FFFFFF;
+  outline-offset: 2px;
+}
+
+/* Screen Reader Only Utility */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Accessible Global Focus States */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-brand-yellow, #FFB90C) !important;
+  outline-offset: 3px !important;
+}
+
+/* Reduced Motion Safety */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+

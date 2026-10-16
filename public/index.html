@@ -21,15 +21,97 @@
     rel="stylesheet">
 
   <!-- Design Tokens & Stylesheets -->
-  <link rel="stylesheet" href="css/tokens.css?v=11">
-  <link rel="stylesheet" href="css/homepage.css?v=11">
+  <link rel="stylesheet" href="css/tokens.css?v=12">
+  <link rel="stylesheet" href="css/components.css?v=17">
+  <link rel="stylesheet" href="css/homepage.css?v=12">
   <link rel="stylesheet" href="css/footer.css?v=1">
+
+  <!-- Schema.org JSON-LD Structured Data (Stage 17) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://devicepro.ng/#organization",
+        "name": "DEVICE PRO Nigeria Limited",
+        "alternateName": "DEVICE PRO",
+        "url": "https://devicepro.ng",
+        "logo": "https://devicepro.ng/images/logo.svg",
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "telephone": "+234-803-123-4567",
+            "contactType": "customer service",
+            "areaServed": "NG",
+            "availableLanguage": ["en"]
+          }
+        ],
+        "sameAs": [
+          "https://facebook.com",
+          "https://twitter.com",
+          "https://instagram.com"
+        ]
+      },
+      {
+        "@type": "LocalBusiness",
+        "@id": "https://devicepro.ng/#localbusiness",
+        "name": "DEVICE PRO Nigeria",
+        "image": "https://devicepro.ng/images/og-solar.jpg",
+        "telephone": "+234 803 123 4567",
+        "email": "info@devicepro.com",
+        "priceRange": "₦₦₦",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "15 Admiralty Way, Lekki Phase 1",
+          "addressLocality": "Lagos",
+          "addressRegion": "Lagos State",
+          "postalCode": "105102",
+          "addressCountry": "NG"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 6.4474,
+          "longitude": 3.4735
+        },
+        "openingHoursSpecification": [
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+            "opens": "08:00",
+            "closes": "18:00"
+          },
+          {
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": ["Saturday"],
+            "opens": "09:00",
+            "closes": "16:00"
+          }
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://devicepro.ng/#website",
+        "url": "https://devicepro.ng",
+        "name": "DEVICE PRO — Clean Energy Solutions Nigeria",
+        "publisher": {
+          "@id": "https://devicepro.ng/#organization"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://devicepro.ng/products?search={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
+  }
+  </script>
 </head>
 
 <body class="devicepro-body">
 
-  <!-- Accessible Skip to Content Link -->
-  <a href="#main-content" class="sr-only">Skip to main content</a>
+  <!-- Accessible Skip to Content Link (WCAG 2.2 AA) -->
+  <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
   <!-- =========================================================================
        HEADER & NAVIGATION (FROSTED CLEAN MODERN)
@@ -1089,11 +1171,11 @@
           </span>
         </div>
         <div class="footer-policy-links">
-          <a href="/faq">Privacy Policy</a>
+          <a href="/privacy-policy">Privacy Policy</a>
           <span class="policy-sep">|</span>
-          <a href="/faq">Terms of Service</a>
+          <a href="/terms">Terms of Service</a>
           <span class="policy-sep">|</span>
-          <a href="/about#warranty">Warranty Policy</a>
+          <a href="/shipping-policy">Shipping Policy</a>
           <span class="policy-sep">|</span>
           <a href="/contact">Support</a>
         </div>
