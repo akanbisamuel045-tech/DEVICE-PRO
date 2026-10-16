@@ -1286,29 +1286,31 @@ if (userCount === 0) {
     {
       username: 'admin',
       email: 'admin@devicepro.com',
-      password: 'Admin@DevicePro2026!',
+      passwordHash: '788817fa95749de7c288c5f49044246df9aa9ab245b1b566cd6729be9e5d939dd6c6343c385091df1b4dc453345dc67cad6807ca13929046b3a170cbb90f3402',
+      salt: 'da08867c8cff8a6e620bee12be23034d',
       fullName: 'DEVICE PRO Administrator',
       role: 'superadmin'
     },
     {
       username: 'engineer.babatunde',
       email: 'babatunde@devicepro.com',
-      password: 'Engineer@DevicePro2026!',
+      passwordHash: '9e080e986be2d19f6c268aaecc55fa209529174bff22dba9d23a50a930d7d41aa729c5142ee346cfc6ae8934e52ff0ccf4f1959ed59197c52be8e22c86649386',
+      salt: '55999f24ccd06d2acfc69cd73375533a',
       fullName: 'Engr. Babatunde Adeyemi (Director of Engineering)',
       role: 'engineer'
     },
     {
       username: 'sales.lagos',
       email: 'sales@devicepro.com',
-      password: 'Sales@DevicePro2026!',
+      passwordHash: '8724095a9bbb4dbf0b4a4825cce9cab5d5d357258d9ab850207b5dd90ab51e8f83bd23aac1ac21e87189dd03bf9322b96cd93d4533e33a3b0345b118c7204dbf',
+      salt: '270212d1c2c9d51bfc7ccfc8e4eff351',
       fullName: 'Victoria Island Showroom Desk',
       role: 'sales'
     }
   ];
 
   for (const s of staff) {
-    const { hash, salt } = hashPassword(s.password);
-    insertUser.run(s.username, s.email, hash, salt, s.fullName, s.role);
+    insertUser.run(s.username, s.email, s.passwordHash, s.salt, s.fullName, s.role);
   }
 }
 
