@@ -7,6 +7,8 @@ const {
   createEnquiry, getEnquiries, getEnquiryById, updateEnquiryStatus,
   createQuote, getQuotes, getQuoteById, updateQuoteStatus,
   createOrder, getOrders, getOrderByNumber, updateOrderStatus,
+  createPaymentRecord, getPaymentByReference, getPaymentsByOrderNumber,
+  updatePaymentStatus, reconcileOrderPayment,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
   getAuditLogs, getDatabaseStats, exportDatabaseBackup, db
 } = require('./db/database');
@@ -18,12 +20,26 @@ const {
   BATTERY_CHEMISTRIES,
   GENERATOR_BENCHMARKS
 } = require('./lib/calculator-engine');
+const {
+  initializeTransaction,
+  verifyTransaction,
+  reconcilePayment,
+  verifyWebhookSignature,
+  setSandboxOverride,
+  clearSandboxOverrides,
+  IS_SANDBOX,
+  PAYSTACK_PUBLIC_KEY
+} = require('./lib/payment-gateway');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware for parsing JSON and form bodies
-app.use(express.json());
+// Middleware for parsing JSON with raw body capture for webhook signature verification
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // Security & caching headers
@@ -420,6 +436,352 @@ app.get('/api/orders/:orderNumber', (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to look up order' });
   }
 });
+
+// =========================================================================
+// STAGE 15: PAYMENTS & GATEWAY INTEGRATION
+// =========================================================================
+
+// Initialize online payment (Paystack or Sandbox)
+app.post('/api/payments/initialize', rateLimiter(60000, 30), async (req, res) => {
+  try {
+    const { orderNumber, email, callbackUrl } = req.body;
+    if (!orderNumber) {
+      return res.status(400).json({ success: false, error: 'Order number is required.' });
+    }
+
+    const order = getOrderByNumber(orderNumber);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found.' });
+    }
+
+    if (order.payment_status === 'paid') {
+      return res.status(400).json({ success: false, error: 'Order is already marked as paid.' });
+    }
+
+    const customerEmail = email || order.customer_email || 'customer@devicepro.com';
+    const host = req.get('host') || 'localhost:3000';
+    const protocol = req.protocol || 'http';
+    const defaultCallback = `${protocol}://${host}/order-confirmation?orderNumber=${encodeURIComponent(orderNumber)}`;
+
+    const initResult = await initializeTransaction({
+      orderNumber: order.order_number,
+      email: customerEmail,
+      amountNgn: order.total_ngn,
+      callbackUrl: callbackUrl || defaultCallback,
+      metadata: {
+        customerName: order.customer_name,
+        deliveryState: order.delivery_state
+      }
+    });
+
+    // Record transaction in payments table
+    createPaymentRecord({
+      orderId: order.id,
+      orderNumber: order.order_number,
+      gateway: initResult.gateway,
+      reference: initResult.reference,
+      amountKobo: initResult.amountKobo,
+      currency: 'NGN',
+      customerEmail,
+      metadataJson: JSON.stringify({ callbackUrl: callbackUrl || defaultCallback })
+    });
+
+    res.json({
+      success: true,
+      gateway: initResult.gateway,
+      reference: initResult.reference,
+      authorizationUrl: initResult.authorizationUrl,
+      accessCode: initResult.accessCode,
+      isSandbox: initResult.isSandbox,
+      amountNgn: order.total_ngn
+    });
+  } catch (err) {
+    console.error('[PAYMENT INIT ERROR]:', err);
+    res.status(500).json({ success: false, error: err.message || 'Payment initialization failed.' });
+  }
+});
+
+// Authoritative server-side payment verification & order reconciliation
+app.get('/api/payments/verify/:reference', async (req, res) => {
+  try {
+    const reference = req.params.reference;
+    const payment = getPaymentByReference(reference);
+
+    let order = null;
+    if (payment) {
+      order = getOrderByNumber(payment.order_number);
+    } else if (req.query.orderNumber) {
+      order = getOrderByNumber(req.query.orderNumber);
+    }
+
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Associated order not found for payment verification.' });
+    }
+
+    // If already paid, return confirmed state directly
+    if (order.payment_status === 'paid') {
+      return res.json({
+        success: true,
+        verified: true,
+        paymentStatus: 'paid',
+        orderStatus: order.order_status,
+        orderNumber: order.order_number,
+        reference,
+        amountNgn: order.total_ngn,
+        channel: payment ? payment.channel : 'card',
+        alreadyPaid: true
+      });
+    }
+
+    // Verify against payment gateway or sandbox
+    const verificationData = await verifyTransaction(reference, order);
+
+    // Reconcile transaction against order
+    const reconciliation = reconcilePayment({
+      expectedOrder: order,
+      verificationData
+    });
+
+    if (!reconciliation.reconciled) {
+      if (payment) {
+        updatePaymentStatus(reference, {
+          status: reconciliation.status || 'failed',
+          gatewayResponse: reconciliation.error
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        verified: false,
+        paymentStatus: order.payment_status,
+        orderNumber: order.order_number,
+        reference,
+        error: reconciliation.error
+      });
+    }
+
+    // Authoritative update in SQLite database
+    const updatedOrder = reconcileOrderPayment(order.order_number, reference, reconciliation);
+
+    res.json({
+      success: true,
+      verified: true,
+      paymentStatus: updatedOrder.payment_status,
+      orderStatus: updatedOrder.order_status,
+      orderNumber: updatedOrder.order_number,
+      reference: reconciliation.reference,
+      amountNgn: updatedOrder.total_ngn,
+      channel: reconciliation.channel,
+      gatewayResponse: reconciliation.gatewayResponse,
+      paidAt: reconciliation.paidAt
+    });
+  } catch (err) {
+    console.error('[PAYMENT VERIFY ERROR]:', err);
+    res.status(500).json({ success: false, error: err.message || 'Payment verification failed.' });
+  }
+});
+
+// Idempotent Webhook receiver with HMAC-SHA512 signature verification
+app.post('/api/payments/webhook', (req, res) => {
+  try {
+    const signature = req.headers['x-paystack-signature'];
+    const rawBody = req.rawBody || Buffer.from(JSON.stringify(req.body));
+
+    if (!verifyWebhookSignature(rawBody, signature)) {
+      return res.status(401).json({ success: false, error: 'Invalid webhook signature.' });
+    }
+
+    const { event, data } = req.body;
+
+    if (event === 'charge.success') {
+      const reference = data.reference;
+      const existingPayment = getPaymentByReference(reference);
+
+      // Idempotency: if already processed and marked paid, return 200 immediately
+      if (existingPayment && existingPayment.status === 'success') {
+        return res.status(200).json({ status: 'success', message: 'Event already processed.' });
+      }
+
+      const orderNumber = (data.metadata && data.metadata.orderNumber) ||
+                          (existingPayment ? existingPayment.order_number : null);
+
+      if (orderNumber) {
+        const order = getOrderByNumber(orderNumber);
+        if (order) {
+          const expectedKobo = Math.round(Number(order.total_ngn) * 100);
+          if (data.amount === expectedKobo && (!data.currency || data.currency.toUpperCase() === 'NGN')) {
+            reconcileOrderPayment(orderNumber, reference, {
+              status: 'success',
+              channel: data.channel || 'card',
+              gatewayResponse: data.gateway_response || 'Approved',
+              paidAt: data.paid_at || new Date().toISOString()
+            });
+          }
+        }
+      }
+    }
+
+    res.status(200).json({ status: 'success' });
+  } catch (err) {
+    console.error('[WEBHOOK ERROR]:', err);
+    res.status(500).json({ status: 'error', error: err.message });
+  }
+});
+
+// Interactive Sandbox Gateway Route for Local Developer / Browser Testing
+app.get('/api/payments/sandbox/:reference', (req, res) => {
+  const reference = req.params.reference;
+  const payment = getPaymentByReference(reference);
+  const orderNumber = req.query.orderNumber || (payment ? payment.order_number : '');
+  const order = orderNumber ? getOrderByNumber(orderNumber) : null;
+  const amount = req.query.amount || (order ? order.total_ngn : 0);
+  const email = req.query.email || (order ? order.customer_email : 'customer@devicepro.com');
+
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paystack Sandbox Simulator | DEVICE PRO</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #060B14;
+      color: #EEF1F8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+    }
+    .sandbox-card {
+      background: #0B1324;
+      border: 1px solid rgba(255, 185, 12, 0.3);
+      border-radius: 12px;
+      padding: 2.25rem;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(255, 185, 12, 0.15);
+      color: #FFB90C;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+    h1 { font-size: 1.4rem; margin: 0 0 0.5rem; color: #FFF; font-weight: 800; }
+    p { font-size: 0.875rem; color: rgba(238,241,248,0.7); margin-bottom: 1.5rem; line-height: 1.5; }
+    .details-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.75rem;
+      font-size: 0.875rem;
+    }
+    .detail-row { display: flex; justify-content: space-between; padding: 0.35rem 0; }
+    .detail-val { font-weight: 700; color: #FFF; }
+    .btn-action {
+      display: block;
+      width: 100%;
+      padding: 0.9rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      margin-bottom: 0.75rem;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn-approve { background: #FFB90C; color: #060B14; }
+    .btn-approve:hover { background: #E5A300; }
+    .btn-ussd { background: #1E293B; color: #60A5FA; border: 1px solid #3B82F6; }
+    .btn-ussd:hover { background: #2563EB; color: #FFF; }
+    .btn-decline { background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .btn-cancel { background: transparent; color: rgba(238,241,248,0.5); font-size: 0.8rem; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="sandbox-card">
+    <span class="badge">Paystack Sandbox Gateway</span>
+    <h1>DEVICE PRO Checkout</h1>
+    <p>Simulating Paystack Hosted Payment Window for local sandbox and regression testing.</p>
+
+    <div class="details-box">
+      <div class="detail-row"><span>Order Number:</span> <span class="detail-val">${orderNumber}</span></div>
+      <div class="detail-row"><span>Customer Email:</span> <span class="detail-val">${email}</span></div>
+      <div class="detail-row"><span>Reference:</span> <span class="detail-val" style="font-family:monospace; font-size:0.8rem;">${reference}</span></div>
+      <div class="detail-row" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 0.5rem; padding-top: 0.5rem;">
+        <span>Total Amount:</span>
+        <span class="detail-val" style="color: #FFB90C; font-size: 1.1rem;">₦${Number(amount).toLocaleString()}</span>
+      </div>
+    </div>
+
+    <form method="POST" action="/api/payments/sandbox/${encodeURIComponent(reference)}/complete">
+      <input type="hidden" name="orderNumber" value="${orderNumber}">
+      <input type="hidden" name="channel" value="card">
+      <input type="hidden" name="action" value="success">
+      <button type="submit" class="btn-action btn-approve">✓ Simulate Successful Card Payment</button>
+    </form>
+
+    <form method="POST" action="/api/payments/sandbox/${encodeURIComponent(reference)}/complete">
+      <input type="hidden" name="orderNumber" value="${orderNumber}">
+      <input type="hidden" name="channel" value="ussd">
+      <input type="hidden" name="action" value="success">
+      <button type="submit" class="btn-action btn-ussd">⚡ Simulate Bank Transfer / USSD</button>
+    </form>
+
+    <form method="POST" action="/api/payments/sandbox/${encodeURIComponent(reference)}/complete">
+      <input type="hidden" name="orderNumber" value="${orderNumber}">
+      <input type="hidden" name="action" value="decline">
+      <button type="submit" class="btn-action btn-decline">✕ Simulate Declined Card (Failure)</button>
+    </form>
+
+    <a href="/checkout" class="btn-action btn-cancel">Cancel and Return to Checkout</a>
+  </div>
+</body>
+</html>
+  `);
+});
+
+// Process sandbox simulation completion
+app.post('/api/payments/sandbox/:reference/complete', (req, res) => {
+  const reference = req.params.reference;
+  const { action, channel = 'card', orderNumber } = req.body;
+
+  if (action === 'decline') {
+    setSandboxOverride(reference, {
+      success: false,
+      status: 'failed',
+      reference,
+      channel,
+      gatewayResponse: 'Declined: Card blocked or insufficient funds'
+    });
+    return res.redirect(`/checkout?error=Payment+Declined&reference=${encodeURIComponent(reference)}`);
+  }
+
+  // Set successful override
+  setSandboxOverride(reference, {
+    success: true,
+    status: 'success',
+    reference,
+    channel,
+    gatewayResponse: 'Approved (DEVICE PRO Sandbox Simulation)',
+    paidAt: new Date().toISOString()
+  });
+
+  res.redirect(`/order-confirmation?orderNumber=${encodeURIComponent(orderNumber)}&reference=${encodeURIComponent(reference)}`);
+});
+
 
 // =========================================================================
 // CALCULATOR API (Stage 12)

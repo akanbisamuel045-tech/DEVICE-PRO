@@ -167,6 +167,26 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+-- 11. Payments & Gateway Transactions
+CREATE TABLE IF NOT EXISTS payments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id INTEGER,
+  order_number TEXT NOT NULL,
+  gateway TEXT NOT NULL DEFAULT 'paystack', -- 'paystack' | 'flutterwave' | 'bank_transfer'
+  reference TEXT NOT NULL UNIQUE,
+  amount_kobo INTEGER NOT NULL,
+  currency TEXT DEFAULT 'NGN',
+  status TEXT DEFAULT 'pending', -- 'pending', 'success', 'failed', 'abandoned'
+  channel TEXT, -- 'card', 'bank', 'ussd', 'qr'
+  gateway_response TEXT,
+  paid_at TEXT,
+  customer_email TEXT,
+  metadata_json TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now')),
+  FOREIGN KEY (order_id) REFERENCES orders(id)
+);
+
 -- Indexes for high-performance querying
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand);
@@ -175,3 +195,6 @@ CREATE INDEX IF NOT EXISTS idx_enquiries_ref ON enquiries(reference_id);
 CREATE INDEX IF NOT EXISTS idx_quotes_ref ON quotes(reference_id);
 CREATE INDEX IF NOT EXISTS idx_orders_num ON orders(order_number);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+CREATE INDEX IF NOT EXISTS idx_payments_ref ON payments(reference);
+CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_number);
+

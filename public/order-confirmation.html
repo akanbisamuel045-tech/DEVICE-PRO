@@ -89,12 +89,12 @@
             <span class="step-lbl">1. Order Placed</span>
             <span class="step-sub">System Reserved</span>
           </div>
-          <div class="tracker-step active">
-            <div class="step-dot">2</div>
+          <div class="tracker-step active" id="tracker-step-payment">
+            <div class="step-dot" id="tracker-dot-payment">2</div>
             <span class="step-lbl">2. Payment Verification</span>
-            <span class="step-sub">Awaiting Transfer</span>
+            <span class="step-sub" id="tracker-sub-payment">Awaiting Transfer</span>
           </div>
-          <div class="tracker-step">
+          <div class="tracker-step" id="tracker-step-qc">
             <div class="step-dot">3</div>
             <span class="step-lbl">3. Bench QC &amp; Testing</span>
             <span class="step-sub">Warehouse Prep</span>
@@ -123,7 +123,7 @@
             <h2 class="invoice-title">PRO-FORMA INVOICE</h2>
             <div class="meta-item"><strong>Date:</strong> <span id="inv-date">--</span></div>
             <div class="meta-item"><strong>Order #:</strong> <span id="inv-order-num">--</span></div>
-            <div class="meta-item"><strong>Status:</strong> <span class="badge-status-pending">Awaiting Payment</span></div>
+            <div class="meta-item"><strong>Status:</strong> <span class="badge-status-pending" id="inv-status-badge">Awaiting Payment</span></div>
           </div>
         </div>
 
@@ -170,7 +170,7 @@
 
         <!-- Totals Summary Grid -->
         <div class="invoice-totals-grid">
-          <div class="bank-transfer-details-box">
+          <div class="bank-transfer-details-box" id="bank-transfer-details-box">
             <h4 class="bank-box-title">🏛️ Direct Bank Transfer Settlement</h4>
             <p class="bank-box-note">Please initiate payment to our designated corporate collection account:</p>
             <div class="bank-info-grid">
@@ -180,6 +180,20 @@
               <div class="bank-row"><span>Payment Narration:</span> <strong id="inv-payment-narration">DP-ORD-XXXXXX</strong></div>
             </div>
             <span class="bank-hint">Send payment receipt to <strong>payments@devicepro.com</strong> or WhatsApp <strong>+234 803 123 4567</strong> for instant clearance.</span>
+          </div>
+
+          <div class="online-payment-confirmed-box" id="online-payment-confirmed-box" style="display:none; background:rgba(22,163,74,0.08); border:1px solid #16A34A; border-radius:8px; padding:1.25rem;">
+            <div style="display:flex; align-items:center; gap:8px; color:#16A34A; font-weight:800; font-size:1.05rem; margin-bottom:0.5rem;">
+              <span>✓</span> <span>Payment Confirmed via Paystack</span>
+            </div>
+            <p style="font-size:0.875rem; color:#475569; margin:0 0 0.75rem; line-height:1.4;">
+              Your payment has been verified by the payment gateway and your hardware is reserved for warehouse testing and dispatch.
+            </p>
+            <div style="font-size:0.8125rem; color:#334155; display:flex; flex-direction:column; gap:4px;">
+              <div><strong>Gateway Reference:</strong> <span id="conf-pay-ref" style="font-family:monospace; font-weight:700;">--</span></div>
+              <div><strong>Payment Channel:</strong> <span id="conf-pay-channel" style="font-weight:700;">Card / Online</span></div>
+              <div><strong>Settlement Status:</strong> <span style="color:#16A34A; font-weight:700;">PAID IN FULL</span></div>
+            </div>
           </div>
 
           <div class="totals-calculation-box">

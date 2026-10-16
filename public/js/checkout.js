@@ -104,8 +104,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btnText = submitBtn.querySelector('span:first-child');
     if (btnText) {
-      btnText.textContent = `Place Order & Generate Invoice (${formatNaira(total)})`;
+      const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+      if (selectedMethod === 'paystack') {
+        btnText.textContent = `Proceed to Secure Online Payment (${formatNaira(total)})`;
+      } else if (selectedMethod === 'cod') {
+        btnText.textContent = `Confirm Pay on Delivery (${formatNaira(total)})`;
+      } else {
+        btnText.textContent = `Place Order & Generate Invoice (${formatNaira(total)})`;
+      }
     }
+  }
+
+  // Check URL error parameter (e.g. redirected back after cancelled or declined payment)
+  const urlParams = new URLSearchParams(window.location.search);
+  const errorParam = urlParams.get('error');
+  if (errorParam) {
+    errorFeedback.textContent = `Payment update: ${decodeURIComponent(errorParam)}. Please review your details or select bank transfer below.`;
+    errorFeedback.style.display = 'block';
   }
 
   // Event Listeners
@@ -120,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     radio.addEventListener('change', () => {
       document.querySelectorAll('.payment-method-card').forEach(c => c.classList.remove('selected'));
       radio.closest('.payment-method-card').classList.add('selected');
+      recalculateTotals();
     });
   });
 
@@ -173,7 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     submitBtn.disabled = true;
-    submitBtn.querySelector('span:first-child').textContent = 'Creating Order & Reserving Hardware...';
+    submitBtn.querySelector('span:first-child').textContent = paymentMethod === 'paystack'
+      ? 'Connecting to Secure Gateway...'
+      : 'Creating Order & Reserving Hardware...';
 
     try {
       const response = await fetch('/api/orders', {
@@ -194,7 +212,32 @@ document.addEventListener('DOMContentLoaded', () => {
       // Clear the cart
       window.DeviceProCart.clearCart();
 
-      // Redirect to confirmation page
+      // If Online Payment (Paystack / Gateway), initialize transaction
+      if (paymentMethod === 'paystack') {
+        submitBtn.querySelector('span:first-child').textContent = 'Opening Payment Gateway...';
+
+        const initRes = await fetch('/api/payments/initialize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderNumber: result.orderNumber,
+            email: customerEmail || 'customer@devicepro.com',
+            callbackUrl: `${window.location.origin}/order-confirmation?orderNumber=${encodeURIComponent(result.orderNumber)}`
+          })
+        });
+
+        const initData = await initRes.json();
+
+        if (!initRes.ok || !initData.success || !initData.authorizationUrl) {
+          throw new Error(initData.error || 'Unable to connect to Paystack gateway. Please choose Direct Bank Transfer.');
+        }
+
+        // Redirect to Paystack or Sandbox Payment Page
+        window.location.href = initData.authorizationUrl;
+        return;
+      }
+
+      // Default: Redirect to pro-forma invoice confirmation page
       window.location.href = `/order-confirmation?orderNumber=${encodeURIComponent(result.orderNumber)}`;
     } catch (err) {
       console.error('[CHECKOUT SUBMIT ERROR]:', err);

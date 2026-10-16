@@ -159,4 +159,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     const waText = encodeURIComponent(`Hello DEVICE PRO Nigeria! I just placed order ${num} for ${formatNaira(total)}. I would like to confirm payment and delivery.`);
     waBtn.href = `https://wa.me/2348031234567?text=${waText}`;
   }
+
+  // Check if returning with payment reference from online gateway
+  const reference = params.get('reference');
+  const statusBadge = document.getElementById('inv-status-badge');
+  const bankBox = document.getElementById('bank-transfer-details-box');
+  const onlineBox = document.getElementById('online-payment-confirmed-box');
+  const confRef = document.getElementById('conf-pay-ref');
+  const confChannel = document.getElementById('conf-pay-channel');
+  const stepPayment = document.getElementById('tracker-step-payment');
+  const dotPayment = document.getElementById('tracker-dot-payment');
+  const subPayment = document.getElementById('tracker-sub-payment');
+  const stepQc = document.getElementById('tracker-step-qc');
+
+  function renderPaidState(payRef, channel) {
+    if (statusBadge) {
+      statusBadge.textContent = 'PAID IN FULL';
+      statusBadge.className = 'badge-status-confirmed';
+      statusBadge.style.cssText = 'background: #16A34A; color: #FFFFFF; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 0.8rem;';
+    }
+    if (bankBox) bankBox.style.display = 'none';
+    if (onlineBox) onlineBox.style.display = 'block';
+    if (confRef) confRef.textContent = payRef || 'VERIFIED';
+    if (confChannel) confChannel.textContent = channel ? channel.toUpperCase() : 'ONLINE CARD / USSD';
+
+    if (stepPayment) {
+      stepPayment.className = 'tracker-step completed';
+      if (dotPayment) dotPayment.textContent = '✓';
+      if (subPayment) subPayment.textContent = 'Verified & Settled';
+    }
+    if (stepQc) {
+      stepQc.className = 'tracker-step active';
+    }
+  }
+
+  // 1. If returning from Paystack / Gateway with reference
+  if (reference) {
+    try {
+      const verifyRes = await fetch(`/api/payments/verify/${encodeURIComponent(reference)}?orderNumber=${encodeURIComponent(num)}`);
+      const verifyData = await verifyRes.json();
+
+      if (verifyRes.ok && verifyData.verified && verifyData.paymentStatus === 'paid') {
+        renderPaidState(reference, verifyData.channel);
+      } else {
+        console.warn('Payment verification pending or failed:', verifyData.error);
+      }
+    } catch (e) {
+      console.error('Error during payment verification call:', e);
+    }
+  } else if (orderData.payment_status === 'paid' || orderData.paymentStatus === 'paid') {
+    // 2. If order already marked paid in database
+    renderPaidState(orderData.payment_reference || 'CONFIRMED', orderData.payment_method || 'transfer');
+  }
 });

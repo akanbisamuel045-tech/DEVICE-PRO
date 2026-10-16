@@ -173,6 +173,25 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
   );
 
+  CREATE TABLE IF NOT EXISTS payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id INTEGER,
+    order_number TEXT NOT NULL,
+    gateway TEXT NOT NULL DEFAULT 'paystack',
+    reference TEXT NOT NULL UNIQUE,
+    amount_kobo INTEGER NOT NULL,
+    currency TEXT DEFAULT 'NGN',
+    status TEXT DEFAULT 'pending',
+    channel TEXT,
+    gateway_response TEXT,
+    paid_at TEXT,
+    customer_email TEXT,
+    metadata_json TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (order_id) REFERENCES orders(id)
+  );
+
   CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
   CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand);
   CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
@@ -180,6 +199,8 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_quotes_ref ON quotes(reference_id);
   CREATE INDEX IF NOT EXISTS idx_orders_num ON orders(order_number);
   CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
+  CREATE INDEX IF NOT EXISTS idx_payments_ref ON payments(reference);
+  CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_number);
 `);
 
 // Seed Products if table is empty
@@ -1727,6 +1748,89 @@ function updateOrderStatus(id, orderStatus, paymentStatus, adminNotes = '', admi
   };
 }
 
+// --- PAYMENTS & GATEWAY RECONCILIATION ---
+function createPaymentRecord({
+  orderId,
+  orderNumber,
+  gateway = 'paystack',
+  reference,
+  amountKobo,
+  currency = 'NGN',
+  customerEmail = '',
+  metadataJson = '{}'
+}) {
+  const stmt = db.prepare(`
+    INSERT INTO payments (
+      order_id, order_number, gateway, reference, amount_kobo, currency,
+      status, customer_email, metadata_json
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, 'pending', ?, ?
+    )
+  `);
+  stmt.run(orderId, orderNumber, gateway, reference, amountKobo, currency, customerEmail, metadataJson);
+  return getPaymentByReference(reference);
+}
+
+function getPaymentByReference(reference) {
+  return db.prepare('SELECT * FROM payments WHERE reference = ?').get(reference);
+}
+
+function getPaymentsByOrderNumber(orderNumber) {
+  return db.prepare('SELECT * FROM payments WHERE order_number = ? ORDER BY id DESC').all(orderNumber);
+}
+
+function updatePaymentStatus(reference, { status, channel = null, gatewayResponse = null, paidAt = null }) {
+  const stmt = db.prepare(`
+    UPDATE payments
+    SET status = ?, channel = COALESCE(?, channel), gateway_response = COALESCE(?, gateway_response),
+        paid_at = COALESCE(?, paid_at), updated_at = datetime('now')
+    WHERE reference = ?
+  `);
+  stmt.run(status, channel, gatewayResponse, paidAt, reference);
+  return getPaymentByReference(reference);
+}
+
+function reconcileOrderPayment(orderNumber, reference, { status, channel = null, gatewayResponse = null, paidAt = null }) {
+  // 1. Update payment transaction record
+  updatePaymentStatus(reference, { status, channel, gatewayResponse, paidAt: paidAt || new Date().toISOString() });
+
+  // 2. If status is success, update order
+  if (status === 'success') {
+    const orderStmt = db.prepare(`
+      UPDATE orders
+      SET payment_status = 'paid', order_status = 'confirmed', updated_at = datetime('now')
+      WHERE order_number = ?
+    `);
+    orderStmt.run(orderNumber);
+
+    logAudit({
+      userId: null,
+      action: 'PAYMENT_VERIFIED',
+      entityType: 'order',
+      entityId: orderNumber,
+      details: `Online payment of order ${orderNumber} verified via ${reference} (Channel: ${channel || 'online'}). Status: PAID.`
+    });
+  } else if (status === 'failed') {
+    const orderStmt = db.prepare(`
+      UPDATE orders
+      SET payment_status = 'failed', updated_at = datetime('now')
+      WHERE order_number = ?
+    `);
+    orderStmt.run(orderNumber);
+
+    logAudit({
+      userId: null,
+      action: 'PAYMENT_FAILED',
+      entityType: 'order',
+      entityId: orderNumber,
+      details: `Payment attempt ${reference} for order ${orderNumber} failed. Gateway response: ${gatewayResponse || 'declined'}`
+    });
+  }
+
+  return getOrderByNumber(orderNumber);
+}
+
+
 // --- AUTHENTICATION & SESSIONS ---
 function getUserByUsername(username) {
   return db.prepare('SELECT * FROM users WHERE username = ? AND is_active = 1').get(username);
@@ -2015,6 +2119,12 @@ module.exports = {
   getOrders,
   getOrderByNumber,
   updateOrderStatus,
+  // Payments
+  createPaymentRecord,
+  getPaymentByReference,
+  getPaymentsByOrderNumber,
+  updatePaymentStatus,
+  reconcileOrderPayment,
   // Auth & Sessions
   hashPassword,
   verifyPassword,

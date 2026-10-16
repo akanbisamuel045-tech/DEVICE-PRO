@@ -1,7 +1,7 @@
 # DEVICE PRO — Project Progress
 
 ## Current Stage
-**Stage 14: Search, Filtering & User Experience Polish**
+**Stage 15: Payment Gateway Integration & Transaction Verification**
 **Status:** ✅ PASS
 
 ## Project Overview
@@ -609,7 +609,52 @@
 - `tests/stage14_search_ux.test.js` (29 automated tests for search, cart, and HTML compliance)
 - `PROJECT_PROGRESS.md` (Stage 14 documented as PASS)
 
-**Next Permitted Stage:** Stage 15 — Payment Gateway Integration & Transaction Verification
+**Next Permitted Stage:** Stage 15 — Payment Gateway Integration & Transaction Verification ✅
+
+### Stage 15: Payment Gateway Integration & Transaction Verification
+**Status:** ✅ PASS
+**Started:** 2026-10-16
+**Completed:** 2026-10-16
+
+**Completed Requirements:**
+- [x] **Modular Payment Gateway Service (`lib/payment-gateway.js`)**:
+  - Implemented multi-mode payment engine supporting live Paystack API and zero-credential local Sandbox Simulation mode.
+  - Transaction initialization with automatic conversion from Nigerian Naira (`₦`) to kobo (`* 100`).
+  - Cryptographically secure transaction reference generator (`DP-TXN-...`).
+  - Server-side transaction verification (`verifyTransaction`) querying the gateway with secret key.
+  - Authoritative reconciliation guard (`reconcilePayment`) protecting against underpayment attacks and foreign currency tampering.
+  - HMAC-SHA512 webhook signature verification (`verifyWebhookSignature`) preventing forged callbacks and replay attacks.
+- [x] **Database Schema & Payment Persistence (`db/database.js`, `db/schema.sql`)**:
+  - Created `payments` table with indexed `reference` and `order_number` columns.
+  - Implemented transactional helpers: `createPaymentRecord`, `getPaymentByReference`, `getPaymentsByOrderNumber`, `updatePaymentStatus`, and `reconcileOrderPayment`.
+  - Strict compliance with PCI-DSS & Zero Card Storage: database schema stores no raw card PAN, CVV, or PIN numbers.
+- [x] **REST API Payment Endpoints (`server.js`)**:
+  - `POST /api/payments/initialize`: Validates order, reserves equipment, creates payment record, and returns gateway `authorizationUrl`.
+  - `GET /api/payments/verify/:reference`: Authoritative server verification reconciles order payment state to `paid` and order status to `confirmed`.
+  - `POST /api/payments/webhook`: Idempotent receiver with HMAC-SHA512 verification for `charge.success` events.
+  - `GET /api/payments/sandbox/:reference`: Interactive developer/test payment window providing real-time testing of successful card payments, USSD transfers, and card declines.
+- [x] **Checkout & Order Confirmation Client Flow (`public/js/checkout.js`, `public/js/order-confirmation.js`, `public/order-confirmation.html`)**:
+  - Dynamically updates submit button label based on selected payment method.
+  - Redirects online payments smoothly to gateway authorization URL.
+  - On `/order-confirmation`, verifies returning gateway references, displays the green verified **"PAID IN FULL"** badge, shows the Paystack receipt card with reference and channel, and automatically transitions tracker step 2 to completed.
+- [x] **Automated Testing & Full Regression**:
+  - Created automated test suite `tests/stage15_payment.test.js` with **13 passed tests (100% pass rate)**.
+  - Re-verified full regression test suite across Stages 12, 13, 14, and 15 with **95 passed tests (100% pass rate)**.
+- [x] **Visual Browser QA Verification**:
+  - Executed complete end-to-end sandbox purchase via `browser_subagent` (recorded in `stage15_payment_flow_1792148109282.webp`).
+
+**Files Created / Modified in Stage 15:**
+- `lib/payment-gateway.js` (Payment Gateway Integration & Sandbox Simulation Engine)
+- `db/database.js` (Added payments table and payment database methods)
+- `db/schema.sql` (Added payments table schema and indexes)
+- `server.js` (Registered payment API routes and rawBody middleware for webhooks)
+- `public/js/checkout.js` (Integrated online payment initialization and error feedback)
+- `public/order-confirmation.html` (Added verified payment UI card and status badge IDs)
+- `public/js/order-confirmation.js` (Integrated client payment verification and paid state rendering)
+- `tests/stage15_payment.test.js` (13 automated tests for gateway, reconciliation, and webhooks)
+- `PROJECT_PROGRESS.md` (Stage 15 documented as PASS)
+
+**Next Permitted Stage:** Stage 16 — Delivery, Installation & After-Sales Operations Workflows
 
 ---
 
@@ -622,7 +667,7 @@
 | Brand colours | ✅ Sampled directly from reference mockup (`tokens.css`) | Resolved |
 | Product categories & specs | ✅ 48 items across 6 categories in SQLite with full specifications | Resolved (Stage 6, 7 & 10) |
 | Product & package pricing | ✅ Realistic Nigerian market Naira pricing with Tier-1 hardware & installation | Resolved (Stage 6 & 10) |
-| Payment gateway (Paystack/Flutterwave) | ❌ Not confirmed | Stage 15 |
+| Payment gateway (Paystack/Flutterwave) | ✅ Supported: Paystack + Sandbox Engine & HMAC Webhooks | Resolved (Stage 15) |
 | Business phone number(s) | ✅ Verified +234 803 123 4567 deployed across all pages | Resolved |
 | Business email | ✅ Verified info@devicepro.com deployed across all pages | Resolved |
 | Physical address(es) | ✅ Lagos HQ (Victoria Island), Abuja (CBD), Port Harcourt (Trans-Amadi) | Resolved (Stage 11) |
