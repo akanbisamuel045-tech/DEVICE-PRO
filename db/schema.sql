@@ -103,6 +103,18 @@ CREATE TABLE IF NOT EXISTS orders (
   payment_method TEXT DEFAULT 'transfer', -- 'transfer', 'card', 'pod'
   payment_status TEXT DEFAULT 'pending', -- 'pending', 'verified', 'failed', 'refunded'
   order_status TEXT DEFAULT 'pending', -- 'pending', 'processing', 'dispatched', 'delivered', 'cancelled'
+  -- Fulfillment & Logistics Tracking (Stage 16)
+  waybill_number TEXT,
+  courier_partner TEXT,
+  estimated_delivery TEXT,
+  -- Certified Installation & Commissioning (Stage 16)
+  assigned_engineer TEXT,
+  engineer_phone TEXT,
+  installation_scheduled_date TEXT,
+  commissioning_status TEXT DEFAULT 'pending', -- 'pending', 'scheduled', 'in_progress', 'commissioned'
+  commissioning_tests TEXT, -- JSON checklist of electrical & safety tests
+  commissioning_date TEXT,
+  commissioning_certificate_id TEXT,
   admin_notes TEXT,
   ip_address TEXT,
   created_at TEXT DEFAULT (datetime('now')),
@@ -187,6 +199,46 @@ CREATE TABLE IF NOT EXISTS payments (
   FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 
+-- 12. Support & Warranty Claim Tickets (Stage 16)
+CREATE TABLE IF NOT EXISTS support_tickets (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ticket_number TEXT NOT NULL UNIQUE,
+  order_number TEXT,
+  customer_name TEXT NOT NULL,
+  customer_phone TEXT NOT NULL,
+  customer_email TEXT,
+  issue_category TEXT NOT NULL, -- 'technical', 'warranty', 'installation', 'billing', 'maintenance'
+  priority TEXT DEFAULT 'normal', -- 'low', 'normal', 'high', 'critical'
+  subject TEXT NOT NULL,
+  description TEXT NOT NULL,
+  status TEXT DEFAULT 'open', -- 'open', 'in_progress', 'resolved', 'closed'
+  assigned_engineer TEXT,
+  resolution_notes TEXT,
+  resolved_at TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+
+-- 13. Digital Equipment Warranties (Stage 16)
+CREATE TABLE IF NOT EXISTS warranties (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  warranty_code TEXT NOT NULL UNIQUE,
+  order_number TEXT,
+  serial_number TEXT NOT NULL UNIQUE,
+  product_name TEXT NOT NULL,
+  product_sku TEXT,
+  customer_name TEXT NOT NULL,
+  customer_phone TEXT NOT NULL,
+  customer_email TEXT,
+  warranty_years INTEGER DEFAULT 5,
+  coverage_summary TEXT,
+  status TEXT DEFAULT 'active', -- 'active', 'expired', 'voided', 'claimed'
+  start_date TEXT DEFAULT (datetime('now')),
+  end_date TEXT,
+  created_at TEXT DEFAULT (datetime('now')),
+  updated_at TEXT DEFAULT (datetime('now'))
+);
+
 -- Indexes for high-performance querying
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand);
@@ -197,4 +249,10 @@ CREATE INDEX IF NOT EXISTS idx_orders_num ON orders(order_number);
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
 CREATE INDEX IF NOT EXISTS idx_payments_ref ON payments(reference);
 CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_number);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_num ON support_tickets(ticket_number);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_order ON support_tickets(order_number);
+CREATE INDEX IF NOT EXISTS idx_support_tickets_phone ON support_tickets(customer_phone);
+CREATE INDEX IF NOT EXISTS idx_warranties_code ON warranties(warranty_code);
+CREATE INDEX IF NOT EXISTS idx_warranties_serial ON warranties(serial_number);
+CREATE INDEX IF NOT EXISTS idx_warranties_order ON warranties(order_number);
 

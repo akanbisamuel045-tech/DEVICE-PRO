@@ -102,6 +102,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   totalEl.textContent = formatNaira(total);
 
+  // Live Tracking Button link
+  const trackingBtn = document.getElementById('btn-live-tracking');
+  if (trackingBtn) {
+    const contact = phone || email || '';
+    trackingBtn.href = `/tracking?orderNumber=${encodeURIComponent(num)}&contact=${encodeURIComponent(contact)}`;
+  }
+
   // Line items
   let items = orderData.items || [];
   if (typeof items === 'string') {

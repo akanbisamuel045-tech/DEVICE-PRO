@@ -109,6 +109,18 @@
           <span class="tab-badge" id="badge-orders-count">0</span>
         </button>
 
+        <button type="button" class="nav-tab-btn" data-tab="fulfillment">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+          <span>Fulfillment &amp; Install</span>
+          <span class="tab-badge" id="badge-fulfillment-count">0</span>
+        </button>
+
+        <button type="button" class="nav-tab-btn" data-tab="support">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+          <span>Support &amp; Warranty</span>
+          <span class="tab-badge" id="badge-support-count">0</span>
+        </button>
+
         <button type="button" class="nav-tab-btn" data-tab="quotes">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
           <span>Solar Quotes</span>
@@ -294,6 +306,131 @@
               </tbody>
             </table>
           </div>
+        </section>
+
+        <!-- ===================================================================
+             STAGE 16: FULFILLMENT & INSTALLATION PANEL
+             =================================================================== -->
+        <section id="panel-fulfillment" class="tab-panel">
+          <div class="panel-toolbar">
+            <div class="toolbar-search">
+              <input type="search" id="fulfillment-search-input" placeholder="Search by Order #, Customer, Waybill, or Engineer..." class="filter-search-box">
+            </div>
+            <div class="toolbar-filters">
+              <select id="fulfillment-status-filter" class="filter-select">
+                <option value="">All Fulfillment Statuses</option>
+                <option value="pending">Pending Dispatch</option>
+                <option value="processing">Processing / Testing</option>
+                <option value="dispatched">Dispatched / In-Transit</option>
+                <option value="completed">Completed / Commissioned</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="table-responsive dash-card">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Customer &amp; State</th>
+                  <th>Logistics &amp; Waybill</th>
+                  <th>Est. Delivery</th>
+                  <th>COREN Lead Engineer</th>
+                  <th>Installation Date</th>
+                  <th>Commissioning</th>
+                  <th style="text-align: center;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="fulfillment-table-body">
+                <tr><td colspan="8" class="empty-cell">Loading fulfillment records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===================================================================
+             STAGE 16: SUPPORT TICKETS & WARRANTIES PANEL
+             =================================================================== -->
+        <section id="panel-support" class="tab-panel">
+          
+          <!-- Support & Warranty KPI Cards -->
+          <div class="kpi-cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 1.5rem; display: grid; gap: 1rem;">
+            <div class="dash-card kpi-card">
+              <div class="kpi-label">Open Support Tickets</div>
+              <div class="kpi-val" id="kpi-open-tickets" style="color: #F59E0B;">0</div>
+              <span class="kpi-sub">Field technician review required</span>
+            </div>
+            <div class="dash-card kpi-card">
+              <div class="kpi-label">Total Support Tickets</div>
+              <div class="kpi-val" id="kpi-total-tickets">0</div>
+              <span class="kpi-sub">All logged service claims</span>
+            </div>
+            <div class="dash-card kpi-card">
+              <div class="kpi-label">Active Digital Warranties</div>
+              <div class="kpi-val" id="kpi-active-warranties" style="color: #22C55E;">0</div>
+              <span class="kpi-sub">Tier-1 hardware under warranty</span>
+            </div>
+          </div>
+
+          <!-- Section A: Support Tickets -->
+          <div class="dash-card" style="margin-bottom: 2rem;">
+            <div class="dash-card-header">
+              <h3>Technical Tickets &amp; Warranty Claims</h3>
+              <div class="toolbar-filters">
+                <select id="support-status-filter" class="filter-select">
+                  <option value="">All Statuses</option>
+                  <option value="open">Open</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Ticket #</th>
+                    <th>Customer &amp; Phone</th>
+                    <th>Category</th>
+                    <th>Priority</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Assigned Engineer</th>
+                    <th style="text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="support-table-body">
+                  <tr><td colspan="8" class="empty-cell">Loading tickets...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section B: Registered Digital Warranties -->
+          <div class="dash-card">
+            <div class="dash-card-header">
+              <h3>Registered Equipment Warranties (Tier-1 Serial Registry)</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Warranty Code</th>
+                    <th>Serial Number</th>
+                    <th>Hardware Product</th>
+                    <th>Customer Name</th>
+                    <th>Duration</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="warranties-table-body">
+                  <tr><td colspan="7" class="empty-cell">Loading warranties...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
         </section>
 
         <!-- ===================================================================
@@ -485,6 +622,192 @@
       <div class="modal-footer">
         <button type="button" class="btn-secondary" data-close-modal>Close</button>
         <button type="button" id="btn-save-order-changes" class="btn-primary-yellow">Save Order Updates</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Fulfillment & Installation Modal (Stage 16) -->
+  <dialog id="fulfillment-modal" class="admin-modal">
+    <div class="modal-card" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 id="modal-ful-title">Logistics Dispatch &amp; COREN Commissioning</h3>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="modal-ful-order-id">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+            <span>Order Number: <strong id="modal-ful-order-num" style="color: #FFF;">--</strong></span>
+            <span>Total Value: <strong id="modal-ful-order-total" style="color: var(--color-brand-yellow);">--</strong></span>
+          </div>
+          <div style="font-size: 0.85rem; color: rgba(238,241,248,0.7);">
+            Customer: <strong id="modal-ful-customer" style="color: #FFF;">--</strong> • Destination: <span id="modal-ful-destination">--</span>
+          </div>
+        </div>
+
+        <h4 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--color-brand-yellow); margin-bottom: 0.75rem;">
+          1. Regional Logistics &amp; Waybill Dispatch
+        </h4>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Waybill Tracking Number</label>
+            <input type="text" id="modal-ful-waybill" class="form-input" placeholder="e.g. GIG-LOS-892110 or DHL-ABJ-449102">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Courier Fleet Partner</label>
+            <select id="modal-ful-courier" class="form-select">
+              <option value="DEVICE PRO Fleet Logistics">DEVICE PRO Fleet Logistics</option>
+              <option value="GIG Logistics Nigeria">GIG Logistics Nigeria</option>
+              <option value="DHL Express Nigeria">DHL Express Nigeria</option>
+              <option value="Red Star Express / FedEx">Red Star Express / FedEx</option>
+              <option value="Customer Showroom Pickup">Customer Showroom Pickup (VI Hub)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-2" style="margin-top: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Estimated Delivery Date</label>
+            <input type="date" id="modal-ful-eta" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Overall Order Status</label>
+            <select id="modal-ful-order-status" class="form-select">
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed (Paid)</option>
+              <option value="processing">Processing (Bench QC)</option>
+              <option value="dispatched">Dispatched (En Route)</option>
+              <option value="completed">Completed (Commissioned)</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+
+        <h4 style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--color-brand-yellow); margin: 1.5rem 0 0.75rem;">
+          2. Certified Installation &amp; Commissioning
+        </h4>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Assigned COREN Lead Engineer</label>
+            <input type="text" id="modal-ful-engineer" class="form-input" placeholder="e.g. Engr. Babatunde Adeleke (COREN #48291)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Engineer Contact Hotline</label>
+            <input type="tel" id="modal-ful-phone" class="form-input" placeholder="+234 803 111 2233">
+          </div>
+        </div>
+
+        <div class="form-row-2" style="margin-top: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Scheduled Installation Date</label>
+            <input type="date" id="modal-ful-date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Commissioning Status</label>
+            <select id="modal-ful-comm-status" class="form-select">
+              <option value="pending">Pending Assignment</option>
+              <option value="scheduled">Scheduled for Site</option>
+              <option value="in_progress">In Progress (Mounting / Wiring)</option>
+              <option value="commissioned">Commissioned (Handover &amp; Tests Passed)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="form-label">NEMSA Mandatory Electrical Safety Sign-Offs</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; background: rgba(255,255,255,0.02); padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #EEF1F8;">
+              <input type="checkbox" id="modal-test-earthing" checked>
+              <span>Earthing Resistance &lt; 5.0Ω</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #EEF1F8;">
+              <input type="checkbox" id="modal-test-spd" checked>
+              <span>Type II DC Surge Protection (SPD)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #EEF1F8;">
+              <input type="checkbox" id="modal-test-sync" checked>
+              <span>Inverter Grid-Sync &amp; Frequency Lock</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: #EEF1F8;">
+              <input type="checkbox" id="modal-test-battery" checked>
+              <span>LiFePO4 BMS Cell Balancing (&lt; 15mV)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row-2" style="margin-top: 0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Commissioning Certificate ID</label>
+            <input type="text" id="modal-ful-cert-id" class="form-input" placeholder="e.g. DP-CERT-ABJ-901">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Operational Notes</label>
+            <input type="text" id="modal-ful-notes" class="form-input" placeholder="e.g. System energized and client training complete.">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+        <button type="button" id="btn-save-fulfillment-changes" class="btn-primary-yellow">Save Fulfillment Updates</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Support Ticket Manage Modal (Stage 16) -->
+  <dialog id="admin-ticket-modal" class="admin-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-tkt-title">Support Ticket Review</h3>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="modal-tkt-id">
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.35rem;">
+            <span>Ticket: <strong id="modal-tkt-num-display" style="color: #FFF;">--</strong></span>
+            <span>Category: <strong id="modal-tkt-cat-display" style="color: var(--color-brand-yellow); text-transform: uppercase;">--</strong></span>
+          </div>
+          <div style="font-size: 0.85rem; color: rgba(238,241,248,0.7);">
+            Client: <strong id="modal-tkt-client" style="color: #FFF;">--</strong> • Phone: <span id="modal-tkt-phone">--</span>
+          </div>
+          <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #FFF; font-weight: 600;" id="modal-tkt-subj"></div>
+          <div style="font-size: 0.82rem; color: rgba(238,241,248,0.7); margin-top: 0.25rem;" id="modal-tkt-desc"></div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label">Ticket Status</label>
+            <select id="modal-tkt-status-select" class="form-select">
+              <option value="open">Open (Unresolved)</option>
+              <option value="in_progress">In Progress (Technician Assigned)</option>
+              <option value="resolved">Resolved (Complete)</option>
+              <option value="closed">Closed / Archived</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Urgency Priority</label>
+            <select id="modal-tkt-priority-select" class="form-select">
+              <option value="low">Low</option>
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="critical">Critical</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label class="form-label">Assigned Field / Service Engineer</label>
+          <input type="text" id="modal-tkt-engineer-input" class="form-input" placeholder="e.g. Engr. Babatunde Adeleke (COREN #48291)">
+        </div>
+
+        <div class="form-group" style="margin-top: 0.75rem;">
+          <label class="form-label">Resolution Notes &amp; Action Taken</label>
+          <textarea id="modal-tkt-notes-input" class="form-textarea" rows="3" placeholder="Enter findings, root cause, rapid swap dispatch, or client resolution notes..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+        <button type="button" id="btn-save-ticket-changes" class="btn-primary-yellow">Save Ticket Updates</button>
       </div>
     </div>
   </dialog>

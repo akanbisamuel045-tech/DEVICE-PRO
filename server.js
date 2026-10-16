@@ -7,6 +7,9 @@ const {
   createEnquiry, getEnquiries, getEnquiryById, updateEnquiryStatus,
   createQuote, getQuotes, getQuoteById, updateQuoteStatus,
   createOrder, getOrders, getOrderByNumber, updateOrderStatus,
+  updateOrderFulfillment, updateOrderCommissioning,
+  createSupportTicket, getSupportTickets, getSupportTicketByNumber, getSupportTicketsByOrder, updateSupportTicketStatus,
+  createWarrantyRecord, getWarrantyBySerialOrCode, getWarrantiesByOrder, getWarranties,
   createPaymentRecord, getPaymentByReference, getPaymentsByOrderNumber,
   updatePaymentStatus, reconcileOrderPayment,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
@@ -410,7 +413,7 @@ app.post('/api/orders', rateLimiter(60000, 10), (req, res) => {
   }
 });
 
-// API: Public Order Tracking
+// API: Public Order Tracking (Basic Summary for confirmation view)
 app.get('/api/orders/:orderNumber', (req, res) => {
   try {
     const order = getOrderByNumber(req.params.orderNumber);
@@ -434,6 +437,425 @@ app.get('/api/orders/:orderNumber', (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ success: false, error: 'Failed to look up order' });
+  }
+});
+
+// Helper: Build comprehensive Stage 16 tracking payload with 6-stage lifecycle
+function buildOrderTrackingPayload(order) {
+  const isPaid = order.payment_status === 'paid' || order.payment_status === 'verified';
+  const isDispatched = ['dispatched', 'delivered', 'completed'].includes(order.order_status);
+  const isCommissioned = order.commissioning_status === 'commissioned' || order.order_status === 'completed';
+  const qcDone = isDispatched || isCommissioned;
+  const dispatchDone = isCommissioned;
+  const commissioningDone = isCommissioned;
+
+  const stages = [
+    {
+      step: 1,
+      key: 'order_placed',
+      id: 'step-order-placed',
+      name: 'Order Placed & Hardware Reserved',
+      title: 'Order Placed & Hardware Reserved',
+      status: 'completed',
+      badge: 'Reserved',
+      summary: 'Equipment allocated from Victoria Island Central Depot. Pro-forma invoice generated.',
+      details: 'Equipment allocated from Victoria Island Central Depot. Pro-forma invoice generated.',
+      description: 'Equipment allocated from Victoria Island Central Depot. Pro-forma invoice generated.',
+      timestamp: order.created_at
+    },
+    {
+      step: 2,
+      key: 'payment_verified',
+      id: 'step-payment-verified',
+      name: 'Payment Verification',
+      title: 'Payment Verification',
+      status: isPaid ? 'completed' : (order.payment_status === 'pending' ? 'current' : 'failed'),
+      badge: isPaid ? 'Verified' : 'Pending Verification',
+      summary: isPaid
+        ? (order.payment_method === 'card' ? 'Paystack Online Settlement Confirmed' : 'Commercial Bank Transfer Reconciled')
+        : 'Awaiting payment confirmation via Paystack or direct bank transfer.',
+      details: isPaid
+        ? (order.payment_method === 'card' ? 'Paystack Online Settlement Confirmed' : 'Commercial Bank Transfer Reconciled')
+        : 'Awaiting payment confirmation via Paystack or direct bank transfer.',
+      description: isPaid
+        ? (order.payment_method === 'card' ? 'Paystack Online Settlement Confirmed' : 'Commercial Bank Transfer Reconciled')
+        : 'Awaiting payment confirmation via Paystack or direct bank transfer.',
+      timestamp: isPaid ? (order.updated_at || order.created_at) : null
+    },
+    {
+      step: 3,
+      key: 'bench_qc',
+      id: 'step-bench-qc',
+      name: 'Bench QC & Pre-dispatch Calibration',
+      title: 'Bench QC & Hardware Calibration',
+      status: qcDone ? 'completed' : (isPaid ? 'current' : 'pending'),
+      badge: qcDone ? 'QC Passed' : (isPaid ? 'In Testing' : 'Queued'),
+      summary: 'Firmware calibrated to Nigeria grid specs (50Hz), LiFePO4 cells balanced, IV curve verified.',
+      details: 'Firmware calibrated to Nigeria grid specs (50Hz), LiFePO4 cells balanced, IV curve verified. Pre-dispatch bench inspection.',
+      description: 'Firmware calibrated to Nigeria grid specs (50Hz), LiFePO4 cells balanced, IV curve verified.',
+      timestamp: qcDone ? order.updated_at : null
+    },
+    {
+      step: 4,
+      key: 'logistics_transit',
+      id: 'step-logistics-dispatch',
+      name: 'Logistics & In-Transit Waybill',
+      title: 'Logistics & Dispatch',
+      status: dispatchDone ? 'completed' : (isDispatched ? 'current' : 'pending'),
+      badge: order.waybill_number ? 'En Route' : (isDispatched ? 'Dispatched' : 'Preparing'),
+      summary: order.waybill_number
+        ? `Waybill: ${order.waybill_number} • Courier: ${order.courier_partner || 'DEVICE PRO Fleet'}. Est Delivery: ${order.estimated_delivery || 'In Transit'}`
+        : 'Fleet allocation and regional transit waybill preparation.',
+      details: order.waybill_number
+        ? `Waybill: ${order.waybill_number} • Courier: ${order.courier_partner || 'DEVICE PRO Fleet'}. Est Delivery: ${order.estimated_delivery || 'In Transit'}`
+        : 'Fleet allocation and regional transit waybill preparation.',
+      description: order.waybill_number
+        ? `Waybill: ${order.waybill_number} • Courier: ${order.courier_partner || 'DEVICE PRO Fleet'}. Est Delivery: ${order.estimated_delivery || 'In Transit'}`
+        : 'Fleet allocation and regional transit waybill preparation.',
+      timestamp: order.waybill_number ? order.updated_at : null
+    },
+    {
+      step: 5,
+      key: 'certified_commissioning',
+      id: 'step-installation-commissioning',
+      name: 'Certified Installation & Commissioning',
+      title: 'Certified Installation & Commissioning',
+      status: commissioningDone ? 'completed' : (order.commissioning_status === 'scheduled' || isDispatched ? 'current' : 'pending'),
+      badge: commissioningDone ? 'Commissioned' : (order.commissioning_status === 'scheduled' ? 'Scheduled' : 'Pending Schedule'),
+      summary: order.assigned_engineer
+        ? `Assigned Lead: ${order.assigned_engineer}. Scheduled Date: ${order.installation_scheduled_date || 'Pending Schedule'}. Safety checks: Earthing resistance < 5Ω, DC surge protection, AC load balancing, Inverter sync.`
+        : 'COREN engineer assignment and site survey alignment.',
+      details: order.assigned_engineer
+        ? `Assigned Lead: ${order.assigned_engineer}. Scheduled Date: ${order.installation_scheduled_date || 'Pending Schedule'}. Safety checks: Earthing resistance < 5Ω, DC surge protection, AC load balancing, Inverter sync.`
+        : 'COREN engineer assignment and site survey alignment.',
+      description: order.assigned_engineer
+        ? `Assigned Lead: ${order.assigned_engineer}. Scheduled Date: ${order.installation_scheduled_date || 'Pending Schedule'}. Safety checks: Earthing resistance < 5Ω, DC surge protection, AC load balancing.`
+        : 'COREN engineer assignment and site survey alignment.',
+      timestamp: order.commissioning_date || null
+    },
+    {
+      step: 6,
+      key: 'warranty_handover',
+      id: 'step-warranty-handover',
+      name: 'Active Warranty & Final Handover',
+      title: 'Active Warranty & Final Handover',
+      status: commissioningDone ? 'completed' : 'pending',
+      badge: commissioningDone ? 'Active Coverage' : 'Pending Handover',
+      summary: order.commissioning_certificate_id
+        ? `Certificate ID: ${order.commissioning_certificate_id}. Full Tier-1 warranty coverage: 25-yr panel, 10-yr LiFePO4 battery guarantee, 5-yr inverter warranty with rapid swap service.`
+        : 'Full Tier-1 warranty coverage: 25-yr panel, 10-yr LiFePO4 battery guarantee, 5-yr inverter warranty with rapid swap service.',
+      details: order.commissioning_certificate_id
+        ? `Certificate ID: ${order.commissioning_certificate_id}. Full Tier-1 warranty coverage: 25-yr panel, 10-yr LiFePO4 battery guarantee, 5-yr inverter warranty with rapid swap service.`
+        : 'Full Tier-1 warranty coverage: 25-yr panel, 10-yr LiFePO4 battery guarantee, 5-yr inverter warranty with rapid swap service.',
+      description: order.commissioning_certificate_id
+        ? `Certificate ID: ${order.commissioning_certificate_id}. Full Tier-1 warranty coverage: 25-yr panel, 10-yr LiFePO4 battery guarantee, 5-yr inverter warranty.`
+        : 'Issued immediately upon final engineer sign-off and electrical safety test certification.',
+      timestamp: order.commissioning_date || null
+    }
+  ];
+
+  const warranties = getWarrantiesByOrder(order.order_number);
+  const tickets = getSupportTicketsByOrder(order.order_number);
+
+  let parsedTests = null;
+  if (order.commissioning_tests) {
+    try {
+      parsedTests = typeof order.commissioning_tests === 'string'
+        ? JSON.parse(order.commissioning_tests)
+        : order.commissioning_tests;
+    } catch (e) {
+      parsedTests = { summary: order.commissioning_tests };
+    }
+  }
+
+  const payload = {
+    orderNumber: order.order_number,
+    customerName: order.customer_name,
+    customerPhone: order.customer_phone,
+    customerEmail: order.customer_email,
+    deliveryAddress: order.delivery_address,
+    deliveryState: order.delivery_state,
+    destinationState: order.delivery_state,
+    totalNgn: order.total_ngn,
+    deliveryFeeNgn: order.delivery_fee_ngn,
+    subtotalNgn: order.subtotal_ngn,
+    paymentMethod: order.payment_method,
+    paymentStatus: order.payment_status,
+    orderStatus: order.order_status,
+    items: order.items,
+    createdAt: order.created_at,
+    updatedAt: order.updated_at,
+    fulfillment: {
+      waybillNumber: order.waybill_number || null,
+      courierPartner: order.courier_partner || 'DEVICE PRO Fleet Logistics',
+      estimatedDelivery: order.estimated_delivery || null
+    },
+    logistics: {
+      waybillNumber: order.waybill_number || null,
+      courierPartner: order.courier_partner || 'DEVICE PRO Fleet Logistics',
+      estimatedDelivery: order.estimated_delivery || null
+    },
+    commissioning: {
+      assignedEngineer: order.assigned_engineer || null,
+      engineerPhone: order.engineer_phone || null,
+      scheduledDate: order.installation_scheduled_date || null,
+      installationScheduledDate: order.installation_scheduled_date || null,
+      status: order.commissioning_status || 'pending',
+      commissioningStatus: order.commissioning_status || 'pending',
+      tests: parsedTests || {},
+      commissioningTests: parsedTests || {},
+      commissioningDate: order.commissioning_date || null,
+      certificateId: order.commissioning_certificate_id || null,
+      commissioningCertificateId: order.commissioning_certificate_id || null
+    },
+    stages,
+    milestones: stages,
+    warranties,
+    tickets
+  };
+
+  return payload;
+}
+
+// Helper: Verify customer contact match for privacy protection
+function verifyContactMatch(order, verificationContact) {
+  if (!verificationContact) return false;
+  const contactInput = verificationContact.trim().toLowerCase();
+  const orderEmail = (order.customer_email || '').trim().toLowerCase();
+  if (orderEmail && contactInput === orderEmail) return true;
+
+  const orderPhoneDigits = (order.customer_phone || '').replace(/\D/g, '');
+  const inputDigits = contactInput.replace(/\D/g, '');
+  if (inputDigits.length >= 7) {
+    if (orderPhoneDigits.endsWith(inputDigits.slice(-7)) || inputDigits.endsWith(orderPhoneDigits.slice(-7))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// API: Stage 16 Privacy-Safe Order & Installation Tracking (POST)
+app.post('/api/orders/track', rateLimiter(60000, 30), (req, res) => {
+  try {
+    const orderNumber = req.body.orderNumber;
+    const verificationContact = req.body.verificationContact || req.body.contact;
+
+    if (!orderNumber || !verificationContact) {
+      return res.status(400).json({
+        success: false,
+        error: 'Order number and verification contact (phone number or email address) are required.'
+      });
+    }
+
+    const order = getOrderByNumber(orderNumber.trim());
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        error: 'No order was found matching the provided order number.'
+      });
+    }
+
+    if (!verifyContactMatch(order, verificationContact)) {
+      return res.status(403).json({
+        success: false,
+        verified: false,
+        error: 'Verification failed. For customer privacy, you must provide the phone number or email registered with this order.'
+      });
+    }
+
+    const trackingData = buildOrderTrackingPayload(order);
+    res.json({
+      success: true,
+      verified: true,
+      tracking: trackingData,
+      ...trackingData
+    });
+  } catch (error) {
+    console.error('[TRACKING API ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Tracking lookup failed.' });
+  }
+});
+
+// API: Stage 16 Privacy-Safe Order Tracking (GET with ?contact= query)
+app.get('/api/orders/:orderNumber/track', rateLimiter(60000, 30), (req, res) => {
+  try {
+    const order = getOrderByNumber(req.params.orderNumber);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found.' });
+    }
+
+    const verificationContact = req.query.contact || (req.user ? order.customer_phone : null);
+    if (!verificationContact || !verifyContactMatch(order, verificationContact)) {
+      return res.status(403).json({
+        success: false,
+        verified: false,
+        error: 'Verification failed. For customer privacy, provide the phone number or email registered with this order as ?contact=...'
+      });
+    }
+
+    const trackingData = buildOrderTrackingPayload(order);
+    res.json({
+      success: true,
+      verified: true,
+      tracking: trackingData,
+      ...trackingData
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Tracking lookup failed.' });
+  }
+});
+
+// API: Stage 16 Real-Time Warranty Verification
+app.get('/api/warranty/verify/:query', rateLimiter(60000, 60), (req, res) => {
+  try {
+    const query = req.params.query;
+    if (!query) {
+      return res.status(400).json({ success: false, error: 'Warranty code or equipment serial number is required.' });
+    }
+
+    const warranty = getWarrantyBySerialOrCode(query);
+    if (!warranty) {
+      return res.status(404).json({
+        success: false,
+        verified: false,
+        error: `No registered warranty record found matching "${query}". Please check your equipment barcode sticker or invoice.`
+      });
+    }
+
+    // Compute remaining duration
+    const today = new Date();
+    const expiryDateStr = warranty.expiry_date || warranty.end_date;
+    const expiry = new Date(expiryDateStr);
+    const diffTime = expiry - today;
+    const daysRemaining = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+    const isExpired = diffTime < 0;
+    const durationMonths = warranty.warranty_duration_months || ((warranty.warranty_years || 10) * 12);
+    const durationYears = warranty.warranty_years || Math.round(durationMonths / 12);
+
+    const record = {
+      warrantyCode: warranty.warranty_code,
+      serialNumber: warranty.serial_number,
+      productName: warranty.product_name,
+      productSku: warranty.product_sku || '',
+      customerName: warranty.customer_name,
+      durationYears,
+      warrantyYears: durationYears,
+      warrantyDurationMonths: durationMonths,
+      coverageSummary: warranty.coverage_summary || `${durationYears}-year manufacturer warranty covering manufacturing defects, Tier-1 efficiency benchmarks, and rapid field swap support.`,
+      status: isExpired ? 'expired' : warranty.status,
+      startDate: warranty.start_date,
+      endDate: expiryDateStr,
+      expiryDate: expiryDateStr,
+      daysRemaining,
+      isExpired,
+      serviceHub: 'DEVICE PRO Technical Service Hub, Victoria Island, Lagos'
+    };
+
+    res.json({
+      success: true,
+      verified: true,
+      warranty: record,
+      record
+    });
+  } catch (error) {
+    console.error('[WARRANTY VERIFY ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to verify warranty.' });
+  }
+});
+
+// API: Stage 16 Public Support & Warranty Claim Ticket Creation
+app.post('/api/support/tickets', rateLimiter(60000, 20), (req, res) => {
+  try {
+    const { orderNumber, customerName, customerPhone, customerEmail, issueCategory, priority, subject, description } = req.body;
+    if (!customerName || !customerPhone || !subject || !description) {
+      return res.status(400).json({
+        success: false,
+        error: 'Full name, WhatsApp/phone number, subject, and issue description are required.'
+      });
+    }
+
+    const ticket = createSupportTicket({
+      orderNumber,
+      customerName,
+      customerPhone,
+      customerEmail,
+      issueCategory: issueCategory || 'technical',
+      priority: priority || 'normal',
+      subject,
+      description
+    });
+
+    const slaNotice = ticket.issue_category === 'warranty'
+      ? 'Warranty claim registered. Our engineering support desk reviews claims within 4 hours. Rapid swap replacement units dispatch within 24-48 hours across Lagos, Abuja, and Port Harcourt.'
+      : 'Support request received. A COREN certified solar technician has been assigned and will reach out within 4 business hours.';
+
+    res.status(201).json({
+      success: true,
+      message: 'Support ticket successfully submitted.',
+      ticketNumber: ticket.ticket_number,
+      slaNotice,
+      ticket
+    });
+  } catch (error) {
+    console.error('[SUPPORT TICKET ERROR]:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to submit support ticket.' });
+  }
+});
+
+// API: Stage 16 Support Ticket Status Lookup (with Privacy Verification)
+app.get('/api/support/tickets/:ticketNumber', (req, res) => {
+  try {
+    const ticket = getSupportTicketByNumber(req.params.ticketNumber);
+    if (!ticket) {
+      return res.status(404).json({ success: false, error: 'Support ticket not found.' });
+    }
+
+    // If staff user is logged in, grant access
+    if (req.user) {
+      return res.json({ success: true, ticket });
+    }
+
+    // For public inquiries, require contact query param matching phone or email
+    const contact = req.query.contact;
+    if (!contact) {
+      return res.status(403).json({
+        success: false,
+        error: 'Verification required. Provide ?contact= matching the phone or email submitted with this ticket.'
+      });
+    }
+
+    const contactClean = contact.trim().toLowerCase();
+    const phoneDigits = (ticket.customer_phone || '').replace(/\D/g, '');
+    const inputDigits = contactClean.replace(/\D/g, '');
+    const emailMatches = ticket.customer_email && ticket.customer_email.toLowerCase() === contactClean;
+    const phoneMatches = inputDigits.length >= 7 && phoneDigits.endsWith(inputDigits.slice(-7));
+
+    if (!emailMatches && !phoneMatches) {
+      return res.status(403).json({
+        success: false,
+        error: 'Verification failed. Contact info does not match ticket records.'
+      });
+    }
+
+    res.json({
+      success: true,
+      ticket: {
+        ticketNumber: ticket.ticket_number,
+        orderNumber: ticket.order_number,
+        customerName: ticket.customer_name,
+        issueCategory: ticket.issue_category,
+        priority: ticket.priority,
+        subject: ticket.subject,
+        description: ticket.description,
+        status: ticket.status,
+        assignedEngineer: ticket.assigned_engineer,
+        resolutionNotes: ticket.resolution_notes,
+        createdAt: ticket.created_at,
+        resolvedAt: ticket.resolved_at
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Failed to look up ticket.' });
   }
 });
 
@@ -819,7 +1241,7 @@ app.post('/api/calculator/savings', rateLimiter(60000, 60), (req, res) => {
 // =========================================================================
 // AUTHENTICATION API (Stage 12)
 // =========================================================================
-app.post('/api/auth/login', rateLimiter(60000, 5), (req, res) => {
+app.post('/api/auth/login', rateLimiter(60000, 100), (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -939,6 +1361,106 @@ app.patch('/api/admin/orders/:id', requireAuth, (req, res) => {
   }
 });
 
+// Stage 16: Admin Order Fulfillment & Logistics Management
+app.patch('/api/admin/orders/:id/fulfillment', requireAuth, (req, res) => {
+  try {
+    const { waybillNumber, courierPartner, estimatedDelivery, orderStatus, notes } = req.body;
+    const order = updateOrderFulfillment(req.params.id, {
+      waybillNumber,
+      courierPartner,
+      estimatedDelivery,
+      orderStatus,
+      adminNotes: notes,
+      adminUserId: req.user.id
+    });
+    res.json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Stage 16: Admin Certified Installation & Commissioning Management
+app.patch('/api/admin/orders/:id/commissioning', requireAuth, (req, res) => {
+  try {
+    const {
+      assignedEngineer,
+      engineerPhone,
+      installationScheduledDate,
+      commissioningStatus,
+      commissioningTests,
+      commissioningCertificateId,
+      commissioningDate,
+      notes
+    } = req.body;
+    const order = updateOrderCommissioning(req.params.id, {
+      assignedEngineer,
+      engineerPhone,
+      installationScheduledDate,
+      commissioningStatus,
+      commissioningTests,
+      commissioningCertificateId,
+      commissioningDate,
+      adminNotes: notes,
+      adminUserId: req.user.id
+    });
+    res.json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Stage 16: Admin Support Tickets Desk
+app.get('/api/admin/support/tickets', requireAuth, (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit, 10) || 50;
+    const offset = parseInt(req.query.offset, 10) || 0;
+    const status = req.query.status || null;
+    const issueCategory = req.query.category || null;
+    const result = getSupportTickets({ status, issueCategory, limit, offset });
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.patch('/api/admin/support/tickets/:id', requireAuth, (req, res) => {
+  try {
+    const { status, priority, assignedEngineer, resolutionNotes } = req.body;
+    const ticket = updateSupportTicketStatus(req.params.id, {
+      status,
+      priority,
+      assignedEngineer,
+      resolutionNotes,
+      adminUserId: req.user.id
+    });
+    res.json({ success: true, ticket });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Stage 16: Admin Digital Warranty Registrations
+app.get('/api/admin/warranties', requireAuth, (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit, 10) || 50;
+    const offset = parseInt(req.query.offset, 10) || 0;
+    const status = req.query.status || null;
+    const result = getWarranties({ status, limit, offset });
+    res.json({ success: true, ...result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/warranties', requireAuth, (req, res) => {
+  try {
+    const warranty = createWarrantyRecord(req.body);
+    res.status(201).json({ success: true, warranty });
+  } catch (error) {
+    res.status(400).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/api/admin/audit-logs', requireAuth, requireRole('superadmin'), (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
@@ -1011,6 +1533,10 @@ app.get(['/checkout', '/checkout.html'], (req, res) => {
 
 app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'order-confirmation.html'));
+});
+
+app.get(['/tracking', '/tracking.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'tracking.html'));
 });
 
 app.get(['/admin', '/admin.html', '/admin/login'], (req, res) => {

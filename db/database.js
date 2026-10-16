@@ -113,6 +113,18 @@ db.exec(`
     payment_method TEXT DEFAULT 'transfer',
     payment_status TEXT DEFAULT 'pending',
     order_status TEXT DEFAULT 'pending',
+    -- Fulfillment & Logistics Tracking (Stage 16)
+    waybill_number TEXT,
+    courier_partner TEXT,
+    estimated_delivery TEXT,
+    -- Certified Installation & Commissioning (Stage 16)
+    assigned_engineer TEXT,
+    engineer_phone TEXT,
+    installation_scheduled_date TEXT,
+    commissioning_status TEXT DEFAULT 'pending',
+    commissioning_tests TEXT,
+    commissioning_date TEXT,
+    commissioning_certificate_id TEXT,
     admin_notes TEXT,
     ip_address TEXT,
     created_at TEXT DEFAULT (datetime('now')),
@@ -201,7 +213,78 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(token);
   CREATE INDEX IF NOT EXISTS idx_payments_ref ON payments(reference);
   CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_number);
+
+  -- Stage 16: Support Tickets & Warranty Registrations
+  CREATE TABLE IF NOT EXISTS support_tickets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ticket_number TEXT NOT NULL UNIQUE,
+    order_number TEXT,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT NOT NULL,
+    customer_email TEXT,
+    issue_category TEXT NOT NULL,
+    priority TEXT DEFAULT 'normal',
+    subject TEXT NOT NULL,
+    description TEXT NOT NULL,
+    status TEXT DEFAULT 'open',
+    assigned_engineer TEXT,
+    resolution_notes TEXT,
+    resolved_at TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS warranties (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    warranty_code TEXT NOT NULL UNIQUE,
+    order_number TEXT,
+    serial_number TEXT NOT NULL UNIQUE,
+    product_name TEXT NOT NULL,
+    product_sku TEXT,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT NOT NULL,
+    customer_email TEXT,
+    warranty_years INTEGER DEFAULT 5,
+    coverage_summary TEXT,
+    status TEXT DEFAULT 'active',
+    start_date TEXT DEFAULT (datetime('now')),
+    end_date TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_support_tickets_num ON support_tickets(ticket_number);
+  CREATE INDEX IF NOT EXISTS idx_support_tickets_order ON support_tickets(order_number);
+  CREATE INDEX IF NOT EXISTS idx_support_tickets_phone ON support_tickets(customer_phone);
+  CREATE INDEX IF NOT EXISTS idx_warranties_code ON warranties(warranty_code);
+  CREATE INDEX IF NOT EXISTS idx_warranties_serial ON warranties(serial_number);
+  CREATE INDEX IF NOT EXISTS idx_warranties_order ON warranties(order_number);
 `);
+
+// Stage 16 Schema Migration: Ensure columns exist in orders table
+const existingOrderCols = db.prepare('PRAGMA table_info(orders)').all().map(c => c.name);
+const neededOrderCols = [
+  { name: 'waybill_number', type: 'TEXT' },
+  { name: 'courier_partner', type: 'TEXT' },
+  { name: 'estimated_delivery', type: 'TEXT' },
+  { name: 'assigned_engineer', type: 'TEXT' },
+  { name: 'engineer_phone', type: 'TEXT' },
+  { name: 'installation_scheduled_date', type: 'TEXT' },
+  { name: 'commissioning_status', type: 'TEXT DEFAULT "pending"' },
+  { name: 'commissioning_tests', type: 'TEXT' },
+  { name: 'commissioning_date', type: 'TEXT' },
+  { name: 'commissioning_certificate_id', type: 'TEXT' }
+];
+for (const col of neededOrderCols) {
+  if (!existingOrderCols.includes(col.name)) {
+    try {
+      db.exec(`ALTER TABLE orders ADD COLUMN ${col.name} ${col.type}`);
+    } catch (e) {
+      console.warn(`[STAGE 16 MIGRATION] Notice on orders.${col.name}:`, e.message);
+    }
+  }
+}
+
 
 // Seed Products if table is empty
 const countStmt = db.prepare('SELECT COUNT(*) as count FROM products');
@@ -1635,9 +1718,11 @@ function updateQuoteStatus(id, status, adminNotes = '', adminUserId = null) {
 
 // --- ORDERS ---
 function createOrder({
+  orderNumber: customOrderNumber = null,
   customerName, customerPhone, customerEmail = '',
   deliveryAddress, deliveryState, items = [],
-  paymentMethod = 'transfer', ipAddress = ''
+  paymentMethod = 'transfer', paymentStatus = 'pending',
+  orderStatus = 'pending', adminNotes = '', ipAddress = ''
 }) {
   if (!customerName || !customerPhone || !deliveryAddress || !deliveryState) {
     throw new Error('Customer name, phone, delivery address, and state are mandatory.');
@@ -1664,7 +1749,7 @@ function createOrder({
     };
   });
 
-  const orderNumber = 'DP-ORD-' + Math.floor(100000 + Math.random() * 900000);
+  const orderNumber = customOrderNumber || ('DP-ORD-' + Math.floor(100000 + Math.random() * 900000));
   const deliveryFee = deliveryState.toLowerCase() === 'lagos' ? 15000 : 35000;
   const totalAmount = calculatedSubtotal + deliveryFee;
 
@@ -1672,16 +1757,16 @@ function createOrder({
     INSERT INTO orders (
       order_number, customer_name, customer_phone, customer_email,
       delivery_address, delivery_state, items_json, subtotal_ngn,
-      delivery_fee_ngn, total_ngn, payment_method, ip_address
+      delivery_fee_ngn, total_ngn, payment_method, payment_status, order_status, admin_notes, ip_address
     ) VALUES (
-      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )
   `);
 
   stmt.run(
     orderNumber, customerName, customerPhone, customerEmail,
     deliveryAddress, deliveryState, JSON.stringify(verifiedItems),
-    calculatedSubtotal, deliveryFee, totalAmount, paymentMethod, ipAddress
+    calculatedSubtotal, deliveryFee, totalAmount, paymentMethod, paymentStatus, orderStatus, adminNotes, ipAddress
   );
 
   logAudit({
@@ -1747,6 +1832,477 @@ function updateOrderStatus(id, orderStatus, paymentStatus, adminNotes = '', admi
     items: JSON.parse(order.items_json || '[]')
   };
 }
+
+// =========================================================================
+// STAGE 16: FULFILLMENT, COMMISSIONING & WARRANTY METHODS
+// =========================================================================
+
+function updateOrderFulfillment(orderIdOrNumber, {
+  waybillNumber,
+  courierPartner,
+  estimatedDelivery,
+  orderStatus = 'dispatched',
+  adminNotes = '',
+  adminUserId = null
+}) {
+  let targetOrder = null;
+  if (typeof orderIdOrNumber === 'number' || (!isNaN(orderIdOrNumber) && !String(orderIdOrNumber).startsWith('DP-'))) {
+    targetOrder = db.prepare('SELECT * FROM orders WHERE id = ?').get(Number(orderIdOrNumber));
+  }
+  if (!targetOrder) {
+    targetOrder = getOrderByNumber(orderIdOrNumber);
+  }
+  if (!targetOrder && typeof orderIdOrNumber === 'string') {
+    targetOrder = db.prepare('SELECT * FROM orders WHERE id = ?').get(orderIdOrNumber);
+  }
+
+  if (!targetOrder) throw new Error('Order not found for fulfillment update.');
+
+  const stmt = db.prepare(`
+    UPDATE orders
+    SET waybill_number = COALESCE(?, waybill_number),
+        courier_partner = COALESCE(?, courier_partner),
+        estimated_delivery = COALESCE(?, estimated_delivery),
+        order_status = COALESCE(?, order_status),
+        admin_notes = CASE WHEN ? IS NOT NULL AND ? != '' THEN ? ELSE admin_notes END,
+        updated_at = datetime('now')
+    WHERE id = ?
+  `);
+  stmt.run(
+    waybillNumber !== undefined ? waybillNumber : null,
+    courierPartner !== undefined ? courierPartner : null,
+    estimatedDelivery !== undefined ? estimatedDelivery : null,
+    orderStatus !== undefined ? orderStatus : null,
+    adminNotes, adminNotes, adminNotes,
+    targetOrder.id
+  );
+
+  logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_ORDER_FULFILLMENT',
+    entityType: 'order',
+    entityId: targetOrder.order_number,
+    details: `Waybill: ${waybillNumber || targetOrder.waybill_number || 'N/A'}, Courier: ${courierPartner || targetOrder.courier_partner || 'N/A'}, ETA: ${estimatedDelivery || targetOrder.estimated_delivery || 'N/A'}, Status: ${orderStatus}`
+  });
+
+  return getOrderByNumber(targetOrder.order_number);
+}
+
+function updateOrderCommissioning(orderIdOrNumber, {
+  assignedEngineer,
+  engineerPhone,
+  installationScheduledDate,
+  commissioningStatus = 'scheduled',
+  commissioningTests = null,
+  commissioningDate = null,
+  commissioningCertificateId = null,
+  adminNotes = '',
+  adminUserId = null
+}) {
+  let targetOrder = null;
+  if (typeof orderIdOrNumber === 'number' || (!isNaN(orderIdOrNumber) && !String(orderIdOrNumber).startsWith('DP-'))) {
+    targetOrder = db.prepare('SELECT * FROM orders WHERE id = ?').get(Number(orderIdOrNumber));
+  }
+  if (!targetOrder) {
+    targetOrder = getOrderByNumber(orderIdOrNumber);
+  }
+  if (!targetOrder && typeof orderIdOrNumber === 'string') {
+    targetOrder = db.prepare('SELECT * FROM orders WHERE id = ?').get(orderIdOrNumber);
+  }
+
+  if (!targetOrder) throw new Error('Order not found for commissioning update.');
+
+  const testsJson = typeof commissioningTests === 'object' && commissioningTests !== null
+    ? JSON.stringify(commissioningTests)
+    : (commissioningTests || null);
+
+  let certId = commissioningCertificateId;
+  const isCompleted = commissioningStatus === 'commissioned' || commissioningStatus === 'completed';
+  if (isCompleted && !certId) {
+    certId = targetOrder.commissioning_certificate_id || `DP-CERT-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
+  }
+
+  const effectiveStatus = isCompleted ? 'commissioned' : commissioningStatus;
+  const commDate = (effectiveStatus === 'commissioned' && !commissioningDate) ? new Date().toISOString() : commissioningDate;
+  const newOrderStatus = effectiveStatus === 'commissioned' ? 'completed' : targetOrder.order_status;
+
+  const stmt = db.prepare(`
+    UPDATE orders
+    SET assigned_engineer = COALESCE(?, assigned_engineer),
+        engineer_phone = COALESCE(?, engineer_phone),
+        installation_scheduled_date = COALESCE(?, installation_scheduled_date),
+        commissioning_status = COALESCE(?, commissioning_status),
+        commissioning_tests = COALESCE(?, commissioning_tests),
+        commissioning_date = COALESCE(?, commissioning_date),
+        commissioning_certificate_id = COALESCE(?, commissioning_certificate_id),
+        order_status = ?,
+        admin_notes = CASE WHEN ? IS NOT NULL AND ? != '' THEN ? ELSE admin_notes END,
+        updated_at = datetime('now')
+    WHERE id = ?
+  `);
+
+  stmt.run(
+    assignedEngineer !== undefined ? assignedEngineer : null,
+    engineerPhone !== undefined ? engineerPhone : null,
+    installationScheduledDate !== undefined ? installationScheduledDate : null,
+    effectiveStatus !== undefined ? effectiveStatus : null,
+    testsJson,
+    commDate,
+    certId,
+    newOrderStatus,
+    adminNotes, adminNotes, adminNotes,
+    targetOrder.id
+  );
+
+  logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_ORDER_COMMISSIONING',
+    entityType: 'order',
+    entityId: targetOrder.order_number,
+    details: `Engineer: ${assignedEngineer || targetOrder.assigned_engineer || 'N/A'}, Scheduled: ${installationScheduledDate || targetOrder.installation_scheduled_date || 'N/A'}, Status: ${effectiveStatus}, Certificate: ${certId || 'N/A'}`
+  });
+
+  return getOrderByNumber(targetOrder.order_number);
+}
+
+// --- SUPPORT TICKETS ---
+function createSupportTicket({
+  orderNumber = null,
+  customerName,
+  customerPhone,
+  customerEmail = null,
+  issueCategory = 'technical',
+  priority = 'normal',
+  subject,
+  description
+}) {
+  if (!customerName || !customerPhone || !subject || !description) {
+    throw new Error('Customer name, phone number, subject, and description are required.');
+  }
+
+  const ticketNumber = 'DP-SPT-' + Math.floor(100000 + Math.random() * 900000);
+  const stmt = db.prepare(`
+    INSERT INTO support_tickets (
+      ticket_number, order_number, customer_name, customer_phone, customer_email,
+      issue_category, priority, subject, description, status
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open'
+    )
+  `);
+
+  stmt.run(
+    ticketNumber,
+    orderNumber ? orderNumber.trim() : null,
+    customerName.trim(),
+    customerPhone.trim(),
+    customerEmail ? customerEmail.trim() : null,
+    issueCategory,
+    priority,
+    subject.trim(),
+    description.trim()
+  );
+
+  logAudit({
+    userId: null,
+    action: 'CREATE_SUPPORT_TICKET',
+    entityType: 'support_ticket',
+    entityId: ticketNumber,
+    details: `Ticket created for ${customerName} (${issueCategory}). Priority: ${priority}. Subject: ${subject}`
+  });
+
+  return getSupportTicketByNumber(ticketNumber);
+}
+
+function getSupportTickets({ status = null, issueCategory = null, limit = 50, offset = 0 } = {}) {
+  let query = 'SELECT * FROM support_tickets';
+  const conditions = [];
+  const params = [];
+
+  if (status) {
+    conditions.push('status = ?');
+    params.push(status);
+  }
+  if (issueCategory) {
+    conditions.push('issue_category = ?');
+    params.push(issueCategory);
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  query += ' ORDER BY id DESC LIMIT ? OFFSET ?';
+  params.push(limit, offset);
+
+  const tickets = db.prepare(query).all(...params);
+
+  let countQuery = 'SELECT COUNT(*) as count FROM support_tickets';
+  const countParams = [];
+  if (conditions.length > 0) {
+    countQuery += ' WHERE ' + conditions.join(' AND ');
+    if (status) countParams.push(status);
+    if (issueCategory) countParams.push(issueCategory);
+  }
+  const countStmt = db.prepare(countQuery).get(...countParams);
+
+  return { tickets, total: countStmt.count };
+}
+
+function getSupportTicketByNumber(ticketNumber) {
+  return db.prepare('SELECT * FROM support_tickets WHERE ticket_number = ?').get(ticketNumber);
+}
+
+function getSupportTicketsByOrder(orderNumber) {
+  return db.prepare('SELECT * FROM support_tickets WHERE order_number = ? ORDER BY id DESC').all(orderNumber);
+}
+
+function updateSupportTicketStatus(id, {
+  status,
+  priority = null,
+  assignedEngineer = null,
+  resolutionNotes = null,
+  adminUserId = null
+}) {
+  const existing = db.prepare('SELECT * FROM support_tickets WHERE id = ?').get(id);
+  if (!existing) throw new Error('Support ticket not found.');
+
+  const resolvedAt = (status === 'resolved' || status === 'closed') ? new Date().toISOString() : existing.resolved_at;
+
+  const stmt = db.prepare(`
+    UPDATE support_tickets
+    SET status = COALESCE(?, status),
+        priority = COALESCE(?, priority),
+        assigned_engineer = COALESCE(?, assigned_engineer),
+        resolution_notes = COALESCE(?, resolution_notes),
+        resolved_at = ?,
+        updated_at = datetime('now')
+    WHERE id = ?
+  `);
+  stmt.run(status, priority, assignedEngineer, resolutionNotes, resolvedAt, id);
+
+  logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_SUPPORT_TICKET',
+    entityType: 'support_ticket',
+    entityId: existing.ticket_number,
+    details: `Ticket ${existing.ticket_number} status updated to: ${status}. Engineer: ${assignedEngineer || existing.assigned_engineer || 'None'}`
+  });
+
+  return db.prepare('SELECT * FROM support_tickets WHERE id = ?').get(id);
+}
+
+// --- DIGITAL WARRANTIES ---
+function createWarrantyRecord({
+  warrantyCode = null,
+  orderNumber = null,
+  productName,
+  productSku = null,
+  serialNumber,
+  customerName,
+  customerPhone,
+  customerEmail = null,
+  warrantyYears = null,
+  warrantyDurationMonths = null,
+  coverageSummary = 'Full parts replacement and tier-1 manufacturer warranty coverage',
+  startDate = null,
+  endDate = null
+}) {
+  if (!serialNumber || !productName || !customerName || !customerPhone) {
+    throw new Error('Serial number, product name, customer name, and phone are required.');
+  }
+
+  const code = warrantyCode || ('DP-WRN-' + crypto.randomBytes(3).toString('hex').toUpperCase());
+  const years = warrantyYears || (warrantyDurationMonths ? Math.round(warrantyDurationMonths / 12) : 5);
+  const start = startDate || new Date().toISOString().split('T')[0];
+  let end = endDate;
+  if (!end) {
+    const sDate = new Date(start);
+    sDate.setFullYear(sDate.getFullYear() + Number(years));
+    end = sDate.toISOString().split('T')[0];
+  }
+
+  const stmt = db.prepare(`
+    INSERT INTO warranties (
+      warranty_code, order_number, serial_number, product_name, product_sku,
+      customer_name, customer_phone, customer_email, warranty_years, coverage_summary,
+      status, start_date, end_date
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?
+    )
+  `);
+
+  stmt.run(
+    code,
+    orderNumber ? orderNumber.trim() : null,
+    serialNumber.trim().toUpperCase(),
+    productName.trim(),
+    productSku ? productSku.trim() : null,
+    customerName.trim(),
+    customerPhone.trim(),
+    customerEmail ? customerEmail.trim() : null,
+    Number(years),
+    coverageSummary,
+    start,
+    end
+  );
+
+  return getWarrantyBySerialOrCode(code);
+}
+
+function getWarrantyBySerialOrCode(query) {
+  if (!query) return null;
+  const clean = query.trim().toUpperCase();
+  return db.prepare(`
+    SELECT * FROM warranties
+    WHERE UPPER(warranty_code) = ? OR UPPER(serial_number) = ?
+  `).get(clean, clean);
+}
+
+function getWarrantiesByOrder(orderNumber) {
+  return db.prepare('SELECT * FROM warranties WHERE order_number = ? ORDER BY id DESC').all(orderNumber);
+}
+
+function getWarranties({ status = null, limit = 50, offset = 0 } = {}) {
+  let query = 'SELECT * FROM warranties';
+  const params = [];
+  if (status) {
+    query += ' WHERE status = ?';
+    params.push(status);
+  }
+  query += ' ORDER BY id DESC LIMIT ? OFFSET ?';
+  params.push(limit, offset);
+
+  const warranties = db.prepare(query).all(...params);
+  const countStmt = status
+    ? db.prepare('SELECT COUNT(*) as count FROM warranties WHERE status = ?').get(status)
+    : db.prepare('SELECT COUNT(*) as count FROM warranties').get();
+
+  return { warranties, total: countStmt.count };
+}
+
+// Seed Initial Warranties and Tickets for Demonstration
+function seedStage16DemoData() {
+  const warrantyCount = db.prepare('SELECT COUNT(*) as count FROM warranties').get().count;
+  if (warrantyCount === 0) {
+    console.log('[DATABASE] Seeding Stage 16 verified warranty records and sample support tickets...');
+    
+    // Sample Orders for Fulfillment & Tracking Demo
+    const existingOrdersCount = db.prepare('SELECT COUNT(*) as count FROM orders').get().count;
+    if (existingOrdersCount === 0) {
+      // Order 1: Dispatched / In-Transit & Scheduled
+      const order1Items = [
+        { id: 1, name: "Jinko 550W Monocrystalline Panel", price: 245000, quantity: 12, subtotal: 2940000 },
+        { id: 7, name: "Deye 8kW Hybrid Inverter 48V", price: 3450000, quantity: 1, subtotal: 3450000 }
+      ];
+      db.prepare(`
+        INSERT INTO orders (
+          order_number, customer_name, customer_phone, customer_email,
+          delivery_address, delivery_state, items_json, subtotal_ngn,
+          delivery_fee_ngn, total_ngn, payment_method, payment_status, order_status,
+          waybill_number, courier_partner, estimated_delivery,
+          assigned_engineer, engineer_phone, installation_scheduled_date, commissioning_status
+        ) VALUES (
+          'DP-ORD-100201', 'Alhaji Musa Danjuma', '08031234567', 'musa.danjuma@example.com',
+          '15 Admiralty Way, Lekki Phase 1', 'Lagos', ?, 6390000,
+          15000, 6405000, 'transfer', 'verified', 'dispatched',
+          'GIG-LOS-892110', 'DEVICE PRO Fleet Logistics', '2026-10-18',
+          'Engr. Babatunde Adeleke (COREN Reg #48291)', '+234 803 111 2233', '2026-10-20', 'scheduled'
+        )
+      `).run(JSON.stringify(order1Items));
+
+      // Order 2: Completed & Fully Commissioned
+      const order2Items = [
+        { id: 13, name: "Felicity 10kWh LiFePO4 Lithium Battery", price: 3850000, quantity: 1, subtotal: 3850000 }
+      ];
+      const testResults = {
+        earthingResistance: "3.4Ω (<5.0Ω COREN/NEMSA Pass)",
+        dcSurgeProtection: "Type II DC SPD Active & Clamped",
+        acLoadBalancing: "Phase Current Imbalance < 4%",
+        inverterSync: "Grid Frequency Lock 50.05Hz Stable",
+        batteryCellDeviation: "8mV Peak Deviation (<15mV Pass)"
+      };
+      db.prepare(`
+        INSERT INTO orders (
+          order_number, customer_name, customer_phone, customer_email,
+          delivery_address, delivery_state, items_json, subtotal_ngn,
+          delivery_fee_ngn, total_ngn, payment_method, payment_status, order_status,
+          waybill_number, courier_partner, estimated_delivery,
+          assigned_engineer, engineer_phone, installation_scheduled_date,
+          commissioning_status, commissioning_tests, commissioning_date, commissioning_certificate_id
+        ) VALUES (
+          'DP-ORD-100202', 'Dr. Ifeanyi Okonjo', '08029876543', 'ifeanyi.okonjo@example.com',
+          'Plot 42 Maitama Crescent', 'Abuja', ?, 3850000,
+          35000, 3885000, 'card', 'paid', 'completed',
+          'DHL-ABJ-449102', 'DHL Express Nigeria', '2026-10-14',
+          'Engr. Nnamdi Eze (COREN Reg #51042)', '+234 802 555 7890', '2026-10-15',
+          'commissioned', ?, '2026-10-15T16:30:00Z', 'DP-CERT-ABJ-901'
+        )
+      `).run(JSON.stringify(order2Items), JSON.stringify(testResults));
+    }
+
+    // Seed Warranties
+    createWarrantyRecord({
+      orderNumber: 'DP-ORD-100201',
+      productName: 'Jinko 550W Monocrystalline Bifacial Solar Panel (12x Array)',
+      productSku: 'JKM-550M-72HL4',
+      serialNumber: 'DP-SN-JK550-2026-001',
+      customerName: 'Alhaji Musa Danjuma',
+      customerPhone: '08031234567',
+      customerEmail: 'musa.danjuma@example.com',
+      warrantyYears: 25,
+      coverageSummary: '25-Year Linear Power Output Guarantee (84.8% power output at Year 25). 12-Year Workmanship Warranty.'
+    });
+
+    createWarrantyRecord({
+      orderNumber: 'DP-ORD-100201',
+      productName: 'Deye 8kW Hybrid Inverter 48V Single Phase',
+      productSku: 'SUN-8K-SG01LP1-EU',
+      serialNumber: 'DP-SN-DYE8K-2026-089',
+      customerName: 'Alhaji Musa Danjuma',
+      customerPhone: '08031234567',
+      customerEmail: 'musa.danjuma@example.com',
+      warrantyYears: 5,
+      coverageSummary: '5-Year Manufacturer Warranty. 24-48h rapid swap units available at Victoria Island Engineering Hub.'
+    });
+
+    createWarrantyRecord({
+      orderNumber: 'DP-ORD-100202',
+      productName: 'Felicity 10kWh LiFePO4 Lithium Battery 51.2V 200Ah',
+      productSku: 'FL-LPBF48200-P',
+      serialNumber: 'DP-SN-FEL10K-2026-304',
+      customerName: 'Dr. Ifeanyi Okonjo',
+      customerPhone: '08029876543',
+      customerEmail: 'ifeanyi.okonjo@example.com',
+      warrantyYears: 10,
+      coverageSummary: '10-Year or 6,000-Cycle Performance Guarantee with internal smart BMS active cell protection.'
+    });
+
+    // Seed Support Tickets
+    createSupportTicket({
+      orderNumber: 'DP-ORD-100201',
+      customerName: 'Alhaji Musa Danjuma',
+      customerPhone: '08031234567',
+      customerEmail: 'musa.danjuma@example.com',
+      issueCategory: 'installation',
+      priority: 'normal',
+      subject: 'Site Pre-Inspection Access Confirmation for Roof Strut Mounting',
+      description: 'The estate gate pass for the DEVICE PRO installation truck has been cleared with Lekki Phase 1 security. Ready for scheduled mounting on the 20th.'
+    });
+
+    createSupportTicket({
+      orderNumber: 'DP-ORD-100202',
+      customerName: 'Dr. Ifeanyi Okonjo',
+      customerPhone: '08029876543',
+      customerEmail: 'ifeanyi.okonjo@example.com',
+      issueCategory: 'technical',
+      priority: 'high',
+      subject: 'Wi-Fi Dongle Cloud Monitoring Setup Assistance',
+      description: 'Solar inverter and lithium storage commissioned successfully. Requesting assistance linking the Felicity cloud app with local Wi-Fi network.'
+    });
+  }
+}
+
+seedStage16DemoData();
 
 // --- PAYMENTS & GATEWAY RECONCILIATION ---
 function createPaymentRecord({
@@ -1938,6 +2494,14 @@ function getDatabaseStats() {
   const users = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
   const caseStudies = db.prepare('SELECT COUNT(*) as count FROM case_studies').get().count;
   const auditLogs = db.prepare('SELECT COUNT(*) as count FROM audit_logs').get().count;
+  let supportTickets = 0;
+  let warranties = 0;
+  try {
+    supportTickets = db.prepare('SELECT COUNT(*) as count FROM support_tickets').get().count;
+    warranties = db.prepare('SELECT COUNT(*) as count FROM warranties').get().count;
+  } catch (e) {
+    // tables may not exist in early tests
+  }
 
   return {
     database: 'SQLite (node:sqlite DatabaseSync)',
@@ -1950,7 +2514,9 @@ function getDatabaseStats() {
       orders,
       users,
       caseStudies,
-      auditLogs
+      auditLogs,
+      supportTickets,
+      warranties
     },
     timestamp: new Date().toISOString()
   };
@@ -2114,11 +2680,24 @@ module.exports = {
   getQuoteById,
   getQuoteByRef,
   updateQuoteStatus,
-  // Orders
+  // Orders & Fulfillment
   createOrder,
   getOrders,
   getOrderByNumber,
   updateOrderStatus,
+  updateOrderFulfillment,
+  updateOrderCommissioning,
+  // Support & Tickets (Stage 16)
+  createSupportTicket,
+  getSupportTickets,
+  getSupportTicketByNumber,
+  getSupportTicketsByOrder,
+  updateSupportTicketStatus,
+  // Warranties (Stage 16)
+  createWarrantyRecord,
+  getWarrantyBySerialOrCode,
+  getWarrantiesByOrder,
+  getWarranties,
   // Payments
   createPaymentRecord,
   getPaymentByReference,

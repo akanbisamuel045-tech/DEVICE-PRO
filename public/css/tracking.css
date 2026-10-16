@@ -1,0 +1,1068 @@
+/* =========================================================================
+   DEVICE PRO NIGERIA — Delivery, Installation & After-Sales Tracking Styles
+   Stage 16: Operations Workflows, Privacy-Safe Tracking & Warranty Portal
+   ========================================================================= */
+
+@import url('tokens.css');
+
+/* Global Container & Page Wrapper */
+.tracking-page-wrapper {
+  background-color: var(--color-brand-cream, #F7FAFC);
+  min-height: calc(100vh - 280px);
+  padding: 2.5rem 1rem 5rem;
+  color: var(--color-brand-blue, #082D50);
+}
+
+.tracking-container {
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+/* Hero Section */
+.tracking-hero {
+  background: linear-gradient(135deg, #061C35 0%, #0B2546 50%, #061C35 100%);
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  color: #FFFFFF;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(6, 28, 53, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.tracking-hero::after {
+  content: 'DEVICE PRO OPERATIONS';
+  position: absolute;
+  right: -20px;
+  bottom: -25px;
+  font-size: 4.5rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.03);
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+.hero-tagline-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: 9999px;
+  background: rgba(255, 185, 12, 0.15);
+  border: 1px solid rgba(255, 185, 12, 0.4);
+  color: var(--color-brand-yellow, #FFB90C);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.tracking-hero h1 {
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+  color: #FFFFFF;
+}
+
+.tracking-hero p {
+  font-size: 1.05rem;
+  color: rgba(238, 241, 248, 0.85);
+  max-width: 720px;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.hero-assurance-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.assurance-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #EEF1F8;
+}
+
+.assurance-chip svg {
+  color: var(--color-brand-yellow, #FFB90C);
+}
+
+/* Tab Navigation Bar */
+.tracking-tabs-nav {
+  display: flex;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 0.35rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  overflow-x: auto;
+  gap: 0.35rem;
+}
+
+.tab-btn {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: #64748B;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: #061C35;
+  background: #F1F5F9;
+}
+
+.tab-btn.active {
+  background: #061C35;
+  color: #FFFFFF;
+  box-shadow: 0 4px 10px rgba(6, 28, 53, 0.2);
+}
+
+.tab-btn.active svg {
+  color: var(--color-brand-yellow, #FFB90C);
+}
+
+/* Tab Panels */
+.tab-content-panel {
+  display: none;
+}
+
+.tab-content-panel.active {
+  display: block;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Search & Input Cards */
+.tracking-search-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 2.25rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  margin-bottom: 2rem;
+}
+
+.search-card-header {
+  margin-bottom: 1.5rem;
+}
+
+.search-card-header h2 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #061C35;
+  margin-bottom: 0.35rem;
+}
+
+.search-card-header p {
+  font-size: 0.92rem;
+  color: #64748B;
+  line-height: 1.5;
+}
+
+.tracking-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1.25rem;
+  align-items: flex-end;
+}
+
+@media (max-width: 768px) {
+  .tracking-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.field-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1E293B;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.field-label .required-star {
+  color: #EF4444;
+}
+
+.field-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-input-wrap svg {
+  position: absolute;
+  left: 1rem;
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+.text-input {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.75rem;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #0F172A;
+  background: #F8FAFC;
+  transition: all 0.2s ease;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #061C35;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(6, 28, 53, 0.1);
+}
+
+.btn-search-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.75rem;
+  background: #061C35;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-height: 48px;
+}
+
+.btn-search-submit:hover {
+  background: #0B2546;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(6, 28, 53, 0.2);
+}
+
+.btn-search-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Privacy Notice Box */
+.privacy-notice-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-top: 1.25rem;
+  font-size: 0.82rem;
+  color: #1E40AF;
+  line-height: 1.45;
+}
+
+.privacy-notice-box svg {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  color: #2563EB;
+}
+
+/* Preset Pills */
+.demo-presets-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #F1F5F9;
+}
+
+.preset-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.preset-pill {
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  color: #0F172A;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.preset-pill:hover {
+  background: #061C35;
+  color: #FFFFFF;
+  border-color: #061C35;
+}
+
+/* Loading & Error States */
+.state-box {
+  padding: 3rem 2rem;
+  text-align: center;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+}
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 3px solid rgba(6, 28, 53, 0.1);
+  border-top-color: #061C35;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.state-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #061C35;
+  margin-bottom: 0.35rem;
+}
+
+.state-desc {
+  font-size: 0.9rem;
+  color: #64748B;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.error-box {
+  background: #FEF2F2;
+  border-color: #FECACA;
+}
+
+.error-box .state-title {
+  color: #991B1B;
+}
+
+.error-box .state-desc {
+  color: #B91C1C;
+}
+
+/* =========================================================================
+   LIVE TRACKING RESULTS VIEW
+   ========================================================================= */
+.tracking-results-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+/* Overview Bar */
+.results-header-bar {
+  background: #061C35;
+  color: #FFFFFF;
+  padding: 1.75rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.order-badge-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.order-badge-title .badge-pill {
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-pill.status-pending { background: #FEF3C7; color: #92400E; }
+.badge-pill.status-confirmed { background: #E0E7FF; color: #3730A3; }
+.badge-pill.status-processing { background: #DBEAFE; color: #1E40AF; }
+.badge-pill.status-dispatched { background: #FEF3C7; color: #B45309; }
+.badge-pill.status-completed { background: #DCFCE7; color: #166534; }
+.badge-pill.status-cancelled { background: #FEE2E2; color: #991B1B; }
+
+.header-meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.meta-item-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-item-lbl {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: rgba(238, 241, 248, 0.6);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.meta-item-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.meta-item-val.highlight {
+  color: var(--color-brand-yellow, #FFB90C);
+}
+
+/* Logistics Waybill Banner */
+.logistics-waybill-banner {
+  background: #F8FAFC;
+  border-bottom: 1px solid #E2E8F0;
+  padding: 1.25rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.courier-info-col {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.courier-icon-box {
+  width: 46px;
+  height: 46px;
+  background: #061C35;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-brand-yellow, #FFB90C);
+  flex-shrink: 0;
+}
+
+.courier-name {
+  font-weight: 800;
+  color: #061C35;
+  font-size: 1rem;
+}
+
+.courier-eta {
+  font-size: 0.85rem;
+  color: #64748B;
+}
+
+.waybill-ref-col {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.waybill-pill {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  font-family: monospace;
+  font-weight: 700;
+  color: #0F172A;
+  font-size: 0.9rem;
+}
+
+/* 6-Stage Timeline Stepper */
+.tracking-stepper-wrap {
+  padding: 2.5rem 2rem;
+}
+
+.stepper-timeline {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 2rem;
+}
+
+.stepper-timeline::before {
+  content: '';
+  position: absolute;
+  top: 15px;
+  bottom: 25px;
+  left: 20px;
+  width: 3px;
+  background: #E2E8F0;
+  z-index: 1;
+}
+
+.timeline-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+.step-marker-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 3px solid #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #94A3B8;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.timeline-step.completed .step-marker-circle {
+  background: #16A34A;
+  border-color: #16A34A;
+  color: #FFFFFF;
+}
+
+.timeline-step.active .step-marker-circle {
+  background: var(--color-brand-yellow, #FFB90C);
+  border-color: #061C35;
+  color: #061C35;
+  box-shadow: 0 0 0 4px rgba(255, 185, 12, 0.25);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 185, 12, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 185, 12, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 185, 12, 0); }
+}
+
+.step-content-card {
+  flex: 1;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.timeline-step.active .step-content-card {
+  background: #FFFFFF;
+  border-color: #061C35;
+  box-shadow: 0 6px 18px rgba(6, 28, 53, 0.06);
+}
+
+.step-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.step-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #061C35;
+}
+
+.step-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  background: #E2E8F0;
+  color: #475569;
+}
+
+.timeline-step.completed .step-badge {
+  background: #DCFCE7;
+  color: #166534;
+}
+
+.timeline-step.active .step-badge {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.step-desc {
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.5;
+  margin-bottom: 0.35rem;
+}
+
+.step-timestamp {
+  font-size: 0.78rem;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+/* Commissioning Matrix Card */
+.commissioning-audit-card {
+  background: #061C35;
+  color: #FFFFFF;
+  border-radius: 14px;
+  padding: 2rem;
+  margin: 1.5rem 2rem;
+  border: 1px solid rgba(255, 185, 12, 0.3);
+}
+
+.audit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1rem;
+}
+
+.audit-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.audit-cert-badge {
+  background: rgba(255, 185, 12, 0.2);
+  border: 1px solid rgba(255, 185, 12, 0.4);
+  color: var(--color-brand-yellow, #FFB90C);
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.engineer-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.eng-info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.eng-lbl {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: rgba(238, 241, 248, 0.6);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.eng-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.tests-checklist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.85rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1.25rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.test-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #EEF1F8;
+}
+
+.test-check-item svg {
+  color: #22C55E;
+  flex-shrink: 0;
+}
+
+/* Equipment Items List */
+.equipment-items-section {
+  padding: 1.5rem 2rem 2rem;
+  border-top: 1px solid #E2E8F0;
+}
+
+.section-subheading {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #061C35;
+  margin-bottom: 1rem;
+}
+
+.items-table-wrap {
+  overflow-x: auto;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.items-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  background: #F8FAFC;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  color: #64748B;
+  font-weight: 700;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.items-table td {
+  padding: 1rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #F1F5F9;
+  color: #1E293B;
+}
+
+/* Actions Row */
+.tracking-actions-bar {
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.btn-action-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.35rem;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  color: #061C35;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-action-outline:hover {
+  background: #F1F5F9;
+  border-color: #94A3B8;
+}
+
+.btn-whatsapp-direct {
+  background: #25D366;
+  color: #FFFFFF;
+  border: none;
+  font-weight: 700;
+  padding: 0.75rem 1.35rem;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  transition: all 0.2s ease;
+}
+
+.btn-whatsapp-direct:hover {
+  background: #1EBE5D;
+}
+
+/* =========================================================================
+   WARRANTY CERTIFICATE CARD
+   ========================================================================= */
+.warranty-cert-card {
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+  margin-top: 1.5rem;
+}
+
+.cert-top-seal {
+  background: linear-gradient(135deg, #061C35 0%, #0F335C 100%);
+  color: #FFFFFF;
+  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.cert-seal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: #22C55E;
+  padding: 0.4rem 0.9rem;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.cert-seal-badge.expired {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #EF4444;
+}
+
+.cert-body {
+  padding: 2.25rem;
+}
+
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.cert-item-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.cert-item-lbl {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748B;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.25rem;
+}
+
+.cert-item-val {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #061C35;
+}
+
+.cert-item-val.mono {
+  font-family: monospace;
+  color: #0B2546;
+  font-size: 1.15rem;
+}
+
+.cert-countdown-box {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.countdown-text {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #166534;
+}
+
+.countdown-pill {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #15803D;
+}
+
+.cert-terms-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 1.25rem;
+  font-size: 0.88rem;
+  color: #475569;
+  line-height: 1.6;
+}
+
+/* =========================================================================
+   SUPPORT TICKET SUBMISSION FORM
+   ========================================================================= */
+.support-form-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #0F172A;
+  background: #F8FAFC;
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #061C35;
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(6, 28, 53, 0.1);
+}
+
+.form-select {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #0F172A;
+  background: #F8FAFC;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #061C35;
+  background: #FFFFFF;
+}
+
+.ticket-success-card {
+  background: #F0FDF4;
+  border: 1px solid #86EFAC;
+  border-radius: 14px;
+  padding: 2rem;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.ticket-success-card h3 {
+  color: #166534;
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.ticket-ref-pill {
+  display: inline-block;
+  background: #166534;
+  color: #FFFFFF;
+  font-family: monospace;
+  font-size: 1.2rem;
+  font-weight: 800;
+  padding: 0.4rem 1.2rem;
+  border-radius: 8px;
+  margin: 0.75rem 0 1rem;
+}
+
+.ticket-sla-notice {
+  font-size: 0.92rem;
+  color: #15803D;
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.5;
+}
+
+/* Print Styles */
+@media print {
+  .tracking-hero,
+  .tracking-tabs-nav,
+  .tracking-search-card,
+  .demo-presets-row,
+  .tracking-actions-bar,
+  .site-header,
+  .site-footer {
+    display: none !important;
+  }
+  .tracking-page-wrapper {
+    padding: 0;
+    background: #FFFFFF;
+  }
+  .tracking-results-card,
+  .warranty-cert-card {
+    border: none;
+    box-shadow: none;
+  }
+}

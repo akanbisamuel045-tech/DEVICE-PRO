@@ -11,11 +11,16 @@
   let currentUser = null;
   let activeTab = 'overview';
   let cachedOrders = [];
+  let cachedFulfillment = [];
+  let cachedTickets = [];
+  let cachedWarranties = [];
   let cachedQuotes = [];
   let cachedEnquiries = [];
   let cachedProducts = [];
   let currentEditingOrderId = null;
   let currentEditingQuoteId = null;
+  let currentEditingFulfillmentId = null;
+  let currentEditingTicketId = null;
 
   // --- DOM ELEMENTS ---
   const authView = document.getElementById('admin-auth-view');
@@ -34,6 +39,8 @@
 
   // Badges & KPI
   const badgeOrders = document.getElementById('badge-orders-count');
+  const badgeFulfillment = document.getElementById('badge-fulfillment-count');
+  const badgeSupport = document.getElementById('badge-support-count');
   const badgeQuotes = document.getElementById('badge-quotes-count');
   const badgeEnquiries = document.getElementById('badge-enquiries-count');
   const kpiRevenue = document.getElementById('kpi-total-revenue');
@@ -42,9 +49,14 @@
   const kpiOpenQuotes = document.getElementById('kpi-open-quotes');
   const kpiOpenEnquiries = document.getElementById('kpi-open-enquiries');
   const kpiProducts = document.getElementById('kpi-products-count');
+  const kpiOpenTickets = document.getElementById('kpi-open-tickets');
+  const kpiTotalTickets = document.getElementById('kpi-total-tickets');
+  const kpiActiveWarranties = document.getElementById('kpi-active-warranties');
 
   // Modals
   const orderModal = document.getElementById('order-details-modal');
+  const fulfillmentModal = document.getElementById('fulfillment-modal');
+  const adminTicketModal = document.getElementById('admin-ticket-modal');
   const quoteModal = document.getElementById('quote-details-modal');
   const productEditModal = document.getElementById('product-edit-modal');
   const addProductModal = document.getElementById('add-product-modal');
@@ -261,6 +273,16 @@
     if (ordersSearch) ordersSearch.addEventListener('input', debounce(() => renderOrdersTable(), 300));
     if (ordersStatus) ordersStatus.addEventListener('change', () => renderOrdersTable());
 
+    // Filter controls - Fulfillment (Stage 16)
+    const fulSearch = document.getElementById('fulfillment-search-input');
+    const fulStatus = document.getElementById('fulfillment-status-filter');
+    if (fulSearch) fulSearch.addEventListener('input', debounce(() => renderFulfillmentTable(), 300));
+    if (fulStatus) fulStatus.addEventListener('change', () => renderFulfillmentTable());
+
+    // Filter controls - Support (Stage 16)
+    const supportStatus = document.getElementById('support-status-filter');
+    if (supportStatus) supportStatus.addEventListener('change', () => renderSupportTicketsTable());
+
     // Filter controls - Quotes
     const quotesSearch = document.getElementById('quotes-search-input');
     const quotesStatus = document.getElementById('quotes-status-filter');
@@ -291,6 +313,18 @@
     const btnSaveOrder = document.getElementById('btn-save-order-changes');
     if (btnSaveOrder) {
       btnSaveOrder.addEventListener('click', saveOrderUpdates);
+    }
+
+    // Save Fulfillment Updates (Stage 16)
+    const btnSaveFulfillment = document.getElementById('btn-save-fulfillment-changes');
+    if (btnSaveFulfillment) {
+      btnSaveFulfillment.addEventListener('click', saveFulfillmentUpdates);
+    }
+
+    // Save Support Ticket Updates (Stage 16)
+    const btnSaveTicket = document.getElementById('btn-save-ticket-changes');
+    if (btnSaveTicket) {
+      btnSaveTicket.addEventListener('click', saveTicketUpdates);
     }
 
     // Save Quote Updates
@@ -349,6 +383,8 @@
     const titles = {
       overview: 'Operational Overview',
       orders: 'Commercial Order Management & Fulfillment',
+      fulfillment: 'Fulfillment, Waybills & Commissioning Operations',
+      support: 'After-Sales Support, Field Claims & Digital Warranties',
       quotes: 'Solar Engineering Quotation Pipeline',
       enquiries: 'Customer Support & Inquiries Desk',
       products: 'Equipment Catalogue & Stock Control',
@@ -366,6 +402,12 @@
         break;
       case 'orders':
         loadOrders();
+        break;
+      case 'fulfillment':
+        loadFulfillmentData();
+        break;
+      case 'support':
+        loadSupportData();
         break;
       case 'quotes':
         loadQuotes();
@@ -399,6 +441,29 @@
 
       if (badgeQuotes) badgeQuotes.textContent = stats.quotes || 0;
       if (badgeEnquiries) badgeEnquiries.textContent = stats.enquiries || 0;
+
+      // Stage 16: Support & Warranty KPIs
+      try {
+        const tktRes = await apiFetch('/api/admin/support/tickets?limit=100');
+        const tktData = await tktRes.json();
+        if (tktData.success) {
+          const tickets = tktData.tickets || [];
+          const openTickets = tickets.filter(t => t.status === 'open' || t.status === 'in_progress').length;
+          if (badgeSupport) badgeSupport.textContent = openTickets;
+          if (kpiOpenTickets) kpiOpenTickets.textContent = openTickets;
+          if (kpiTotalTickets) kpiTotalTickets.textContent = tktData.total || tickets.length;
+        }
+
+        const warRes = await apiFetch('/api/admin/warranties?limit=100');
+        const warData = await warRes.json();
+        if (warData.success) {
+          const wars = warData.warranties || [];
+          const activeWars = wars.filter(w => w.status === 'active').length;
+          if (kpiActiveWarranties) kpiActiveWarranties.textContent = activeWars;
+        }
+      } catch (e) {
+        // Silent fallback
+      }
     } catch (err) {
       console.error('[LOAD STATS ERROR]:', err);
     }
@@ -678,6 +743,430 @@
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'Save Order Updates';
+      }
+    }
+  }
+
+  // ==========================================================================
+  // STAGE 16: FULFILLMENT & COMMISSIONING MANAGEMENT
+  // ==========================================================================
+  async function loadFulfillmentData() {
+    const tbody = document.getElementById('fulfillment-table-body');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">Loading fulfillment records from database...</td></tr>';
+
+    try {
+      const res = await apiFetch('/api/admin/orders?limit=100');
+      const data = await res.json();
+      if (data.success) {
+        cachedFulfillment = data.orders || [];
+        const pendingCount = cachedFulfillment.filter(o => o.order_status !== 'completed' && o.order_status !== 'cancelled').length;
+        if (badgeFulfillment) badgeFulfillment.textContent = pendingCount;
+        renderFulfillmentTable();
+      } else {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="empty-cell">Failed: ${escapeHtml(data.error)}</td></tr>`;
+      }
+    } catch (err) {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="empty-cell">Network error loading fulfillment records.</td></tr>`;
+    }
+  }
+
+  function renderFulfillmentTable() {
+    const tbody = document.getElementById('fulfillment-table-body');
+    if (!tbody) return;
+
+    const searchTerm = (document.getElementById('fulfillment-search-input')?.value || '').toLowerCase().trim();
+    const statusFilter = document.getElementById('fulfillment-status-filter')?.value || '';
+
+    let filtered = cachedFulfillment.filter(o => {
+      const matchesSearch = !searchTerm ||
+        (o.order_number && o.order_number.toLowerCase().includes(searchTerm)) ||
+        (o.customer_name && o.customer_name.toLowerCase().includes(searchTerm)) ||
+        (o.waybill_number && o.waybill_number.toLowerCase().includes(searchTerm)) ||
+        (o.assigned_engineer && o.assigned_engineer.toLowerCase().includes(searchTerm)) ||
+        (o.delivery_state && o.delivery_state.toLowerCase().includes(searchTerm));
+
+      const matchesStatus = !statusFilter || o.order_status === statusFilter || (o.commissioning_status === statusFilter);
+      return matchesSearch && matchesStatus;
+    });
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">No fulfillment records match the specified filters.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(o => {
+      const commStatus = o.commissioning_status || 'pending';
+      const courier = o.courier_partner || 'DEVICE PRO Fleet';
+      const waybill = o.waybill_number ? `<code>${escapeHtml(o.waybill_number)}</code>` : '<span style="color: rgba(238,241,248,0.4);">Unassigned</span>';
+      const engineer = o.assigned_engineer ? escapeHtml(o.assigned_engineer) : '<span style="color: rgba(238,241,248,0.4);">Unassigned</span>';
+      const schedDate = o.installation_scheduled_date ? o.installation_scheduled_date : '—';
+      const eta = o.estimated_delivery ? o.estimated_delivery : '—';
+
+      return `
+        <tr>
+          <td><strong>${escapeHtml(o.order_number)}</strong></td>
+          <td>
+            <div style="font-weight: 600;">${escapeHtml(o.customer_name)}</div>
+            <div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(o.delivery_state || 'Nigeria')}</div>
+          </td>
+          <td>
+            <div style="font-size: 0.8rem; font-weight: 500;">${escapeHtml(courier)}</div>
+            <div style="font-size: 0.72rem;">${waybill}</div>
+          </td>
+          <td style="white-space: nowrap;">${eta}</td>
+          <td>
+            <div style="font-size: 0.82rem; font-weight: 600;">${engineer}</div>
+            ${o.engineer_phone ? `<div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(o.engineer_phone)}</div>` : ''}
+          </td>
+          <td style="white-space: nowrap;">${schedDate}</td>
+          <td>
+            <span class="status-pill status-${commStatus}">${commStatus}</span>
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-table-action" onclick="window.adminOpenFulfillmentModal('${o.order_number}')">
+              Manage Dispatch
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.adminOpenFulfillmentModal = function (orderNumber) {
+    const order = cachedFulfillment.find(o => o.order_number === orderNumber) ||
+                  cachedOrders.find(o => o.order_number === orderNumber);
+    if (!order || !fulfillmentModal) return;
+
+    currentEditingFulfillmentId = order.id;
+
+    const titleEl = document.getElementById('modal-ful-title');
+    if (titleEl) titleEl.textContent = `Dispatch & Commissioning: ${order.order_number}`;
+
+    const numDisplay = document.getElementById('modal-ful-order-num-display');
+    if (numDisplay) numDisplay.textContent = order.order_number;
+
+    const clientDisplay = document.getElementById('modal-ful-client-display');
+    if (clientDisplay) clientDisplay.textContent = `${order.customer_name} • ${order.delivery_state || 'Lagos'} (${order.delivery_address || ''})`;
+
+    const courierEl = document.getElementById('modal-ful-courier');
+    if (courierEl) courierEl.value = order.courier_partner || 'DEVICE PRO Dedicated Fleet';
+
+    const waybillEl = document.getElementById('modal-ful-waybill');
+    if (waybillEl) waybillEl.value = order.waybill_number || '';
+
+    const etaEl = document.getElementById('modal-ful-eta');
+    if (etaEl) etaEl.value = order.estimated_delivery || '';
+
+    const statusEl = document.getElementById('modal-ful-order-status');
+    if (statusEl) statusEl.value = order.order_status || 'processing';
+
+    const engEl = document.getElementById('modal-ful-engineer');
+    if (engEl) engEl.value = order.assigned_engineer || '';
+
+    const phoneEl = document.getElementById('modal-ful-phone');
+    if (phoneEl) phoneEl.value = order.engineer_phone || '';
+
+    const dateEl = document.getElementById('modal-ful-date');
+    if (dateEl) dateEl.value = order.installation_scheduled_date || '';
+
+    const commStatusEl = document.getElementById('modal-ful-comm-status');
+    if (commStatusEl) commStatusEl.value = order.commissioning_status || 'pending';
+
+    // Parse safety tests
+    let tests = {};
+    try {
+      tests = typeof order.commissioning_tests === 'string'
+        ? JSON.parse(order.commissioning_tests)
+        : (order.commissioning_tests || {});
+    } catch (e) {
+      tests = {};
+    }
+
+    const tEarthing = document.getElementById('modal-test-earthing');
+    const tSpd = document.getElementById('modal-test-spd');
+    const tSync = document.getElementById('modal-test-sync');
+    const tBattery = document.getElementById('modal-test-battery');
+
+    if (tEarthing) tEarthing.checked = tests.earthingResistancePassed !== false;
+    if (tSpd) tSpd.checked = tests.dcSurgeProtectionVerified !== false;
+    if (tSync) tSync.checked = tests.inverterSyncVerified !== false;
+    if (tBattery) tBattery.checked = tests.cellBalancingVerified !== false;
+
+    const certIdEl = document.getElementById('modal-ful-cert-id');
+    if (certIdEl) certIdEl.value = order.commissioning_certificate_id || '';
+
+    const notesEl = document.getElementById('modal-ful-notes');
+    if (notesEl) notesEl.value = order.admin_notes || '';
+
+    fulfillmentModal.showModal();
+  };
+
+  async function saveFulfillmentUpdates() {
+    if (!currentEditingFulfillmentId) return;
+    const btn = document.getElementById('btn-save-fulfillment-changes');
+
+    const courierPartner = document.getElementById('modal-ful-courier')?.value;
+    const waybillNumber = document.getElementById('modal-ful-waybill')?.value;
+    const estimatedDelivery = document.getElementById('modal-ful-eta')?.value;
+    const orderStatus = document.getElementById('modal-ful-order-status')?.value;
+
+    const assignedEngineer = document.getElementById('modal-ful-engineer')?.value;
+    const engineerPhone = document.getElementById('modal-ful-phone')?.value;
+    const installationScheduledDate = document.getElementById('modal-ful-date')?.value;
+    const commissioningStatus = document.getElementById('modal-ful-comm-status')?.value;
+    const commissioningCertificateId = document.getElementById('modal-ful-cert-id')?.value;
+    const notes = document.getElementById('modal-ful-notes')?.value;
+
+    const commissioningTests = {
+      earthingResistancePassed: document.getElementById('modal-test-earthing')?.checked ?? true,
+      dcSurgeProtectionVerified: document.getElementById('modal-test-spd')?.checked ?? true,
+      inverterSyncVerified: document.getElementById('modal-test-sync')?.checked ?? true,
+      cellBalancingVerified: document.getElementById('modal-test-battery')?.checked ?? true
+    };
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving Fulfillment...';
+    }
+
+    try {
+      // 1. Update fulfillment & waybill
+      const resFul = await apiFetch(`/api/admin/orders/${currentEditingFulfillmentId}/fulfillment`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          waybillNumber,
+          courierPartner,
+          estimatedDelivery,
+          orderStatus,
+          notes
+        })
+      });
+      const dataFul = await resFul.json();
+      if (!resFul.ok || !dataFul.success) {
+        throw new Error(dataFul.error || 'Failed to update logistics.');
+      }
+
+      // 2. Update commissioning & tests
+      const resComm = await apiFetch(`/api/admin/orders/${currentEditingFulfillmentId}/commissioning`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          assignedEngineer,
+          engineerPhone,
+          installationScheduledDate,
+          commissioningStatus,
+          commissioningTests,
+          commissioningCertificateId,
+          commissioningDate: commissioningStatus === 'commissioned' ? new Date().toISOString() : null,
+          notes
+        })
+      });
+      const dataComm = await resComm.json();
+      if (!resComm.ok || !dataComm.success) {
+        throw new Error(dataComm.error || 'Failed to update commissioning.');
+      }
+
+      fulfillmentModal.close();
+      loadFulfillmentData();
+      loadOrders();
+      loadDashboardStats();
+    } catch (err) {
+      alert('Error updating fulfillment: ' + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Save Fulfillment Updates';
+      }
+    }
+  }
+
+  // ==========================================================================
+  // STAGE 16: SUPPORT TICKETS & DIGITAL WARRANTIES
+  // ==========================================================================
+  async function loadSupportData() {
+    const tktTbody = document.getElementById('support-table-body');
+    const warTbody = document.getElementById('warranties-table-body');
+
+    if (tktTbody) tktTbody.innerHTML = '<tr><td colspan="8" class="empty-cell">Loading support tickets...</td></tr>';
+    if (warTbody) warTbody.innerHTML = '<tr><td colspan="7" class="empty-cell">Loading digital warranties...</td></tr>';
+
+    try {
+      const [tktRes, warRes] = await Promise.all([
+        apiFetch('/api/admin/support/tickets?limit=100'),
+        apiFetch('/api/admin/warranties?limit=100')
+      ]);
+
+      const tktData = await tktRes.json();
+      const warData = await warRes.json();
+
+      if (tktData.success) {
+        cachedTickets = tktData.tickets || [];
+        const openCount = cachedTickets.filter(t => t.status === 'open' || t.status === 'in_progress').length;
+        if (badgeSupport) badgeSupport.textContent = openCount;
+        if (kpiOpenTickets) kpiOpenTickets.textContent = openCount;
+        if (kpiTotalTickets) kpiTotalTickets.textContent = tktData.total || cachedTickets.length;
+        renderSupportTicketsTable();
+      }
+
+      if (warData.success) {
+        cachedWarranties = warData.warranties || [];
+        const activeCount = cachedWarranties.filter(w => w.status === 'active').length;
+        if (kpiActiveWarranties) kpiActiveWarranties.textContent = activeCount;
+        renderWarrantiesTable();
+      }
+    } catch (err) {
+      console.error('[LOAD SUPPORT ERROR]:', err);
+      if (tktTbody) tktTbody.innerHTML = '<tr><td colspan="8" class="empty-cell">Error loading support tickets.</td></tr>';
+      if (warTbody) warTbody.innerHTML = '<tr><td colspan="7" class="empty-cell">Error loading warranties.</td></tr>';
+    }
+  }
+
+  function renderSupportTicketsTable() {
+    const tbody = document.getElementById('support-table-body');
+    if (!tbody) return;
+
+    const statusFilter = document.getElementById('support-status-filter')?.value || '';
+    let filtered = cachedTickets.filter(t => !statusFilter || t.status === statusFilter);
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">No customer support tickets found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filtered.map(t => `
+      <tr>
+        <td><strong>${escapeHtml(t.ticket_number)}</strong></td>
+        <td>
+          <div style="font-weight: 600;">${escapeHtml(t.customer_name)}</div>
+          <div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(t.customer_phone)}</div>
+        </td>
+        <td><span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: var(--color-brand-yellow);">${escapeHtml(t.issue_category)}</span></td>
+        <td><span class="status-pill status-${t.priority}">${t.priority}</span></td>
+        <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(t.subject)}">
+          ${escapeHtml(t.subject)}
+        </td>
+        <td><span class="status-pill status-${t.status}">${t.status}</span></td>
+        <td style="font-size: 0.8rem;">${escapeHtml(t.assigned_engineer || 'Unassigned')}</td>
+        <td style="text-align: center;">
+          <button type="button" class="btn-table-action" onclick="window.adminOpenTicketModal('${t.ticket_number}')">
+            Review
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function renderWarrantiesTable() {
+    const tbody = document.getElementById('warranties-table-body');
+    if (!tbody) return;
+
+    if (!cachedWarranties || cachedWarranties.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">No registered equipment warranties found.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = cachedWarranties.map(w => {
+      const years = (w.warranty_duration_months / 12).toFixed(0);
+      const isExpired = new Date(w.expiry_date) < new Date();
+      const statusText = isExpired ? 'expired' : w.status;
+
+      return `
+        <tr>
+          <td><strong>${escapeHtml(w.warranty_code)}</strong></td>
+          <td><code>${escapeHtml(w.serial_number)}</code></td>
+          <td>
+            <div style="font-weight: 600;">${escapeHtml(w.product_name)}</div>
+            <div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(w.brand || 'Tier-1 Certified')}</div>
+          </td>
+          <td>${escapeHtml(w.customer_name)}</td>
+          <td>${w.warranty_duration_months} mo (${years} yrs)</td>
+          <td style="white-space: nowrap;">${formatDate(w.expiry_date)}</td>
+          <td><span class="status-pill status-${statusText}">${statusText}</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.adminOpenTicketModal = function (ticketNumber) {
+    const ticket = cachedTickets.find(t => t.ticket_number === ticketNumber);
+    if (!ticket || !adminTicketModal) return;
+
+    currentEditingTicketId = ticket.id;
+
+    const titleEl = document.getElementById('modal-tkt-title');
+    if (titleEl) titleEl.textContent = `Support Ticket Review: ${ticket.ticket_number}`;
+
+    const numDisplay = document.getElementById('modal-tkt-num-display');
+    if (numDisplay) numDisplay.textContent = ticket.ticket_number;
+
+    const catDisplay = document.getElementById('modal-tkt-cat-display');
+    if (catDisplay) catDisplay.textContent = ticket.issue_category;
+
+    const clientEl = document.getElementById('modal-tkt-client');
+    if (clientEl) clientEl.textContent = ticket.customer_name;
+
+    const phoneEl = document.getElementById('modal-tkt-phone');
+    if (phoneEl) phoneEl.textContent = `${ticket.customer_phone} ${ticket.customer_email ? '(' + ticket.customer_email + ')' : ''}`;
+
+    const subjEl = document.getElementById('modal-tkt-subj');
+    if (subjEl) subjEl.textContent = ticket.subject;
+
+    const descEl = document.getElementById('modal-tkt-desc');
+    if (descEl) descEl.textContent = ticket.description;
+
+    const statusSelect = document.getElementById('modal-tkt-status-select');
+    if (statusSelect) statusSelect.value = ticket.status || 'open';
+
+    const prioritySelect = document.getElementById('modal-tkt-priority-select');
+    if (prioritySelect) prioritySelect.value = ticket.priority || 'normal';
+
+    const engineerInput = document.getElementById('modal-tkt-engineer-input');
+    if (engineerInput) engineerInput.value = ticket.assigned_engineer || '';
+
+    const notesInput = document.getElementById('modal-tkt-notes-input');
+    if (notesInput) notesInput.value = ticket.resolution_notes || '';
+
+    adminTicketModal.showModal();
+  };
+
+  async function saveTicketUpdates() {
+    if (!currentEditingTicketId) return;
+    const btn = document.getElementById('btn-save-ticket-changes');
+
+    const status = document.getElementById('modal-tkt-status-select')?.value;
+    const priority = document.getElementById('modal-tkt-priority-select')?.value;
+    const assignedEngineer = document.getElementById('modal-tkt-engineer-input')?.value;
+    const resolutionNotes = document.getElementById('modal-tkt-notes-input')?.value;
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving Ticket...';
+    }
+
+    try {
+      const res = await apiFetch(`/api/admin/support/tickets/${currentEditingTicketId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({
+          status,
+          priority,
+          assignedEngineer,
+          resolutionNotes
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update support ticket.');
+      }
+
+      adminTicketModal.close();
+      loadSupportData();
+      loadDashboardStats();
+    } catch (err) {
+      alert('Error saving ticket: ' + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Save Ticket Updates';
       }
     }
   }

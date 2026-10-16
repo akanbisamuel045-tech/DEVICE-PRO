@@ -654,7 +654,101 @@
 - `tests/stage15_payment.test.js` (13 automated tests for gateway, reconciliation, and webhooks)
 - `PROJECT_PROGRESS.md` (Stage 15 documented as PASS)
 
-**Next Permitted Stage:** Stage 16 — Delivery, Installation & After-Sales Operations Workflows
+**Next Permitted Stage:** Stage 16 — Delivery, Installation & After-Sales Operations Workflows ✅
+
+### Stage 16: Delivery, Installation & After-Sales Operations Workflows
+**Status:** ✅ PASS
+**Started:** 2026-10-16
+**Completed:** 2026-10-16
+
+**Completed Requirements:**
+- [x] **Public Order, Delivery & Installation Tracking Portal (`public/tracking.html`, `public/css/tracking.css`, `public/js/tracking.js`)**:
+  - Dedicated modern, responsive multi-tab portal accessible at `/tracking` and `/tracking.html`.
+  - **Tab 1: Order & Commissioning Tracker**:
+    - **Privacy-Safe Tracking Gate**: Requires both Order Number (`DP-ORD-...`) and matching customer phone or email before displaying fulfillment details, shipping waybills, or engineer assignments.
+    - **Logistics & Dispatch Banner**: Displays courier partner (DEVICE PRO Fleet Logistics, GIG Logistics, DHL Express), waybill tracking number, and estimated arrival date.
+    - **6-Stage Engineering Milestone Stepper**:
+      1. *Order Placed & Hardware Reserved*: Equipment allocated from Victoria Island Central Depot.
+      2. *Payment Verification*: Paystack online settlement or commercial bank transfer reconciliation verified.
+      3. *Bench QC & Hardware Calibration*: Firmware calibrated to Nigeria grid specs (50Hz), LiFePO4 cells balanced (< 15mV), IV curve verified.
+      4. *Logistics & Dispatch*: Regional transit waybill allocation and en-route tracking.
+      5. *Certified Installation & Commissioning*: Lead COREN engineer assignment, scheduled installation date, and NEMSA safety checklist.
+      6. *Active Warranty & Final Handover*: Digital warranty certificate issuance, 25-yr panel / 10-yr battery / 5-yr inverter coverage active.
+    - **Certified Commissioning Matrix**: Details assigned COREN engineer name, direct contact phone, installation schedule, and NEMSA electrical safety checklist (Earthing < 5.0Ω, Type II DC SPD, Inverter Grid-Sync, LiFePO4 cell balancing).
+    - **Hardware Item Breakdown**: Itemized equipment bill with quantities and Naira subtotals.
+    - **Showroom Engineering Escalation**: Direct WhatsApp hotline link (`https://wa.me/2348031234567`) pre-populated with order number.
+  - **Tab 2: Digital Equipment Warranty Verification**:
+    - Real-time warranty lookup by hardware serial number (e.g., `DP-SN-JK550-2026-001`) or warranty code (e.g., `DP-WRN-...`).
+    - Interactive digital warranty certificate card displaying green active coverage badge, hardware product name, SKU, customer name, duration (years/months), days remaining until expiration, and service hub location (Victoria Island, Lagos).
+  - **Tab 3: Open Support & Warranty Claim Ticket**:
+    - Public ticketing form for technical support, warranty replacement claims, installation inquiries, and billing/payment assistance.
+    - Immediate ticket generation with unique ticket number (`DP-SPT-...`).
+    - SLA guarantee notice: 4-hour technical response time; 24-48 hour rapid swap replacement units for inverters and batteries across Lagos, Abuja, and Port Harcourt.
+  - **Tab 4: Ticket Status Lookup**:
+    - Public ticket inquiry requiring ticket number and matching customer phone or email (privacy gate).
+    - Displays current status (`open`, `in_progress`, `resolved`), assigned field engineer, and resolution notes.
+- [x] **Customer Confirmation Integration (`public/order-confirmation.html`, `public/js/order-confirmation.js`)**:
+  - Added prominent "Live Order & Installation Tracker →" CTA banner that deep-links directly into `/tracking?orderNumber=...&contact=...`.
+- [x] **Staff Operations Console Updates (`public/admin.html`, `public/js/admin.js`)**:
+  - Added "Fulfillment & Install" tab and "Support & Warranty" tab to the administrative sidebar and main content panels.
+  - **Fulfillment & Installation Panel**:
+    - Searchable, filterable operations table showing order number, customer, state, courier waybill, ETA, COREN lead engineer, installation date, and commissioning status.
+    - **Dispatch & Commissioning Management Modal (`#fulfillment-modal`)**:
+      - Manage courier partner, waybill number, estimated delivery date, and order status.
+      - Assign COREN lead engineer and hotline.
+      - Record NEMSA electrical safety sign-offs (Earthing resistance < 5.0Ω, Type II SPD, 50Hz grid-sync lock, LiFePO4 cell balancing).
+      - Record commissioning certificate ID and operational handover notes.
+  - **Support Tickets & Warranty Desk Panel**:
+    - Real-time KPI metrics cards: Open Support Tickets, Total Tickets, Active Digital Warranties.
+    - Filterable customer support tickets table with priority badges, categories, and review modal.
+    - **Support Ticket Review Modal (`#admin-ticket-modal`)**:
+      - Update ticket status (`open`, `in_progress`, `resolved`, `closed`) and priority.
+      - Assign field service engineer and record technical resolution notes.
+    - Registered Tier-1 digital equipment warranties table displaying serial numbers, warranty duration, and expiration dates.
+- [x] **Database Schema & Persistence (`db/schema.sql`, `db/database.js`)**:
+  - Enhanced `orders` table with fulfillment and commissioning columns: `waybill_number`, `courier_partner`, `estimated_delivery`, `assigned_engineer`, `engineer_phone`, `installation_scheduled_date`, `commissioning_status`, `commissioning_tests`, `commissioning_date`, `commissioning_certificate_id`.
+  - Created `support_tickets` table with indexes on `ticket_number`, `order_number`, and `status`.
+  - Created `warranties` table with indexes on `warranty_code`, `serial_number`, and `order_number`.
+  - Implemented transactional helpers: `updateOrderFulfillment`, `updateOrderCommissioning`, `createSupportTicket`, `getSupportTickets`, `getSupportTicketByNumber`, `updateSupportTicketStatus`, `createWarrantyRecord`, `getWarrantyBySerialOrCode`, `getWarranties`.
+  - Automated seeding of demonstration warranties, tickets, and scheduled/commissioned orders (`seedStage16DemoData`).
+- [x] **REST API Endpoints (`server.js`)**:
+  - `POST /api/orders/track`: Privacy-safe public order tracking lookup requiring matching phone/email.
+  - `GET /api/orders/:orderNumber/track`: Deep-link public order tracking with `?contact=` verification.
+  - `GET /api/warranty/verify/:query`: Public real-time warranty verification by serial or code.
+  - `POST /api/support/tickets`: Public ticket submission returning `DP-SPT-...` and SLA notice.
+  - `GET /api/support/tickets/:ticketNumber`: Privacy-safe public ticket status lookup.
+  - `PATCH /api/admin/orders/:id/fulfillment`: Protected logistics and waybill updates.
+  - `PATCH /api/admin/orders/:id/commissioning`: Protected COREN engineer assignment and NEMSA safety checklist updates.
+  - `GET /api/admin/support/tickets`: Protected ticket desk list with filters.
+  - `PATCH /api/admin/support/tickets/:id`: Protected ticket resolution and engineer assignment.
+  - `GET /api/admin/warranties`: Protected registered equipment warranty list.
+  - `POST /api/admin/warranties`: Protected warranty creation endpoint.
+  - `GET /tracking`, `GET /tracking.html`: Serves public tracking portal.
+- [x] **Automated Testing & Full Regression**:
+  - Created automated test suite `tests/stage16_delivery_support.test.js` covering privacy gates, 6-stage stepper milestones, logistics updates, COREN commissioning checklist, digital warranty lookup, and support tickets with **14 passed tests (100% pass rate)**.
+  - Full regression executed across all stages:
+    - Stage 12 API: 28/28 PASSED
+    - Stage 13 Cart & Admin: 25/25 PASSED
+    - Stage 14 Search & UX: 29/29 PASSED
+    - Stage 15 Payment Gateway: 13/13 PASSED
+    - Stage 16 Delivery & Support: 14/14 PASSED
+    - **Total: 109 automated integration tests passed with 0 failures**.
+- [x] **Browser QA Walkthrough**:
+  - Verified public tracking portal, 6-stage stepper, warranty verification, support ticket creation, and staff operations console.
+
+**Files Created / Modified in Stage 16:**
+- `public/tracking.html` (Public Order, Commissioning & Warranty Portal)
+- `public/css/tracking.css` (Styles for 6-stage stepper, warranty certificate cards, and ticketing)
+- `public/js/tracking.js` (Tracking client logic, tab switching, and API calls)
+- `public/order-confirmation.html` & `public/js/order-confirmation.js` (Live tracking deep-link CTA)
+- `public/admin.html` & `public/js/admin.js` (Fulfillment and Support & Warranty admin tabs and modals)
+- `db/schema.sql` (Schema migrations for fulfillment, support_tickets, and warranties)
+- `db/database.js` (Added Stage 16 fulfillment, commissioning, support ticket, and warranty methods)
+- `server.js` (Added Stage 16 public and admin REST endpoints and tracking route)
+- `tests/stage16_delivery_support.test.js` (14 automated tests for Stage 16)
+- `PROJECT_PROGRESS.md` (Stage 16 documented as PASS)
+
+**Next Permitted Stage:** Stage 17 — Performance Optimization, SEO & Production Readiness
 
 ---
 
