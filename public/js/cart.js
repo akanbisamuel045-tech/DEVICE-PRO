@@ -265,18 +265,85 @@
     },
 
     /**
+     * Ensure drawer and backdrop markup exist in the DOM
+     */
+    ensureDrawer: function () {
+      let drawer = document.getElementById('cart-drawer');
+      let backdrop = document.getElementById('modal-backdrop');
+
+      if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'modal-backdrop';
+        backdrop.className = 'modal-backdrop';
+        document.body.appendChild(backdrop);
+        backdrop.addEventListener('click', () => this.closeDrawer());
+      }
+
+      if (!drawer) {
+        drawer = document.createElement('aside');
+        drawer.id = 'cart-drawer';
+        drawer.className = 'drawer cart-slide-drawer';
+        drawer.setAttribute('aria-labelledby', 'cart-drawer-title');
+        drawer.setAttribute('role', 'dialog');
+        drawer.setAttribute('aria-modal', 'true');
+        drawer.innerHTML = `
+          <div class="drawer-header" style="display:flex; justify-content:space-between; align-items:center; padding:1.25rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.08);">
+            <h2 id="cart-drawer-title" style="font-size:1.15rem; font-weight:800; color:#FFFFFF; margin:0;">Your Equipment Cart</h2>
+            <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+          </div>
+          <div class="drawer-body" id="cart-drawer-body" style="padding:1.5rem; overflow-y:auto; flex-grow:1;">
+            <!-- Rendered dynamically -->
+          </div>
+          <div class="drawer-footer" style="padding:1.25rem 1.5rem; border-top:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
+            <div class="cart-subtotal-row" style="display:flex; justify-content:space-between; margin-bottom:1rem; font-weight:700; font-size:1.05rem; color:#FFFFFF;">
+              <span>Subtotal</span>
+              <span id="cart-subtotal-val" style="color:var(--color-brand-yellow, #FFB90C);">₦0</span>
+            </div>
+            <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" style="width:100%; padding:0.85rem; background:var(--color-brand-yellow, #FFB90C); color:#060B14; border:none; border-radius:8px; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.2s ease;">
+              Proceed to Checkout →
+            </button>
+          </div>
+        `;
+        document.body.appendChild(drawer);
+
+        drawer.querySelectorAll('[data-close-drawer]').forEach(btn => {
+          btn.addEventListener('click', () => this.closeDrawer());
+        });
+      }
+
+      return drawer;
+    },
+
+    /**
      * Open the cart drawer
      */
     openDrawer: function () {
+      this.ensureDrawer();
       const cartDrawer = document.getElementById('cart-drawer');
       const backdrop = document.getElementById('modal-backdrop');
 
       if (cartDrawer) {
+        this.renderDrawer();
         cartDrawer.classList.add('open');
         cartDrawer.setAttribute('aria-hidden', 'false');
         if (backdrop) backdrop.classList.add('open');
         document.body.style.overflow = 'hidden';
       }
+    },
+
+    /**
+     * Close the cart drawer
+     */
+    closeDrawer: function () {
+      const cartDrawer = document.getElementById('cart-drawer');
+      const backdrop = document.getElementById('modal-backdrop');
+
+      if (cartDrawer) {
+        cartDrawer.classList.remove('open');
+        cartDrawer.setAttribute('aria-hidden', 'true');
+      }
+      if (backdrop) backdrop.classList.remove('open');
+      document.body.style.overflow = '';
     }
   };
 
@@ -286,22 +353,44 @@
   // Initialize on DOM load
   document.addEventListener('DOMContentLoaded', () => {
     DeviceProCart.updateBadge();
-    DeviceProCart.renderDrawer();
 
     // Hook into global buttons with data-add-cart
     document.addEventListener('click', (e) => {
-      const target = e.target.closest('[data-add-cart], [data-add-to-cart], [data-buy-now]');
-      if (target) {
+      // Add to cart buttons
+      const addBtn = e.target.closest('[data-add-cart], [data-add-to-cart], [data-buy-now]');
+      if (addBtn) {
         e.preventDefault();
-        const id = target.getAttribute('data-id') || target.getAttribute('data-product-id');
-        const name = target.getAttribute('data-name') || target.getAttribute('data-product-name');
-        const price = target.getAttribute('data-price') || target.getAttribute('data-product-price');
-        const image = target.getAttribute('data-image') || target.getAttribute('data-product-image');
-        const slug = target.getAttribute('data-slug');
+        const id = addBtn.getAttribute('data-id') || addBtn.getAttribute('data-product-id');
+        const name = addBtn.getAttribute('data-name') || addBtn.getAttribute('data-product-name');
+        const price = addBtn.getAttribute('data-price') || addBtn.getAttribute('data-product-price');
+        const image = addBtn.getAttribute('data-image') || addBtn.getAttribute('data-product-image');
+        const slug = addBtn.getAttribute('data-slug');
 
         if (name) {
           DeviceProCart.addItem({ id, name, price, image, slug });
+          DeviceProCart.openDrawer();
         }
+      }
+
+      // Cart trigger buttons
+      const cartTrigger = e.target.closest('[data-trigger-cart]');
+      if (cartTrigger) {
+        e.preventDefault();
+        DeviceProCart.openDrawer();
+      }
+
+      // Close drawer buttons
+      const closeBtn = e.target.closest('[data-close-drawer]');
+      if (closeBtn) {
+        e.preventDefault();
+        DeviceProCart.closeDrawer();
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        DeviceProCart.closeDrawer();
       }
     });
   });

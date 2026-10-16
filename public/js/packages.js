@@ -93,6 +93,17 @@
   }
 
   function addPackageToCart(pkg) {
+    if (window.DeviceProCart) {
+      window.DeviceProCart.addItem({
+        id: pkg.id,
+        name: pkg.name,
+        price: pkg.price_ngn,
+        image: pkg.image_url,
+        slug: pkg.slug
+      });
+      window.DeviceProCart.openDrawer();
+      return;
+    }
     try {
       const cart = JSON.parse(localStorage.getItem(STORAGE_CART_KEY)) || [];
       const existing = cart.find(i => i.id === pkg.id);

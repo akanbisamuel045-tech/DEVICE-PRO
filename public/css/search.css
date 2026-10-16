@@ -1,0 +1,381 @@
+/**
+ * DEVICE PRO — Global Search & Autocomplete Command Palette
+ * Dark-first corporate engineering aesthetic with Solar Gold accents
+ * Spotlight dialog modal with keyboard navigation hints
+ */
+
+/* ==========================================================================
+   1. DIALOG CONTAINER & BACKDROP
+   ========================================================================== */
+dialog#search-dialog {
+  margin: 5vh auto auto auto;
+  padding: 0;
+  background: transparent;
+  border: none;
+  max-width: 680px;
+  width: 92vw;
+  border-radius: 16px;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 185, 12, 0.12);
+  overflow: visible;
+  position: fixed;
+  top: 5vh;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+}
+
+dialog#search-dialog::backdrop {
+  background: rgba(6, 11, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.search-dialog-inner {
+  background: #0B1324;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: var(--color-d-text, #EEF1F8);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+/* Header */
+.dialog-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.dialog-header-row h2,
+#search-dialog-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.modal-close-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-d-text-muted, rgba(238, 241, 248, 0.7));
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: all 0.15s ease;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   2. SEARCH INPUT BOX
+   ========================================================================== */
+.search-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(6, 11, 20, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 0.25rem 0.75rem 0.25rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.search-input-box:focus-within {
+  border-color: var(--color-brand-yellow, #FFB90C);
+  box-shadow: 0 0 0 3px rgba(255, 185, 12, 0.2);
+  background: #060B14;
+}
+
+.search-input-box svg {
+  color: var(--color-brand-yellow, #FFB90C);
+  flex-shrink: 0;
+  margin-right: 0.75rem;
+}
+
+.search-input-box input[type="search"] {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #FFFFFF;
+  padding: 0.75rem 0;
+}
+
+.search-input-box input[type="search"]::placeholder {
+  color: rgba(238, 241, 248, 0.45);
+}
+
+.search-input-box input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* Clear button */
+.btn-clear-search {
+  background: transparent;
+  border: none;
+  color: rgba(238, 241, 248, 0.5);
+  cursor: pointer;
+  padding: 0.35rem;
+  font-size: 0.85rem;
+  border-radius: 4px;
+  display: none;
+}
+
+.btn-clear-search:hover {
+  color: #FFFFFF;
+}
+
+/* Keyboard hint badges */
+.search-input-shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.kbd-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-d-text-subtle, rgba(238, 241, 248, 0.5));
+}
+
+/* ==========================================================================
+   3. POPULAR / RECENT SEARCH TAGS
+   ========================================================================== */
+.search-popular-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  color: var(--color-d-text-subtle, rgba(238, 241, 248, 0.5));
+}
+
+.search-popular-tags .tag-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  color: var(--color-d-text-muted, rgba(238, 241, 248, 0.8));
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.search-popular-tags .tag-btn:hover {
+  background: rgba(255, 185, 12, 0.15);
+  border-color: rgba(255, 185, 12, 0.4);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   4. LIVE AUTOCOMPLETE RESULTS
+   ========================================================================== */
+.search-results-wrapper {
+  margin-top: 1.25rem;
+  overflow-y: auto;
+  max-height: 50vh;
+  padding-right: 0.25rem;
+}
+
+.search-group-title {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-brand-yellow, #FFB90C);
+  margin: 1rem 0 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.search-group-title:first-child {
+  margin-top: 0;
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.search-result-item:hover,
+.search-result-item.active {
+  background: rgba(255, 185, 12, 0.12);
+  border-color: rgba(255, 185, 12, 0.35);
+  transform: translateX(2px);
+}
+
+.result-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.result-thumb {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  background: #FFFFFF;
+  border-radius: 6px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.result-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.result-text-col {
+  overflow: hidden;
+}
+
+.result-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-sub {
+  font-size: 0.72rem;
+  color: var(--color-d-text-subtle, rgba(238, 241, 248, 0.6));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.1rem;
+}
+
+.result-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.result-price {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--color-brand-yellow, #FFB90C);
+}
+
+.result-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-top: 0.2rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(238, 241, 248, 0.7);
+}
+
+/* Empty Search State */
+.search-empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--color-d-text-subtle, rgba(238, 241, 248, 0.6));
+}
+
+.search-empty-state p {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.search-empty-state small {
+  font-size: 0.78rem;
+  display: block;
+}
+
+/* Footer Instructions */
+.search-dialog-footer {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--color-d-text-subtle, rgba(238, 241, 248, 0.5));
+}
+
+.btn-view-all-results {
+  background: transparent;
+  border: none;
+  color: var(--color-brand-yellow, #FFB90C);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.btn-view-all-results:hover {
+  color: var(--color-brand-yellow-hover, #E6A300);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  dialog#search-dialog {
+    margin: 2vh auto auto auto;
+    width: 96vw;
+  }
+
+  .search-dialog-inner {
+    padding: 1.15rem;
+  }
+
+  .kbd-badge {
+    display: none;
+  }
+}

@@ -418,6 +418,17 @@
   }
 
   function addToCart(productItem) {
+    if (window.DeviceProCart) {
+      window.DeviceProCart.addItem({
+        id: productItem.id,
+        name: productItem.name,
+        price: productItem.price_ngn || productItem.price,
+        image: productItem.image_url || productItem.image,
+        slug: productItem.slug
+      });
+      window.DeviceProCart.openDrawer();
+      return;
+    }
     const cart = getCart();
     const existingIndex = cart.findIndex(item => item.id === productItem.id);
     if (existingIndex > -1) {

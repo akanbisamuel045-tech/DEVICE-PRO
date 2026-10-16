@@ -335,7 +335,20 @@
           return;
         }
 
-        // Add to localStorage cart
+        if (window.DeviceProCart) {
+          window.DeviceProCart.addItem({
+            id: `pkg-${pkg.slug}`,
+            slug: pkg.slug,
+            name: pkg.name,
+            category: 'Solar Packages',
+            price: pkg.priceNgn,
+            image: '/images/products/package-5kva-duplex.jpg'
+          });
+          window.DeviceProCart.openDrawer();
+          return;
+        }
+
+        // Add to localStorage cart fallback
         const cartItem = {
           id: `pkg-${pkg.slug}`,
           slug: pkg.slug,

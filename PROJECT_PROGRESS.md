@@ -1,7 +1,7 @@
 # DEVICE PRO — Project Progress
 
 ## Current Stage
-**Stage 13: Cart, Checkout & Order Management / Admin Operations Console**
+**Stage 14: Search, Filtering & User Experience Polish**
 **Status:** ✅ PASS
 
 ## Project Overview
@@ -570,6 +570,46 @@
 - `PROJECT_PROGRESS.md` (Stage 13 documented as PASS)
 
 **Next Permitted Stage:** Stage 14 — Search, Filtering & User Experience Polish ✅
+
+### Stage 14: Search, Filtering & User Experience Polish
+**Status:** ✅ PASS
+**Started:** 2026-10-16
+**Completed:** 2026-10-16
+
+**Completed Requirements:**
+- [x] **Universal Spotlight Search & Command Palette (`public/css/search.css`, `public/js/search.js`)**:
+  - Global Command Palette (`#search-dialog`) accessible from all pages via `data-trigger-search` buttons, keyboard shortcuts (`Cmd/Ctrl + K`), or pressing `/` key.
+  - Frosted glass backdrop (`backdrop-filter: blur(12px)`), dark-navy canvas (`#0B1324`), solar gold accents (`#FFB90C`), and accessibility hints (`ESC`, `↑↓`, `↵`).
+  - Multi-entity asynchronous querying across Equipment Hardware (`/api/products?search=...`), Turnkey Solar Packages (`/api/packages`), and Engineered Project Case Studies (`/api/case-studies`).
+  - Live 150ms debounced autocomplete results grouped by category with product thumbnails, specifications, stock badges, and Nigerian Naira (`₦`) pricing.
+  - Full keyboard navigation: `ArrowDown`/`ArrowUp` to cycle through results with active item highlighting and smooth scrolling; `Enter` to navigate to the selected item or submit full query to the product catalogue.
+  - Curated popular search tags (`5kVA Inverter`, `LiFePO4 Battery`, `550W Panels`, `Villa Packages`, `Commercial`).
+  - Self-injecting DOM structure ensuring search modal is automatically available on any page without hardcoded DOM dependencies.
+- [x] **Universal Cart System & Badge Synchronization (`public/js/cart.js`)**:
+  - Unified single source of truth across all 14 pages using `dp_equipment_cart_v1` in `localStorage`.
+  - Self-injecting slide-out drawer (`#cart-drawer`) with overlay backdrop (`#modal-backdrop`) and quantity adjustment controls (`−`, `+`, `✕`).
+  - Real-time subtotal calculation in Naira (`₦`), live badge counter updates on all navigation bars, and direct handoff to `/checkout`.
+  - Global event delegation for `[data-add-cart]`, `[data-trigger-cart]`, `[data-close-drawer]`, and `Escape` key.
+- [x] **Catalogue & Page UX Polish Across All 14 Public Pages**:
+  - Synchronized `products.js`, `product-detail.js`, `packages.js`, `calculator.js`, and `main.js` with `window.DeviceProCart` and `window.DeviceProSearch`.
+  - Added `<script src="/js/cart.js?v=2"></script>` and `<script src="/js/search.js?v=1"></script>` across all public HTML pages.
+  - Added `@import url('search.css');` into `public/css/tokens.css` ensuring immediate design token availability everywhere.
+- [x] **Automated Testing & Browser Verification**:
+  - Created automated test suite `tests/stage14_search_ux.test.js` with **29 passed tests (100% pass rate)**.
+  - Re-verified regression test suites (`stage12_api.test.js`, `stage13_cart_admin.test.js`) with **53 passed tests (100% pass rate)**.
+  - Automated browser QA executed via `browser_subagent` recording search modal opening, dynamic query results, keyboard navigation, and cart drawer interaction.
+
+**Files Created / Modified in Stage 14:**
+- `public/css/search.css` (Command Palette Styles & Responsive Modal Layout)
+- `public/js/search.js` (Spotlight Search Engine & Autocomplete Controller)
+- `public/css/tokens.css` (Imported search.css)
+- `public/js/cart.js` (Universal Cart Manager & Self-Injecting Drawer)
+- `public/js/products.js`, `public/js/packages.js`, `public/js/product-detail.js`, `public/js/calculator.js`, `public/js/main.js` (Cart & Search Integration)
+- `public/*.html` (Updated script inclusions across all 14 public HTML files)
+- `tests/stage14_search_ux.test.js` (29 automated tests for search, cart, and HTML compliance)
+- `PROJECT_PROGRESS.md` (Stage 14 documented as PASS)
+
+**Next Permitted Stage:** Stage 15 — Payment Gateway Integration & Transaction Verification
 
 ---
 

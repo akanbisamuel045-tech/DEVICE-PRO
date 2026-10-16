@@ -58,18 +58,36 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ctrl/Cmd + K for Search
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
       e.preventDefault();
-      openElement(searchModal);
+      if (window.DeviceProSearch) {
+        window.DeviceProSearch.open();
+      } else {
+        openElement(searchModal);
+      }
     }
   });
 
   // Search Triggers
   document.querySelectorAll('[data-trigger-search]').forEach(btn => {
-    btn.addEventListener('click', () => openElement(searchModal));
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.DeviceProSearch) {
+        window.DeviceProSearch.open();
+      } else {
+        openElement(searchModal);
+      }
+    });
   });
 
   // Cart Triggers
   document.querySelectorAll('[data-trigger-cart]').forEach(btn => {
-    btn.addEventListener('click', () => openElement(cartDrawer));
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.DeviceProCart) {
+        window.DeviceProCart.openDrawer();
+      } else {
+        openElement(cartDrawer);
+      }
+    });
   });
 
   // Mobile Menu Triggers
