@@ -135,6 +135,42 @@
   background: #FFFFFF;
 }
 
+.section-header-center {
+  text-align: center;
+  max-width: 780px;
+  margin: 0 auto 3.5rem;
+}
+
+.section-pill {
+  display: inline-block;
+  padding: 0.35rem 1.1rem;
+  background: #EBF3FB;
+  color: #0157A2;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 20px;
+  margin-bottom: 0.85rem;
+}
+
+.section-title-dark,
+#showrooms-heading {
+  font-size: clamp(1.85rem, 3.2vw, 2.5rem);
+  font-weight: 800;
+  color: #0157A2 !important; /* Specific user requirement: blue font color */
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.85rem 0;
+}
+
+.section-subtitle {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #6B7280;
+  margin-top: 0.5rem;
+}
+
 .showrooms-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -351,10 +387,56 @@
   margin-top: 1rem;
 }
 
-.form-actions-row .btn-primary-yellow {
+.btn-primary-yellow,
+.form-actions-row .btn-primary-yellow,
+#btn-submit-contact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
   align-self: flex-start;
+  background: linear-gradient(135deg, #FFC400 0%, #FFB100 100%);
+  color: #061C35;
+  font-family: inherit;
   font-size: 1.05rem;
-  padding: 1rem 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  padding: 1.1rem 2.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 196, 0, 0.6);
+  box-shadow: 0 6px 20px rgba(255, 196, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary-yellow:hover,
+.form-actions-row .btn-primary-yellow:hover,
+#btn-submit-contact:hover {
+  background: linear-gradient(135deg, #FFD033 0%, #FFBA08 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(255, 196, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.btn-primary-yellow:active,
+.form-actions-row .btn-primary-yellow:active,
+#btn-submit-contact:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(255, 196, 0, 0.3);
+}
+
+.btn-primary-yellow:focus-visible,
+#btn-submit-contact:focus-visible {
+  outline: 3px solid rgba(1, 87, 162, 0.4);
+  outline-offset: 3px;
+}
+
+.btn-primary-yellow:disabled,
+#btn-submit-contact:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Feedback banner */
@@ -433,6 +515,59 @@
   flex-shrink: 0;
 }
 
+.btn-emergency-hotline,
+.sla-action .btn-outline-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background: #FFFFFF;
+  color: #061C35;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.95rem 2rem;
+  border-radius: 999px;
+  text-decoration: none;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.btn-emergency-hotline svg,
+.sla-action .btn-outline-white svg {
+  color: #DC2626; /* Urgent emergency red accent for the phone icon */
+  flex-shrink: 0;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.btn-emergency-hotline:hover,
+.sla-action .btn-outline-white:hover {
+  background: #FFC400;
+  border-color: #FFC400;
+  color: #061C35;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(255, 196, 0, 0.45);
+}
+
+.btn-emergency-hotline:hover svg,
+.sla-action .btn-outline-white:hover svg {
+  color: #061C35;
+  transform: rotate(-12deg) scale(1.15);
+}
+
+.btn-emergency-hotline:active,
+.sla-action .btn-outline-white:active {
+  transform: translateY(0);
+}
+
+.btn-emergency-hotline:focus-visible,
+.sla-action .btn-outline-white:focus-visible {
+  outline: 3px solid #FFC400;
+  outline-offset: 3px;
+}
+
 /* =========================================================================
    RESPONSIVE DESIGN
    ========================================================================= */
@@ -456,7 +591,8 @@
     width: 100%;
   }
 
-  .sla-action .btn-outline-white {
+  .sla-action .btn-outline-white,
+  .sla-action .btn-emergency-hotline {
     width: 100%;
   }
 }
@@ -478,7 +614,8 @@
     grid-column: span 1;
   }
 
-  .form-actions-row .btn-primary-yellow {
+  .form-actions-row .btn-primary-yellow,
+  #btn-submit-contact {
     width: 100%;
     text-align: center;
   }
