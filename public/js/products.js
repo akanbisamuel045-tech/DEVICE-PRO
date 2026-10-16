@@ -18,8 +18,7 @@
     in_stock: false,
     sort: 'featured',
     page: 1,
-    per_page: 12,
-    view: 'grid'
+    per_page: 12
   };
 
   // DOM Elements
@@ -27,8 +26,6 @@
   const countLabel = document.getElementById('products-count-label');
   const paginationNav = document.getElementById('catalogue-pagination');
   const sortSelect = document.getElementById('catalogue-sort');
-  const btnViewGrid = document.getElementById('btn-view-grid');
-  const btnViewList = document.getElementById('btn-view-list');
   const filterForm = document.getElementById('filters-form');
   const searchInput = document.getElementById('sidebar-search-input');
   const priceMinInput = document.getElementById('price-min');
@@ -52,7 +49,6 @@
   let searchDebounceTimeout = null;
 
   // LocalStorage keys
-  const STORAGE_WISHLIST_KEY = 'devicepro_wishlist';
   const STORAGE_CART_KEY = 'devicepro_cart';
 
   // Helper: Format Naira currency (e.g. ₦1,250,000)
@@ -95,7 +91,6 @@
     if (params.has('in_stock')) state.in_stock = params.get('in_stock') === '1';
     if (params.has('sort')) state.sort = params.get('sort');
     if (params.has('page')) state.page = parseInt(params.get('page'), 10) || 1;
-    if (params.has('view')) state.view = params.get('view');
   }
 
   function syncStateToURL() {
@@ -109,7 +104,6 @@
     if (state.in_stock) params.set('in_stock', '1');
     if (state.sort && state.sort !== 'featured') params.set('sort', state.sort);
     if (state.page > 1) params.set('page', state.page);
-    if (state.view && state.view !== 'grid') params.set('view', state.view);
 
     const newQuery = params.toString();
     const newRelativePathQuery = window.location.pathname + (newQuery ? '?' + newQuery : '');
@@ -165,21 +159,6 @@
 
     // 8. Sync sort dropdown
     if (sortSelect) sortSelect.value = state.sort;
-
-    // 9. Sync view mode
-    if (state.view === 'list') {
-      gridContainer.classList.add('list-mode');
-      btnViewGrid.classList.remove('active');
-      btnViewGrid.setAttribute('aria-pressed', 'false');
-      btnViewList.classList.add('active');
-      btnViewList.setAttribute('aria-pressed', 'true');
-    } else {
-      gridContainer.classList.remove('list-mode');
-      btnViewGrid.classList.add('active');
-      btnViewGrid.setAttribute('aria-pressed', 'true');
-      btnViewList.classList.remove('active');
-      btnViewList.setAttribute('aria-pressed', 'false');
-    }
   }
 
   // =========================================================================
@@ -254,28 +233,7 @@
     }
   }
 
-  // Wishlist Storage helper
-  function getWishlist() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_WISHLIST_KEY)) || [];
-    } catch {
-      return [];
-    }
-  }
 
-  function toggleWishlist(productId) {
-    const list = getWishlist();
-    const index = list.indexOf(productId);
-    let added = false;
-    if (index > -1) {
-      list.splice(index, 1);
-    } else {
-      list.push(productId);
-      added = true;
-    }
-    localStorage.setItem(STORAGE_WISHLIST_KEY, JSON.stringify(list));
-    return added;
-  }
 
   // Render Product Cards
   function renderProducts(products, total) {
@@ -296,23 +254,15 @@
       return;
     }
 
-    const wishlist = getWishlist();
-
     const cardsHtml = products.map(product => {
-      const isWishlisted = wishlist.includes(product.id);
       const categoryBadge = product.category_label || 'Equipment';
 
       return `
         <article class="product-card" data-product-id="${product.id}" data-slug="${product.slug}">
           
-          <!-- Top Row: Badge & Wishlist -->
+          <!-- Top Row: Category Badge -->
           <div class="card-top-row">
             <span class="category-badge-pill">${categoryBadge}</span>
-            <button type="button" class="btn-wishlist ${isWishlisted ? 'active' : ''}" data-wishlist-id="${product.id}" aria-label="Save ${product.name} to wishlist">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="${isWishlisted ? '#EF4444' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
-            </button>
           </div>
 
           <!-- Product Image -->
@@ -631,28 +581,7 @@
     });
   }
 
-  // 9. Grid / List View Toggle
-  if (btnViewGrid && btnViewList) {
-    btnViewGrid.addEventListener('click', () => {
-      state.view = 'grid';
-      gridContainer.classList.remove('list-mode');
-      btnViewGrid.classList.add('active');
-      btnViewGrid.setAttribute('aria-pressed', 'true');
-      btnViewList.classList.remove('active');
-      btnViewList.setAttribute('aria-pressed', 'false');
-      syncStateToURL();
-    });
 
-    btnViewList.addEventListener('click', () => {
-      state.view = 'list';
-      gridContainer.classList.add('list-mode');
-      btnViewGrid.classList.remove('active');
-      btnViewGrid.setAttribute('aria-pressed', 'false');
-      btnViewList.classList.add('active');
-      btnViewList.setAttribute('aria-pressed', 'true');
-      syncStateToURL();
-    });
-  }
 
   // 10. Clear All Filters handler
   function handleClearAll() {
@@ -691,20 +620,8 @@
     });
   }
 
-  // 12. Wishlist & Add-to-Cart clicks (event delegation)
+  // 12. Add-to-Cart clicks (event delegation)
   gridContainer.addEventListener('click', (e) => {
-    // Wishlist Toggle
-    const wishBtn = e.target.closest('.btn-wishlist');
-    if (wishBtn) {
-      const pid = parseInt(wishBtn.getAttribute('data-wishlist-id'), 10);
-      const isAdded = toggleWishlist(pid);
-      wishBtn.classList.toggle('active', isAdded);
-      const svg = wishBtn.querySelector('svg');
-      if (svg) svg.setAttribute('fill', isAdded ? '#EF4444' : 'none');
-      showToast(isAdded ? 'Added product to your wishlist' : 'Removed product from wishlist');
-      return;
-    }
-
     // Add to Cart
     const cartBtn = e.target.closest('.btn-card-cart');
     if (cartBtn) {

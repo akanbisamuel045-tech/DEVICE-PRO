@@ -810,34 +810,7 @@ body.products-page-body {
   pointer-events: none;
 }
 
-.view-toggles-wrap {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background-color: var(--p-surface);
-  border: 1px solid var(--p-border);
-  border-radius: 6px;
-  padding: 2px;
-}
 
-.view-toggle-btn {
-  background: none;
-  border: none;
-  color: var(--p-muted);
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.view-toggle-btn.active {
-  background-color: var(--p-navy);
-  color: #FFFFFF;
-}
 
 /* =============================================================================
    SECTION 7: PRODUCT CARDS (3 COLUMNS DESKTOP)
@@ -849,31 +822,7 @@ body.products-page-body {
   min-height: 480px;
 }
 
-/* In list view mode */
-.products-grid-view.list-mode {
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
 
-.products-grid-view.list-mode .product-card {
-  display: grid;
-  grid-template-columns: 180px 1fr 220px;
-  gap: 24px;
-  align-items: center;
-}
-
-.products-grid-view.list-mode .card-image-wrap {
-  height: 140px;
-  margin: 0;
-}
-
-.products-grid-view.list-mode .card-bottom-row {
-  margin-top: 0;
-}
-
-.products-grid-view.list-mode .card-actions-row {
-  grid-template-columns: 1fr;
-}
 
 /* Individual Product Card */
 .product-card {
@@ -896,7 +845,7 @@ body.products-page-body {
 .card-top-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   margin-bottom: 12px;
 }
 
@@ -909,32 +858,6 @@ body.products-page-body {
   border-radius: 999px;
   border: 1px solid rgba(1, 87, 162, 0.12);
   display: inline-block;
-}
-
-.btn-wishlist {
-  background: none;
-  border: none;
-  color: #94A3B8;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: color 0.2s ease, transform 0.2s ease;
-}
-
-.btn-wishlist:hover {
-  color: #EF4444;
-  transform: scale(1.15);
-}
-
-.btn-wishlist.active {
-  color: #EF4444;
-}
-
-.btn-wishlist.active svg {
-  fill: #EF4444;
 }
 
 /* Clean Product Image */
@@ -1948,7 +1871,8 @@ dialog#search-dialog::backdrop {
     width: 100%;
   }
   .products-grid-view {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
   .footer-grid-columns {
     grid-template-columns: 1fr 1fr;
@@ -1986,7 +1910,66 @@ dialog#search-dialog::backdrop {
     flex-direction: column;
     align-items: flex-start;
   }
+  .products-grid-view {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .product-card {
+    padding: 12px 10px;
+    border-radius: 8px;
+  }
+  .card-image-wrap {
+    height: 120px;
+    margin: 4px 0 10px;
+  }
+  .category-badge-pill {
+    font-size: 0.625rem;
+    padding: 2px 7px;
+  }
+  .card-brand {
+    font-size: 0.6875rem;
+    margin-bottom: 2px;
+  }
+  .card-title {
+    font-size: 0.8125rem;
+    min-height: 32px;
+    line-height: 1.25;
+    margin-bottom: 4px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-specs {
+    font-size: 0.6875rem;
+    min-height: 16px;
+    margin-bottom: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-bottom-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    margin-bottom: 10px;
+  }
+  .card-price {
+    font-size: 0.9375rem;
+  }
+  .stock-indicator {
+    font-size: 0.6875rem;
+  }
   .card-actions-row {
     grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .btn-card-details,
+  .btn-card-cart {
+    padding: 7px 8px;
+    font-size: 0.75rem;
+    border-radius: 5px;
+    text-align: center;
+    justify-content: center;
   }
 }
