@@ -1,7 +1,7 @@
 # DEVICE PRO — Project Progress
 
 ## Current Stage
-**Stage 12: Solar Sizing & Savings Calculators / Node.js API, Data Model & Persistence**
+**Stage 13: Cart, Checkout & Order Management / Admin Operations Console**
 **Status:** ✅ PASS
 
 ## Project Overview
@@ -10,7 +10,7 @@
 - **Stack:** HTML5 + CSS3 + Vanilla JS + Node.js/Express + SQLite
 - **Runtime:** Node.js v26.4.0, npm 11.17.0, Git 2.47.1
 - **Start Date:** 2026-10-09
-- **Last Updated:** 2026-10-15
+- **Last Updated:** 2026-10-16
 
 ---
 
@@ -521,6 +521,55 @@
 - `PROJECT_PROGRESS.md` (Stage 12 documented as PASS)
 
 **Next Permitted Stage:** Stage 13 — Cart, Checkout & Order Management ✅
+
+### Stage 13: Cart, Checkout & Order Management / Admin Operations Console
+**Status:** ✅ PASS
+**Started:** 2026-10-16
+**Completed:** 2026-10-16
+
+**Completed Requirements:**
+- [x] **Universal Commerce Cart Drawer (`public/js/cart.js`)**:
+  - Implemented `window.DeviceProCart` supporting `localStorage` persistence under `deviceProCart`.
+  - Item addition, quantity increment/decrement/removal, subtotal calculation, and real-time badge synchronization across all 12 public pages.
+  - Slide-out drawer markup with empty states, line items table, and direct "Proceed to Checkout" action button.
+- [x] **Dedicated Checkout Experience (`public/checkout.html`, `public/css/checkout.css`, `public/js/checkout.js`)**:
+  - Progressive 3-step checkout flow (Customer & Delivery Information, Professional Installation option, Payment Method selection).
+  - Dynamic Nigerian delivery fee computation: Lagos State flat rate (₦15,000), Outside Lagos / Inter-State delivery (₦35,000), Victoria Island showroom pickup (₦0).
+  - Certified installation checkbox with transparent scoping (+₦150,000 baseline load balancing, DC surge protection, and earthing verification).
+  - Sticky order summary card showing itemized equipment rows, delivery fee, installation fee, total amount formatted in ₦, and trust badges (256-bit SSL, Tier-1 Warranty, Fast Dispatch).
+  - Direct integration with `POST /api/orders` creating orders in SQLite, clearing the cart, and transferring session data to order confirmation.
+- [x] **Order Confirmation & Pro-Forma Invoice (`public/order-confirmation.html`, `public/css/order-confirmation.css`, `public/js/order-confirmation.js`)**:
+  - Visual 4-stage fulfillment lifecycle tracker (`1. Order Placed` -> `2. Payment Verification` -> `3. Bench QC & Testing` -> `4. Dispatch / Install`).
+  - Formal commercial pro-forma invoice with TIN (24891024-0001), corporate details, billed/delivered coordinates, itemized lines, and Nigerian corporate settlement bank details (Zenith Bank PLC).
+  - Direct WhatsApp dispatch confirmation link pre-populating order number and customer name.
+  - Print-friendly invoice stylesheet (`@media print`) and copy reference button.
+- [x] **Staff Operations Portal & Gated Authentication (`public/admin.html`, `public/css/admin.css`, `public/js/admin.js`)**:
+  - Gated login screen (`#admin-auth-view`) with role-based authentication via `POST /api/auth/login`.
+  - Quick demo account selector pills for instant testing (`Superadmin`, `Lead Engineer`, `Showroom Sales`).
+  - Session verification via `GET /api/auth/me` and secure token storage in `sessionStorage` with graceful sign-out.
+  - Responsive dark-navy corporate console with solar gold accents, sidebar navigation, user role badges, and active tab switching.
+  - **Overview Tab**: Live KPI metrics (Total Commerce Revenue, Pending Fulfillment, Solar Sizing Pipeline, Open Inquiries, Equipment in Catalogue) and recent orders/quotes preview.
+  - **Orders Tab**: Comprehensive table of commercial orders with search, status filtering, and modal for viewing line items, updating order status (`pending`, `confirmed`, `processing`, `dispatched`, `completed`, `cancelled`), updating payment status, and logging internal staff notes.
+  - **Solar Quotes Tab**: Pipeline of consultation proposals with search, status filter (`new`, `under_review`, `quoted`, `converted`, `lost`), survey notes, and proposal updating.
+  - **Customer Inquiries Tab**: Contact desk messages with search, status toggle (`new`, `in_progress`, `resolved`), and resolution notes.
+  - **Catalogue & Stock Control Tab**: Equipment SKU management with search, category filtering, "Edit SKU" modal for live price/stock adjustments, "Add SKU" modal for new equipment, and SKU archiving.
+  - **Audit Log & Database Backup Tab**: Superadmin-only protected view with tamper-evident staff audit trail and live SQLite database backup snapshot generator (`GET /api/admin/backup`).
+- [x] **Automated Testing & Browser Verification**:
+  - Automated test suite `tests/stage13_cart_admin.test.js` executed with **25 tests passed (100% pass rate)**.
+  - Regression test suite `tests/stage12_api.test.js` executed with **28 tests passed (100% pass rate)**.
+  - Automated browser QA executed via `browser_subagent` recording complete checkout flow and cart drawer interaction.
+
+**Files Created / Modified in Stage 13:**
+- `public/js/cart.js` (Universal Cart Manager & Slide-Out Drawer)
+- `public/checkout.html` & `public/css/checkout.css` & `public/js/checkout.js`
+- `public/order-confirmation.html` & `public/css/order-confirmation.css` & `public/js/order-confirmation.js`
+- `public/admin.html` & `public/css/admin.css` & `public/js/admin.js`
+- `db/database.js` (Added product management methods: `updateProduct`, `createProduct`, `deleteProduct` with audit logs)
+- `server.js` (Registered static routes for `/checkout`, `/order-confirmation`, `/admin`, and protected `/api/admin/products` CRUD routes)
+- `tests/stage13_cart_admin.test.js` (25 automated integration & security tests)
+- `PROJECT_PROGRESS.md` (Stage 13 documented as PASS)
+
+**Next Permitted Stage:** Stage 14 — Search, Filtering & User Experience Polish ✅
 
 ---
 

@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('path');
 const {
-  getProducts, getProductBySlug, getProductById, getPackages, getPackageBySlug,
+  getProducts, getProductBySlug, getProductById, updateProduct, createProduct, deleteProduct,
+  getPackages, getPackageBySlug,
   getCategories, getCaseStudies, getCaseStudyBySlug,
   createEnquiry, getEnquiries, getEnquiryById, updateEnquiryStatus,
   createQuote, getQuotes, getQuoteById, updateQuoteStatus,
@@ -596,9 +597,64 @@ app.get('/api/admin/backup', requireAuth, requireRole('superadmin'), (req, res) 
   }
 });
 
+// Product Catalogue Administration (Stage 13)
+app.get('/api/admin/products', requireAuth, (req, res) => {
+  try {
+    const category = req.query.category && req.query.category !== 'all' ? req.query.category : undefined;
+    const search = req.query.search || undefined;
+    const result = getProducts({
+      category,
+      search,
+      limit: 100
+    });
+    res.json({ success: true, products: result.products, total: result.total });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.patch('/api/admin/products/:id', requireAuth, (req, res) => {
+  try {
+    const updated = updateProduct(req.params.id, req.body, req.user.id);
+    res.json({ success: true, product: updated });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/admin/products', requireAuth, (req, res) => {
+  try {
+    const created = createProduct(req.body, req.user.id);
+    res.status(201).json({ success: true, product: created });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/admin/products/:id', requireAuth, (req, res) => {
+  try {
+    const result = deleteProduct(req.params.id, req.user.id);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // =========================================================================
 // STATIC HTML PAGE ROUTES
 // =========================================================================
+app.get(['/checkout', '/checkout.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'checkout.html'));
+});
+
+app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'order-confirmation.html'));
+});
+
+app.get(['/admin', '/admin.html', '/admin/login'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 app.get(['/calculator', '/calculator.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'calculator.html'));
 });
@@ -652,9 +708,12 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start listening
-const server = app.listen(PORT, () => {
-  console.log(`DEVICE PRO Web Server is running at http://localhost:${PORT}`);
-});
-
-module.exports = server;
+// Start listening only when run directly
+if (require.main === module) {
+  const server = app.listen(PORT, () => {
+    console.log(`DEVICE PRO Web Server is running at http://localhost:${PORT}`);
+  });
+  module.exports = server;
+} else {
+  module.exports = app;
+}

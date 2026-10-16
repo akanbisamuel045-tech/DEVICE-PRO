@@ -1,0 +1,524 @@
+/* =============================================================================
+   DEVICE PRO — Order Confirmation & Pro-Forma Invoice Stylesheet
+   ============================================================================= */
+
+.confirmation-main-content {
+  background-color: #F8FAFC;
+  padding: 40px 0 80px;
+  min-height: calc(100vh - 400px);
+  color: #0F172A;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Success Card */
+.confirmation-success-card {
+  background: #FFFFFF;
+  border: 1px solid #BBF7D0;
+  border-radius: 16px;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 16px rgba(22, 163, 74, 0.06);
+  flex-wrap: wrap;
+}
+
+.success-icon-wrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #DCFCE7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.success-text-col {
+  flex: 1;
+  min-width: 280px;
+}
+
+.success-kicker {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #16A34A;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.success-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #061C35;
+  margin: 0 0 6px;
+}
+
+.success-desc {
+  font-size: 0.875rem;
+  color: #475569;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.order-ref-badge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  padding: 12px 16px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.ref-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748B;
+  margin-bottom: 4px;
+}
+
+.ref-code-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ref-code {
+  font-family: monospace;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #061C35;
+}
+
+.btn-copy-code {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 4px;
+  color: #64748B;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-copy-code:hover {
+  background: #061C35;
+  color: #FFFFFF;
+  border-color: #061C35;
+}
+
+/* Tracker Section */
+.fulfillment-tracker-section {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.tracker-steps-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  position: relative;
+}
+
+.tracker-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.tracker-step::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #E2E8F0;
+  z-index: 1;
+}
+
+.tracker-step:last-child::after {
+  display: none;
+}
+
+.step-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #F1F5F9;
+  color: #64748B;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 2;
+  border: 2px solid #FFFFFF;
+}
+
+.tracker-step.completed .step-dot {
+  background: #16A34A;
+  color: #FFFFFF;
+}
+
+.tracker-step.completed::after {
+  background: #16A34A;
+}
+
+.tracker-step.active .step-dot {
+  background: #061C35;
+  color: #FFC400;
+  box-shadow: 0 0 0 4px rgba(6, 28, 53, 0.15);
+}
+
+.step-lbl {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 2px;
+}
+
+.step-sub {
+  font-size: 0.72rem;
+  color: #64748B;
+}
+
+/* Printable Invoice Card */
+.printable-invoice-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+.invoice-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.invoice-logo {
+  height: 36px;
+  width: auto;
+  margin-bottom: 12px;
+}
+
+.company-address {
+  font-size: 0.8125rem;
+  color: #64748B;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.invoice-meta-info {
+  text-align: right;
+}
+
+.invoice-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #061C35;
+  margin: 0 0 10px;
+  letter-spacing: -0.02em;
+}
+
+.meta-item {
+  font-size: 0.8125rem;
+  color: #475569;
+  margin-bottom: 4px;
+}
+
+.badge-status-pending {
+  display: inline-block;
+  background: #FEF3C7;
+  color: #92400E;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.badge-status-paid {
+  display: inline-block;
+  background: #DCFCE7;
+  color: #166534;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.invoice-divider {
+  border: none;
+  border-top: 1px solid #E2E8F0;
+  margin: 24px 0;
+}
+
+.invoice-parties-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.party-heading {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748B;
+  margin: 0 0 8px;
+}
+
+.party-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #061C35;
+  margin-bottom: 4px;
+}
+
+.party-detail {
+  font-size: 0.8125rem;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* Invoice Table */
+.invoice-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 32px;
+}
+
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84375rem;
+}
+
+.invoice-table th {
+  background: #F8FAFC;
+  color: #061C35;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-top: 1px solid #E2E8F0;
+  border-bottom: 1px solid #E2E8F0;
+  text-align: left;
+}
+
+.invoice-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #F1F5F9;
+  color: #334155;
+}
+
+.invoice-table td strong {
+  color: #0F172A;
+}
+
+/* Invoice Totals Grid */
+.invoice-totals-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.bank-transfer-details-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.bank-box-title {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: #061C35;
+  margin: 0 0 6px;
+}
+
+.bank-box-note {
+  font-size: 0.78125rem;
+  color: #64748B;
+  margin: 0 0 14px;
+}
+
+.bank-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8125rem;
+  margin-bottom: 12px;
+}
+
+.bank-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.bank-row span {
+  color: #64748B;
+}
+
+.bank-row strong {
+  color: #0F172A;
+}
+
+.acc-num {
+  font-family: monospace;
+  font-size: 1rem;
+  color: #061C35 !important;
+}
+
+.bank-hint {
+  display: block;
+  font-size: 0.72rem;
+  color: #475569;
+  line-height: 1.4;
+}
+
+.totals-calculation-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calc-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.calc-line.total-highlight {
+  border-top: 2px solid #061C35;
+  padding-top: 12px;
+  margin-top: 6px;
+  color: #061C35;
+  font-weight: 800;
+  font-size: 1.15rem;
+}
+
+.calc-line.total-highlight strong {
+  font-size: 1.35rem;
+  color: #061C35;
+}
+
+/* Actions Row */
+.confirmation-actions-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-print-invoice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  color: #061C35;
+  border: 1.5px solid #061C35;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-print-invoice:hover {
+  background: #F1F5F9;
+}
+
+.btn-whatsapp-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #FFFFFF;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-whatsapp-action:hover {
+  background: #1EBE5D;
+  transform: translateY(-2px);
+}
+
+.btn-continue-shopping {
+  color: #061C35;
+  font-weight: 700;
+  font-size: 0.875rem;
+  text-decoration: none;
+  padding: 12px 16px;
+}
+
+.btn-continue-shopping:hover {
+  text-decoration: underline;
+}
+
+/* Print Specific Styling */
+@media print {
+  body {
+    background: #FFFFFF;
+  }
+  .site-header,
+  .site-footer,
+  .confirmation-success-card,
+  .fulfillment-tracker-section,
+  .confirmation-actions-row {
+    display: none !important;
+  }
+  .printable-invoice-card {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .printable-invoice-card {
+    padding: 24px 16px;
+  }
+  .invoice-parties-grid,
+  .invoice-totals-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .invoice-meta-info {
+    text-align: left;
+  }
+  .tracker-steps-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .tracker-step::after {
+    display: none;
+  }
+}

@@ -1871,12 +1871,125 @@ function exportDatabaseBackup() {
   };
 }
 
+// --- PRODUCT ADMINISTRATION (Stage 13) ---
+function updateProduct(id, updates = {}, adminUserId = null) {
+  const existing = getProductById(id);
+  if (!existing) {
+    throw new Error(`Product with ID ${id} not found.`);
+  }
+
+  const fields = [];
+  const params = [];
+
+  const allowedFields = [
+    'name', 'slug', 'brand', 'category', 'category_label', 'sku',
+    'description', 'price_ngn', 'previous_price_ngn', 'power_rating',
+    'power_tier', 'specifications', 'image_url', 'stock_status', 'featured', 'published'
+  ];
+
+  for (const field of allowedFields) {
+    if (updates[field] !== undefined) {
+      fields.push(`${field} = ?`);
+      params.push(updates[field]);
+    }
+  }
+
+  if (fields.length === 0) {
+    return existing;
+  }
+
+  params.push(id);
+  const sql = `UPDATE products SET ${fields.join(', ')} WHERE id = ?`;
+  db.prepare(sql).run(...params);
+
+  logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_PRODUCT',
+    entityType: 'product',
+    entityId: id.toString(),
+    details: `Updated fields: ${Object.keys(updates).join(', ')} on product ${existing.name} (${existing.sku})`
+  });
+
+  return getProductById(id);
+}
+
+function createProduct(productData = {}, adminUserId = null) {
+  const {
+    name, brand = 'DEVICE PRO', category = 'accessories',
+    category_label = 'Accessories', sku, description = '',
+    price_ngn = 0, previous_price_ngn = null, power_rating = 'Standard',
+    power_tier = 'standard', specifications = '', image_url = 'images/products/jinko-solar-panel.png',
+    stock_status = 'in_stock', featured = 0, published = 1
+  } = productData;
+
+  if (!name) {
+    throw new Error('Product name is required.');
+  }
+
+  const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const slug = productData.slug || `${baseSlug}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const finalSku = sku || `DP-${Math.floor(10000 + Math.random() * 90000)}`;
+
+  const stmt = db.prepare(`
+    INSERT INTO products (
+      name, slug, brand, category, category_label, sku, description,
+      price_ngn, previous_price_ngn, power_rating, power_tier,
+      specifications, image_url, stock_status, featured, published
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )
+  `);
+
+  const result = stmt.run(
+    name, slug, brand, category, category_label, finalSku, description,
+    parseInt(price_ngn, 10) || 0,
+    previous_price_ngn ? parseInt(previous_price_ngn, 10) : null,
+    power_rating, power_tier, specifications, image_url, stock_status,
+    featured ? 1 : 0, published ? 1 : 0
+  );
+
+  const newProduct = getProductById(result.lastInsertRowid);
+
+  logAudit({
+    userId: adminUserId,
+    action: 'CREATE_PRODUCT',
+    entityType: 'product',
+    entityId: newProduct.id.toString(),
+    details: `Created new product ${newProduct.name} (${newProduct.sku}) at ₦${newProduct.price_ngn.toLocaleString()}`
+  });
+
+  return newProduct;
+}
+
+function deleteProduct(id, adminUserId = null) {
+  const product = getProductById(id);
+  if (!product) {
+    throw new Error(`Product with ID ${id} not found.`);
+  }
+
+  // Soft delete / unpublish
+  db.prepare('UPDATE products SET published = 0 WHERE id = ?').run(id);
+
+  logAudit({
+    userId: adminUserId,
+    action: 'DELETE_PRODUCT',
+    entityType: 'product',
+    entityId: id.toString(),
+    details: `Unpublished/archived product ${product.name} (${product.sku})`
+  });
+
+  return { success: true, message: `Product ${product.name} archived.` };
+}
+
 module.exports = {
   db,
   // Products & Packages
   getProducts,
   getProductBySlug,
   getProductById,
+  updateProduct,
+  createProduct,
+  deleteProduct,
   getPackages,
   getPackageBySlug,
   // Categories & Case Studies
