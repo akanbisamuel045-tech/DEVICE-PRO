@@ -132,6 +132,7 @@
   const customModal = document.getElementById('custom-appliance-modal');
   const btnOpenCustom = document.getElementById('btn-open-custom-app');
   const btnCloseCustom = document.getElementById('btn-close-custom-app');
+  const btnCancelCustomX = document.getElementById('btn-cancel-custom-x');
   const btnSaveCustom = document.getElementById('btn-save-custom-app');
 
   // Quote Form
@@ -308,17 +309,37 @@
     }
 
     // Custom Appliance Modal
+    const closeCustomModal = () => {
+      if (customModal) customModal.classList.remove('open');
+    };
+
     if (btnOpenCustom && customModal) {
       btnOpenCustom.addEventListener('click', () => {
         customModal.classList.add('open');
+        const firstInput = document.getElementById('custom-app-name');
+        if (firstInput) firstInput.focus();
       });
     }
 
-    if (btnCloseCustom && customModal) {
-      btnCloseCustom.addEventListener('click', () => {
-        customModal.classList.remove('open');
+    if (btnCloseCustom) {
+      btnCloseCustom.addEventListener('click', closeCustomModal);
+    }
+
+    if (btnCancelCustomX) {
+      btnCancelCustomX.addEventListener('click', closeCustomModal);
+    }
+
+    if (customModal) {
+      customModal.addEventListener('click', (e) => {
+        if (e.target === customModal) closeCustomModal();
       });
     }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && customModal && customModal.classList.contains('open')) {
+        closeCustomModal();
+      }
+    });
 
     if (btnSaveCustom) {
       btnSaveCustom.addEventListener('click', saveCustomAppliance);
