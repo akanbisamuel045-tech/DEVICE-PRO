@@ -373,7 +373,7 @@
       }
 
       // Cart trigger buttons
-      const cartTrigger = e.target.closest('[data-trigger-cart]');
+      const cartTrigger = e.target.closest('[data-trigger-cart], .header-circle-btn[aria-label*="Cart" i], .header-cart-btn, #cart-btn');
       if (cartTrigger) {
         e.preventDefault();
         DeviceProCart.openDrawer();

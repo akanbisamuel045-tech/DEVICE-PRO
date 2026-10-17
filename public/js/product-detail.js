@@ -678,11 +678,16 @@
   });
 
   document.querySelectorAll('[data-trigger-cart]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const drawer = document.getElementById('cart-drawer');
-      if (drawer) {
-        drawer.classList.add('open');
-        renderCartDrawerItems();
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.DeviceProCart) {
+        window.DeviceProCart.openDrawer();
+      } else {
+        const drawer = document.getElementById('cart-drawer');
+        if (drawer) {
+          drawer.classList.add('open');
+          renderCartDrawerItems();
+        }
       }
     });
   });
