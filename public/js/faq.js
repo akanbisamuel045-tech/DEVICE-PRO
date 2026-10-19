@@ -334,12 +334,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Sync cart badge
   try {
-    const cart = JSON.parse(localStorage.getItem('devicepro_cart') || '[]');
-    const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-    document.querySelectorAll('.cart-badge').forEach(badge => {
-      badge.textContent = count;
-      badge.setAttribute('aria-label', `${count} items in cart`);
-    });
+    localStorage.removeItem('devicepro_cart');
+    if (window.DeviceProCart) {
+      window.DeviceProCart.updateBadge();
+    } else {
+      const cart = JSON.parse(localStorage.getItem('dp_equipment_cart_v1') || '[]');
+      const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      document.querySelectorAll('.cart-badge').forEach(badge => {
+        badge.textContent = count;
+        badge.setAttribute('aria-label', `${count} items in cart`);
+      });
+    }
   } catch (e) {
     console.warn('[FAQ CART SYNC]:', e);
   }

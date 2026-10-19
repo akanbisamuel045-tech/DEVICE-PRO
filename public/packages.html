@@ -18,11 +18,11 @@
 
   <!-- Core Stylesheets -->
   <link rel="stylesheet" href="/css/tokens.css?v=12">
-  <link rel="stylesheet" href="/css/components.css?v=18">
+  <link rel="stylesheet" href="/css/components.css?v=19">
   <link rel="stylesheet" href="/css/homepage.css?v=12">
   <link rel="stylesheet" href="/css/products.css?v=2">
   <link rel="stylesheet" href="/css/solutions.css?v=1">
-  <link rel="stylesheet" href="/css/packages.css?v=1">
+  <link rel="stylesheet" href="/css/packages.css?v=2">
   <link rel="stylesheet" href="/css/footer.css?v=1">
 </head>
 <body class="devicepro-body packages-page-body">
@@ -97,13 +97,12 @@
 
       <nav class="products-nav" aria-label="Primary Navigation">
         <a href="/" class="p-nav-link">Home</a>
-        <a href="/solutions" class="p-nav-link">Solutions</a>
+        <a href="/#solutions" class="p-nav-link">Solutions</a>
         <a href="/products" class="p-nav-link">Products</a>
         <a href="/packages" class="p-nav-link active">Pricing</a>
         <a href="/projects" class="p-nav-link">Projects</a>
         <a href="/calculator" class="p-nav-link">Calculators</a>
         <a href="/about" class="p-nav-link">About</a>
-        <a href="/resources" class="p-nav-link">Resources</a>
         <a href="/faq" class="p-nav-link">FAQs</a>
         <a href="/contact" class="p-nav-link">Contact</a>
       </nav>
@@ -775,6 +774,9 @@
     </div>
   </aside>
 
+  <!-- Modal Backdrop for Drawers & Modals -->
+  <div id="modal-backdrop" class="modal-backdrop"></div>
+
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <img src="/images/logo.svg" alt="DEVICE PRO" style="height: 32px;" id="mobile-nav-title">
@@ -783,13 +785,12 @@
     <div class="drawer-body">
       <div class="mobile-nav-links-list">
         <a href="/" class="m-nav-link" data-close-drawer>Home</a>
-        <a href="/solutions" class="m-nav-link" data-close-drawer>Solutions</a>
+        <a href="/#solutions" class="m-nav-link" data-close-drawer>Solutions</a>
         <a href="/products" class="m-nav-link" data-close-drawer>Products</a>
         <a href="/packages" class="m-nav-link active" data-close-drawer>Pricing &amp; Packages</a>
         <a href="/projects" class="m-nav-link" data-close-drawer>Case Studies &amp; Projects</a>
         <a href="/calculator" class="m-nav-link" data-close-drawer>Calculators</a>
         <a href="/about" class="m-nav-link" data-close-drawer>About Us</a>
-        <a href="/resources" class="m-nav-link" data-close-drawer>Knowledge Base</a>
         <a href="/faq" class="m-nav-link" data-close-drawer>Technical FAQs</a>
         <a href="/contact" class="m-nav-link" data-close-drawer>Showroom &amp; Contact</a>
         <hr class="mobile-divider">

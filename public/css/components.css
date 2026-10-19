@@ -58,6 +58,15 @@ a {
   transition: all var(--transition-fast);
 }
 
+.brand-logo-img {
+  height: 28px;
+  max-height: 32px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+  display: block;
+}
+
 img, svg {
   display: block;
   max-width: 100%;
@@ -964,10 +973,10 @@ textarea:focus-visible,
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(6, 28, 53, 0.45);
+  background: rgba(6, 28, 53, 0.55);
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  z-index: 9999;
+  z-index: 99990 !important;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.25s ease, visibility 0.25s ease;
@@ -975,9 +984,9 @@ textarea:focus-visible,
 }
 
 .modal-backdrop.open {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 .drawer,
@@ -985,12 +994,11 @@ textarea:focus-visible,
   position: fixed;
   top: 0;
   right: 0;
-  width: 100%;
-  max-width: 420px;
+  width: min(440px, 100vw);
   height: 100%;
-  background-color: #FFFFFF;
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
-  z-index: 99999 !important;
+  background-color: #FFFFFF !important;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.22);
+  z-index: 100000 !important;
   transform: translateX(100%);
   visibility: hidden;
   pointer-events: none;
@@ -1001,9 +1009,11 @@ textarea:focus-visible,
 
 .drawer.open,
 #cart-drawer.open {
-  transform: translateX(0);
-  visibility: visible;
-  pointer-events: auto;
+  transform: translateX(0) !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  z-index: 100000 !important;
 }
 
 .drawer-header {
@@ -1013,6 +1023,13 @@ textarea:focus-visible,
   padding: 18px 24px;
   border-bottom: 1px solid #E2E8F0;
   background-color: #FFFFFF;
+}
+
+.drawer-header h2 {
+  font-size: 1.1875rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin: 0;
 }
 
 .drawer-body {
@@ -1026,6 +1043,48 @@ textarea:focus-visible,
   padding: 18px 24px;
   border-top: 1px solid #E2E8F0;
   background-color: #F8FAFC;
+}
+
+.cart-subtotal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #0F172A;
+}
+
+.cart-subtotal-row span:last-child {
+  color: #0157A2;
+  font-size: 1.15rem;
+}
+
+.btn-checkout-submit {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  background: var(--color-brand-yellow, #FFC400);
+  color: #061C35;
+  border: none;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-checkout-submit:hover:not(:disabled) {
+  background: #E5B000;
+  transform: translateY(-1px);
+}
+
+.btn-checkout-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .mobile-nav-links-list {
@@ -1054,10 +1113,67 @@ textarea:focus-visible,
   margin: 12px 0;
 }
 
-/* Guard against legacy unstyled drawer classes */
-.cart-drawer,
-.mobile-nav-drawer {
+/* Universal Header Circle Button & Cart Badge */
+.header-circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #CBD5E1;
+  background: #FFFFFF;
+  color: #061C35;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.header-circle-btn:hover {
+  background: #F4F8FC;
+  border-color: #061C35;
+  color: #0157A2;
+}
+
+.header-circle-btn .cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: #FFB90C;
+  color: #0A121F;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  line-height: 1;
+}
+
+/* Mobile Nav Toggle: Hidden on Desktop (min-width: 1025px) */
+.mobile-nav-toggle,
+.mobile-menu-trigger {
   display: none !important;
 }
+
+@media (max-width: 1024px) {
+  .mobile-nav-toggle,
+  .mobile-menu-trigger {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #061C35;
+    padding: 0.5rem;
+  }
+}
+
 
 

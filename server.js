@@ -391,7 +391,8 @@ app.post('/api/orders', rateLimiter(60000, 10), (req, res) => {
   try {
     const {
       customerName, customerPhone, customerEmail,
-      deliveryAddress, deliveryState, items, paymentMethod
+      deliveryAddress, deliveryState, items, paymentMethod,
+      installationOption, installationFeeNgn, deliveryFeeNgn, notes
     } = req.body;
 
     if (!customerName || !customerPhone || !deliveryAddress || !deliveryState) {
@@ -417,6 +418,10 @@ app.post('/api/orders', rateLimiter(60000, 10), (req, res) => {
       deliveryState: deliveryState.trim(),
       items,
       paymentMethod: paymentMethod || 'transfer',
+      installationOption: installationOption || 'supply_only',
+      installationFeeNgn: typeof installationFeeNgn === 'number' ? installationFeeNgn : (installationFeeNgn ? parseInt(installationFeeNgn, 10) : undefined),
+      deliveryFeeNgn: typeof deliveryFeeNgn === 'number' ? deliveryFeeNgn : (deliveryFeeNgn ? parseInt(deliveryFeeNgn, 10) : undefined),
+      notes: (notes || '').trim(),
       ipAddress
     });
 
@@ -433,26 +438,49 @@ app.post('/api/orders', rateLimiter(60000, 10), (req, res) => {
   }
 });
 
-// API: Public Order Tracking (Basic Summary for confirmation view)
+// API: Public Order Tracking & Invoice Breakdown
 app.get('/api/orders/:orderNumber', (req, res) => {
   try {
     const order = getOrderByNumber(req.params.orderNumber);
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found.' });
     }
-    // Return safe public tracking fields
+    // Return complete public tracking and invoice fields
     res.json({
       success: true,
       order: {
         orderNumber: order.order_number,
+        order_number: order.order_number,
         customerName: order.customer_name,
+        customer_name: order.customer_name,
+        customerPhone: order.customer_phone,
+        customer_phone: order.customer_phone,
+        customerEmail: order.customer_email,
+        customer_email: order.customer_email,
+        deliveryAddress: order.delivery_address,
+        delivery_address: order.delivery_address,
         deliveryState: order.delivery_state,
+        delivery_state: order.delivery_state,
+        subtotalNgn: order.subtotal_ngn,
+        subtotal_ngn: order.subtotal_ngn,
+        deliveryFeeNgn: order.delivery_fee_ngn,
+        delivery_fee_ngn: order.delivery_fee_ngn,
+        installationOption: order.installation_option,
+        installation_option: order.installation_option,
+        installationFeeNgn: order.installation_fee_ngn || 0,
+        installation_fee_ngn: order.installation_fee_ngn || 0,
         totalNgn: order.total_ngn,
+        total_ngn: order.total_ngn,
+        paymentMethod: order.payment_method,
+        payment_method: order.payment_method,
         paymentStatus: order.payment_status,
+        payment_status: order.payment_status,
         orderStatus: order.order_status,
+        order_status: order.order_status,
         itemCount: order.items.length,
         items: order.items,
-        createdAt: order.created_at
+        createdAt: order.created_at,
+        created_at: order.created_at
       }
     });
   } catch (error) {
@@ -1162,9 +1190,12 @@ app.get('/api/payments/sandbox/:reference', (req, res) => {
       <div class="detail-row"><span>Order Number:</span> <span class="detail-val">${orderNumber}</span></div>
       <div class="detail-row"><span>Customer Email:</span> <span class="detail-val">${email}</span></div>
       <div class="detail-row"><span>Reference:</span> <span class="detail-val" style="font-family:monospace; font-size:0.8rem;">${reference}</span></div>
+      ${order && order.subtotal_ngn ? `<div class="detail-row" style="color: rgba(238,241,248,0.7); font-size:0.85rem;"><span>Hardware Subtotal:</span> <span class="detail-val">₦${Number(order.subtotal_ngn).toLocaleString()}</span></div>` : ''}
+      ${order && order.delivery_fee_ngn ? `<div class="detail-row" style="color: rgba(238,241,248,0.7); font-size:0.85rem;"><span>Nationwide Logistics:</span> <span class="detail-val">₦${Number(order.delivery_fee_ngn).toLocaleString()}</span></div>` : ''}
+      ${order && order.installation_fee_ngn > 0 ? `<div class="detail-row" style="color: #60A5FA; font-size:0.85rem;"><span>Certified Turnkey Installation:</span> <span class="detail-val" style="color: #60A5FA;">₦${Number(order.installation_fee_ngn).toLocaleString()}</span></div>` : ''}
       <div class="detail-row" style="border-top: 1px solid rgba(255,255,255,0.08); margin-top: 0.5rem; padding-top: 0.5rem;">
-        <span>Total Amount:</span>
-        <span class="detail-val" style="color: #FFB90C; font-size: 1.1rem;">₦${Number(amount).toLocaleString()}</span>
+        <span>Total Amount Payable:</span>
+        <span class="detail-val" style="color: #FFB90C; font-size: 1.15rem;">₦${Number(amount).toLocaleString()}</span>
       </div>
     </div>
 
@@ -1560,7 +1591,6 @@ function generateSitemapXml() {
     { loc: '/calculator', priority: '0.8', changefreq: 'monthly' },
     { loc: '/savings-calculator', priority: '0.8', changefreq: 'monthly' },
     { loc: '/about', priority: '0.7', changefreq: 'monthly' },
-    { loc: '/resources', priority: '0.7', changefreq: 'weekly' },
     { loc: '/faq', priority: '0.7', changefreq: 'monthly' },
     { loc: '/contact', priority: '0.7', changefreq: 'monthly' },
     { loc: '/tracking', priority: '0.6', changefreq: 'monthly' },
@@ -1690,7 +1720,11 @@ app.get(['/packages/:slug'], (req, res) => {
 });
 
 app.get(['/solutions', '/solutions.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'solutions.html'));
+  res.redirect('/#solutions');
+});
+
+app.get(['/cart', '/cart.html'], (req, res) => {
+  res.redirect('/checkout');
 });
 
 app.get(['/products', '/products.html'], (req, res) => {
@@ -1714,7 +1748,7 @@ app.get(['/about', '/about.html'], (req, res) => {
 });
 
 app.get(['/resources', '/resources.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'resources.html'));
+  res.redirect('/');
 });
 
 app.get(['/faq', '/faq.html'], (req, res) => {

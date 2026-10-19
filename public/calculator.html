@@ -18,12 +18,12 @@
 
   <!-- Core Stylesheets -->
   <link rel="stylesheet" href="/css/tokens.css?v=12">
-  <link rel="stylesheet" href="/css/components.css?v=18">
+  <link rel="stylesheet" href="/css/components.css?v=19">
   <link rel="stylesheet" href="/css/homepage.css?v=12">
   <link rel="stylesheet" href="/css/products.css?v=2">
   <link rel="stylesheet" href="/css/solutions.css?v=1">
-  <link rel="stylesheet" href="/css/packages.css?v=1">
-  <link rel="stylesheet" href="/css/calculator.css?v=2">
+  <link rel="stylesheet" href="/css/packages.css?v=2">
+  <link rel="stylesheet" href="/css/calculator.css?v=3">
   <link rel="stylesheet" href="/css/footer.css?v=1">
 </head>
 <body class="devicepro-body calculator-page-body">
@@ -98,13 +98,12 @@
 
       <nav class="products-nav" aria-label="Primary Navigation">
         <a href="/" class="p-nav-link">Home</a>
-        <a href="/solutions" class="p-nav-link">Solutions</a>
+        <a href="/#solutions" class="p-nav-link">Solutions</a>
         <a href="/products" class="p-nav-link">Products</a>
         <a href="/packages" class="p-nav-link">Pricing</a>
         <a href="/projects" class="p-nav-link">Projects</a>
         <a href="/calculator" class="p-nav-link active">Calculators</a>
         <a href="/about" class="p-nav-link">About</a>
-        <a href="/resources" class="p-nav-link">Resources</a>
         <a href="/faq" class="p-nav-link">FAQs</a>
         <a href="/contact" class="p-nav-link">Contact</a>
       </nav>
@@ -117,21 +116,23 @@
           </svg>
         </button>
 
-        <button type="button" class="header-circle-btn header-cart-btn" data-trigger-cart aria-label="View equipment cart">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Cart Trigger -->
+        <button type="button" class="header-circle-btn" data-trigger-cart aria-label="Shopping Cart">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="9" cy="21" r="1"></circle>
             <circle cx="20" cy="21" r="1"></circle>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
           </svg>
-          <span class="cart-badge-count" id="header-cart-badge">0</span>
+          <span class="cart-badge" aria-label="0 items in cart">0</span>
         </button>
 
-        <a href="/contact" class="btn-get-quote-yellow">
-          Get a Quote →
+        <a href="/contact" class="btn-get-quote-yellow" data-trigger-quote>
+          Get a Quote <span class="arrow" aria-hidden="true">→</span>
         </a>
 
-        <button type="button" class="mobile-menu-trigger" data-trigger-menu aria-label="Open mobile menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Mobile Menu Toggle (Desktop Hidden) -->
+        <button type="button" class="mobile-nav-toggle" id="mobile-menu-btn" data-trigger-menu aria-label="Open mobile menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -150,7 +151,7 @@
         <nav class="calc-breadcrumbs" aria-label="Breadcrumbs">
           <a href="/">Home</a>
           <span aria-hidden="true">/</span>
-          <a href="/solutions">Calculators</a>
+          <a href="/#solutions">Solutions</a>
           <span aria-hidden="true">/</span>
           <span aria-current="page">Solar Sizing Calculator</span>
         </nav>
@@ -832,6 +833,9 @@
     </div>
   </aside>
 
+  <!-- Modal Backdrop for Drawers & Modals -->
+  <div id="modal-backdrop" class="modal-backdrop"></div>
+
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <img src="/images/logo.svg" alt="DEVICE PRO" style="height: 32px;" id="mobile-nav-title">
@@ -840,14 +844,13 @@
     <div class="drawer-body">
       <div class="mobile-nav-links-list">
         <a href="/" class="m-nav-link" data-close-drawer>Home</a>
-        <a href="/solutions" class="m-nav-link" data-close-drawer>Solutions</a>
+        <a href="/#solutions" class="m-nav-link" data-close-drawer>Solutions</a>
         <a href="/products" class="m-nav-link" data-close-drawer>Products</a>
         <a href="/packages" class="m-nav-link" data-close-drawer>Pricing &amp; Packages</a>
         <a href="/projects" class="m-nav-link" data-close-drawer>Case Studies &amp; Projects</a>
         <a href="/calculator" class="m-nav-link active" data-close-drawer>Solar Sizing Calculator</a>
         <a href="/savings-calculator" class="m-nav-link" data-close-drawer>Generator vs Solar ROI</a>
         <a href="/about" class="m-nav-link" data-close-drawer>About Us</a>
-        <a href="/resources" class="m-nav-link" data-close-drawer>Knowledge Base</a>
         <a href="/faq" class="m-nav-link" data-close-drawer>Technical FAQs</a>
         <a href="/contact" class="m-nav-link" data-close-drawer>Showroom &amp; Contact</a>
         <hr class="mobile-divider">

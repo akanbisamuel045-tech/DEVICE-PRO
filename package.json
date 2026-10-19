@@ -5,7 +5,11 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "node --test --test-concurrency=1 tests/*.test.js",
+    "smoke": "node scripts/production-smoke-test.js",
+    "backup": "node scripts/backup-db.js",
+    "restore": "node scripts/restore-db.js"
   },
   "keywords": [
     "solar",

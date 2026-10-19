@@ -11,8 +11,13 @@
   // Cart badge update
   function updateCartBadges() {
     try {
-      const cart = JSON.parse(localStorage.getItem(STORAGE_CART_KEY)) || [];
-      const totalItems = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+      localStorage.removeItem('devicepro_cart');
+      if (window.DeviceProCart) {
+        window.DeviceProCart.updateBadge();
+        return;
+      }
+      const cart = JSON.parse(localStorage.getItem('dp_equipment_cart_v1')) || [];
+      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || item.qty || 1), 0);
       document.querySelectorAll('.cart-badge').forEach(badge => {
         badge.textContent = totalItems;
         badge.setAttribute('aria-label', `${totalItems} items in cart`);

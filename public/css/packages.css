@@ -303,8 +303,16 @@
 .package-sku {
   font-size: 0.75rem;
   font-family: monospace;
-  color: #64748B;
-  margin-bottom: 0.85rem;
+  color: #334155;
+  margin-bottom: 0.5rem;
+}
+
+.package-description {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #1E293B;
+  margin: 0 0 0.85rem 0;
+  font-weight: 500;
 }
 
 .package-price-box {
@@ -360,7 +368,7 @@
 .spec-chip-lbl {
   font-size: 0.675rem;
   text-transform: uppercase;
-  color: #64748B;
+  color: #334155;
   font-weight: 700;
   letter-spacing: 0.03em;
 }
@@ -416,9 +424,18 @@
 .card-acc-panel {
   display: none;
   padding-bottom: 0.75rem;
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: #475569;
+  font-size: 0.825rem;
+  line-height: 1.6;
+  color: #1E293B;
+}
+
+.card-acc-panel p {
+  color: #1E293B;
+  margin-bottom: 0.35rem;
+}
+
+.card-acc-panel strong {
+  color: #0A121F;
 }
 
 .card-accordion-item.open .card-acc-panel {
@@ -772,6 +789,66 @@
 .packages-faqs-section {
   padding: clamp(3rem, 5vw, 4.5rem) 0;
   background: #FFFFFF;
+}
+
+.packages-faqs-section .faq-item {
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  margin-bottom: 0.85rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.packages-faqs-section .faq-question-btn {
+  width: 100%;
+  text-align: left;
+  background: #F8FAFC;
+  border: none;
+  padding: 1.15rem 1.35rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #061C35;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.packages-faqs-section .faq-question-btn:hover {
+  background: #EFF6FF;
+  color: #0157A2;
+}
+
+.packages-faqs-section .faq-chevron {
+  font-size: 0.9rem;
+  color: #64748B;
+  transition: transform 0.2s ease;
+}
+
+.packages-faqs-section .faq-item.open .faq-chevron {
+  transform: rotate(180deg);
+  color: #061C35;
+}
+
+.packages-faqs-section .faq-answer {
+  display: none;
+  padding: 1.15rem 1.35rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #1E293B;
+  background: #FFFFFF;
+  border-top: 1px solid #EDF2F7;
+}
+
+.packages-faqs-section .faq-item.open .faq-answer {
+  display: block;
+}
+
+.packages-faqs-section .faq-answer p {
+  color: #1E293B;
+  margin: 0;
+  line-height: 1.65;
 }
 
 /* Responsive Breakpoints */

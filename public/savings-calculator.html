@@ -89,13 +89,12 @@
 
       <nav class="products-nav" aria-label="Primary Navigation">
         <a href="/" class="p-nav-link">Home</a>
-        <a href="/solutions" class="p-nav-link">Solutions</a>
+        <a href="/#solutions" class="p-nav-link">Solutions</a>
         <a href="/products" class="p-nav-link">Products</a>
         <a href="/packages" class="p-nav-link">Pricing</a>
         <a href="/projects" class="p-nav-link">Projects</a>
         <a href="/savings-calculator" class="p-nav-link active">Calculators</a>
         <a href="/about" class="p-nav-link">About</a>
-        <a href="/resources" class="p-nav-link">Resources</a>
         <a href="/faq" class="p-nav-link">FAQs</a>
         <a href="/contact" class="p-nav-link">Contact</a>
       </nav>
@@ -704,6 +703,9 @@
     </div>
   </aside>
 
+  <!-- Modal Backdrop for Drawers & Modals -->
+  <div id="modal-backdrop" class="modal-backdrop"></div>
+
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <img src="/images/logo.svg" alt="DEVICE PRO" style="height: 32px;" id="mobile-nav-title">
@@ -712,14 +714,13 @@
     <div class="drawer-body">
       <div class="mobile-nav-links-list">
         <a href="/" class="m-nav-link" data-close-drawer>Home</a>
-        <a href="/solutions" class="m-nav-link" data-close-drawer>Solutions</a>
+        <a href="/#solutions" class="m-nav-link" data-close-drawer>Solutions</a>
         <a href="/products" class="m-nav-link" data-close-drawer>Products</a>
         <a href="/packages" class="m-nav-link" data-close-drawer>Pricing &amp; Packages</a>
         <a href="/projects" class="m-nav-link" data-close-drawer>Case Studies &amp; Projects</a>
         <a href="/calculator" class="m-nav-link" data-close-drawer>Solar Sizing Calculator</a>
         <a href="/savings-calculator" class="m-nav-link active" data-close-drawer>Generator vs Solar ROI</a>
         <a href="/about" class="m-nav-link" data-close-drawer>About Us</a>
-        <a href="/resources" class="m-nav-link" data-close-drawer>Knowledge Base</a>
         <a href="/faq" class="m-nav-link" data-close-drawer>Technical FAQs</a>
         <a href="/contact" class="m-nav-link" data-close-drawer>Showroom &amp; Contact</a>
         <hr class="mobile-divider">
@@ -733,7 +734,7 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Scripts -->
-  <script src="/js/cart.js?v=2"></script>
+  <script src="/js/cart.js?v=3"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/calculator-engine.js?v=1"></script>
   <script src="/js/savings-calculator.js?v=1"></script>

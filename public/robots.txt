@@ -12,7 +12,6 @@ Allow: /projects
 Allow: /calculator
 Allow: /savings-calculator
 Allow: /about
-Allow: /resources
 Allow: /faq
 Allow: /contact
 Allow: /tracking

@@ -192,7 +192,7 @@ async function runTests() {
   // =========================================================================
   // 4. HTML PAGE INTEGRATION & TRIGGER COMPLIANCE
   // =========================================================================
-  console.log('\n--- 4. Universal HTML Page Compliance (12 Customer-Facing Pages) ---');
+  console.log('\n--- 4. Universal HTML Page Compliance (11 Customer-Facing Pages) ---');
 
   const customerPages = [
     { file: 'index.html', path: '/' },
@@ -204,7 +204,6 @@ async function runTests() {
     { file: 'calculator.html', path: '/calculator' },
     { file: 'savings-calculator.html', path: '/savings-calculator' },
     { file: 'about.html', path: '/about' },
-    { file: 'resources.html', path: '/resources' },
     { file: 'faq.html', path: '/faq' },
     { file: 'contact.html', path: '/contact' }
   ];

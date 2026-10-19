@@ -945,3 +945,66 @@
     align-items: flex-start;
   }
 }
+
+/* Header Circle Cart Button & Badge */
+.products-header-actions .header-circle-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid #CBD5E1;
+  background: #FFFFFF;
+  color: #061C35;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.products-header-actions .header-circle-btn:hover {
+  background: #F4F8FC;
+  border-color: #061C35;
+  color: #0157A2;
+}
+
+.products-header-actions .header-circle-btn .cart-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: #FFB90C;
+  color: #0A121F;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  line-height: 1;
+}
+
+/* Hide Hamburger on Desktop */
+.products-header-actions .mobile-nav-toggle,
+.products-header-actions .mobile-menu-trigger {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .products-header-actions .mobile-nav-toggle,
+  .products-header-actions .mobile-menu-trigger {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #061C35;
+    padding: 0.5rem;
+  }
+}
+

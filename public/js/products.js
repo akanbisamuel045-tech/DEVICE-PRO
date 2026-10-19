@@ -354,15 +354,22 @@
   // CART MANAGEMENT (LOCAL STORAGE PERSISTENCE)
   // =========================================================================
   function getCart() {
+    if (window.DeviceProCart) {
+      return window.DeviceProCart.getItems();
+    }
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_CART_KEY)) || [];
+      return JSON.parse(localStorage.getItem('dp_equipment_cart_v1')) || [];
     } catch {
       return [];
     }
   }
 
   function saveCart(cart) {
-    localStorage.setItem(STORAGE_CART_KEY, JSON.stringify(cart));
+    if (window.DeviceProCart) {
+      window.DeviceProCart.saveItems(cart);
+      return;
+    }
+    localStorage.setItem('dp_equipment_cart_v1', JSON.stringify(cart));
     updateCartBadges();
     renderCartDrawerItems();
   }
@@ -391,14 +398,22 @@
   }
 
   function removeFromCart(productId) {
+    if (window.DeviceProCart) {
+      window.DeviceProCart.removeItem(productId);
+      return;
+    }
     let cart = getCart();
     cart = cart.filter(item => item.id !== productId);
     saveCart(cart);
   }
 
   function updateCartBadges() {
+    if (window.DeviceProCart) {
+      window.DeviceProCart.updateBadge();
+      return;
+    }
     const cart = getCart();
-    const totalItems = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || item.qty || 1), 0);
     cartBadges.forEach(badge => {
       badge.textContent = totalItems;
       badge.setAttribute('aria-label', `${totalItems} items in cart`);
@@ -825,6 +840,9 @@
   // INITIALIZATION
   // =========================================================================
   function init() {
+    try {
+      localStorage.removeItem('devicepro_cart');
+    } catch (_) {}
     loadStateFromURL();
     syncUIFromState();
     updateCartBadges();

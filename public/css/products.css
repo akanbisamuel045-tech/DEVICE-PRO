@@ -1512,11 +1512,11 @@ body.products-page-body {
   position: fixed;
   top: 0;
   right: 0;
-  width: min(420px, 100vw);
+  width: min(440px, 100vw);
   height: 100vh;
-  background-color: #FFFFFF;
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.2);
-  z-index: 99999;
+  background-color: #FFFFFF !important;
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.22);
+  z-index: 100000 !important;
   display: flex;
   flex-direction: column;
   transform: translateX(100%);
@@ -1527,9 +1527,11 @@ body.products-page-body {
 
 .drawer.open,
 #cart-drawer.open {
-  transform: translateX(0);
-  visibility: visible;
-  pointer-events: auto;
+  transform: translateX(0) !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  z-index: 100000 !important;
 }
 
 .drawer-header {

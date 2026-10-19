@@ -287,19 +287,19 @@
         drawer.setAttribute('role', 'dialog');
         drawer.setAttribute('aria-modal', 'true');
         drawer.innerHTML = `
-          <div class="drawer-header" style="display:flex; justify-content:space-between; align-items:center; padding:1.25rem 1.5rem; border-bottom:1px solid rgba(255,255,255,0.08);">
-            <h2 id="cart-drawer-title" style="font-size:1.15rem; font-weight:800; color:#FFFFFF; margin:0;">Your Equipment Cart</h2>
-            <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+          <div class="drawer-header" style="display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid #E2E8F0; background:#FFFFFF;">
+            <h2 id="cart-drawer-title" style="font-size:1.15rem; font-weight:700; color:#0F172A; margin:0;">Your Equipment &amp; Package Cart</h2>
+            <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer" style="width:36px; height:36px; border-radius:50%; border:1px solid #E2E8F0; background:#FFFFFF; color:#64748B; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
           </div>
-          <div class="drawer-body" id="cart-drawer-body" style="padding:1.5rem; overflow-y:auto; flex-grow:1;">
+          <div class="drawer-body" id="cart-drawer-body" style="padding:24px; overflow-y:auto; flex:1; background:#FFFFFF;">
             <!-- Rendered dynamically -->
           </div>
-          <div class="drawer-footer" style="padding:1.25rem 1.5rem; border-top:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02);">
-            <div class="cart-subtotal-row" style="display:flex; justify-content:space-between; margin-bottom:1rem; font-weight:700; font-size:1.05rem; color:#FFFFFF;">
+          <div class="drawer-footer" style="padding:18px 24px; border-top:1px solid #E2E8F0; background:#F8FAFC;">
+            <div class="cart-subtotal-row" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; font-weight:700; font-size:1.05rem; color:#0F172A;">
               <span>Subtotal</span>
-              <span id="cart-subtotal-val" style="color:var(--color-brand-yellow, #FFB90C);">₦0</span>
+              <span id="cart-subtotal-val" style="color:#0157A2; font-size:1.15rem;">₦0</span>
             </div>
-            <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" style="width:100%; padding:0.85rem; background:var(--color-brand-yellow, #FFB90C); color:#060B14; border:none; border-radius:8px; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.2s ease;">
+            <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" style="width:100%; padding:0.85rem 1.25rem; background:var(--color-brand-yellow, #FFC400); color:#061C35; border:none; border-radius:9999px; font-weight:700; font-size:0.95rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:all 0.2s ease;">
               Proceed to Checkout →
             </button>
           </div>
@@ -324,11 +324,27 @@
 
       if (cartDrawer) {
         this.renderDrawer();
+        cartDrawer.style.setProperty('z-index', '100000', 'important');
+        cartDrawer.style.setProperty('background-color', '#FFFFFF', 'important');
+        cartDrawer.style.setProperty('background', '#FFFFFF', 'important');
+        if (backdrop) {
+          backdrop.style.setProperty('z-index', '99990', 'important');
+          backdrop.classList.add('open');
+        }
         cartDrawer.classList.add('open');
         cartDrawer.setAttribute('aria-hidden', 'false');
-        if (backdrop) backdrop.classList.add('open');
         document.body.style.overflow = 'hidden';
+
+        // Focus trap & accessible initial focus
+        const focusTarget = cartDrawer.querySelector('[data-close-drawer], .modal-close-btn, button, a');
+        if (focusTarget) {
+          setTimeout(() => focusTarget.focus(), 60);
+        }
       }
+    },
+
+    openCart: function () {
+      this.openDrawer();
     },
 
     /**
@@ -344,6 +360,10 @@
       }
       if (backdrop) backdrop.classList.remove('open');
       document.body.style.overflow = '';
+    },
+
+    closeCart: function () {
+      this.closeDrawer();
     }
   };
 
@@ -352,6 +372,10 @@
 
   // Initialize on DOM load
   document.addEventListener('DOMContentLoaded', () => {
+    // Purge any stale legacy cart keys that caused phantom badge counts
+    try {
+      localStorage.removeItem('devicepro_cart');
+    } catch (_) {}
     DeviceProCart.updateBadge();
 
     // Hook into global buttons with data-add-cart
@@ -372,16 +396,18 @@
         }
       }
 
-      // Cart trigger buttons
-      const cartTrigger = e.target.closest('[data-trigger-cart], .header-circle-btn[aria-label*="Cart" i], .header-cart-btn, #cart-btn');
+      // Universal cart trigger buttons
+      const cartTrigger = e.target.closest(
+        '[data-trigger-cart], [data-cart-open], .header-circle-btn[aria-label*="Cart" i], .header-icon-btn[aria-label*="Cart" i], .header-cart-btn, #cart-btn, .cart-btn, a[href="/cart"], a[href="#cart"]'
+      );
       if (cartTrigger) {
         e.preventDefault();
         DeviceProCart.openDrawer();
       }
 
       // Close drawer buttons
-      const closeBtn = e.target.closest('[data-close-drawer]');
-      if (closeBtn) {
+      const closeBtn = e.target.closest('[data-close-drawer], .modal-close-btn[aria-label*="cart" i]');
+      if (closeBtn && closeBtn.closest('#cart-drawer')) {
         e.preventDefault();
         DeviceProCart.closeDrawer();
       }

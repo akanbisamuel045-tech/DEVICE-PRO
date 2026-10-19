@@ -774,10 +774,15 @@
 
 .faq-answer {
   padding: 0 20px 16px;
-  font-size: 0.84375rem;
+  font-size: 0.875rem;
   line-height: 1.6;
-  color: var(--p-muted);
+  color: #1E293B;
   display: none;
+}
+
+.faq-answer p {
+  color: #1E293B;
+  margin: 0;
 }
 
 .faq-item.open .faq-answer {

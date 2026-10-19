@@ -76,14 +76,19 @@ Used at every stage gate. Covers:
 # Install dependencies
 npm install
 
-# Run all unit tests
-node --test tests/unit/
+# Run entire automated regression suite (133 tests across 6 suites)
+npm test
 
-# Run all integration tests
-node --test tests/integration/
+# Equivalent direct command with sequential concurrency (prevents SQLite lock contention)
+node --test --test-concurrency=1 tests/*.test.js
 
-# Run all tests
-node --test tests/
+# Run individual stage test suites
+node tests/stage12_api.test.js
+node tests/stage13_cart_admin.test.js
+node tests/stage14_search_ux.test.js
+node tests/stage15_payment.test.js
+node tests/stage16_delivery_support.test.js
+node tests/stage17_security_seo_perf.test.js
 
 # Start development server
 npm run dev
@@ -93,11 +98,12 @@ npm run dev
 - Test data uses clearly labelled placeholder values
 - No real customer data in test fixtures
 - No real payment credentials in test environment
-- Database seeds use `database/seeds/` directory
+- Database seeds use `database/seeds/` and `data/` directory
+- Automated database backups exported to `data/backups/`
 
 ## Adding New Tests
-1. Create test file in appropriate directory (`unit/`, `integration/`, `browser/`)
-2. Follow naming convention: `<module>.test.js`
+1. Create test file in `tests/` directory
+2. Follow naming convention: `stage<number>_<topic>.test.js`
 3. Use Node.js built-in `test` and `assert` modules
 4. Include both success and failure scenarios
 5. Test edge cases and boundary conditions
@@ -106,6 +112,25 @@ npm run dev
 ---
 
 ## Test Execution Log
+
+### Stage 17 Comprehensive Regression & Security Audit (2026-10-17)
+**Scope:** Full application stack — `server.js`, `db/database.js`, `public/`, and all 6 test suites  
+**Test Method:** Automated Node.js built-in test runner (`npm test`) with sequential concurrency, HTTP benchmark probes, and WCAG A11y verification  
+**Results:**
+- **Total Test Suites:** 6
+- **Total Assertions:** 133
+- **Passed:** 133 (100%)
+- **Failed:** 0 (0%)
+- **Duration:** 3.41s
+- **Breakdown:**
+  - `tests/stage12_api.test.js`: 28 Passed (Schema, Sizing, Generator OPEX, Salted Scrypt Auth)
+  - `tests/stage13_cart_admin.test.js`: 25 Passed (Cart, Checkout, Lagos/Regional Delivery, RBAC, Catalog CRUD, Audit Logs)
+  - `tests/stage14_search_ux.test.js`: 29 Passed (Search API, Spotlight Palette, 12 Core HTML Pages Compliance)
+  - `tests/stage15_payment.test.js`: 13 Passed (Paystack Sandbox, Idempotency, HMAC-SHA512 Webhooks, Zero Card Storage)
+  - `tests/stage16_delivery_support.test.js`: 14 Passed (Privacy Tracking Gate, 6-Stage Stepper, NEMSA Safety, Warranties)
+  - `tests/stage17_security_seo_perf.test.js`: 24 Passed (XML Sitemap 75 URLs, Robots.txt, HSTS/CSP, Gzip, Caching, JSON-LD, SQLite Integrity)
+- **Dependency Audit:** `npm audit` returned 0 vulnerabilities.
+- **Overall Status:** ✅ **PASS — PRODUCTION READY**
 
 ### Reference Homepage Implementation QA (2026-10-13)
 **Scope:** `public/index.html`, `public/css/homepage.css`, `public/js/main.js`, `server.js`  
@@ -123,4 +148,5 @@ npm run dev
   - Mobile Nav Drawer (`#mobile-nav-drawer`): Opens on hamburger click, lists all navigation items, hides completely off-canvas when closed.
 - **Visual Asset Integrity:** All 12 extracted and cleaned reference photographic assets load with HTTP 200 without text distortion.
 - **Overall Status:** ✅ **PASS**
+
 

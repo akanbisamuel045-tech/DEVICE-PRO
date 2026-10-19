@@ -512,20 +512,36 @@
    6. SOLUTIONS CONSULTATION FORM
    ============================================================================= */
 .solutions-form-section {
-  padding: 80px 0;
-  background-color: #FFFFFF;
-  border-bottom: 1px solid var(--p-border);
+  padding: 85px 0;
+  background: linear-gradient(135deg, #05182E 0%, #09284B 45%, #0157A2 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+}
+
+.solutions-form-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(1, 87, 162, 0.4) 0%, transparent 60%);
+  pointer-events: none;
 }
 
 .solutions-form-card {
-  background-color: var(--p-surface);
-  border: 1px solid var(--p-border);
-  border-radius: 14px;
+  background-color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
   padding: 44px;
   display: grid;
   grid-template-columns: 1fr 1.3fr;
   gap: 48px;
   align-items: start;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+  z-index: 2;
 }
 
 .form-heading {

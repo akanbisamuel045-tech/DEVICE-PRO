@@ -273,7 +273,10 @@ const neededOrderCols = [
   { name: 'commissioning_status', type: 'TEXT DEFAULT "pending"' },
   { name: 'commissioning_tests', type: 'TEXT' },
   { name: 'commissioning_date', type: 'TEXT' },
-  { name: 'commissioning_certificate_id', type: 'TEXT' }
+  { name: 'commissioning_certificate_id', type: 'TEXT' },
+  { name: 'installation_option', type: 'TEXT DEFAULT "supply_only"' },
+  { name: 'installation_fee_ngn', type: 'INTEGER DEFAULT 0' },
+  { name: 'notes', type: 'TEXT' }
 ];
 for (const col of neededOrderCols) {
   if (!existingOrderCols.includes(col.name)) {
@@ -1722,7 +1725,13 @@ function createOrder({
   customerName, customerPhone, customerEmail = '',
   deliveryAddress, deliveryState, items = [],
   paymentMethod = 'transfer', paymentStatus = 'pending',
-  orderStatus = 'pending', adminNotes = '', ipAddress = ''
+  orderStatus = 'pending', adminNotes = '', ipAddress = '',
+  installationOption = 'supply_only',
+  installationFeeNgn = null,
+  deliveryFeeNgn = null,
+  notes = '',
+  subtotalNgn = null,
+  totalNgn = null
 }) {
   if (!customerName || !customerPhone || !deliveryAddress || !deliveryState) {
     throw new Error('Customer name, phone, delivery address, and state are mandatory.');
@@ -1749,24 +1758,46 @@ function createOrder({
     };
   });
 
+  const finalSubtotal = (subtotalNgn !== null && subtotalNgn !== undefined)
+    ? parseInt(subtotalNgn, 10)
+    : calculatedSubtotal;
+
   const orderNumber = customOrderNumber || ('DP-ORD-' + Math.floor(100000 + Math.random() * 900000));
-  const deliveryFee = deliveryState.toLowerCase() === 'lagos' ? 15000 : 35000;
-  const totalAmount = calculatedSubtotal + deliveryFee;
+  const deliveryFee = (deliveryFeeNgn !== null && deliveryFeeNgn !== undefined)
+    ? parseInt(deliveryFeeNgn, 10)
+    : (deliveryState.toLowerCase() === 'lagos' ? 15000 : 35000);
+
+  let installationFee = 0;
+  if (installationOption === 'turnkey_install') {
+    if (installationFeeNgn !== null && installationFeeNgn !== undefined) {
+      installationFee = parseInt(installationFeeNgn, 10);
+    } else {
+      installationFee = Math.max(120000, Math.round(finalSubtotal * 0.08));
+    }
+  } else {
+    installationFee = 0;
+  }
+
+  const totalAmount = (totalNgn !== null && totalNgn !== undefined)
+    ? parseInt(totalNgn, 10)
+    : (finalSubtotal + deliveryFee + installationFee);
 
   const stmt = db.prepare(`
     INSERT INTO orders (
       order_number, customer_name, customer_phone, customer_email,
       delivery_address, delivery_state, items_json, subtotal_ngn,
-      delivery_fee_ngn, total_ngn, payment_method, payment_status, order_status, admin_notes, ip_address
+      delivery_fee_ngn, installation_fee_ngn, installation_option,
+      total_ngn, payment_method, payment_status, order_status, admin_notes, notes, ip_address
     ) VALUES (
-      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     )
   `);
 
   stmt.run(
     orderNumber, customerName, customerPhone, customerEmail,
     deliveryAddress, deliveryState, JSON.stringify(verifiedItems),
-    calculatedSubtotal, deliveryFee, totalAmount, paymentMethod, paymentStatus, orderStatus, adminNotes, ipAddress
+    finalSubtotal, deliveryFee, installationFee, installationOption,
+    totalAmount, paymentMethod, paymentStatus, orderStatus, adminNotes, notes, ipAddress
   );
 
   logAudit({

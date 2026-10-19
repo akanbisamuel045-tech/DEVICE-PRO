@@ -18,35 +18,57 @@ document.addEventListener('DOMContentLoaded', () => {
   handleScroll();
 
   // 2. Modals and Drawers Utility
-  const backdrop = document.getElementById('modal-backdrop');
-  const searchModal = document.getElementById('search-modal');
-  const cartDrawer = document.getElementById('cart-drawer');
-  const mobileNavDrawer = document.getElementById('mobile-nav-drawer');
-  const quoteModal = document.getElementById('quote-modal');
+  const getBackdrop = () => {
+    let bd = document.getElementById('modal-backdrop');
+    if (!bd) {
+      bd = document.createElement('div');
+      bd.id = 'modal-backdrop';
+      bd.className = 'modal-backdrop';
+      document.body.appendChild(bd);
+      bd.addEventListener('click', closeAll);
+    }
+    return bd;
+  };
 
   const openElement = (elem) => {
     if (!elem) return;
-    backdrop.classList.add('open');
+    const bd = getBackdrop();
+    if (bd) {
+      bd.style.setProperty('z-index', '99990', 'important');
+      bd.classList.add('open');
+    }
+    elem.style.setProperty('z-index', '100000', 'important');
+    elem.style.setProperty('background-color', '#FFFFFF', 'important');
+    elem.style.setProperty('background', '#FFFFFF', 'important');
     elem.classList.add('open');
+    elem.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
     const firstInput = elem.querySelector('input, button');
     if (firstInput) firstInput.focus();
   };
 
   const closeAll = () => {
-    backdrop.classList.remove('open');
-    [searchModal, cartDrawer, mobileNavDrawer, quoteModal].forEach(el => {
-      if (el) el.classList.remove('open');
+    const bd = document.getElementById('modal-backdrop');
+    if (bd) bd.classList.remove('open');
+    document.querySelectorAll('.drawer.open, #cart-drawer.open, #mobile-nav-drawer.open').forEach(el => {
+      el.classList.remove('open');
+      el.setAttribute('aria-hidden', 'true');
+    });
+    document.querySelectorAll('dialog[open]').forEach(d => {
+      if (typeof d.close === 'function') {
+        try { d.close(); } catch (_) {}
+      }
     });
     document.body.style.overflow = '';
   };
 
-  if (backdrop) {
-    backdrop.addEventListener('click', closeAll);
+  const existingBackdrop = document.getElementById('modal-backdrop');
+  if (existingBackdrop) {
+    existingBackdrop.addEventListener('click', closeAll);
   }
 
   // Close buttons inside modals/drawers
-  document.querySelectorAll('[data-close-modal]').forEach(btn => {
+  document.querySelectorAll('[data-close-modal], [data-close-drawer], [data-close-dialog]').forEach(btn => {
     btn.addEventListener('click', closeAll);
   });
 

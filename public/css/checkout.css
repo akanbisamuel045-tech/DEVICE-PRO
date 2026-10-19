@@ -3,6 +3,39 @@
    Layout Archetype 4: Progressive Multi-Step Form
    ============================================================================= */
 
+/* Header & Brand Logo Styling */
+.site-header {
+  background-color: #0A121F;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand-logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.brand-logo-img {
+  height: 28px !important;
+  max-height: 28px !important;
+  width: auto !important;
+  max-width: 140px !important;
+  object-fit: contain;
+  display: block;
+}
+
 .checkout-main-content {
   background-color: #F8FAFC;
   padding: 40px 0 80px;

@@ -72,10 +72,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const email = orderData.customer_email || orderData.customerEmail || '';
   const address = orderData.delivery_address || orderData.deliveryAddress || 'Standard Delivery';
   const state = orderData.delivery_state || orderData.deliveryState || 'Lagos';
-  const total = orderData.total_ngn || orderData.totalNgn || 0;
-  const subtotal = orderData.subtotal_ngn || orderData.subtotalNgn || total;
-  const deliveryFee = orderData.delivery_fee_ngn || orderData.deliveryFeeNgn || (state.toLowerCase() === 'lagos' ? 15000 : 35000);
-  const installFee = orderData.installation_fee_ngn || orderData.installationFeeNgn || 0;
+  const subtotal = Number(orderData.subtotal_ngn !== undefined ? orderData.subtotal_ngn : (orderData.subtotalNgn !== undefined ? orderData.subtotalNgn : 0));
+  const deliveryFee = Number(orderData.delivery_fee_ngn !== undefined ? orderData.delivery_fee_ngn : (orderData.deliveryFeeNgn !== undefined ? orderData.deliveryFeeNgn : (state.toLowerCase() === 'lagos' ? 15000 : 35000)));
+
+  let installFee = Number(orderData.installation_fee_ngn !== undefined ? orderData.installation_fee_ngn : (orderData.installationFeeNgn !== undefined ? orderData.installationFeeNgn : 0));
+  const installOption = orderData.installation_option || orderData.installationOption;
+  if (installFee === 0 && installOption === 'turnkey_install' && subtotal > 0) {
+    installFee = Math.max(120000, Math.round(subtotal * 0.08));
+  }
+
+  const rawTotal = Number(orderData.total_ngn !== undefined ? orderData.total_ngn : (orderData.totalNgn !== undefined ? orderData.totalNgn : 0));
+  const total = rawTotal > 0 && rawTotal >= (subtotal + deliveryFee + installFee)
+    ? rawTotal
+    : (subtotal + deliveryFee + installFee);
+
   const createdAt = orderData.created_at || new Date().toISOString();
 
   // Populate UI

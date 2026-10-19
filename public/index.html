@@ -22,8 +22,9 @@
 
   <!-- Design Tokens & Stylesheets -->
   <link rel="stylesheet" href="css/tokens.css?v=12">
-  <link rel="stylesheet" href="css/components.css?v=18">
-  <link rel="stylesheet" href="css/homepage.css?v=12">
+  <link rel="stylesheet" href="css/components.css?v=25">
+  <link rel="stylesheet" href="css/homepage.css?v=25">
+  <link rel="stylesheet" href="css/solutions.css?v=2">
   <link rel="stylesheet" href="css/footer.css?v=1">
 
   <!-- Schema.org JSON-LD Structured Data (Stage 17) -->
@@ -127,13 +128,12 @@
       <!-- Desktop Primary Navigation -->
       <nav class="header-nav" aria-label="Primary Navigation">
         <a href="/" class="nav-link active">Home</a>
-        <a href="/solutions" class="nav-link">Solutions</a>
+        <a href="#solutions" class="nav-link">Solutions</a>
         <a href="/products" class="nav-link">Products</a>
         <a href="/packages" class="nav-link">Packages</a>
         <a href="/projects" class="nav-link">Projects</a>
         <a href="/calculator" class="nav-link">Calculators</a>
         <a href="/about" class="nav-link">About</a>
-        <a href="/resources" class="nav-link">Resources</a>
         <a href="/faq" class="nav-link">FAQs</a>
         <a href="/contact" class="nav-link">Contact</a>
       </nav>
@@ -243,80 +243,7 @@
     </section>
 
     <!-- =======================================================================
-         SECTION 2: ARCHITECTURAL SOLAR DESIGN & CAD GRID INTEGRATION
-         ======================================================================= -->
-    <section class="solar-design-section" id="solar-design" aria-label="Precision Solar Design & Grid Integration">
-      <div class="layout-container">
-
-        <div class="solar-design-header">
-          <span class="sunfold-pill-badge-subtle">Precision Engineering</span>
-          <h2 class="solar-design-title">Architectural Solar Design &amp; Grid Integration</h2>
-          <p class="solar-design-desc">
-            From ground-mounted utility arrays to high-capacity rooftop installations, every system is engineered on
-            precise isometric CAD load grids with smart transformer and transmission integration.
-          </p>
-        </div>
-
-        <!-- CAD Wireframe Schematic Visual Frame -->
-        <div class="solar-design-schematic-wrap">
-          <img src="images/solar-wireframe-schematic.jpg"
-            alt="Architectural CAD blueprint of commercial ground-mounted solar array connected to solar substation building with rooftop panels and battery energy storage cabinets"
-            class="solar-schematic-img" loading="lazy">
-        </div>
-
-        <!-- 3 Engineering Blueprint Feature Cards -->
-        <div class="solar-blueprint-grid">
-          <div class="solar-blueprint-card">
-            <div class="blueprint-card-icon" aria-hidden="true">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
-                <line x1="3" y1="9" x2="21" y2="9"></line>
-                <line x1="9" y1="21" x2="9" y2="9"></line>
-              </svg>
-            </div>
-            <h3 class="blueprint-card-title">CAD Load Simulation</h3>
-            <p class="blueprint-card-desc">
-              Structural wind-load modeling, tilt-angle solar yield optimization, and millimeter-accurate string layout
-              designed for maximum irradiance capture.
-            </p>
-          </div>
-
-          <div class="solar-blueprint-card">
-            <div class="blueprint-card-icon" aria-hidden="true">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-              </svg>
-            </div>
-            <h3 class="blueprint-card-title">Grid Tie &amp; Pylon Interconnection</h3>
-            <p class="blueprint-card-desc">
-              Step-up transformer topologies, smart substation bus integration, and bi-directional transmission feed
-              synchronization for smooth grid stability.
-            </p>
-          </div>
-
-          <div class="solar-blueprint-card">
-            <div class="blueprint-card-icon" aria-hidden="true">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                <polyline points="9 12 11 14 15 10"></polyline>
-              </svg>
-            </div>
-            <h3 class="blueprint-card-title">25-Year Structural Integrity</h3>
-            <p class="blueprint-card-desc">
-              Hot-dip galvanized steel mounting racks and corrosion-resistant anodized aluminum clamps engineered to
-              endure extreme tropical storms and UV exposure.
-            </p>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =======================================================================
-         SECTION 3: TOP NIGERIAN SOLAR & INVERTER BRANDS (REPLACES "OUR EXPERTISE")
+         SECTION 2: TOP NIGERIAN SOLAR & INVERTER BRANDS (REPLACES "OUR EXPERTISE")
          ======================================================================= -->
     <section class="brand-showcase-section" id="brands" aria-label="Authorized Solar and Inverter Brands in Nigeria">
       <div class="layout-container">
@@ -631,6 +558,800 @@
     </section>
 
     <!-- =======================================================================
+         SECTION: FEATURED TIER-1 SOLAR PRODUCTS (6 PRODUCTS FROM PRODUCT PAGE)
+         PLACED RIGHT AFTER BRANDS SECTION
+         ======================================================================= -->
+    <section class="homepage-featured-products-section" id="featured-products" aria-label="Featured Tier-1 Solar Products">
+      <div class="layout-container">
+        <div class="section-header-split">
+          <div class="section-header-split-info">
+            <span class="section-tag-pill">Procurement &amp; Distribution</span>
+            <h2 class="section-heading-white">Nigeria's Most Requested Solar Hardware</h2>
+            <p class="section-desc-light">
+              Direct factory distribution with manufacturer warranty, Lagos showroom availability, and express nationwide delivery.
+            </p>
+          </div>
+          <a href="/products" class="btn-header-view-all">
+            <span>Explore Complete Catalogue</span>
+            <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+
+        <div class="home-products-grid">
+          <!-- Product 1: Jinko Solar Monocrystalline Solar Panel 550W -->
+          <article class="home-product-card">
+            <div class="home-product-img-wrap">
+              <span class="home-prod-badge-stock">In Stock</span>
+              <span class="home-prod-badge-brand">Jinko Solar</span>
+              <img src="/images/products/jinko-solar-panel.png" alt="Jinko Solar Monocrystalline Solar Panel 550W" class="home-product-img" loading="lazy">
+            </div>
+            <div class="home-product-body">
+              <div class="home-prod-category-power">Solar Panels • 550W Bifacial</div>
+              <h3 class="home-product-title">Monocrystalline Solar Panel</h3>
+              <div class="home-product-price-row">
+                <span class="home-product-price">₦245,000</span>
+                <span class="home-product-currency">NGN</span>
+              </div>
+              <div class="home-product-btn-row">
+                <button type="button" class="home-btn-cart" data-add-cart data-id="1" data-name="Monocrystalline Solar Panel" data-price="245000" data-image="/images/products/jinko-solar-panel.png" data-slug="jinko-monocrystalline-solar-panel-550w">
+                  <span>Add to Cart</span>
+                </button>
+                <a href="/product-detail?id=1" class="home-btn-view">Details</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Product 2: Growatt Hybrid Inverter 5kW -->
+          <article class="home-product-card">
+            <div class="home-product-img-wrap">
+              <span class="home-prod-badge-stock">In Stock</span>
+              <span class="home-prod-badge-brand">Growatt</span>
+              <img src="/images/products/growatt-hybrid-inverter.png" alt="Growatt Hybrid Inverter 5kW" class="home-product-img" loading="lazy">
+            </div>
+            <div class="home-product-body">
+              <div class="home-prod-category-power">Inverters • 5kW Smart Hybrid</div>
+              <h3 class="home-product-title">Hybrid Inverter</h3>
+              <div class="home-product-price-row">
+                <span class="home-product-price">₦1,250,000</span>
+                <span class="home-product-currency">NGN</span>
+              </div>
+              <div class="home-product-btn-row">
+                <button type="button" class="home-btn-cart" data-add-cart data-id="2" data-name="Hybrid Inverter" data-price="1250000" data-image="/images/products/growatt-hybrid-inverter.png" data-slug="growatt-hybrid-inverter-5kw">
+                  <span>Add to Cart</span>
+                </button>
+                <a href="/product-detail?id=2" class="home-btn-view">Details</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Product 3: Pylontech Lithium Battery 4.8kWh -->
+          <article class="home-product-card">
+            <div class="home-product-img-wrap">
+              <span class="home-prod-badge-stock">In Stock</span>
+              <span class="home-prod-badge-brand">Pylontech</span>
+              <img src="/images/products/pylontech-lithium-battery.png" alt="Pylontech Lithium Battery 4.8kWh" class="home-product-img" loading="lazy">
+            </div>
+            <div class="home-product-body">
+              <div class="home-prod-category-power">Batteries • 4.8kWh LiFePO4</div>
+              <h3 class="home-product-title">Lithium Battery</h3>
+              <div class="home-product-price-row">
+                <span class="home-product-price">₦1,850,000</span>
+                <span class="home-product-currency">NGN</span>
+              </div>
+              <div class="home-product-btn-row">
+                <button type="button" class="home-btn-cart" data-add-cart data-id="3" data-name="Lithium Battery" data-price="1850000" data-image="/images/products/pylontech-lithium-battery.png" data-slug="pylontech-lithium-battery-48v-100ah">
+                  <span>Add to Cart</span>
+                </button>
+                <a href="/product-detail?id=3" class="home-btn-view">Details</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Product 4: Solar Mount Roof Mounting Structure -->
+          <article class="home-product-card">
+            <div class="home-product-img-wrap">
+              <span class="home-prod-badge-stock">In Stock</span>
+              <span class="home-prod-badge-brand">Solar Mount</span>
+              <img src="/images/products/roof-mounting-structure.png" alt="Solar Mount Roof Mounting Structure" class="home-product-img" loading="lazy">
+            </div>
+            <div class="home-product-body">
+              <div class="home-prod-category-power">Balance of System • 6 Panels Rail</div>
+              <h3 class="home-product-title">Roof Mounting Structure</h3>
+              <div class="home-product-price-row">
+                <span class="home-product-price">₦180,000</span>
+                <span class="home-product-currency">NGN</span>
+              </div>
+              <div class="home-product-btn-row">
+                <button type="button" class="home-btn-cart" data-add-cart data-id="4" data-name="Roof Mounting Structure" data-price="180000" data-image="/images/products/roof-mounting-structure.png" data-slug="solar-mount-roof-mounting-structure">
+                  <span>Add to Cart</span>
+                </button>
+                <a href="/product-detail?id=4" class="home-btn-view">Details</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Product 5: MC4 Solar Cable 100m -->
+          <article class="home-product-card">
+            <div class="home-product-img-wrap">
+              <span class="home-prod-badge-stock">In Stock</span>
+              <span class="home-prod-badge-brand">MC4</span>
+              <img src="/images/products/mc4-solar-cable.png" alt="MC4 Solar Cable 100m" class="home-product-img" loading="lazy">
+            </div>
+            <div class="home-product-body">
+              <div class="home-prod-category-power">Accessories • 1000V DC 100m</div>
+              <h3 class="home-product-title">Solar Cable (100m)</h3>
+              <div class="home-product-price-row">
+                <span class="home-product-price">₦95,000</span>
+                <span class="home-product-currency">NGN</span>
+              </div>
+              <div class="home-product-btn-row">
+                <button type="button" class="home-btn-cart" data-add-cart data-id="5" data-name="Solar Cable (100m)" data-price="95000" data-image="/images/products/mc4-solar-cable.png" data-slug="mc4-solar-cable-100m">
+                  <span>Add to Cart</span>
+                </button>
+                <a href="/product-detail?id=5" class="home-btn-view">Details</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Product 6: EcoFlow Portable Power Station 1kWh -->
+          <article class="home-product-card">
+            <div class="home-product-img-wrap">
+              <span class="home-prod-badge-stock">In Stock</span>
+              <span class="home-prod-badge-brand">EcoFlow</span>
+              <img src="/images/products/ecoflow-power-station.png" alt="EcoFlow Portable Power Station 1kWh" class="home-product-img" loading="lazy">
+            </div>
+            <div class="home-product-body">
+              <div class="home-prod-category-power">Portable Power • 1kWh LFP</div>
+              <h3 class="home-product-title">Portable Power Station</h3>
+              <div class="home-product-price-row">
+                <span class="home-product-price">₦650,000</span>
+                <span class="home-product-currency">NGN</span>
+              </div>
+              <div class="home-product-btn-row">
+                <button type="button" class="home-btn-cart" data-add-cart data-id="6" data-name="Portable Power Station" data-price="650000" data-image="/images/products/ecoflow-power-station.png" data-slug="ecoflow-portable-power-station-1kwh">
+                  <span>Add to Cart</span>
+                </button>
+                <a href="/product-detail?id=6" class="home-btn-view">Details</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         SECTION: ENGINEERED SOLAR ENERGY SOLUTIONS FOR EVERY SECTOR
+         (SOLUTIONS HOMEPAGE SECTION)
+         ======================================================================= -->
+    <section id="solutions" class="homepage-solutions-wrapper" aria-label="Engineered Solar Energy Solutions">
+      
+      <!-- Solutions Hero Header Banner -->
+      <div class="solutions-hero-banner" aria-label="Solutions Overview">
+        <div class="layout-container solutions-hero-container">
+          
+          <div class="solutions-hero-badge">
+            <span class="badge-dot"></span> Certified Clean Energy Systems for Nigeria
+          </div>
+
+          <h2 class="solutions-hero-title">
+            Engineered Solar Energy Solutions<br>for Every Sector
+          </h2>
+
+          <p class="solutions-hero-desc">
+            From residential duplexes and commercial facilities to manufacturing factories and agricultural infrastructure, DEVICE PRO designs, procures, installs, and commissions turnkey solar systems engineered to eliminate diesel dependency.
+          </p>
+
+          <!-- Solutions Metrics Strip -->
+          <div class="solutions-hero-metrics">
+            <div class="metric-box">
+              <span class="metric-number">500+</span>
+              <span class="metric-label">Commissioned Sites</span>
+            </div>
+            <div class="metric-sep"></div>
+            <div class="metric-box">
+              <span class="metric-number">99.8%</span>
+              <span class="metric-label">System Reliability</span>
+            </div>
+            <div class="metric-sep"></div>
+            <div class="metric-box">
+              <span class="metric-number">70%</span>
+              <span class="metric-label">Avg. Diesel Savings</span>
+            </div>
+            <div class="metric-sep"></div>
+            <div class="metric-box">
+              <span class="metric-number">25 Yrs</span>
+              <span class="metric-label">Module Performance</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Sector Nav Strip -->
+      <div class="sector-quick-nav-section" aria-label="Sector Quick Navigation">
+        <div class="layout-container">
+          <div class="sector-nav-track">
+            <a href="#residential" class="sector-nav-btn active">
+              <span class="sector-nav-icon">🏡</span>
+              <span>Residential Solar</span>
+            </a>
+            <a href="#commercial" class="sector-nav-btn">
+              <span class="sector-nav-icon">🏢</span>
+              <span>Commercial &amp; Business</span>
+            </a>
+            <a href="#industrial" class="sector-nav-btn">
+              <span class="sector-nav-icon">🏭</span>
+              <span>Industrial &amp; Micro-Grids</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4 In-Depth Solution Pillar Showcases -->
+      <!-- Pillar 1: Residential Solar -->
+      <div class="solution-pillar-section" id="residential" aria-label="Residential Solar Solutions">
+        <div class="layout-container pillar-grid">
+          <div class="pillar-image-col">
+            <div class="pillar-image-card">
+              <img src="/images/solution-residential.jpg" alt="Modern Nigerian home powered by DEVICE PRO solar panels" class="pillar-img" loading="lazy">
+              <div class="pillar-overlay-badge">
+                <span class="badge-icon">⚡</span>
+                <span>24/7 Silent Power • Zero Noise</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-text-col">
+            <div class="pillar-kicker">RESIDENTIAL APPLICATIONS</div>
+            <h3 class="pillar-title">Uninterrupted Comfort for Modern Nigerian Homes</h3>
+            <p class="pillar-desc">
+              Escape the unpredictable public power grid and eliminate skyrocketing generator fueling costs. DEVICE PRO engineers customized rooftop photovoltaic systems with smart hybrid inverters and deep-cycle LiFePO4 battery storage, delivering instant, seamless backup without flickering your lights or TV.
+            </p>
+
+            <div class="pillar-specs-grid">
+              <div class="pillar-spec-item">
+                <strong>Target Properties</strong>
+                <span>3 – 6 Bedroom Homes, Duplexes, Luxury Villas, Gated Estates.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>Typical Capacities</strong>
+                <span>5kVA, 8kVA, 10kVA, and 15kVA Single-Phase/Split-Phase.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>Supported Loads</strong>
+                <span>Inverter ACs, deep freezers, refrigerators, borehole pumps, TVs, home offices.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>Battery Chemistry</strong>
+                <span>Tier-1 LiFePO4 (Pylontech / Felicity) with 6,000+ cycle lifespan.</span>
+              </div>
+            </div>
+
+            <div class="pillar-cta-row">
+              <a href="/products?category=solar-packages" class="btn-pillar-primary">
+                Explore Residential Packages <span class="arrow">→</span>
+              </a>
+              <button type="button" class="btn-pillar-outline" data-trigger-quote data-solution-type="Residential">
+                Request Home Sizing Quote
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pillar 2: Commercial Solar -->
+      <div class="solution-pillar-section alt-bg" id="commercial" aria-label="Commercial and Business Solar">
+        <div class="layout-container pillar-grid reverse">
+          <div class="pillar-image-col">
+            <div class="pillar-image-card">
+              <img src="/images/solution-commercial.jpg" alt="Commercial office complex with commercial rooftop solar installation" class="pillar-img" loading="lazy">
+              <div class="pillar-overlay-badge">
+                <span class="badge-icon">💼</span>
+                <span>60% – 75% Reduction in Diesel OPEX</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-text-col">
+            <div class="pillar-kicker">COMMERCIAL &amp; INSTITUTIONAL</div>
+            <h3 class="pillar-title">Lower Operating Costs &amp; Protect Business Continuity</h3>
+            <p class="pillar-desc">
+              High daytime energy consumption during business hours makes solar the most lucrative capital investment for Nigerian enterprises. Our three-phase commercial solar systems directly harvest solar radiation to power servers, lighting, and HVAC during peak operational hours, cutting diesel bills dramatically.
+            </p>
+
+            <div class="pillar-specs-grid">
+              <div class="pillar-spec-item">
+                <strong>Target Sectors</strong>
+                <span>Corporate Offices, Supermarkets, Medical Clinics, Hotels, Schools, Plazas.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>System Configurations</strong>
+                <span>20kVA to 100kVA Three-Phase with intelligent export limiting.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>Generator Sync (ATS)</strong>
+                <span>Smart generator frequency matching for seamless hybrid operation.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>Expected Payback</strong>
+                <span>2.5 to 3.5 Years with 20+ years of free daytime energy thereafter.</span>
+              </div>
+            </div>
+
+            <div class="pillar-cta-row">
+              <a href="/products?category=inverters" class="btn-pillar-primary">
+                View Commercial Inverters <span class="arrow">→</span>
+              </a>
+              <button type="button" class="btn-pillar-outline" data-trigger-quote data-solution-type="Commercial">
+                Book Business Energy Audit
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pillar 3: Industrial & High Energy Storage -->
+      <div class="solution-pillar-section" id="industrial" aria-label="Industrial and High Energy Solutions">
+        <div class="layout-container pillar-grid">
+          <div class="pillar-image-col">
+            <div class="pillar-image-card">
+              <img src="/images/industrial-power-storage-schematic.jpg" alt="Industrial Megawatt BESS storage schematic and hardware" class="pillar-img" loading="lazy">
+              <div class="pillar-overlay-badge">
+                <span class="badge-icon">🏭</span>
+                <span>Heavy Inductive Surge &amp; High-Voltage BESS</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pillar-text-col">
+            <div class="pillar-kicker">INDUSTRIAL INFRASTRUCTURE</div>
+            <h3 class="pillar-title">Megawatt-Scale Energy Storage &amp; Peak Shaving</h3>
+            <p class="pillar-desc">
+              Manufacturing facilities, cold-storage distribution hubs, and processing factories require resilient, high-capacity electrical architecture capable of absorbing high inductive motor startup surges. DEVICE PRO integrates containerized high-voltage LiFePO4 battery storage (BESS) and multi-string three-phase synchronous inverters.
+            </p>
+
+            <div class="pillar-specs-grid">
+              <div class="pillar-spec-item">
+                <strong>Target Applications</strong>
+                <span>Manufacturing lines, plastics, food processing, cold-chain hubs.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>Capacity Range</strong>
+                <span>100kVA up to 500kVA+ hybrid micro-grid architectures.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>Harmonics &amp; Power Factor</strong>
+                <span>Active THD filtering with power-factor correction up to 0.99.</span>
+              </div>
+              <div class="pillar-spec-item">
+                <strong>Telemetry &amp; SCADA</strong>
+                <span>Real-time remote cloud telemetry, string monitoring, and automated fault logging.</span>
+              </div>
+            </div>
+
+            <div class="pillar-cta-row">
+              <button type="button" class="btn-pillar-primary" data-trigger-quote data-solution-type="Industrial">
+                Request Industrial Assessment <span class="arrow">→</span>
+              </button>
+              <a href="https://wa.me/2348031234567?text=Hello%20DEVICE%20PRO%2C%20I%20would%20like%20to%20discuss%20an%20Industrial%20BESS%20system." target="_blank" rel="noopener" class="btn-pillar-outline">
+                WhatsApp Technical Team
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- =======================================================================
+           FEATURED SOLAR PACKAGES & PRICING (4 PACKAGES IN HORIZONTAL ROW)
+           PLACED RIGHT AFTER INDUSTRIAL INFRASTRUCTURE SECTION
+           ======================================================================= -->
+      <section class="homepage-packages-row-section" id="featured-packages" aria-label="Turnkey Solar Packages &amp; Pricing">
+        <div class="layout-container">
+          <div class="section-header-split">
+            <div class="section-header-split-info">
+              <span class="section-tag-pill">Turnkey Packages &amp; Transparent Pricing</span>
+              <h2 class="section-heading-white">Popular Solar Home &amp; Enterprise Packages</h2>
+              <p class="section-desc-light">
+                Complete pre-engineered hybrid solar solutions with Tier-1 lithium storage, professional rooftop installation, and certified warranty protection.
+              </p>
+            </div>
+            <a href="/packages" class="btn-header-view-all">
+              <span>View All Packages &amp; Pricing</span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+
+          <div class="packages-horizontal-row">
+            <!-- Package 1: 2kVA Starter Backup -->
+            <article class="pkg-home-card">
+              <div class="pkg-home-img-wrap">
+                <span class="pkg-home-badge">2kVA System</span>
+                <img src="/images/package-8kw.jpg" alt="2kVA Starter Solar Backup System" class="pkg-home-img" loading="lazy">
+              </div>
+              <div class="pkg-home-body">
+                <h3 class="pkg-home-title">2kVA Starter Solar Backup</h3>
+                <p class="pkg-home-target">1–2 Bedroom Apartment, Small Shop, or Home Office</p>
+                <div class="pkg-specs-mini-grid">
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Inverter</span>
+                    <span class="pkg-spec-mini-val">2.0 kW</span>
+                  </div>
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Battery</span>
+                    <span class="pkg-spec-mini-val">2.56 kWh</span>
+                  </div>
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Solar PV</span>
+                    <span class="pkg-spec-mini-val">1.1 kWp</span>
+                  </div>
+                </div>
+                <div class="pkg-home-footer">
+                  <span class="pkg-home-price-lbl">Turnkey All-Inclusive Price</span>
+                  <div class="pkg-home-price">₦1,150,000</div>
+                  <div class="pkg-home-btn-group">
+                    <button type="button" class="pkg-btn-cart" data-add-cart data-id="27" data-name="2kVA Starter Solar Backup System" data-price="1150000" data-image="/images/package-8kw.jpg" data-slug="2kva-starter-solar-backup-package">
+                      <span>Add to Cart</span>
+                    </button>
+                    <a href="/packages" class="pkg-btn-detail">Details</a>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Package 2: 3.5kVA Essential Home -->
+            <article class="pkg-home-card">
+              <div class="pkg-home-img-wrap">
+                <span class="pkg-home-badge">3.5kVA System</span>
+                <img src="/images/package-8kw.jpg" alt="3.5kVA Essential Home Solar System" class="pkg-home-img" loading="lazy">
+              </div>
+              <div class="pkg-home-body">
+                <h3 class="pkg-home-title">3.5kVA Essential Home</h3>
+                <p class="pkg-home-target">2–3 Bedroom Flat, Clinic, or Modern Workspace</p>
+                <div class="pkg-specs-mini-grid">
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Inverter</span>
+                    <span class="pkg-spec-mini-val">3.0 kW</span>
+                  </div>
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Battery</span>
+                    <span class="pkg-spec-mini-val">5.12 kWh</span>
+                  </div>
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Solar PV</span>
+                    <span class="pkg-spec-mini-val">2.2 kWp</span>
+                  </div>
+                </div>
+                <div class="pkg-home-footer">
+                  <span class="pkg-home-price-lbl">Turnkey All-Inclusive Price</span>
+                  <div class="pkg-home-price">₦2,450,000</div>
+                  <div class="pkg-home-btn-group">
+                    <button type="button" class="pkg-btn-cart" data-add-cart data-id="23" data-name="3.5kVA Essential Home Solar System" data-price="2450000" data-image="/images/package-8kw.jpg" data-slug="3-5kva-essential-home-solar-package">
+                      <span>Add to Cart</span>
+                    </button>
+                    <a href="/packages" class="pkg-btn-detail">Details</a>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Package 3: 5kVA Premium Duplex (Most Popular) -->
+            <article class="pkg-home-card">
+              <div class="pkg-home-img-wrap">
+                <span class="pkg-home-badge">5kVA System</span>
+                <span class="pkg-home-badge-popular">Most Popular</span>
+                <img src="/images/package-10kw.jpg" alt="5kVA Premium Duplex Solar Package" class="pkg-home-img" loading="lazy">
+              </div>
+              <div class="pkg-home-body">
+                <h3 class="pkg-home-title">5kVA Premium Duplex</h3>
+                <p class="pkg-home-target">4–5 Bedroom Duplex, Filling Station, or Studio</p>
+                <div class="pkg-specs-mini-grid">
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Inverter</span>
+                    <span class="pkg-spec-mini-val">5.0 kW</span>
+                  </div>
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Battery</span>
+                    <span class="pkg-spec-mini-val">10.24 kWh</span>
+                  </div>
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Solar PV</span>
+                    <span class="pkg-spec-mini-val">4.4 kWp</span>
+                  </div>
+                </div>
+                <div class="pkg-home-footer">
+                  <span class="pkg-home-price-lbl">Turnkey All-Inclusive Price</span>
+                  <div class="pkg-home-price">₦4,350,000</div>
+                  <div class="pkg-home-btn-group">
+                    <button type="button" class="pkg-btn-cart" data-add-cart data-id="24" data-name="5kVA Premium Duplex Solar Package" data-price="4350000" data-image="/images/package-10kw.jpg" data-slug="5kva-premium-duplex-solar-package">
+                      <span>Add to Cart</span>
+                    </button>
+                    <a href="/packages" class="pkg-btn-detail">Details</a>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- Package 4: 10kVA Executive Residence -->
+            <article class="pkg-home-card">
+              <div class="pkg-home-img-wrap">
+                <span class="pkg-home-badge">10kVA System</span>
+                <img src="/images/package-12kw.jpg" alt="10kVA Executive Residence Solar System" class="pkg-home-img" loading="lazy">
+              </div>
+              <div class="pkg-home-body">
+                <h3 class="pkg-home-title">10kVA Executive Residence</h3>
+                <p class="pkg-home-target">Executive Villa, Commercial Plaza, or Mini-Hospital</p>
+                <div class="pkg-specs-mini-grid">
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Inverter</span>
+                    <span class="pkg-spec-mini-val">10.0 kW</span>
+                  </div>
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Battery</span>
+                    <span class="pkg-spec-mini-val">15.36 kWh</span>
+                  </div>
+                  <div class="pkg-spec-mini-item">
+                    <span class="pkg-spec-mini-lbl">Solar PV</span>
+                    <span class="pkg-spec-mini-val">8.8 kWp</span>
+                  </div>
+                </div>
+                <div class="pkg-home-footer">
+                  <span class="pkg-home-price-lbl">Turnkey All-Inclusive Price</span>
+                  <div class="pkg-home-price">₦8,200,000</div>
+                  <div class="pkg-home-btn-group">
+                    <button type="button" class="pkg-btn-cart" data-add-cart data-id="25" data-name="10kVA Executive Residence Solar System" data-price="8200000" data-image="/images/package-12kw.jpg" data-slug="10kva-executive-residence-solar-package">
+                      <span>Add to Cart</span>
+                    </button>
+                    <a href="/packages" class="pkg-btn-detail">Details</a>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Hardware Architecture: 4 Core Elements -->
+      <div class="anatomy-section" aria-label="Anatomy of a Complete Solar System">
+        <div class="layout-container">
+          
+          <div class="section-title-centered">
+            <span class="sub-heading-pill">HARDWARE ARCHITECTURE</span>
+            <h3 class="section-heading-dark">The 4 Core Elements of a DEVICE PRO System</h3>
+            <p class="section-subtext">Every solar installation is an engineered ecosystem. We use only Tier-1 components designed to communicate seamlessly and withstand Nigerian climatic conditions.</p>
+          </div>
+
+          <div class="anatomy-grid">
+            
+            <div class="anatomy-card">
+              <div class="anatomy-step-badge">01</div>
+              <div class="anatomy-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0157A2" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                  <line x1="3" y1="9" x2="21" y2="9"></line>
+                  <line x1="3" y1="15" x2="21" y2="15"></line>
+                  <line x1="9" y1="3" x2="9" y2="21"></line>
+                  <line x1="15" y1="3" x2="15" y2="21"></line>
+                </svg>
+              </div>
+              <h4 class="anatomy-card-title">Photovoltaic (PV) Array</h4>
+              <p class="anatomy-card-text">
+                High-efficiency monocrystalline bifacial solar modules (Jinko, Canadian Solar, Longi) convert tropical irradiance into clean DC electricity with 25-year performance warranties.
+              </p>
+              <a href="/products?category=solar-panels" class="anatomy-link">View Solar Panels →</a>
+            </div>
+
+            <div class="anatomy-card">
+              <div class="anatomy-step-badge">02</div>
+              <div class="anatomy-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0157A2" stroke-width="2">
+                  <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+                  <circle cx="12" cy="9" r="2.5"></circle>
+                  <line x1="8" y1="16" x2="16" y2="16"></line>
+                </svg>
+              </div>
+              <h4 class="anatomy-card-title">Smart Hybrid Inverter</h4>
+              <p class="anatomy-card-text">
+                The brain of the system. Converts DC power to pure sine wave AC electricity, manages dual MPPT strings, and coordinates battery charging and generator autostart.
+              </p>
+              <a href="/products?category=inverters" class="anatomy-link">View Inverters →</a>
+            </div>
+
+            <div class="anatomy-card">
+              <div class="anatomy-step-badge">03</div>
+              <div class="anatomy-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0157A2" stroke-width="2">
+                  <rect x="3" y="6" width="18" height="14" rx="2"></rect>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                </svg>
+              </div>
+              <h4 class="anatomy-card-title">LiFePO4 Energy Storage</h4>
+              <p class="anatomy-card-text">
+                Safe Lithium Iron Phosphate chemistry with internal Battery Management Systems (BMS), providing 6,000+ cycles of deep discharge power for night and cloudy weather.
+              </p>
+              <a href="/products?category=batteries" class="anatomy-link">View Batteries →</a>
+            </div>
+
+            <div class="anatomy-card">
+              <div class="anatomy-step-badge">04</div>
+              <div class="anatomy-icon-wrap">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0157A2" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <h4 class="anatomy-card-title">Balance of System &amp; Protection</h4>
+              <p class="anatomy-card-text">
+                DC disconnect switches, Type-II lightning surge arresters, copper earthing rods, and anodized aluminium structural mounting rails for safety and structural longevity.
+              </p>
+              <a href="/products?category=accessories" class="anatomy-link">View Accessories →</a>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 7-Stage Turnkey Installation Process -->
+      <div class="process-section" id="process" aria-label="Turnkey Installation Process">
+        <div class="layout-container">
+          
+          <div class="section-title-centered">
+            <span class="sub-heading-pill">SYSTEMATIC DELIVERY</span>
+            <h3 class="section-heading-dark">Our 7-Stage Turnkey Installation Process</h3>
+            <p class="section-subtext">How we take your energy project from preliminary concept to a commissioned, high-performing solar power asset.</p>
+          </div>
+
+          <div class="process-timeline-grid">
+            
+            <div class="process-step-item">
+              <div class="step-bubble">1</div>
+              <h4 class="step-title">Energy Audit &amp; Discovery</h4>
+              <p class="step-desc">We review your monthly energy bills, appliance inventory, and peak operating hours to determine exact kilowatt demand.</p>
+            </div>
+
+            <div class="process-step-item">
+              <div class="step-bubble">2</div>
+              <h4 class="step-title">Engineering Sizing</h4>
+              <p class="step-desc">Our engineers model PV array tilt angles, inverter capacity, and battery storage depth to ensure zero power gaps.</p>
+            </div>
+
+            <div class="process-step-item">
+              <div class="step-bubble">3</div>
+              <h4 class="step-title">Technical Site Survey</h4>
+              <p class="step-desc">Physical inspection of roof orientation, shading analysis, DB distribution boards, and earthing soil resistivity.</p>
+            </div>
+
+            <div class="process-step-item">
+              <div class="step-bubble">4</div>
+              <h4 class="step-title">Transparent Agreement</h4>
+              <p class="step-desc">A comprehensive proposal detailing itemized equipment SKUs, labor, timeline, and warranty guarantees without hidden costs.</p>
+            </div>
+
+            <div class="process-step-item">
+              <div class="step-bubble">5</div>
+              <h4 class="step-title">Certified Installation</h4>
+              <p class="step-desc">Execution by certified solar installers following international electrical safety standards and local building codes.</p>
+            </div>
+
+            <div class="process-step-item">
+              <div class="step-bubble">6</div>
+              <h4 class="step-title">Commissioning &amp; Handover</h4>
+              <p class="step-desc">Full load testing, thermal scanning of connections, cloud telemetry setup, and client operational training.</p>
+            </div>
+
+            <div class="process-step-item">
+              <div class="step-bubble">7</div>
+              <h4 class="step-title">After-Sales Support</h4>
+              <p class="step-desc">Scheduled preventative maintenance visits, remote health telemetry monitoring, and local warranty backing.</p>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Solutions Sizing & Consultation Form -->
+      <div class="solutions-form-section" id="consultation-form-section" aria-label="Request an Engineered Proposal">
+        <div class="layout-container">
+          <div class="solutions-form-card">
+            
+            <div class="form-intro-col">
+              <span class="sub-heading-pill">GET AN ENGINEERED QUOTE</span>
+              <h3 class="form-heading">Ready to Engineer Your Solar System?</h3>
+              <p class="form-subtext">
+                Fill out this quick requirement assessment, and one of our certified solar engineers will prepare an itemized system design proposal tailored to your specific building and energy budget.
+              </p>
+
+              <div class="form-perks-list">
+                <div class="form-perk">
+                  <span class="perk-check">✓</span>
+                  <span>Free preliminary system sizing &amp; ROI projection</span>
+                </div>
+                <div class="form-perk">
+                  <span class="perk-check">✓</span>
+                  <span>Genuine Tier-1 equipment with serial tracking</span>
+                </div>
+                <div class="form-perk">
+                  <span class="perk-check">✓</span>
+                  <span>Turnkey installation coverage nationwide</span>
+                </div>
+              </div>
+
+              <div class="direct-contact-box">
+                <span class="contact-lbl">Prefer immediate WhatsApp consultation?</span>
+                <a href="https://wa.me/2348031234567?text=Hello%20DEVICE%20PRO%2C%20I%20would%20like%20to%20request%20a%20solar%20solution%20proposal." target="_blank" rel="noopener" class="wa-direct-btn">
+                  <span>💬 Chat on WhatsApp (+234 803 123 4567)</span>
+                </a>
+              </div>
+            </div>
+
+            <div class="form-fields-col">
+              <form id="solutions-quote-form" class="solutions-quote-form">
+                
+                <div class="form-group-row">
+                  <div class="form-field">
+                    <label for="sol-name" class="field-label">Full Name *</label>
+                    <input type="text" id="sol-name" class="field-input" placeholder="e.g. Babatunde Adeleke" required>
+                  </div>
+                  <div class="form-field">
+                    <label for="sol-phone" class="field-label">WhatsApp Number *</label>
+                    <input type="tel" id="sol-phone" class="field-input" placeholder="+234 800 000 0000" required>
+                  </div>
+                </div>
+
+                <div class="form-group-row">
+                  <div class="form-field">
+                    <label for="sol-email" class="field-label">Email Address</label>
+                    <input type="email" id="sol-email" class="field-input" placeholder="babatunde@example.com">
+                  </div>
+                  <div class="form-field">
+                    <label for="sol-type" class="field-label">Solution Sector *</label>
+                    <select id="sol-type" class="field-select" required>
+                      <option value="Residential">Residential (3–6 Bedroom Home)</option>
+                      <option value="Commercial">Commercial (Office / Plaza / Clinic)</option>
+                      <option value="Industrial">Industrial (Factory / Cold Storage)</option>
+                      <option value="Agricultural">Agricultural (Borehole / Farm Mini-Grid)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group-row">
+                  <div class="form-field">
+                    <label for="sol-location" class="field-label">Installation Location (State &amp; City) *</label>
+                    <input type="text" id="sol-location" class="field-input" placeholder="e.g. Lekki Phase 1, Lagos" required>
+                  </div>
+                  <div class="form-field">
+                    <label for="sol-spend" class="field-label">Current Monthly Generator / Power Spend</label>
+                    <select id="sol-spend" class="field-select">
+                      <option value="Under ₦200,000">Under ₦200,000 / month</option>
+                      <option value="₦200,000 - ₦500,000">₦200,000 – ₦500,000 / month</option>
+                      <option value="₦500,000 - ₦1,500,000">₦500,000 – ₦1,500,000 / month</option>
+                      <option value="Above ₦1,500,000">Above ₦1,500,000 / month</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label for="sol-notes" class="field-label">Specific Appliances &amp; Operating Hours (Optional)</label>
+                  <textarea id="sol-notes" class="field-textarea" rows="3" placeholder="Tell us about your key loads (e.g. 3× 1.5HP Inverter ACs, 1 borehole pump, 2 fridges, 8 hours night backup)..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit-proposal" id="btn-sol-submit">
+                  Submit Energy Sizing Request →
+                </button>
+
+                <div id="sol-form-feedback" class="form-feedback-msg" style="display:none;"></div>
+
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- =======================================================================
          SECTION 4: BENTO GRID ("OUR EXPERTISE")
          ======================================================================= -->
     <section class="sunfold-bento-section" id="expertise" aria-label="Our Solar Expertise">
@@ -697,6 +1418,80 @@
             </div>
           </article>
 
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         ARCHITECTURAL SOLAR DESIGN & CAD GRID INTEGRATION
+         PLACED RIGHT BEFORE TIER-1 RENEWABLE HARDWARE
+         ======================================================================= -->
+    <section class="solar-design-section" id="solar-design" aria-label="Precision Solar Design & Grid Integration">
+      <div class="layout-container">
+
+        <div class="solar-design-header">
+          <span class="sunfold-pill-badge-subtle">Precision Engineering</span>
+          <h2 class="solar-design-title">Architectural Solar Design &amp; Grid Integration</h2>
+          <p class="solar-design-desc">
+            From ground-mounted utility arrays to high-capacity rooftop installations, every system is engineered on
+            precise isometric CAD load grids with smart transformer and transmission integration.
+          </p>
+        </div>
+
+        <!-- CAD Wireframe Schematic Visual Frame -->
+        <div class="solar-design-schematic-wrap">
+          <img src="images/solar-wireframe-schematic.jpg"
+            alt="Architectural CAD blueprint of commercial ground-mounted solar array connected to solar substation building with rooftop panels and battery energy storage cabinets"
+            class="solar-schematic-img" loading="lazy">
+        </div>
+
+        <!-- 3 Engineering Blueprint Feature Cards -->
+        <div class="solar-blueprint-grid">
+          <div class="solar-blueprint-card">
+            <div class="blueprint-card-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="9" y1="21" x2="9" y2="9"></line>
+              </svg>
+            </div>
+            <h3 class="blueprint-card-title">CAD Load Simulation</h3>
+            <p class="blueprint-card-desc">
+              Structural wind-load modeling, tilt-angle solar yield optimization, and millimeter-accurate string layout
+              designed for maximum irradiance capture.
+            </p>
+          </div>
+
+          <div class="solar-blueprint-card">
+            <div class="blueprint-card-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <h3 class="blueprint-card-title">Grid Tie &amp; Pylon Interconnection</h3>
+            <p class="blueprint-card-desc">
+              Step-up transformer topologies, smart substation bus integration, and bi-directional transmission feed
+              synchronization for smooth grid stability.
+            </p>
+          </div>
+
+          <div class="solar-blueprint-card">
+            <div class="blueprint-card-icon" aria-hidden="true">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <polyline points="9 12 11 14 15 10"></polyline>
+              </svg>
+            </div>
+            <h3 class="blueprint-card-title">25-Year Structural Integrity</h3>
+            <p class="blueprint-card-desc">
+              Hot-dip galvanized steel mounting racks and corrosion-resistant anodized aluminum clamps engineered to
+              endure extreme tropical storms and UV exposure.
+            </p>
+          </div>
         </div>
 
       </div>
@@ -1071,12 +1866,11 @@
         <div class="footer-col-links">
           <h3 class="footer-col-title">Solar Solutions</h3>
           <ul class="footer-links-list">
-            <li><a href="/solutions#residential">Residential Solar</a></li>
-            <li><a href="/solutions#commercial">Commercial &amp; Business</a></li>
-            <li><a href="/solutions#industrial">Industrial &amp; Micro-Grids</a></li>
-            <li><a href="/solutions#agriculture">AgriSolar &amp; Pumping</a></li>
+            <li><a href="#residential">Residential Solar</a></li>
+            <li><a href="#commercial">Commercial &amp; Business</a></li>
+            <li><a href="#industrial">Industrial &amp; Micro-Grids</a></li>
             <li><a href="/packages">Turnkey Packages &amp; Pricing</a></li>
-            <li><a href="/solutions#process">7-Stage Engineering Process</a></li>
+            <li><a href="#process">7-Stage Engineering Process</a></li>
           </ul>
         </div>
 
@@ -1220,31 +2014,36 @@
        ========================================================================= -->
   <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
-      <h2 id="cart-drawer-title" style="font-size:1.25rem; font-weight:700; margin:0;">Your Equipment Cart</h2>
+      <h2 id="cart-drawer-title">Your Equipment Cart</h2>
       <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
     </div>
-    <div class="drawer-body">
-      <div style="text-align:center; padding:3rem 1rem; color:#64748B;">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5"
-          style="margin:0 auto 1rem;">
+    <div class="drawer-body" id="cart-drawer-body">
+      <!-- Empty state or cart item list rendered by cart.js -->
+      <div class="cart-empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
           <circle cx="9" cy="21" r="1"></circle>
           <circle cx="20" cy="21" r="1"></circle>
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
         </svg>
-        <p style="font-weight:600; color:#0A121F; margin-bottom:4px;">Your cart is currently empty</p>
-        <p style="font-size:0.875rem;">Explore our Tier-1 solar panels, inverters, and battery storage solutions.</p>
-        <a href="/products" class="sunfold-pill-btn" style="margin-top:1.5rem;" data-close-drawer>Browse Products →</a>
+        <p class="empty-title">Your cart is currently empty</p>
+        <p class="empty-desc">Explore our Tier-1 solar panels, inverters, and battery storage solutions.</p>
+        <button type="button" class="btn-browse-equip" data-close-drawer>Browse Products →</button>
       </div>
     </div>
     <div class="drawer-footer">
-      <div style="display:flex; justify-content:space-between; margin-bottom:1rem; font-weight:700;">
+      <div class="cart-subtotal-row">
         <span>Subtotal</span>
-        <span>₦0.00</span>
+        <span id="cart-subtotal-val">₦0</span>
       </div>
-      <button type="button" class="form-btn-submit" disabled style="opacity:0.6; cursor:not-allowed;">Proceed to
-        Checkout</button>
+      <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" disabled>Proceed to Checkout</button>
     </div>
   </aside>
+
+  <!-- Modal Backdrop for Drawers & Modals -->
+  <div id="modal-backdrop" class="modal-backdrop"></div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- =========================================================================
        QUICK QUOTE MODAL DIALOG
@@ -1282,6 +2081,42 @@
   </dialog>
 
   <!-- =========================================================================
+       SHOPPING CART DRAWER
+       ========================================================================= -->
+  <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
+    <div class="drawer-header">
+      <h2 id="cart-drawer-title">Your Equipment &amp; Package Cart</h2>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+    </div>
+    <div class="drawer-body" id="cart-drawer-body">
+      <!-- Empty state or cart item list -->
+      <div class="cart-empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+        <p class="empty-title">Your cart is currently empty</p>
+        <p class="empty-desc">Explore our Tier-1 solar panels, inverters, and battery storage solutions.</p>
+        <button type="button" class="btn-browse-equip" data-close-drawer>Browse Products →</button>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span>
+        <span id="cart-subtotal-val">₦0</span>
+      </div>
+      <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" disabled>Proceed to Checkout</button>
+    </div>
+  </aside>
+
+  <!-- Modal Backdrop for Drawers & Modals -->
+  <div id="modal-backdrop" class="modal-backdrop"></div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- =========================================================================
        MOBILE NAVIGATION DRAWER
        ========================================================================= -->
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
@@ -1292,14 +2127,13 @@
     <div class="drawer-body">
       <div style="display:flex; flex-direction:column; gap:16px;">
         <a href="/" class="nav-link active" data-close-drawer>Home</a>
-        <a href="/solutions" class="nav-link" data-close-drawer>Solutions</a>
+        <a href="#solutions" class="nav-link" data-close-drawer>Solutions</a>
         <a href="/products" class="nav-link" data-close-drawer>Products</a>
         <a href="/packages" class="nav-link" data-close-drawer>Packages &amp; Pricing</a>
         <a href="/projects" class="nav-link" data-close-drawer>Case Studies &amp; Projects</a>
         <a href="/calculator" class="nav-link" data-close-drawer>Solar Sizing Calculator</a>
         <a href="/savings-calculator" class="nav-link" data-close-drawer>Generator vs Solar ROI</a>
         <a href="/about" class="nav-link" data-close-drawer>About Us</a>
-        <a href="/resources" class="nav-link" data-close-drawer>Knowledge Base</a>
         <a href="/faq" class="nav-link" data-close-drawer>Technical FAQs</a>
         <a href="/contact" class="nav-link" data-close-drawer>Showroom &amp; Contact</a>
         <hr style="border:none; border-top:1px solid #E2E8F0; margin:1rem 0;">
@@ -1311,9 +2145,10 @@
   </nav>
 
   <!-- Core JavaScript -->
-  <script src="/js/cart.js?v=3"></script>
+  <script src="/js/cart.js?v=25"></script>
   <script src="/js/search.js?v=1"></script>
-  <script src="/js/main.js?v=12"></script>
+  <script src="/js/solutions.js?v=2"></script>
+  <script src="/js/main.js?v=25"></script>
 </body>
 
 </html>

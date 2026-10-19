@@ -83,8 +83,12 @@
   }
 
   function updateCartBadges() {
+    if (window.DeviceProCart) {
+      window.DeviceProCart.updateBadge();
+      return;
+    }
     const cart = getCart();
-    const totalItems = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || item.qty || 1), 0);
     document.querySelectorAll('.cart-badge').forEach(badge => {
       badge.textContent = totalItems;
       badge.setAttribute('aria-label', `${totalItems} items in cart`);
