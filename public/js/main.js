@@ -6,18 +6,25 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Sticky Header Scroll Effect
-  const header = document.querySelector('.site-header');
-  const handleScroll = () => {
-    if (window.scrollY > 20) {
-      header.classList.add('scrolled');
-    } else {
-      header.classList.remove('scrolled');
-    }
-  };
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  handleScroll();
+  const header = document.querySelector('.products-header') || document.querySelector('.site-header');
+  if (header) {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+  }
 
   // 2. Modals and Drawers Utility
+  const searchModal = document.getElementById('search-dialog');
+  const cartDrawer = document.getElementById('cart-drawer');
+  const mobileNavDrawer = document.getElementById('mobile-nav-drawer');
+  const quoteModal = document.getElementById('quote-modal');
+
   const getBackdrop = () => {
     let bd = document.getElementById('modal-backdrop');
     if (!bd) {

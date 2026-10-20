@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="css/tokens.css?v=12">
   <link rel="stylesheet" href="css/components.css?v=25">
   <link rel="stylesheet" href="css/homepage.css?v=25">
+  <link rel="stylesheet" href="css/products.css?v=2">
   <link rel="stylesheet" href="css/solutions.css?v=2">
   <link rel="stylesheet" href="css/footer.css?v=1">
 
@@ -115,44 +116,103 @@
   <a href="#main-content" class="skip-to-content">Skip to main content</a>
 
   <!-- =========================================================================
-       HEADER & NAVIGATION (FROSTED CLEAN MODERN)
+       SECTION 1: TOP INFORMATION BAR (SLIM NAVY STRIP)
        ========================================================================= -->
-  <header class="site-header" role="banner">
-    <div class="layout-container header-inner">
+  <aside class="top-info-bar" aria-label="Business Information">
+    <div class="layout-container top-info-inner">
+      <div class="top-info-left">
+        <span class="info-item">
+          <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>Lagos, Nigeria (Head Office)</span>
+        </span>
+      </div>
 
-      <!-- Brand Logo -->
+      <div class="top-info-right">
+        <span class="info-item">
+          <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          <a href="tel:+2348031234567" class="info-link">+234 803 123 4567</a>
+        </span>
+
+        <span class="info-separator" aria-hidden="true">|</span>
+
+        <span class="info-item">
+          <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <a href="mailto:info@devicepro.com" class="info-link">info@devicepro.com</a>
+        </span>
+
+        <div class="top-social-links" aria-label="Social Media">
+          <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" class="social-icon-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+            </svg>
+          </a>
+          <a href="https://twitter.com" target="_blank" rel="noopener" aria-label="Twitter" class="social-icon-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+            </svg>
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </a>
+          <a href="https://youtube.com" target="_blank" rel="noopener" aria-label="YouTube" class="social-icon-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
+              <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" fill="#082D50"></polygon>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- =========================================================================
+       SECTION 2: MAIN NAVIGATION (WHITE NAVBAR DIRECTLY BELOW TOP BAR)
+       ========================================================================= -->
+  <header class="products-header" role="banner">
+    <div class="layout-container products-header-inner">
+      <!-- Original Brand Logo -->
       <a href="/" class="brand-logo-link" aria-label="DEVICE PRO Homepage">
-        <img src="images/logo.svg" alt="DEVICE PRO" class="brand-logo-img">
+        <img src="images/logo.svg" alt="DEVICE PRO - Clean Energy. A Brighter Future" class="brand-logo-img">
       </a>
 
-      <!-- Desktop Primary Navigation -->
-      <nav class="header-nav" aria-label="Primary Navigation">
-        <a href="/" class="nav-link active">Home</a>
-        <a href="#solutions" class="nav-link">Solutions</a>
-        <a href="/products" class="nav-link">Products</a>
-        <a href="/packages" class="nav-link">Packages</a>
-        <a href="/projects" class="nav-link">Projects</a>
-        <a href="/calculator" class="nav-link">Calculators</a>
-        <a href="/about" class="nav-link">About</a>
-        <a href="/faq" class="nav-link">FAQs</a>
-        <a href="/contact" class="nav-link">Contact</a>
+      <!-- Desktop Navigation Links -->
+      <nav class="products-nav" aria-label="Primary Navigation">
+        <a href="/" class="p-nav-link active">Home</a>
+        <a href="/#solutions" class="p-nav-link">Solutions</a>
+        <a href="/products" class="p-nav-link">Products</a>
+        <a href="/packages" class="p-nav-link">Pricing</a>
+        <a href="/projects" class="p-nav-link">Projects</a>
+        <a href="/calculator" class="p-nav-link">Calculators</a>
+        <a href="/about" class="p-nav-link">About</a>
+        <a href="/faq" class="p-nav-link">FAQs</a>
+        <a href="/contact" class="p-nav-link">Contact</a>
       </nav>
 
       <!-- Action Items & Buttons -->
-      <div class="header-actions">
+      <div class="products-header-actions">
         <!-- Search Trigger -->
-        <button type="button" class="header-icon-btn" data-trigger-search aria-label="Search catalog and equipment">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <button type="button" class="header-circle-btn" data-trigger-search aria-label="Search equipment catalogue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
         </button>
 
         <!-- Cart Trigger -->
-        <button type="button" class="header-icon-btn" data-trigger-cart aria-label="Shopping Cart">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <button type="button" class="header-circle-btn" data-trigger-cart aria-label="Shopping Cart">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="9" cy="21" r="1"></circle>
             <circle cx="20" cy="21" r="1"></circle>
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -160,22 +220,20 @@
           <span class="cart-badge" aria-label="0 items in cart">0</span>
         </button>
 
-        <!-- Book a Call CTA Button -->
-        <a href="#quote" class="sunfold-btn-black" data-trigger-quote>
-          Book a call <span class="arrow">→</span>
+        <!-- Get a Quote Yellow Pill Button -->
+        <a href="#quote" class="btn-get-quote-yellow" data-trigger-quote>
+          Get a Quote <span class="arrow" aria-hidden="true">→</span>
         </a>
 
-        <!-- Mobile Menu Hamburger Button -->
-        <button type="button" class="mobile-nav-toggle" id="mobile-menu-btn" aria-label="Open mobile navigation menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <!-- Mobile Menu Toggle -->
+        <button type="button" class="mobile-nav-toggle" id="mobile-menu-btn" aria-label="Open navigation menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
             <line x1="3" y1="18" x2="21" y2="18"></line>
           </svg>
         </button>
       </div>
-
     </div>
   </header>
 
@@ -2032,42 +2090,6 @@
       </div>
     </div>
   </dialog>
-
-  <!-- =========================================================================
-       SHOPPING CART DRAWER
-       ========================================================================= -->
-  <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
-    <div class="drawer-header">
-      <h2 id="cart-drawer-title">Your Equipment Cart</h2>
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
-    </div>
-    <div class="drawer-body" id="cart-drawer-body">
-      <!-- Empty state or cart item list rendered by cart.js -->
-      <div class="cart-empty-state">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
-        <p class="empty-title">Your cart is currently empty</p>
-        <p class="empty-desc">Explore our Tier-1 solar panels, inverters, and battery storage solutions.</p>
-        <button type="button" class="btn-browse-equip" data-close-drawer>Browse Products →</button>
-      </div>
-    </div>
-    <div class="drawer-footer">
-      <div class="cart-subtotal-row">
-        <span>Subtotal</span>
-        <span id="cart-subtotal-val">₦0</span>
-      </div>
-      <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" disabled>Proceed to Checkout</button>
-    </div>
-  </aside>
-
-  <!-- Modal Backdrop for Drawers & Modals -->
-  <div id="modal-backdrop" class="modal-backdrop"></div>
-
-  <!-- Toast Notification Container -->
-  <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- =========================================================================
        QUICK QUOTE MODAL DIALOG
