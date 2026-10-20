@@ -8,6 +8,7 @@
    ============================================================================= */
 .product-detail-page {
   background-color: #FFFFFF;
+  font-size: 0.875rem;
 }
 
 .breadcrumb-strip {
@@ -243,7 +244,7 @@
 }
 
 .buybox-title {
-  font-size: clamp(1.75rem, 2.5vw, 2.25rem);
+  font-size: clamp(1.25rem, 1.8vw, 1.55rem);
   font-weight: 800;
   color: var(--p-text);
   line-height: 1.22;
@@ -304,14 +305,14 @@
 }
 
 .current-price {
-  font-size: 2.25rem;
+  font-size: 1.625rem;
   font-weight: 900;
   color: var(--p-text);
   line-height: 1;
 }
 
 .previous-price {
-  font-size: 1.1875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: #94A3B8;
   text-decoration: line-through;
@@ -320,7 +321,7 @@
 .discount-badge {
   background-color: rgba(22, 163, 74, 0.12);
   color: var(--p-green-stock);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   font-weight: 800;
   padding: 4px 10px;
   border-radius: 6px;
@@ -328,15 +329,15 @@
 }
 
 .tax-note {
-  font-size: 0.78125rem;
+  font-size: 0.75rem;
   color: var(--p-muted);
   margin: 8px 0 0;
   line-height: 1.4;
 }
 
 .buybox-desc {
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  font-size: 0.84375rem;
+  line-height: 1.55;
   color: var(--p-text);
   margin: 0 0 20px;
 }
@@ -457,11 +458,11 @@
 .btn-detail-add-cart {
   background-color: var(--p-yellow);
   color: var(--p-navy);
-  font-size: 0.9375rem;
+  font-size: 0.84375rem;
   font-weight: 800;
   border: none;
   border-radius: 8px;
-  height: 48px;
+  height: 44px;
   padding: 0 24px;
   display: inline-flex;
   align-items: center;
@@ -482,11 +483,11 @@
 .btn-detail-request-quote {
   background-color: var(--p-navy);
   color: #FFFFFF;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   border: none;
   border-radius: 8px;
-  height: 48px;
+  height: 44px;
   padding: 0 18px;
   display: inline-flex;
   align-items: center;
@@ -515,9 +516,9 @@
   border: 1.5px solid #BBF7D0;
   border-radius: 8px;
   color: #15803D;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 700;
-  padding: 12px 18px;
+  padding: 10px 16px;
   text-decoration: none;
   transition: all 0.2s ease;
 }
@@ -588,8 +589,8 @@
 .tab-nav-btn {
   background: none;
   border: none;
-  padding: 14px 22px;
-  font-size: 0.9375rem;
+  padding: 11px 18px;
+  font-size: 0.84375rem;
   font-weight: 600;
   color: var(--p-muted);
   cursor: pointer;
@@ -627,14 +628,14 @@
 }
 
 .pane-title {
-  font-size: 1.25rem;
+  font-size: 1.0625rem;
   font-weight: 800;
   color: var(--p-text);
   margin: 0 0 6px;
 }
 
 .pane-subtitle {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--p-muted);
   margin: 0 0 24px;
 }
@@ -647,7 +648,7 @@
 .specs-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .specs-table tr:nth-child(even) {
@@ -656,7 +657,7 @@
 
 .specs-table th,
 .specs-table td {
-  padding: 14px 20px;
+  padding: 10px 16px;
   border: 1px solid var(--p-border);
   text-align: left;
 }
@@ -687,7 +688,7 @@
 }
 
 .delivery-card h4 {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 800;
   color: var(--p-navy);
   margin: 0 0 14px;
@@ -700,7 +701,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  font-size: 0.84375rem;
+  font-size: 0.78125rem;
   color: var(--p-text);
 }
 
@@ -731,14 +732,14 @@
 }
 
 .compat-rule-card h4 {
-  font-size: 0.9375rem;
+  font-size: 0.84375rem;
   font-weight: 700;
   color: var(--p-navy);
   margin: 0 0 8px;
 }
 
 .compat-rule-card p {
-  font-size: 0.8125rem;
+  font-size: 0.78125rem;
   color: var(--p-muted);
   line-height: 1.5;
   margin: 0;
@@ -762,10 +763,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 12px 18px;
   background: none;
   border: none;
-  font-size: 0.9375rem;
+  font-size: 0.84375rem;
   font-weight: 700;
   color: var(--p-text);
   text-align: left;
@@ -774,7 +775,7 @@
 
 .faq-answer {
   padding: 0 20px 16px;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   line-height: 1.6;
   color: #1E293B;
   display: none;
@@ -810,21 +811,21 @@
 }
 
 .related-heading {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--p-navy);
   margin: 0 0 6px;
 }
 
 .related-sub {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--p-muted);
   margin: 0;
 }
 
 .related-see-all {
   color: var(--p-blue-brand);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   text-decoration: none;
   display: inline-flex;
