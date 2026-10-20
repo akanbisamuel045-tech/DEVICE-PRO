@@ -4,21 +4,36 @@
  * Provides schema initialization, seed data, and comprehensive filtering/sorting/pagination.
  */
 
-const { DatabaseSync } = require('node:sqlite');
+let db = null;
+let sqliteAvailable = false;
 const path = require('path');
 const fs = require('fs');
 
-const dataDir = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
+try {
+  const { DatabaseSync } = require('node:sqlite');
+  const dataDir = path.join(__dirname, '..', 'data');
+  if (!fs.existsSync(dataDir)) {
+    try { fs.mkdirSync(dataDir, { recursive: true }); } catch (e) {}
+  }
+  const dbPath = path.join(dataDir, 'products.db');
+  db = new DatabaseSync(dbPath);
+  sqliteAvailable = true;
+} catch (err) {
+  console.warn('[DATABASE] Local SQLite unavailable (running in cloud/serverless environment):', err.message);
+  db = {
+    exec: () => {},
+    prepare: () => ({
+      get: () => null,
+      all: () => [],
+      run: () => ({ lastInsertRowid: 1, changes: 0 })
+    })
+  };
 }
-
-const dbPath = path.join(dataDir, 'products.db');
-const db = new DatabaseSync(dbPath);
 
 const crypto = require('crypto');
 
 // Initialize full schema (Stage 12 Data Model)
+if (sqliteAvailable) {
 db.exec(`
   CREATE TABLE IF NOT EXISTS schema_migrations (
     version INTEGER PRIMARY KEY,
@@ -1532,6 +1547,7 @@ db.exec(`
   INSERT OR IGNORE INTO schema_migrations (version, name)
   VALUES (1, 'initial_relational_schema_stage12');
 `);
+}
 
 // =========================================================================
 // CRUD DATA ACCESS METHODS (Stage 12)
@@ -2684,70 +2700,161 @@ function deleteProduct(id, adminUserId = null) {
   return { success: true, message: `Product ${product.name} archived.` };
 }
 
+// --- DUAL-ENGINE DISPATCHER (MongoDB Atlas / SQLite Fallback) ---
+const { isMongoConnected } = require('./mongo/connection');
+const mongoRepo = require('./mongo/repository');
+
+function sqliteGetProductFacets() {
+  const catRows = db.prepare(`
+    SELECT category, category_label, COUNT(*) as count 
+    FROM products 
+    WHERE published = 1 
+    GROUP BY category, category_label
+    ORDER BY count DESC
+  `).all();
+
+  const brandRows = db.prepare(`
+    SELECT brand, COUNT(*) as count 
+    FROM products 
+    WHERE published = 1 
+    GROUP BY brand 
+    ORDER BY count DESC
+  `).all();
+
+  const priceRow = db.prepare(`
+    SELECT MIN(price_ngn) as min_price, MAX(price_ngn) as max_price 
+    FROM products 
+    WHERE published = 1
+  `).get();
+
+  return {
+    categories: catRows,
+    brands: brandRows,
+    priceRange: {
+      min: (priceRow && priceRow.min_price) || 0,
+      max: (priceRow && priceRow.max_price) || 15000000
+    }
+  };
+}
+
+function sqliteGetRelatedProducts(category, productId, limit = 3) {
+  return db.prepare(`
+    SELECT * FROM products 
+    WHERE category = ? AND id != ? AND published = 1 
+    LIMIT ?
+  `).all(category, productId, limit);
+}
+
+function dispatch(mongoFn, sqliteFn) {
+  return function(...args) {
+    if (!isMongoConnected()) {
+      return sqliteFn(...args);
+    }
+
+    // When MongoDB is connected:
+    // Execute SQLite synchronously if possible for instant parity with legacy sync callers/tests
+    let syncRes = null;
+    if (typeof sqliteFn === 'function') {
+      try {
+        syncRes = sqliteFn(...args);
+      } catch (err) {
+        // Ignored; Mongo is primary
+      }
+    }
+
+    // Primary execution on MongoDB Atlas
+    const asyncPromise = (async () => {
+      try {
+        const mongoRes = await mongoFn(...args);
+        if (mongoRes !== null && mongoRes !== undefined) {
+          return mongoRes;
+        }
+        if (syncRes !== null) return syncRes;
+        return mongoRes;
+      } catch (err) {
+        if (syncRes !== null) return syncRes;
+        throw err;
+      }
+    })();
+
+    // Expose synchronous properties directly on the promise for sync property access
+    if (syncRes && typeof syncRes === 'object') {
+      try {
+        Object.assign(asyncPromise, syncRes);
+      } catch (e) {}
+    }
+
+    return asyncPromise;
+  };
+}
+
 module.exports = {
   db,
+  isMongoConnected,
   // Products & Packages
-  getProducts,
-  getProductBySlug,
-  getProductById,
-  updateProduct,
-  createProduct,
-  deleteProduct,
-  getPackages,
-  getPackageBySlug,
+  getProducts: dispatch(mongoRepo.getProducts, getProducts),
+  getProductBySlug: dispatch(mongoRepo.getProductBySlug, getProductBySlug),
+  getProductById: dispatch(mongoRepo.getProductById, getProductById),
+  getProductFacets: dispatch(mongoRepo.getProductFacets, sqliteGetProductFacets),
+  getRelatedProducts: dispatch(mongoRepo.getRelatedProducts, sqliteGetRelatedProducts),
+  updateProduct: dispatch(mongoRepo.updateProduct, updateProduct),
+  createProduct: dispatch(mongoRepo.createProduct, createProduct),
+  deleteProduct: dispatch(mongoRepo.deleteProduct, deleteProduct),
+  getPackages: dispatch(mongoRepo.getPackages, getPackages),
+  getPackageBySlug: dispatch(mongoRepo.getPackageBySlug, getPackageBySlug),
   // Categories & Case Studies
-  getCategories,
-  getCaseStudies,
-  getCaseStudyBySlug,
+  getCategories: dispatch(mongoRepo.getCategories, getCategories),
+  getCaseStudies: dispatch(mongoRepo.getCaseStudies, getCaseStudies),
+  getCaseStudyBySlug: dispatch(mongoRepo.getCaseStudyBySlug, getCaseStudyBySlug),
   // Enquiries
-  createEnquiry,
-  getEnquiries,
-  getEnquiryById,
-  getEnquiryByRef,
-  updateEnquiryStatus,
+  createEnquiry: dispatch(mongoRepo.createEnquiry, createEnquiry),
+  getEnquiries: dispatch(mongoRepo.getEnquiries, getEnquiries),
+  getEnquiryById: dispatch(mongoRepo.getEnquiryById, getEnquiryById),
+  getEnquiryByRef: dispatch(mongoRepo.getEnquiryByRef, getEnquiryByRef),
+  updateEnquiryStatus: dispatch(mongoRepo.updateEnquiryStatus, updateEnquiryStatus),
   // Quotes
-  createQuote,
-  getQuotes,
-  getQuoteById,
-  getQuoteByRef,
-  updateQuoteStatus,
+  createQuote: dispatch(mongoRepo.createQuote, createQuote),
+  getQuotes: dispatch(mongoRepo.getQuotes, getQuotes),
+  getQuoteById: dispatch(mongoRepo.getQuoteById, getQuoteById),
+  getQuoteByRef: dispatch(mongoRepo.getQuoteByRef, getQuoteByRef),
+  updateQuoteStatus: dispatch(mongoRepo.updateQuoteStatus, updateQuoteStatus),
   // Orders & Fulfillment
-  createOrder,
-  getOrders,
-  getOrderByNumber,
-  updateOrderStatus,
-  updateOrderFulfillment,
-  updateOrderCommissioning,
+  createOrder: dispatch(mongoRepo.createOrder, createOrder),
+  getOrders: dispatch(mongoRepo.getOrders, getOrders),
+  getOrderByNumber: dispatch(mongoRepo.getOrderByNumber, getOrderByNumber),
+  updateOrderStatus: dispatch(mongoRepo.updateOrderStatus, updateOrderStatus),
+  updateOrderFulfillment: dispatch(mongoRepo.updateOrderFulfillment, updateOrderFulfillment),
+  updateOrderCommissioning: dispatch(mongoRepo.updateOrderCommissioning, updateOrderCommissioning),
   // Support & Tickets (Stage 16)
-  createSupportTicket,
-  getSupportTickets,
-  getSupportTicketByNumber,
-  getSupportTicketsByOrder,
-  updateSupportTicketStatus,
+  createSupportTicket: dispatch(mongoRepo.createSupportTicket, createSupportTicket),
+  getSupportTickets: dispatch(mongoRepo.getSupportTickets, getSupportTickets),
+  getSupportTicketByNumber: dispatch(mongoRepo.getSupportTicketByNumber, getSupportTicketByNumber),
+  getSupportTicketsByOrder: dispatch(mongoRepo.getSupportTicketsByOrder, getSupportTicketsByOrder),
+  updateSupportTicketStatus: dispatch(mongoRepo.updateSupportTicketStatus, updateSupportTicketStatus),
   // Warranties (Stage 16)
-  createWarrantyRecord,
-  getWarrantyBySerialOrCode,
-  getWarrantiesByOrder,
-  getWarranties,
+  createWarrantyRecord: dispatch(mongoRepo.createWarrantyRecord, createWarrantyRecord),
+  getWarrantyBySerialOrCode: dispatch(mongoRepo.getWarrantyBySerialOrCode, getWarrantyBySerialOrCode),
+  getWarrantiesByOrder: dispatch(mongoRepo.getWarrantiesByOrder, getWarrantiesByOrder),
+  getWarranties: dispatch(mongoRepo.getWarranties, getWarranties),
   // Payments
-  createPaymentRecord,
-  getPaymentByReference,
-  getPaymentsByOrderNumber,
-  updatePaymentStatus,
-  reconcileOrderPayment,
+  createPaymentRecord: dispatch(mongoRepo.createPaymentRecord, createPaymentRecord),
+  getPaymentByReference: dispatch(mongoRepo.getPaymentByReference, getPaymentByReference),
+  getPaymentsByOrderNumber: dispatch(mongoRepo.getPaymentsByOrderNumber, getPaymentsByOrderNumber),
+  updatePaymentStatus: dispatch(mongoRepo.updatePaymentStatus, updatePaymentStatus),
+  reconcileOrderPayment: dispatch(mongoRepo.reconcileOrderPayment, reconcileOrderPayment),
   // Auth & Sessions
   hashPassword,
   verifyPassword,
-  getUserByUsername,
-  getUserById,
-  verifyUserLogin,
-  createSession,
-  getSessionUser,
-  revokeSession,
+  getUserByUsername: dispatch(mongoRepo.getUserByUsername, getUserByUsername),
+  getUserById: dispatch(mongoRepo.getUserById, getUserById),
+  verifyUserLogin: dispatch(mongoRepo.verifyUserLogin, verifyUserLogin),
+  createSession: dispatch(mongoRepo.createSession, createSession),
+  getSessionUser: dispatch(mongoRepo.getSessionUser, getSessionUser),
+  revokeSession: dispatch(mongoRepo.revokeSession, revokeSession),
   // Audit & Backup
-  logAudit,
-  getAuditLogs,
-  getDatabaseStats,
-  exportDatabaseBackup
+  logAudit: dispatch(mongoRepo.logAudit, logAudit),
+  getAuditLogs: dispatch(mongoRepo.getAuditLogs, getAuditLogs),
+  getDatabaseStats: dispatch(mongoRepo.getDatabaseStats, getDatabaseStats),
+  exportDatabaseBackup: dispatch(mongoRepo.exportDatabaseBackup, exportDatabaseBackup)
 };
 

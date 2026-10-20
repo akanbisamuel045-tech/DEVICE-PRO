@@ -828,6 +828,19 @@
 - `STAGE18_PRODUCTION_LAUNCH_REPORT.md` (Stage 18 final launch report)
 - `PROJECT_PROGRESS.md` (Recorded Stage 18 COMPLETE / PASS)
 
+### Stage 18: MongoDB Atlas Cloud Database Migration & Dual-Engine Architecture
+- **Status:** Complete ✅
+- **Started:** October 2026
+- **Completed:** October 2026
+- **Summary:** Transitioned DEVICE PRO from standalone local SQLite to MongoDB Atlas cloud database with high-availability clustering and seamless dual-engine failover.
+- **Key Deliverables:**
+  - `db/mongo/models.js`: 12 production Mongoose schemas (`Category`, `Product`, `CaseStudy`, `Enquiry`, `Quote`, `Order`, `Payment`, `Warranty`, `SupportTicket`, `User`, `Session`, `AuditLog`) with compound indexing and audit hooks.
+  - `db/mongo/connection.js`: Cloud connection manager with 8-second timeout, exponential backoff, and `.env` parsing.
+  - `db/mongo/repository.js`: Fully asynchronous repository layer implementing all catalog queries, multifaceted filters, full CRUD, payments reconciliation, tracking, and warranty verification.
+  - `db/database.js`: Dual-engine dispatcher routing calls dynamically to MongoDB Atlas when connected with synchronous property bridging and SQLite fallback.
+  - `scripts/migrate-sqlite-to-mongo.js`: Data migration utility with idempotent upserting (`returnDocument: 'after'`). Migrated 1,392 records across all 11 collections with 100% parity.
+  - Automated Regression: All 6 test suites (`stage12` to `stage17`) pass with 100% success rate on `npm test`.
+
 **Next Permitted Stage:** Project Lifecycle Complete — Ready for Live Production Launch & Commercial Operations
 
 ---

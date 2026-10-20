@@ -3,7 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const compression = require('compression');
 const {
-  getProducts, getProductBySlug, getProductById, updateProduct, createProduct, deleteProduct,
+  getProducts, getProductBySlug, getProductById, getProductFacets, getRelatedProducts,
+  updateProduct, createProduct, deleteProduct,
   getPackages, getPackageBySlug,
   getCategories, getCaseStudies, getCaseStudyBySlug,
   createEnquiry, getEnquiries, getEnquiryById, updateEnquiryStatus,
@@ -15,8 +16,9 @@ const {
   createPaymentRecord, getPaymentByReference, getPaymentsByOrderNumber,
   updatePaymentStatus, reconcileOrderPayment,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
-  getAuditLogs, getDatabaseStats, exportDatabaseBackup, db
+  getAuditLogs, getDatabaseStats, exportDatabaseBackup, isMongoConnected, db
 } = require('./db/database');
+const { connectMongo } = require('./db/mongo/connection');
 const {
   calculateSolarSizing,
   calculateGeneratorSavings,
@@ -113,7 +115,7 @@ function rateLimiter(windowMs, maxRequests) {
 }
 
 // Authentication middleware
-function authenticate(req, res, next) {
+async function authenticate(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.startsWith('Bearer ')
     ? authHeader.slice(7)
@@ -124,10 +126,15 @@ function authenticate(req, res, next) {
     return next();
   }
 
-  const user = getSessionUser(token);
-  req.user = user;
-  req.token = token;
-  next();
+  try {
+    const user = await getSessionUser(token);
+    req.user = user;
+    req.token = token;
+    next();
+  } catch (err) {
+    req.user = null;
+    next();
+  }
 }
 
 app.use(authenticate);
@@ -159,9 +166,9 @@ function requireRole(...roles) {
 // =========================================================================
 
 // API: Health & Database Diagnostics
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
   try {
-    const stats = getDatabaseStats();
+    const stats = await getDatabaseStats();
     res.json({
       status: 'ok',
       service: 'DEVICE PRO Core API',
@@ -173,9 +180,9 @@ app.get('/api/health', (req, res) => {
 });
 
 // API: Categories
-app.get('/api/categories', (req, res) => {
+app.get('/api/categories', async (req, res) => {
   try {
-    const categories = getCategories();
+    const categories = await getCategories();
     res.json({ success: true, count: categories.length, categories });
   } catch (error) {
     res.status(500).json({ success: false, error: 'Failed to retrieve categories.' });
@@ -183,41 +190,17 @@ app.get('/api/categories', (req, res) => {
 });
 
 // API: Products catalog with filtering, sorting, search, and pagination
-app.get('/api/products', (req, res) => {
+app.get('/api/products', async (req, res) => {
   try {
-    const result = getProducts(req.query);
-
-    const catRows = db.prepare(`
-      SELECT category, category_label, COUNT(*) as count 
-      FROM products 
-      WHERE published = 1 
-      GROUP BY category, category_label
-      ORDER BY count DESC
-    `).all();
-
-    const brandRows = db.prepare(`
-      SELECT brand, COUNT(*) as count 
-      FROM products 
-      WHERE published = 1 
-      GROUP BY brand 
-      ORDER BY count DESC
-    `).all();
-
-    const priceRow = db.prepare(`
-      SELECT MIN(price_ngn) as min_price, MAX(price_ngn) as max_price 
-      FROM products 
-      WHERE published = 1
-    `).get();
+    const result = await getProducts(req.query);
+    const facets = await getProductFacets();
 
     res.json({
       success: true,
       ...result,
-      categories: catRows,
-      brands: brandRows,
-      priceRange: {
-        min: priceRow.min_price || 0,
-        max: priceRow.max_price || 15000000
-      }
+      categories: facets.categories,
+      brands: facets.brands,
+      priceRange: facets.priceRange
     });
   } catch (error) {
     console.error('[API PRODUCTS ERROR]:', error);
@@ -226,18 +209,14 @@ app.get('/api/products', (req, res) => {
 });
 
 // API: Product detail by slug
-app.get('/api/products/:slug', (req, res) => {
+app.get('/api/products/:slug', async (req, res) => {
   try {
-    const product = getProductBySlug(req.params.slug);
+    const product = await getProductBySlug(req.params.slug);
     if (!product) {
       return res.status(404).json({ success: false, error: 'Product not found' });
     }
 
-    const related = db.prepare(`
-      SELECT * FROM products 
-      WHERE category = ? AND id != ? AND published = 1 
-      LIMIT 3
-    `).all(product.category, product.id);
+    const related = await getRelatedProducts(product.category, product.id, 3);
 
     res.json({
       success: true,
@@ -251,9 +230,9 @@ app.get('/api/products/:slug', (req, res) => {
 });
 
 // API: Turnkey Solar Packages
-app.get('/api/packages', (req, res) => {
+app.get('/api/packages', async (req, res) => {
   try {
-    const packages = getPackages();
+    const packages = await getPackages();
     res.json({
       success: true,
       count: packages.length,
@@ -265,9 +244,9 @@ app.get('/api/packages', (req, res) => {
   }
 });
 
-app.get('/api/packages/:slug', (req, res) => {
+app.get('/api/packages/:slug', async (req, res) => {
   try {
-    const pkg = getPackageBySlug(req.params.slug);
+    const pkg = await getPackageBySlug(req.params.slug);
     if (!pkg) {
       return res.status(404).json({ success: false, error: 'Package not found' });
     }
@@ -282,10 +261,10 @@ app.get('/api/packages/:slug', (req, res) => {
 });
 
 // API: Case Studies (Projects)
-app.get('/api/case-studies', (req, res) => {
+app.get('/api/case-studies', async (req, res) => {
   try {
     const sector = req.query.sector;
-    const caseStudies = getCaseStudies(sector);
+    const caseStudies = await getCaseStudies(sector);
     res.json({ success: true, count: caseStudies.length, caseStudies });
   } catch (error) {
     console.error('[API CASE STUDIES ERROR]:', error);
@@ -293,9 +272,9 @@ app.get('/api/case-studies', (req, res) => {
   }
 });
 
-app.get('/api/case-studies/:slug', (req, res) => {
+app.get('/api/case-studies/:slug', async (req, res) => {
   try {
-    const cs = getCaseStudyBySlug(req.params.slug);
+    const cs = await getCaseStudyBySlug(req.params.slug);
     if (!cs) {
       return res.status(404).json({ success: false, error: 'Case study not found' });
     }
@@ -305,8 +284,8 @@ app.get('/api/case-studies/:slug', (req, res) => {
   }
 });
 
-// API: Contact enquiry submission (persisted to SQLite database)
-app.post(['/api/contact', '/api/enquiries'], rateLimiter(60000, 10), (req, res) => {
+// API: Contact enquiry submission (persisted to database)
+app.post(['/api/contact', '/api/enquiries'], rateLimiter(60000, 10), async (req, res) => {
   try {
     const { phone, email, state, subject, message } = req.body;
     const clientName = (req.body.name || req.body.fullName || '').trim();
@@ -316,7 +295,7 @@ app.post(['/api/contact', '/api/enquiries'], rateLimiter(60000, 10), (req, res) 
     }
 
     const ipAddress = req.ip || req.connection.remoteAddress || '';
-    const enquiry = createEnquiry({
+    const enquiry = await createEnquiry({
       name: clientName,
       phone: clientPhone,
       email: (email || '').trim(),
@@ -339,8 +318,8 @@ app.post(['/api/contact', '/api/enquiries'], rateLimiter(60000, 10), (req, res) 
   }
 });
 
-// API: Quotation & Site Audit request submission (persisted to SQLite database)
-app.post(['/api/quote', '/api/quotes'], rateLimiter(60000, 10), (req, res) => {
+// API: Quotation & Site Audit request submission (persisted to database)
+app.post(['/api/quote', '/api/quotes'], rateLimiter(60000, 10), async (req, res) => {
   try {
     const {
       phone, email, state, propertyType, type, sector,
@@ -355,7 +334,7 @@ app.post(['/api/quote', '/api/quotes'], rateLimiter(60000, 10), (req, res) => {
     }
 
     const ipAddress = req.ip || req.connection.remoteAddress || '';
-    const quote = createQuote({
+    const quote = await createQuote({
       name: clientName,
       phone: clientPhone,
       email: (email || '').trim(),
@@ -386,8 +365,8 @@ app.post(['/api/quote', '/api/quotes'], rateLimiter(60000, 10), (req, res) => {
   }
 });
 
-// API: Equipment Order Creation (persisted to SQLite database)
-app.post('/api/orders', rateLimiter(60000, 10), (req, res) => {
+// API: Equipment Order Creation (persisted to database)
+app.post('/api/orders', rateLimiter(60000, 10), async (req, res) => {
   try {
     const {
       customerName, customerPhone, customerEmail,
@@ -410,7 +389,7 @@ app.post('/api/orders', rateLimiter(60000, 10), (req, res) => {
     }
 
     const ipAddress = req.ip || req.connection.remoteAddress || '';
-    const order = createOrder({
+    const order = await createOrder({
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
       customerEmail: (customerEmail || '').trim(),
@@ -439,9 +418,9 @@ app.post('/api/orders', rateLimiter(60000, 10), (req, res) => {
 });
 
 // API: Public Order Tracking & Invoice Breakdown
-app.get('/api/orders/:orderNumber', (req, res) => {
+app.get('/api/orders/:orderNumber', async (req, res) => {
   try {
-    const order = getOrderByNumber(req.params.orderNumber);
+    const order = await getOrderByNumber(req.params.orderNumber);
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found.' });
     }
@@ -683,7 +662,7 @@ function verifyContactMatch(order, verificationContact) {
 }
 
 // API: Stage 16 Privacy-Safe Order & Installation Tracking (POST)
-app.post('/api/orders/track', rateLimiter(60000, 30), (req, res) => {
+app.post('/api/orders/track', rateLimiter(60000, 30), async (req, res) => {
   try {
     const orderNumber = req.body.orderNumber;
     const verificationContact = req.body.verificationContact || req.body.contact;
@@ -695,7 +674,7 @@ app.post('/api/orders/track', rateLimiter(60000, 30), (req, res) => {
       });
     }
 
-    const order = getOrderByNumber(orderNumber.trim());
+    const order = await getOrderByNumber(orderNumber.trim());
     if (!order) {
       return res.status(404).json({
         success: false,
@@ -725,9 +704,9 @@ app.post('/api/orders/track', rateLimiter(60000, 30), (req, res) => {
 });
 
 // API: Stage 16 Privacy-Safe Order Tracking (GET with ?contact= query)
-app.get('/api/orders/:orderNumber/track', rateLimiter(60000, 30), (req, res) => {
+app.get('/api/orders/:orderNumber/track', rateLimiter(60000, 30), async (req, res) => {
   try {
-    const order = getOrderByNumber(req.params.orderNumber);
+    const order = await getOrderByNumber(req.params.orderNumber);
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found.' });
     }
@@ -754,14 +733,14 @@ app.get('/api/orders/:orderNumber/track', rateLimiter(60000, 30), (req, res) => 
 });
 
 // API: Stage 16 Real-Time Warranty Verification
-app.get('/api/warranty/verify/:query', rateLimiter(60000, 60), (req, res) => {
+app.get('/api/warranty/verify/:query', rateLimiter(60000, 60), async (req, res) => {
   try {
     const query = req.params.query;
     if (!query) {
       return res.status(400).json({ success: false, error: 'Warranty code or equipment serial number is required.' });
     }
 
-    const warranty = getWarrantyBySerialOrCode(query);
+    const warranty = await getWarrantyBySerialOrCode(query);
     if (!warranty) {
       return res.status(404).json({
         success: false,
@@ -812,7 +791,7 @@ app.get('/api/warranty/verify/:query', rateLimiter(60000, 60), (req, res) => {
 });
 
 // API: Stage 16 Public Support & Warranty Claim Ticket Creation
-app.post('/api/support/tickets', rateLimiter(60000, 20), (req, res) => {
+app.post('/api/support/tickets', rateLimiter(60000, 20), async (req, res) => {
   try {
     const { orderNumber, customerName, customerPhone, customerEmail, issueCategory, priority, subject, description } = req.body;
     if (!customerName || !customerPhone || !subject || !description) {
@@ -822,7 +801,7 @@ app.post('/api/support/tickets', rateLimiter(60000, 20), (req, res) => {
       });
     }
 
-    const ticket = createSupportTicket({
+    const ticket = await createSupportTicket({
       orderNumber,
       customerName,
       customerPhone,
@@ -851,9 +830,9 @@ app.post('/api/support/tickets', rateLimiter(60000, 20), (req, res) => {
 });
 
 // API: Stage 16 Support Ticket Status Lookup (with Privacy Verification)
-app.get('/api/support/tickets/:ticketNumber', (req, res) => {
+app.get('/api/support/tickets/:ticketNumber', async (req, res) => {
   try {
-    const ticket = getSupportTicketByNumber(req.params.ticketNumber);
+    const ticket = await getSupportTicketByNumber(req.params.ticketNumber);
     if (!ticket) {
       return res.status(404).json({ success: false, error: 'Support ticket not found.' });
     }
@@ -919,7 +898,7 @@ app.post('/api/payments/initialize', rateLimiter(60000, 30), async (req, res) =>
       return res.status(400).json({ success: false, error: 'Order number is required.' });
     }
 
-    const order = getOrderByNumber(orderNumber);
+    const order = await getOrderByNumber(orderNumber);
     if (!order) {
       return res.status(404).json({ success: false, error: 'Order not found.' });
     }
@@ -945,7 +924,7 @@ app.post('/api/payments/initialize', rateLimiter(60000, 30), async (req, res) =>
     });
 
     // Record transaction in payments table
-    createPaymentRecord({
+    await createPaymentRecord({
       orderId: order.id,
       orderNumber: order.order_number,
       gateway: initResult.gateway,
@@ -975,13 +954,13 @@ app.post('/api/payments/initialize', rateLimiter(60000, 30), async (req, res) =>
 app.get('/api/payments/verify/:reference', async (req, res) => {
   try {
     const reference = req.params.reference;
-    const payment = getPaymentByReference(reference);
+    const payment = await getPaymentByReference(reference);
 
     let order = null;
     if (payment) {
-      order = getOrderByNumber(payment.order_number);
+      order = await getOrderByNumber(payment.order_number);
     } else if (req.query.orderNumber) {
-      order = getOrderByNumber(req.query.orderNumber);
+      order = await getOrderByNumber(req.query.orderNumber);
     }
 
     if (!order) {
@@ -1014,7 +993,7 @@ app.get('/api/payments/verify/:reference', async (req, res) => {
 
     if (!reconciliation.reconciled) {
       if (payment) {
-        updatePaymentStatus(reference, {
+        await updatePaymentStatus(reference, {
           status: reconciliation.status || 'failed',
           gatewayResponse: reconciliation.error
         });
@@ -1029,8 +1008,8 @@ app.get('/api/payments/verify/:reference', async (req, res) => {
       });
     }
 
-    // Authoritative update in SQLite database
-    const updatedOrder = reconcileOrderPayment(order.order_number, reference, reconciliation);
+    // Authoritative update in database
+    const updatedOrder = await reconcileOrderPayment(order.order_number, reference, reconciliation);
 
     res.json({
       success: true,
@@ -1051,7 +1030,7 @@ app.get('/api/payments/verify/:reference', async (req, res) => {
 });
 
 // Idempotent Webhook receiver with HMAC-SHA512 signature verification
-app.post('/api/payments/webhook', (req, res) => {
+app.post('/api/payments/webhook', async (req, res) => {
   try {
     const signature = req.headers['x-paystack-signature'];
     const rawBody = req.rawBody || Buffer.from(JSON.stringify(req.body));
@@ -1064,7 +1043,7 @@ app.post('/api/payments/webhook', (req, res) => {
 
     if (event === 'charge.success') {
       const reference = data.reference;
-      const existingPayment = getPaymentByReference(reference);
+      const existingPayment = await getPaymentByReference(reference);
 
       // Idempotency: if already processed and marked paid, return 200 immediately
       if (existingPayment && existingPayment.status === 'success') {
@@ -1075,11 +1054,11 @@ app.post('/api/payments/webhook', (req, res) => {
                           (existingPayment ? existingPayment.order_number : null);
 
       if (orderNumber) {
-        const order = getOrderByNumber(orderNumber);
+        const order = await getOrderByNumber(orderNumber);
         if (order) {
           const expectedKobo = Math.round(Number(order.total_ngn) * 100);
           if (data.amount === expectedKobo && (!data.currency || data.currency.toUpperCase() === 'NGN')) {
-            reconcileOrderPayment(orderNumber, reference, {
+            await reconcileOrderPayment(orderNumber, reference, {
               status: 'success',
               channel: data.channel || 'card',
               gatewayResponse: data.gateway_response || 'Approved',
@@ -1098,11 +1077,11 @@ app.post('/api/payments/webhook', (req, res) => {
 });
 
 // Interactive Sandbox Gateway Route for Local Developer / Browser Testing
-app.get('/api/payments/sandbox/:reference', (req, res) => {
+app.get('/api/payments/sandbox/:reference', async (req, res) => {
   const reference = req.params.reference;
-  const payment = getPaymentByReference(reference);
+  const payment = await getPaymentByReference(reference);
   const orderNumber = req.query.orderNumber || (payment ? payment.order_number : '');
-  const order = orderNumber ? getOrderByNumber(orderNumber) : null;
+  const order = orderNumber ? await getOrderByNumber(orderNumber) : null;
   const amount = req.query.amount || (order ? order.total_ngn : 0);
   const email = req.query.email || (order ? order.customer_email : 'customer@devicepro.com');
 
@@ -1292,19 +1271,19 @@ app.post('/api/calculator/savings', rateLimiter(60000, 60), (req, res) => {
 // =========================================================================
 // AUTHENTICATION API (Stage 12)
 // =========================================================================
-app.post('/api/auth/login', rateLimiter(60000, 100), (req, res) => {
+app.post('/api/auth/login', rateLimiter(60000, 100), async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
       return res.status(400).json({ success: false, error: 'Username and password are required.' });
     }
 
-    const user = verifyUserLogin(username.trim(), password);
+    const user = await verifyUserLogin(username.trim(), password);
     if (!user) {
       return res.status(401).json({ success: false, error: 'Invalid username or password.' });
     }
 
-    const session = createSession(user.id);
+    const session = await createSession(user.id);
     res.json({
       success: true,
       message: `Welcome, ${user.fullName}`,
@@ -1325,9 +1304,9 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
   });
 });
 
-app.post('/api/auth/logout', requireAuth, (req, res) => {
+app.post('/api/auth/logout', requireAuth, async (req, res) => {
   try {
-    revokeSession(req.token);
+    await revokeSession(req.token);
     res.json({ success: true, message: 'Logged out successfully.' });
   } catch (error) {
     res.status(500).json({ success: false, error: 'Logout failed.' });
@@ -1337,75 +1316,75 @@ app.post('/api/auth/logout', requireAuth, (req, res) => {
 // =========================================================================
 // PROTECTED ADMINISTRATIVE API (Stage 12 / Stage 13 prep)
 // =========================================================================
-app.get('/api/admin/stats', requireAuth, (req, res) => {
+app.get('/api/admin/stats', requireAuth, async (req, res) => {
   try {
-    const stats = getDatabaseStats();
+    const stats = await getDatabaseStats();
     res.json({ success: true, stats: stats.tables, meta: stats });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.get('/api/admin/enquiries', requireAuth, (req, res) => {
+app.get('/api/admin/enquiries', requireAuth, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
     const offset = parseInt(req.query.offset, 10) || 0;
     const status = req.query.status || null;
-    const result = getEnquiries({ limit, offset, status });
+    const result = await getEnquiries({ limit, offset, status });
     res.json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.patch('/api/admin/enquiries/:id', requireAuth, (req, res) => {
+app.patch('/api/admin/enquiries/:id', requireAuth, async (req, res) => {
   try {
     const { status, notes } = req.body;
-    const enquiry = updateEnquiryStatus(req.params.id, status, notes, req.user.id);
+    const enquiry = await updateEnquiryStatus(req.params.id, status, notes, req.user.id);
     res.json({ success: true, enquiry });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.get('/api/admin/quotes', requireAuth, (req, res) => {
+app.get('/api/admin/quotes', requireAuth, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
     const offset = parseInt(req.query.offset, 10) || 0;
     const status = req.query.status || null;
-    const result = getQuotes({ limit, offset, status });
+    const result = await getQuotes({ limit, offset, status });
     res.json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.patch('/api/admin/quotes/:id', requireAuth, (req, res) => {
+app.patch('/api/admin/quotes/:id', requireAuth, async (req, res) => {
   try {
     const { status, notes } = req.body;
-    const quote = updateQuoteStatus(req.params.id, status, notes, req.user.id);
+    const quote = await updateQuoteStatus(req.params.id, status, notes, req.user.id);
     res.json({ success: true, quote });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.get('/api/admin/orders', requireAuth, (req, res) => {
+app.get('/api/admin/orders', requireAuth, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
     const offset = parseInt(req.query.offset, 10) || 0;
     const status = req.query.status || null;
-    const result = getOrders({ limit, offset, status });
+    const result = await getOrders({ limit, offset, status });
     res.json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.patch('/api/admin/orders/:id', requireAuth, (req, res) => {
+app.patch('/api/admin/orders/:id', requireAuth, async (req, res) => {
   try {
     const { orderStatus, paymentStatus, notes } = req.body;
-    const order = updateOrderStatus(req.params.id, orderStatus, paymentStatus, notes, req.user.id);
+    const order = await updateOrderStatus(req.params.id, orderStatus, paymentStatus, notes, req.user.id);
     res.json({ success: true, order });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -1413,10 +1392,10 @@ app.patch('/api/admin/orders/:id', requireAuth, (req, res) => {
 });
 
 // Stage 16: Admin Order Fulfillment & Logistics Management
-app.patch('/api/admin/orders/:id/fulfillment', requireAuth, (req, res) => {
+app.patch('/api/admin/orders/:id/fulfillment', requireAuth, async (req, res) => {
   try {
     const { waybillNumber, courierPartner, estimatedDelivery, orderStatus, notes } = req.body;
-    const order = updateOrderFulfillment(req.params.id, {
+    const order = await updateOrderFulfillment(req.params.id, {
       waybillNumber,
       courierPartner,
       estimatedDelivery,
@@ -1431,7 +1410,7 @@ app.patch('/api/admin/orders/:id/fulfillment', requireAuth, (req, res) => {
 });
 
 // Stage 16: Admin Certified Installation & Commissioning Management
-app.patch('/api/admin/orders/:id/commissioning', requireAuth, (req, res) => {
+app.patch('/api/admin/orders/:id/commissioning', requireAuth, async (req, res) => {
   try {
     const {
       assignedEngineer,
@@ -1443,7 +1422,7 @@ app.patch('/api/admin/orders/:id/commissioning', requireAuth, (req, res) => {
       commissioningDate,
       notes
     } = req.body;
-    const order = updateOrderCommissioning(req.params.id, {
+    const order = await updateOrderCommissioning(req.params.id, {
       assignedEngineer,
       engineerPhone,
       installationScheduledDate,
@@ -1461,23 +1440,23 @@ app.patch('/api/admin/orders/:id/commissioning', requireAuth, (req, res) => {
 });
 
 // Stage 16: Admin Support Tickets Desk
-app.get('/api/admin/support/tickets', requireAuth, (req, res) => {
+app.get('/api/admin/support/tickets', requireAuth, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
     const offset = parseInt(req.query.offset, 10) || 0;
     const status = req.query.status || null;
     const issueCategory = req.query.category || null;
-    const result = getSupportTickets({ status, issueCategory, limit, offset });
+    const result = await getSupportTickets({ status, issueCategory, limit, offset });
     res.json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.patch('/api/admin/support/tickets/:id', requireAuth, (req, res) => {
+app.patch('/api/admin/support/tickets/:id', requireAuth, async (req, res) => {
   try {
     const { status, priority, assignedEngineer, resolutionNotes } = req.body;
-    const ticket = updateSupportTicketStatus(req.params.id, {
+    const ticket = await updateSupportTicketStatus(req.params.id, {
       status,
       priority,
       assignedEngineer,
@@ -1491,41 +1470,41 @@ app.patch('/api/admin/support/tickets/:id', requireAuth, (req, res) => {
 });
 
 // Stage 16: Admin Digital Warranty Registrations
-app.get('/api/admin/warranties', requireAuth, (req, res) => {
+app.get('/api/admin/warranties', requireAuth, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
     const offset = parseInt(req.query.offset, 10) || 0;
     const status = req.query.status || null;
-    const result = getWarranties({ status, limit, offset });
+    const result = await getWarranties({ status, limit, offset });
     res.json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.post('/api/admin/warranties', requireAuth, (req, res) => {
+app.post('/api/admin/warranties', requireAuth, async (req, res) => {
   try {
-    const warranty = createWarrantyRecord(req.body);
+    const warranty = await createWarrantyRecord(req.body);
     res.status(201).json({ success: true, warranty });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
   }
 });
 
-app.get('/api/admin/audit-logs', requireAuth, requireRole('superadmin'), (req, res) => {
+app.get('/api/admin/audit-logs', requireAuth, requireRole('superadmin'), async (req, res) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
     const offset = parseInt(req.query.offset, 10) || 0;
-    const result = getAuditLogs({ limit, offset });
+    const result = await getAuditLogs({ limit, offset });
     res.json({ success: true, ...result });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.get('/api/admin/backup', requireAuth, requireRole('superadmin'), (req, res) => {
+app.get('/api/admin/backup', requireAuth, requireRole('superadmin'), async (req, res) => {
   try {
-    const backup = exportDatabaseBackup();
+    const backup = await exportDatabaseBackup();
     res.json({ success: true, backup });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -1533,11 +1512,11 @@ app.get('/api/admin/backup', requireAuth, requireRole('superadmin'), (req, res) 
 });
 
 // Product Catalogue Administration (Stage 13)
-app.get('/api/admin/products', requireAuth, (req, res) => {
+app.get('/api/admin/products', requireAuth, async (req, res) => {
   try {
     const category = req.query.category && req.query.category !== 'all' ? req.query.category : undefined;
     const search = req.query.search || undefined;
-    const result = getProducts({
+    const result = await getProducts({
       category,
       search,
       limit: 100
@@ -1548,27 +1527,27 @@ app.get('/api/admin/products', requireAuth, (req, res) => {
   }
 });
 
-app.patch('/api/admin/products/:id', requireAuth, (req, res) => {
+app.patch('/api/admin/products/:id', requireAuth, async (req, res) => {
   try {
-    const updated = updateProduct(req.params.id, req.body, req.user.id);
+    const updated = await updateProduct(req.params.id, req.body, req.user.id);
     res.json({ success: true, product: updated });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.post('/api/admin/products', requireAuth, (req, res) => {
+app.post('/api/admin/products', requireAuth, async (req, res) => {
   try {
-    const created = createProduct(req.body, req.user.id);
+    const created = await createProduct(req.body, req.user.id);
     res.status(201).json({ success: true, product: created });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.delete('/api/admin/products/:id', requireAuth, (req, res) => {
+app.delete('/api/admin/products/:id', requireAuth, async (req, res) => {
   try {
-    const result = deleteProduct(req.params.id, req.user.id);
+    const result = await deleteProduct(req.params.id, req.user.id);
     res.json(result);
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -1578,7 +1557,7 @@ app.delete('/api/admin/products/:id', requireAuth, (req, res) => {
 // =========================================================================
 // SEO & DYNAMIC SITEMAP GENERATION (Stage 17)
 // =========================================================================
-function generateSitemapXml() {
+async function generateSitemapXml() {
   const baseUrl = 'https://devicepro.ng';
   const today = new Date().toISOString().split('T')[0];
 
@@ -1616,9 +1595,9 @@ function generateSitemapXml() {
 
   // 48 Dynamic Products
   try {
-    const { products } = getProducts({ limit: 100 });
-    for (const prod of products) {
-      const lastmod = prod.updated_at ? prod.updated_at.split(' ')[0] : today;
+    const { products } = await getProducts({ limit: 100 });
+    for (const prod of (products || [])) {
+      const lastmod = prod.updated_at ? String(prod.updated_at).split(' ')[0] : today;
       xml += '  <url>\n';
       xml += `    <loc>${baseUrl}/products/${encodeURIComponent(prod.slug)}</loc>\n`;
       xml += `    <lastmod>${lastmod}</lastmod>\n`;
@@ -1632,9 +1611,9 @@ function generateSitemapXml() {
 
   // 6 Dynamic Turnkey Packages
   try {
-    const packages = getPackages();
-    for (const pkg of packages) {
-      const lastmod = pkg.updated_at ? pkg.updated_at.split(' ')[0] : today;
+    const packages = await getPackages();
+    for (const pkg of (packages || [])) {
+      const lastmod = pkg.updated_at ? String(pkg.updated_at).split(' ')[0] : today;
       xml += '  <url>\n';
       xml += `    <loc>${baseUrl}/packages/${encodeURIComponent(pkg.slug)}</loc>\n`;
       xml += `    <lastmod>${lastmod}</lastmod>\n`;
@@ -1648,8 +1627,8 @@ function generateSitemapXml() {
 
   // 6 Dynamic Case Studies
   try {
-    const caseStudies = getCaseStudies();
-    for (const cs of caseStudies) {
+    const caseStudies = await getCaseStudies();
+    for (const cs of (caseStudies || [])) {
       xml += '  <url>\n';
       xml += `    <loc>${baseUrl}/projects/${encodeURIComponent(cs.slug)}</loc>\n`;
       xml += `    <lastmod>${today}</lastmod>\n`;
@@ -1666,17 +1645,18 @@ function generateSitemapXml() {
 }
 
 // Generate and write static public/sitemap.xml on startup
-try {
-  const initialSitemap = generateSitemapXml();
-  fs.writeFileSync(path.join(__dirname, 'public', 'sitemap.xml'), initialSitemap, 'utf8');
-} catch (e) {
-  console.warn('Initial sitemap generation warning:', e.message);
-}
+generateSitemapXml().then(initialSitemap => {
+  try {
+    fs.writeFileSync(path.join(__dirname, 'public', 'sitemap.xml'), initialSitemap, 'utf8');
+  } catch (e) {
+    console.warn('Initial sitemap generation warning:', e.message);
+  }
+}).catch(() => {});
 
 // Sitemap endpoint
-app.get('/sitemap.xml', (req, res) => {
+app.get('/sitemap.xml', async (req, res) => {
   try {
-    const xml = generateSitemapXml();
+    const xml = await generateSitemapXml();
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.send(xml);
   } catch (err) {
@@ -1782,10 +1762,16 @@ app.get('*', (req, res) => {
 
 // Start listening only when run directly
 if (require.main === module) {
+  connectMongo().catch(err => {
+    console.warn('[DATABASE] MongoDB Atlas startup status:', err.message);
+  });
   const server = app.listen(PORT, () => {
     console.log(`DEVICE PRO Web Server is running at http://localhost:${PORT}`);
   });
   module.exports = server;
 } else {
+  if (process.env.MONGODB_URI) {
+    connectMongo().catch(() => {});
+  }
   module.exports = app;
 }
