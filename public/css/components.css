@@ -33,6 +33,7 @@ body {
   flex-direction: column;
   background-color: var(--color-ink-000);
   color: var(--color-d-text);
+  zoom: 0.8;
 }
 
 .sr-only {

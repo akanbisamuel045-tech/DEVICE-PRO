@@ -204,3 +204,8 @@
   --z-index-modal: 400;
   --z-index-toast: 500;
 }
+
+/* Global 80% (-20%) scale across all viewports */
+body {
+  zoom: 0.8;
+}
