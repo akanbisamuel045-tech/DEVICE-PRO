@@ -164,14 +164,14 @@
     return added;
   }
 
-  // Determine current slug from URL
+  // Determine current slug or identifier from URL
   function getProductSlug() {
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     let slug = pathParts[pathParts.length - 1];
 
-    if (!slug || slug === 'products' || slug === 'product-detail.html') {
+    if (!slug || slug === 'products' || slug === 'product-detail' || slug === 'product-detail.html') {
       const urlParams = new URLSearchParams(window.location.search);
-      slug = urlParams.get('slug') || 'jinko-monocrystalline-solar-panel-550w';
+      slug = urlParams.get('slug') || urlParams.get('id') || 'jinko-monocrystalline-solar-panel-550w';
     }
     return slug;
   }
@@ -360,7 +360,9 @@
             </button>
           </div>
           <div class="card-image-wrap">
-            <img src="/${item.image_url}" alt="${item.name}" class="card-product-img" loading="lazy">
+            <a href="/products/${item.slug}" title="${item.name}" class="card-image-link">
+              <img src="/${item.image_url}" alt="${item.name}" class="card-product-img" loading="lazy">
+            </a>
           </div>
           <div class="card-brand">${item.brand}</div>
           <h3 class="card-title">

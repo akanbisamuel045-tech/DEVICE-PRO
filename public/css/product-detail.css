@@ -71,12 +71,12 @@
   background-color: #FFFFFF;
   border: 1px solid var(--p-border);
   border-radius: 12px;
-  height: 440px;
+  height: 520px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 16px;
   box-shadow: 0 4px 20px rgba(8, 45, 80, 0.04);
 }
 

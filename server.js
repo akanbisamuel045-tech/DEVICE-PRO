@@ -239,10 +239,21 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-// API: Product detail by slug
+// API: Product detail by slug or ID
 app.get('/api/products/:slug', async (req, res) => {
   try {
-    const product = await getProductBySlug(req.params.slug);
+    if (!isMongoConnected() && process.env.MONGODB_URI) {
+      try { await connectMongo(); } catch (e) {}
+    }
+
+    const param = req.params.slug;
+    let product = await getProductBySlug(param);
+
+    // If not found by slug and param is numeric, check by numeric ID
+    if (!product && /^\d+$/.test(param)) {
+      product = await getProductById(Number(param));
+    }
+
     if (!product) {
       return res.status(404).json({ success: false, error: 'Product not found' });
     }

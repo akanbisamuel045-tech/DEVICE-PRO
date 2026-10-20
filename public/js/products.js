@@ -267,7 +267,9 @@
 
           <!-- Product Image -->
           <div class="card-image-wrap">
-            <img src="${product.image_url}" alt="${product.name}" class="card-product-img" loading="lazy">
+            <a href="/products/${product.slug}" title="${product.name}" class="card-image-link">
+              <img src="${product.image_url}" alt="${product.name}" class="card-product-img" loading="lazy">
+            </a>
           </div>
 
           <!-- Brand & Name -->
