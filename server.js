@@ -167,6 +167,30 @@ function requireRole(...roles) {
 
 // API: Health & Database Diagnostics
 app.get('/api/health', async (req, res) => {
+  const mongoConnected = isMongoConnected();
+  const mongoUriConfigured = Boolean(process.env.MONGODB_URI);
+
+  if (!mongoConnected) {
+    if (mongoUriConfigured) {
+      try { await connectMongo(); } catch (e) {}
+    }
+  }
+
+  if (!isMongoConnected()) {
+    return res.status(200).json({
+      status: 'degraded',
+      service: 'DEVICE PRO Core API',
+      database: {
+        engine: 'MongoDB Atlas',
+        status: 'disconnected',
+        uriConfigured: mongoUriConfigured,
+        reason: mongoUriConfigured 
+          ? 'Connecting or IP blocked by MongoDB Atlas Network Access whitelist (ensure 0.0.0.0/0 is permitted in Atlas)'
+          : 'MONGODB_URI is not configured in Vercel environment variables'
+      }
+    });
+  }
+
   try {
     const stats = await getDatabaseStats();
     res.json({
@@ -182,8 +206,11 @@ app.get('/api/health', async (req, res) => {
 // API: Categories
 app.get('/api/categories', async (req, res) => {
   try {
+    if (!isMongoConnected() && process.env.MONGODB_URI) {
+      try { await connectMongo(); } catch (e) {}
+    }
     const categories = await getCategories();
-    res.json({ success: true, count: categories.length, categories });
+    res.json({ success: true, count: (categories || []).length, categories: categories || [] });
   } catch (error) {
     res.status(500).json({ success: false, error: 'Failed to retrieve categories.' });
   }
@@ -192,15 +219,19 @@ app.get('/api/categories', async (req, res) => {
 // API: Products catalog with filtering, sorting, search, and pagination
 app.get('/api/products', async (req, res) => {
   try {
+    if (!isMongoConnected() && process.env.MONGODB_URI) {
+      try { await connectMongo(); } catch (e) {}
+    }
+
     const result = await getProducts(req.query);
     const facets = await getProductFacets();
 
     res.json({
       success: true,
       ...result,
-      categories: facets.categories,
-      brands: facets.brands,
-      priceRange: facets.priceRange
+      categories: (facets && facets.categories) || [],
+      brands: (facets && facets.brands) || [],
+      priceRange: (facets && facets.priceRange) || { min: 0, max: 15000000 }
     });
   } catch (error) {
     console.error('[API PRODUCTS ERROR]:', error);
