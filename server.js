@@ -1593,11 +1593,25 @@ async function generateSitemapXml() {
     xml += '  </url>\n';
   }
 
+  function formatDateYMD(d) {
+    if (!d) return today;
+    if (d instanceof Date) return d.toISOString().split('T')[0];
+    const s = String(d);
+    if (s.includes('T')) return s.split('T')[0];
+    const parts = s.split(' ');
+    if (/^\d{4}-\d{2}-\d{2}$/.test(parts[0])) return parts[0];
+    try {
+      const parsed = new Date(d);
+      if (!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
+    } catch (e) {}
+    return today;
+  }
+
   // 48 Dynamic Products
   try {
     const { products } = await getProducts({ limit: 100 });
     for (const prod of (products || [])) {
-      const lastmod = prod.updated_at ? String(prod.updated_at).split(' ')[0] : today;
+      const lastmod = formatDateYMD(prod.updated_at);
       xml += '  <url>\n';
       xml += `    <loc>${baseUrl}/products/${encodeURIComponent(prod.slug)}</loc>\n`;
       xml += `    <lastmod>${lastmod}</lastmod>\n`;
@@ -1613,7 +1627,7 @@ async function generateSitemapXml() {
   try {
     const packages = await getPackages();
     for (const pkg of (packages || [])) {
-      const lastmod = pkg.updated_at ? String(pkg.updated_at).split(' ')[0] : today;
+      const lastmod = formatDateYMD(pkg.updated_at);
       xml += '  <url>\n';
       xml += `    <loc>${baseUrl}/packages/${encodeURIComponent(pkg.slug)}</loc>\n`;
       xml += `    <lastmod>${lastmod}</lastmod>\n`;

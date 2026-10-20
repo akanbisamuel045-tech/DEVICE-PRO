@@ -5,6 +5,44 @@
     {
       "source": "/api/(.*)",
       "destination": "/api/index.js"
+    },
+    {
+      "source": "/products/:slug",
+      "destination": "/product-detail.html"
+    },
+    {
+      "source": "/packages/:slug",
+      "destination": "/packages.html"
+    },
+    {
+      "source": "/projects/:slug",
+      "destination": "/projects.html"
+    },
+    {
+      "source": "/admin/login",
+      "destination": "/admin.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/pricing",
+      "destination": "/packages",
+      "permanent": true
+    },
+    {
+      "source": "/cart",
+      "destination": "/checkout",
+      "permanent": true
+    },
+    {
+      "source": "/solutions",
+      "destination": "/#solutions",
+      "permanent": true
+    },
+    {
+      "source": "/resources",
+      "destination": "/",
+      "permanent": true
     }
   ]
 }
