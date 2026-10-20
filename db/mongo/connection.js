@@ -30,6 +30,7 @@ function loadEnvFile() {
 loadEnvFile();
 
 let isConnected = false;
+let connectionPromise = null;
 
 /**
  * Connect to MongoDB Atlas (or local MongoDB instance)
@@ -38,9 +39,14 @@ let isConnected = false;
 async function connectMongo(uri = process.env.MONGODB_URI) {
   loadEnvFile();
   const effectiveUri = uri || process.env.MONGODB_URI;
+  const dbName = process.env.MONGODB_DB_NAME || 'devicepro';
 
-  if (isConnected) {
+  if (isConnected && mongoose.connection.readyState === 1) {
     return mongoose.connection;
+  }
+
+  if (connectionPromise) {
+    return connectionPromise;
   }
 
   if (!effectiveUri) {
@@ -48,21 +54,26 @@ async function connectMongo(uri = process.env.MONGODB_URI) {
     return null;
   }
 
-  try {
-    console.log('[DATABASE] Connecting to MongoDB Atlas...');
-    const conn = await mongoose.connect(effectiveUri, {
-      serverSelectionTimeoutMS: 8000,
-      autoIndex: true
-    });
-    isConnected = true;
-    console.log(`[DATABASE] MongoDB Atlas connected successfully: ${conn.connection.host}/${conn.connection.name}`);
-    return conn.connection;
-  } catch (error) {
-    console.error('[DATABASE ERROR] Failed to connect to MongoDB Atlas:', error.message);
-    console.log('[DATABASE] Falling back to local SQLite engine (data/products.db).');
-    isConnected = false;
-    return null;
-  }
+  connectionPromise = (async () => {
+    try {
+      console.log(`[DATABASE] Connecting to MongoDB Atlas (database: ${dbName})...`);
+      const conn = await mongoose.connect(effectiveUri, {
+        dbName,
+        serverSelectionTimeoutMS: 8000,
+        autoIndex: false
+      });
+      isConnected = true;
+      console.log(`[DATABASE] MongoDB Atlas connected successfully: ${conn.connection.host}/${conn.connection.name}`);
+      return conn.connection;
+    } catch (error) {
+      console.error('[DATABASE ERROR] Failed to connect to MongoDB Atlas:', error.message);
+      isConnected = false;
+      connectionPromise = null;
+      return null;
+    }
+  })();
+
+  return connectionPromise;
 }
 
 /**

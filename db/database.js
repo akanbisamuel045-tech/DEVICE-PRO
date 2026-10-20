@@ -9,13 +9,14 @@ let sqliteAvailable = false;
 const path = require('path');
 const fs = require('fs');
 
+const dataDir = path.join(__dirname, '..', 'data');
+const dbPath = path.join(dataDir, 'products.db');
+
 try {
   const { DatabaseSync } = require('node:sqlite');
-  const dataDir = path.join(__dirname, '..', 'data');
   if (!fs.existsSync(dataDir)) {
     try { fs.mkdirSync(dataDir, { recursive: true }); } catch (e) {}
   }
-  const dbPath = path.join(dataDir, 'products.db');
   db = new DatabaseSync(dbPath);
   sqliteAvailable = true;
 } catch (err) {
@@ -2747,44 +2748,48 @@ function sqliteGetRelatedProducts(category, productId, limit = 3) {
 
 function dispatch(mongoFn, sqliteFn) {
   return function(...args) {
-    if (!isMongoConnected()) {
+    if (isMongoConnected()) {
+      let syncRes = null;
+      if (sqliteAvailable && typeof sqliteFn === 'function') {
+        try {
+          syncRes = sqliteFn(...args);
+        } catch (err) {
+          // Ignored; Mongo is primary
+        }
+      }
+
+      // Primary execution on MongoDB Atlas
+      const asyncPromise = (async () => {
+        try {
+          const mongoRes = await mongoFn(...args);
+          if (mongoRes !== null && mongoRes !== undefined) {
+            return mongoRes;
+          }
+          if (sqliteAvailable && syncRes !== null) return syncRes;
+          return mongoRes;
+        } catch (err) {
+          if (sqliteAvailable && syncRes !== null) return syncRes;
+          throw err;
+        }
+      })();
+
+      // Expose synchronous properties directly on the promise for sync property access
+      if (syncRes && typeof syncRes === 'object') {
+        try {
+          Object.assign(asyncPromise, syncRes);
+        } catch (e) {}
+      }
+
+      return asyncPromise;
+    }
+
+    // If SQLite is available locally, use it
+    if (sqliteAvailable && typeof sqliteFn === 'function') {
       return sqliteFn(...args);
     }
 
-    // When MongoDB is connected:
-    // Execute SQLite synchronously if possible for instant parity with legacy sync callers/tests
-    let syncRes = null;
-    if (typeof sqliteFn === 'function') {
-      try {
-        syncRes = sqliteFn(...args);
-      } catch (err) {
-        // Ignored; Mongo is primary
-      }
-    }
-
-    // Primary execution on MongoDB Atlas
-    const asyncPromise = (async () => {
-      try {
-        const mongoRes = await mongoFn(...args);
-        if (mongoRes !== null && mongoRes !== undefined) {
-          return mongoRes;
-        }
-        if (syncRes !== null) return syncRes;
-        return mongoRes;
-      } catch (err) {
-        if (syncRes !== null) return syncRes;
-        throw err;
-      }
-    })();
-
-    // Expose synchronous properties directly on the promise for sync property access
-    if (syncRes && typeof syncRes === 'object') {
-      try {
-        Object.assign(asyncPromise, syncRes);
-      } catch (e) {}
-    }
-
-    return asyncPromise;
+    // In serverless/cloud environments where SQLite is disabled, dispatch to MongoDB
+    return mongoFn(...args);
   };
 }
 
