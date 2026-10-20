@@ -6,6 +6,22 @@ let connectionPromise = null;
 
 module.exports = async (req, res) => {
   try {
+    // Restore original URL when rewritten by Vercel serverless proxy
+    const originalUrl = req.headers['x-original-url'] || req.headers['x-matched-path'];
+    if (originalUrl) {
+      const currentQuery = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '';
+      const targetPath = originalUrl.split('?')[0];
+      const targetQuery = originalUrl.includes('?') ? originalUrl.substring(originalUrl.indexOf('?')) : currentQuery;
+      req.url = `${targetPath}${targetQuery}`;
+    }
+
+    // Normalize URL if Vercel serverless routing passes function path prefix
+    if (req.url.startsWith('/api/index/')) {
+      req.url = req.url.replace('/api/index/', '/api/');
+    } else if (req.url === '/api/index') {
+      req.url = '/api';
+    }
+
     if (process.env.MONGODB_URI) {
       if (!connectionPromise) {
         connectionPromise = connectMongo().catch(err => {

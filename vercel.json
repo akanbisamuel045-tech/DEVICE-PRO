@@ -6,10 +6,21 @@
       "includeFiles": "public/**"
     }
   },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "x-original-url",
+          "value": "/api/$1"
+        }
+      ]
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "destination": "/api"
     },
     {
       "source": "/products/:slug",
@@ -26,6 +37,10 @@
     {
       "source": "/admin/login",
       "destination": "/admin.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api"
     }
   ],
   "redirects": [

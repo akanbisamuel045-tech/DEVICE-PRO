@@ -96,11 +96,11 @@ async function runTests() {
     assert.strictEqual(vercelConfig.cleanUrls, true, 'cleanUrls must be true for edge HTML routing');
   });
 
-  await test('vercel.json restricts API rewrites to /api/(.*)', () => {
+  await test('vercel.json maps API rewrites to /api', () => {
     const vercelConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8'));
     const apiRewrite = vercelConfig.rewrites.find(r => r.source === '/api/(.*)');
     assert(apiRewrite, 'Must have rewrite for /api/(.*)');
-    assert.strictEqual(apiRewrite.destination, '/api/index.js');
+    assert.strictEqual(apiRewrite.destination, '/api');
   });
 
   await test('vercel.json configures dynamic product, package, and project routes', () => {
