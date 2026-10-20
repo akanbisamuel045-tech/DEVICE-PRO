@@ -1681,98 +1681,52 @@ app.get('/sitemap.xml', async (req, res) => {
 // =========================================================================
 // STATIC HTML PAGE ROUTES
 // =========================================================================
-app.get(['/checkout', '/checkout.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'checkout.html'));
-});
+// Safe HTML file streamer with path resolution and error boundaries
+function safeSendFile(res, relativePath) {
+  const primary = path.join(__dirname, relativePath);
+  const secondary = path.join(process.cwd(), relativePath);
+  const target = fs.existsSync(primary) ? primary : (fs.existsSync(secondary) ? secondary : null);
 
-app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'order-confirmation.html'));
-});
+  if (target) {
+    return res.sendFile(target, err => {
+      if (err && !res.headersSent) {
+        console.error(`[STATIC SEND ERROR] Could not stream ${relativePath}:`, err.message);
+        res.status(404).send('Not Found');
+      }
+    });
+  }
 
-app.get(['/tracking', '/tracking.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'tracking.html'));
-});
+  if (!res.headersSent) {
+    console.error(`[STATIC FILE MISSING] ${relativePath} not found on server disk.`);
+    res.status(404).send('Not Found');
+  }
+}
 
-app.get(['/admin', '/admin.html', '/admin/login'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-app.get(['/calculator', '/calculator.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'calculator.html'));
-});
-
-app.get(['/savings-calculator', '/savings-calculator.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'savings-calculator.html'));
-});
-
-app.get(['/packages', '/packages.html', '/pricing', '/pricing.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'packages.html'));
-});
-
-app.get(['/packages/:slug'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'packages.html'));
-});
-
-app.get(['/solutions', '/solutions.html'], (req, res) => {
-  res.redirect('/#solutions');
-});
-
-app.get(['/cart', '/cart.html'], (req, res) => {
-  res.redirect('/checkout');
-});
-
-app.get(['/products', '/products.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'products.html'));
-});
-
-app.get(['/products/:slug', '/product-detail.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'product-detail.html'));
-});
-
-app.get(['/projects', '/projects.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'projects.html'));
-});
-
-app.get(['/projects/:slug'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'projects.html'));
-});
-
-app.get(['/about', '/about.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'about.html'));
-});
-
-app.get(['/resources', '/resources.html'], (req, res) => {
-  res.redirect('/');
-});
-
-app.get(['/faq', '/faq.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'faq.html'));
-});
-
-app.get(['/contact', '/contact.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'contact.html'));
-});
-
-app.get(['/privacy-policy', '/privacy-policy.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'privacy-policy.html'));
-});
-
-app.get(['/terms', '/terms.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
-});
-
-app.get(['/shipping-policy', '/shipping-policy.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'shipping-policy.html'));
-});
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get(['/checkout', '/checkout.html'], (req, res) => safeSendFile(res, 'public/checkout.html'));
+app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => safeSendFile(res, 'public/order-confirmation.html'));
+app.get(['/tracking', '/tracking.html'], (req, res) => safeSendFile(res, 'public/tracking.html'));
+app.get(['/admin', '/admin.html', '/admin/login'], (req, res) => safeSendFile(res, 'public/admin.html'));
+app.get(['/calculator', '/calculator.html'], (req, res) => safeSendFile(res, 'public/calculator.html'));
+app.get(['/savings-calculator', '/savings-calculator.html'], (req, res) => safeSendFile(res, 'public/savings-calculator.html'));
+app.get(['/packages', '/packages.html', '/pricing', '/pricing.html'], (req, res) => safeSendFile(res, 'public/packages.html'));
+app.get(['/packages/:slug'], (req, res) => safeSendFile(res, 'public/packages.html'));
+app.get(['/solutions', '/solutions.html'], (req, res) => res.redirect('/#solutions'));
+app.get(['/cart', '/cart.html'], (req, res) => res.redirect('/checkout'));
+app.get(['/products', '/products.html'], (req, res) => safeSendFile(res, 'public/products.html'));
+app.get(['/products/:slug', '/product-detail.html'], (req, res) => safeSendFile(res, 'public/product-detail.html'));
+app.get(['/projects', '/projects.html'], (req, res) => safeSendFile(res, 'public/projects.html'));
+app.get(['/projects/:slug'], (req, res) => safeSendFile(res, 'public/projects.html'));
+app.get(['/about', '/about.html'], (req, res) => safeSendFile(res, 'public/about.html'));
+app.get(['/resources', '/resources.html'], (req, res) => res.redirect('/'));
+app.get(['/faq', '/faq.html'], (req, res) => safeSendFile(res, 'public/faq.html'));
+app.get(['/contact', '/contact.html'], (req, res) => safeSendFile(res, 'public/contact.html'));
+app.get(['/privacy-policy', '/privacy-policy.html'], (req, res) => safeSendFile(res, 'public/privacy-policy.html'));
+app.get(['/terms', '/terms.html'], (req, res) => safeSendFile(res, 'public/terms.html'));
+app.get(['/shipping-policy', '/shipping-policy.html'], (req, res) => safeSendFile(res, 'public/shipping-policy.html'));
+app.get('/', (req, res) => safeSendFile(res, 'public/index.html'));
 
 // Fallback to homepage for other unknown routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.get('*', (req, res) => safeSendFile(res, 'public/index.html'));
 
 // Start listening only when run directly
 if (require.main === module) {

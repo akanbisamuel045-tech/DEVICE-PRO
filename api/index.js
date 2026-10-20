@@ -6,14 +6,19 @@ let connectionPromise = null;
 
 module.exports = async (req, res) => {
   try {
-    if (process.env.MONGODB_URI && !connectionPromise) {
-      connectionPromise = connectMongo().catch(err => {
-        console.error('[VERCEL] MongoDB connection error:', err.message);
-        connectionPromise = null;
-      });
-    }
-    if (connectionPromise) {
-      await connectionPromise;
+    if (process.env.MONGODB_URI) {
+      if (!connectionPromise) {
+        connectionPromise = connectMongo().catch(err => {
+          console.error('[VERCEL] MongoDB connection error:', err.message);
+          connectionPromise = null;
+          return null;
+        });
+      }
+      if (connectionPromise) {
+        await connectionPromise;
+      }
+    } else {
+      console.warn('[VERCEL WARNING] MONGODB_URI environment variable is not defined in Vercel settings.');
     }
     return app(req, res);
   } catch (err) {

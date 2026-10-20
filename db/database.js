@@ -12,15 +12,16 @@ const fs = require('fs');
 const dataDir = path.join(__dirname, '..', 'data');
 const dbPath = path.join(dataDir, 'products.db');
 
-try {
-  const { DatabaseSync } = require('node:sqlite');
-  if (!fs.existsSync(dataDir)) {
-    try { fs.mkdirSync(dataDir, { recursive: true }); } catch (e) {}
-  }
-  db = new DatabaseSync(dbPath);
-  sqliteAvailable = true;
-} catch (err) {
-  console.warn('[DATABASE] Local SQLite unavailable (running in cloud/serverless environment):', err.message);
+const isServerlessCloud = Boolean(
+  process.env.VERCEL || 
+  process.env.AWS_LAMBDA_FUNCTION_NAME || 
+  process.env.LAMBDA_TASK_ROOT || 
+  process.env.VERCEL_ENV
+);
+
+if (isServerlessCloud) {
+  // Pure cloud serverless environment: operate in cloud mode (MongoDB Atlas)
+  sqliteAvailable = false;
   db = {
     exec: () => {},
     prepare: () => ({
@@ -29,6 +30,25 @@ try {
       run: () => ({ lastInsertRowid: 1, changes: 0 })
     })
   };
+} else {
+  try {
+    const { DatabaseSync } = require('node:sqlite');
+    if (!fs.existsSync(dataDir)) {
+      try { fs.mkdirSync(dataDir, { recursive: true }); } catch (e) {}
+    }
+    db = new DatabaseSync(dbPath);
+    sqliteAvailable = true;
+  } catch (err) {
+    sqliteAvailable = false;
+    db = {
+      exec: () => {},
+      prepare: () => ({
+        get: () => null,
+        all: () => [],
+        run: () => ({ lastInsertRowid: 1, changes: 0 })
+      })
+    };
+  }
 }
 
 const crypto = require('crypto');
@@ -2350,7 +2370,9 @@ function seedStage16DemoData() {
   }
 }
 
-seedStage16DemoData();
+if (sqliteAvailable) {
+  seedStage16DemoData();
+}
 
 // --- PAYMENTS & GATEWAY RECONCILIATION ---
 function createPaymentRecord({
