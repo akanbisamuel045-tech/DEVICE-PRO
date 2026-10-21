@@ -83,7 +83,7 @@ async function runTests() {
     assert(res.body.includes('</urlset>'), 'Must properly close urlset');
   });
 
-  await test('1.3: Sitemap contains all 14 required static routes with priority & changefreq', async () => {
+  await test('1.3: Sitemap contains all 13 required static routes with priority & changefreq', async () => {
     const res = await request('/sitemap.xml');
     const staticRoutes = [
       'https://devicepro.ng/',
@@ -92,7 +92,6 @@ async function runTests() {
       'https://devicepro.ng/packages',
       'https://devicepro.ng/projects',
       'https://devicepro.ng/calculator',
-      'https://devicepro.ng/savings-calculator',
       'https://devicepro.ng/about',
       'https://devicepro.ng/faq',
       'https://devicepro.ng/contact',
@@ -107,10 +106,10 @@ async function runTests() {
     }
   });
 
-  await test('1.4: Sitemap contains exactly 74 URLs (14 static + 48 products + 6 packages + 6 case studies)', async () => {
+  await test('1.4: Sitemap contains exactly 73 URLs (13 static + 48 products + 6 packages + 6 case studies)', async () => {
     const res = await request('/sitemap.xml');
     const urlMatches = res.body.match(/<url>/g) || [];
-    assert.strictEqual(urlMatches.length, 74, `Sitemap must contain exactly 74 URLs, found: ${urlMatches.length}`);
+    assert.strictEqual(urlMatches.length, 73, `Sitemap must contain exactly 73 URLs, found: ${urlMatches.length}`);
   });
 
   await test('1.5: Static public/sitemap.xml file exists and matches dynamic output', async () => {
@@ -118,7 +117,7 @@ async function runTests() {
     assert(fs.existsSync(filePath), 'public/sitemap.xml file must exist on disk');
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const urlMatches = fileContent.match(/<url>/g) || [];
-    assert.strictEqual(urlMatches.length, 74, 'Static sitemap must contain 74 URLs');
+    assert.strictEqual(urlMatches.length, 73, 'Static sitemap must contain 73 URLs');
   });
 
   // =========================================================================

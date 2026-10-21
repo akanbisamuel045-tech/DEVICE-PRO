@@ -202,7 +202,6 @@ async function runTests() {
     { file: 'solutions.html', path: '/solutions' },
     { file: 'projects.html', path: '/projects' },
     { file: 'calculator.html', path: '/calculator' },
-    { file: 'savings-calculator.html', path: '/savings-calculator' },
     { file: 'about.html', path: '/about' },
     { file: 'faq.html', path: '/faq' },
     { file: 'contact.html', path: '/contact' }

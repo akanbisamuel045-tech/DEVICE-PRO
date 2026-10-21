@@ -431,12 +431,10 @@ async function runTests() {
     assert(html.includes('calc-workspace-grid'));
   });
 
-  await asyncTest('GET /savings-calculator serves static HTML', async () => {
-    const res = await fetch(`${BASE_URL}/savings-calculator`);
-    assert.strictEqual(res.status, 200);
-    const html = await res.text();
-    assert(html.includes('Generator vs Solar Savings &amp; ROI Calculator'));
-    assert(html.includes('savings-app-grid'));
+  await asyncTest('GET /savings-calculator redirects to /calculator', async () => {
+    const res = await fetch(`${BASE_URL}/savings-calculator`, { redirect: 'manual' });
+    assert([301, 302].includes(res.status), `Expected redirect status, got ${res.status}`);
+    assert(res.headers.get('location')?.includes('/calculator'));
   });
 
   console.log('\n===============================================================');

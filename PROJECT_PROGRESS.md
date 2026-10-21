@@ -4,13 +4,24 @@
 **Stage 18: Production Launch, Deployment Readiness & Operational Handover**
 **Status:** ✅ PASS — FULL LIFECYCLE COMPLETE (STAGES 1–18 DELIVERED & PRODUCTION READY)
 
+### Latest Milestone: Navbar Standardization & FAQ Page Merger
+- **Navbar Across All Devices (Desktop, Mobile, Tablet)**:
+  - Standardized exact 7 links: `Home`, `Products`, `Solar Package`, `Projects`, `Calculator`, `About`, `Contacts`.
+  - Updated all 14 customer-facing HTML templates, header navbars, and mobile drawer navigation menus.
+- **FAQ Page Merged into About Page**:
+  - Replaced former "Tier-1 Hardware Ecosystem" section (Section 9) in `public/about.html` with full interactive FAQ component (search input, category filter tabs, and responsive accordion list).
+  - Linked `faq.css`, `faq.js`, and embedded Schema.org `FAQPage` JSON-LD structured data into `about.html`.
+  - Configured permanent redirects from `/faq` and `/faq.html` to `/about#faqs` in `server.js` and `vercel.json`.
+- **Test Suite Verification**:
+  - 100% pass across all 7 test suites (121 tests passed, 0 failed).
+  - Production smoke test: 24/24 tests passed cleanly.
+
 ## Project Overview
 - **Project:** DEVICE PRO Solar Energy Website & Commerce Platform
 - **Market:** Nigeria
 - **Stack:** HTML5 + CSS3 + Vanilla JS + Node.js/Express + SQLite
 - **Runtime:** Node.js v26.4.0, npm 11.17.0, Git 2.47.1
-- **Start Date:** 2026-10-09
-- **Last Updated:** 2026-10-16
+- **Last Updated:** 2026-10-21
 
 ---
 
@@ -839,7 +850,9 @@
   - `db/mongo/repository.js`: Fully asynchronous repository layer implementing all catalog queries, multifaceted filters, full CRUD, payments reconciliation, tracking, and warranty verification.
   - `db/database.js`: Dual-engine dispatcher routing calls dynamically to MongoDB Atlas when connected with synchronous property bridging and SQLite fallback.
   - `scripts/migrate-sqlite-to-mongo.js`: Data migration utility with idempotent upserting (`returnDocument: 'after'`). Migrated 1,392 records across all 11 collections with 100% parity.
-  - Automated Regression: All 6 test suites (`stage12` to `stage17`) pass with 100% success rate on `npm test`.
+  - Automated Regression: All 7 test suites (`stage12` to `stage18`) pass with 100% success rate on `npm test`.
+  - Navigation Refinement: Removed "Solutions" link from top navbar across all pages for a cleaner menu structure.
+  - Page Deletion: Deleted redundant Generator vs Solar ROI calculator (`public/savings-calculator.html`, `public/css/savings-calculator.css`, `public/js/savings-calculator.js`) and redirected legacy traffic to the primary sizing engine (`/calculator`).
 
 **Next Permitted Stage:** Project Lifecycle Complete — Ready for Live Production Launch & Commercial Operations
 

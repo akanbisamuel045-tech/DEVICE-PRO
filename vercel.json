@@ -63,6 +63,16 @@
       "source": "/resources",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/savings-calculator",
+      "destination": "/calculator",
+      "permanent": true
+    },
+    {
+      "source": "/faq",
+      "destination": "/about#faqs",
+      "permanent": true
     }
   ]
 }

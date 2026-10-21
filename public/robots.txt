@@ -10,7 +10,6 @@ Allow: /packages/*
 Allow: /solutions
 Allow: /projects
 Allow: /calculator
-Allow: /savings-calculator
 Allow: /about
 Allow: /faq
 Allow: /contact

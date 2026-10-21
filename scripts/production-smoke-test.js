@@ -47,7 +47,7 @@ async function runSmokeTests() {
   });
 
   // --- 2. CORE PUBLIC HTML PAGES (14 ROUTES) ---
-  console.log('\n--- 2. CORE PUBLIC HTML PAGES (14 ROUTES) ---');
+  console.log('\n--- 2. CORE PUBLIC HTML PAGES (13 ROUTES) ---');
   const pages = [
     { route: '/', title: 'Home' },
     { route: '/solutions', title: 'Solutions' },
@@ -56,7 +56,6 @@ async function runSmokeTests() {
     { route: '/packages', title: 'Turnkey Packages' },
     { route: '/projects', title: 'Projects Portfolio' },
     { route: '/calculator', title: 'Sizing Calculator' },
-    { route: '/savings-calculator', title: 'Generator ROI Calculator' },
     { route: '/about', title: 'About Us' },
     { route: '/faq', title: 'FAQs' },
     { route: '/contact', title: 'Contact & Hubs' },
@@ -130,14 +129,14 @@ async function runSmokeTests() {
 
   // --- 4. SEO & SEARCH ENGINE INDEXING ---
   console.log('\n--- 4. SEO & SEARCH ENGINE INDEXING ---');
-  await test('GET /sitemap.xml returns valid XML sitemap with 74 URLs', async () => {
+  await test('GET /sitemap.xml returns valid XML sitemap with 73 URLs', async () => {
     const res = await fetch(`${BASE_URL}/sitemap.xml`);
     assert(res.status === 200, `Expected 200, got ${res.status}`);
     const xml = await res.text();
     assert(xml.includes('<?xml version="1.0" encoding="UTF-8"?>'), 'Missing XML declaration');
     assert(xml.includes('<urlset'), 'Missing urlset tag');
     const matches = (xml.match(/<loc>/g) || []).length;
-    assert(matches === 74, `Expected 74 URLs in sitemap, found ${matches}`);
+    assert(matches === 73, `Expected 73 URLs in sitemap, found ${matches}`);
   });
 
   await test('GET /robots.txt disallows administrative & checkout paths', async () => {

@@ -1610,7 +1610,6 @@ async function generateSitemapXml() {
     { loc: '/packages', priority: '0.9', changefreq: 'weekly' },
     { loc: '/projects', priority: '0.8', changefreq: 'weekly' },
     { loc: '/calculator', priority: '0.8', changefreq: 'monthly' },
-    { loc: '/savings-calculator', priority: '0.8', changefreq: 'monthly' },
     { loc: '/about', priority: '0.7', changefreq: 'monthly' },
     { loc: '/faq', priority: '0.7', changefreq: 'monthly' },
     { loc: '/contact', priority: '0.7', changefreq: 'monthly' },
@@ -1749,7 +1748,7 @@ app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => safeS
 app.get(['/tracking', '/tracking.html'], (req, res) => safeSendFile(res, 'public/tracking.html'));
 app.get(['/admin', '/admin.html', '/admin/login'], (req, res) => safeSendFile(res, 'public/admin.html'));
 app.get(['/calculator', '/calculator.html'], (req, res) => safeSendFile(res, 'public/calculator.html'));
-app.get(['/savings-calculator', '/savings-calculator.html'], (req, res) => safeSendFile(res, 'public/savings-calculator.html'));
+app.get(['/savings-calculator', '/savings-calculator.html'], (req, res) => res.redirect(301, '/calculator'));
 app.get(['/packages', '/packages.html', '/pricing', '/pricing.html'], (req, res) => safeSendFile(res, 'public/packages.html'));
 app.get(['/packages/:slug'], (req, res) => safeSendFile(res, 'public/packages.html'));
 app.get(['/solutions', '/solutions.html'], (req, res) => res.redirect('/#solutions'));
@@ -1760,7 +1759,7 @@ app.get(['/projects', '/projects.html'], (req, res) => safeSendFile(res, 'public
 app.get(['/projects/:slug'], (req, res) => safeSendFile(res, 'public/projects.html'));
 app.get(['/about', '/about.html'], (req, res) => safeSendFile(res, 'public/about.html'));
 app.get(['/resources', '/resources.html'], (req, res) => res.redirect('/'));
-app.get(['/faq', '/faq.html'], (req, res) => safeSendFile(res, 'public/faq.html'));
+app.get(['/faq', '/faq.html'], (req, res) => res.redirect(301, '/about#faqs'));
 app.get(['/contact', '/contact.html'], (req, res) => safeSendFile(res, 'public/contact.html'));
 app.get(['/privacy-policy', '/privacy-policy.html'], (req, res) => safeSendFile(res, 'public/privacy-policy.html'));
 app.get(['/terms', '/terms.html'], (req, res) => safeSendFile(res, 'public/terms.html'));

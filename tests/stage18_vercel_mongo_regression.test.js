@@ -131,7 +131,7 @@ async function runTests() {
   await test('All 15 customer-facing and administrative HTML templates exist in public/', () => {
     const requiredHtml = [
       'index.html', 'products.html', 'product-detail.html', 'packages.html',
-      'solutions.html', 'projects.html', 'calculator.html', 'savings-calculator.html',
+      'solutions.html', 'projects.html', 'calculator.html',
       'checkout.html', 'order-confirmation.html', 'tracking.html', 'about.html',
       'faq.html', 'contact.html', 'admin.html', 'privacy-policy.html',
       'terms.html', 'shipping-policy.html'
