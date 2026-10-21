@@ -891,18 +891,106 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .main-image-card {
     height: 320px;
   }
+  
   .buybox-purchase-actions {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
+    gap: 16px;
+    margin-bottom: 16px;
   }
-  .action-buttons-group {
+  
+  .qty-control-wrapper {
+    width: 100%;
+    display: flex;
     flex-direction: column;
+    gap: 8px;
   }
+  
+  .qty-stepper {
+    width: 100%;
+    height: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .qty-btn {
+    width: 52px;
+    height: 100%;
+    font-size: 1.25rem;
+  }
+  
+  .qty-input {
+    flex: 1;
+    width: auto;
+    font-size: 1.1rem;
+  }
+  
+  .action-buttons-group {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    gap: 12px;
+    flex: none;
+  }
+  
+  .btn-detail-add-cart,
+  .btn-detail-request-quote {
+    width: 100%;
+    height: 50px;
+    min-height: 50px;
+    border-radius: 10px;
+    font-size: 0.9375rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-sizing: border-box;
+    flex: none;
+    text-align: center;
+  }
+
+  .btn-detail-add-cart {
+    background-color: var(--p-yellow, #FFC400);
+    color: var(--p-navy, #061C35);
+    box-shadow: 0 4px 14px rgba(255, 196, 0, 0.35);
+  }
+
+  .btn-detail-request-quote {
+    background-color: var(--p-navy, #061C35);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 14px rgba(6, 28, 53, 0.15);
+  }
+
+  .whatsapp-consultation-row {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .btn-whatsapp-engineer {
+    width: 100%;
+    min-height: 48px;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
   .buybox-highlights-grid {
     grid-template-columns: 1fr;
   }
 }
+
