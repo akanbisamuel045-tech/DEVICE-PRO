@@ -129,11 +129,25 @@
     btn.addEventListener('click', (e) => {
       const type = btn.getAttribute('data-solution-type');
       const select = document.getElementById('sol-type');
-      if (select && type) {
+      const formSection = document.getElementById('consultation-form-section');
+      if (select && formSection && type) {
         select.value = type;
-        const formSection = document.getElementById('consultation-form-section');
-        if (formSection) {
-          formSection.scrollIntoView({ behavior: 'smooth' });
+        formSection.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        const modal = document.getElementById('quote-modal');
+        if (modal && typeof modal.showModal === 'function') {
+          const propSelect = document.getElementById('quote-property');
+          if (propSelect && type) {
+            for (let i = 0; i < propSelect.options.length; i++) {
+              if (propSelect.options[i].text.toLowerCase().includes(type.toLowerCase())) {
+                propSelect.selectedIndex = i;
+                break;
+              }
+            }
+          }
+          modal.showModal();
+        } else {
+          window.location.href = `/solutions#consultation-form-section`;
         }
       }
     });

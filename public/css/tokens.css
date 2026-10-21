@@ -205,7 +205,13 @@
   --z-index-toast: 500;
 }
 
-/* Global 80% (-20%) scale across all viewports */
+/* Global scale: 90% for Desktop & Tablet, 80% for Mobile */
 body {
-  zoom: 0.8;
+  zoom: 0.9;
+}
+
+@media (max-width: 767px) {
+  body {
+    zoom: 0.8;
+  }
 }
