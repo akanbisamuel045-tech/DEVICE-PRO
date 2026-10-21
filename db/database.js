@@ -324,6 +324,29 @@ for (const col of neededOrderCols) {
   }
 }
 
+// Stage 19: Customer Auth Schema Migration for SQLite users table
+if (sqliteAvailable) {
+  try {
+    const existingUserCols = db.prepare('PRAGMA table_info(users)').all().map(c => c.name);
+    const neededUserCols = [
+      { name: 'normalized_email', type: 'TEXT' },
+      { name: 'phone', type: 'TEXT' },
+      { name: 'google_subject', type: 'TEXT' },
+      { name: 'email_verified', type: 'INTEGER DEFAULT 0' },
+      { name: 'reset_token_hash', type: 'TEXT' },
+      { name: 'reset_token_expires', type: 'TEXT' }
+    ];
+    for (const col of neededUserCols) {
+      if (!existingUserCols.includes(col.name)) {
+        try {
+          db.exec(`ALTER TABLE users ADD COLUMN ${col.name} ${col.type}`);
+        } catch (e) {
+          console.warn(`[AUTH MIGRATION] Notice on users.${col.name}:`, e.message);
+        }
+      }
+    }
+  } catch (err) {}
+}
 
 // Seed Products if table is empty
 const countStmt = db.prepare('SELECT COUNT(*) as count FROM products');
@@ -2459,12 +2482,113 @@ function reconcileOrderPayment(orderNumber, reference, { status, channel = null,
 
 // --- AUTHENTICATION & SESSIONS ---
 function getUserByUsername(username) {
+  if (!username) return null;
   return db.prepare('SELECT * FROM users WHERE username = ? AND is_active = 1').get(username);
 }
 
+function getUserByEmail(email) {
+  if (!email || typeof email !== 'string') return null;
+  const trimmed = email.trim();
+  const normalized = trimmed.toLowerCase();
+  return db.prepare('SELECT * FROM users WHERE (email = ? OR normalized_email = ? OR username = ? OR username = ?) AND is_active = 1').get(trimmed, normalized, trimmed, normalized);
+}
+
+function getUserByGoogleSubject(googleSubject) {
+  if (!googleSubject) return null;
+  return db.prepare('SELECT * FROM users WHERE google_subject = ? AND is_active = 1').get(googleSubject);
+}
+
 function getUserById(id) {
-  const user = db.prepare('SELECT id, username, email, full_name, role, is_active, last_login, created_at FROM users WHERE id = ?').get(id);
-  return user;
+  const user = db.prepare('SELECT id, username, email, normalized_email, phone, full_name, role, is_active, google_subject, email_verified, last_login, created_at FROM users WHERE id = ?').get(id);
+  if (!user) return null;
+  return {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    normalizedEmail: user.normalized_email,
+    phone: user.phone,
+    fullName: user.full_name,
+    role: user.role,
+    googleSubject: user.google_subject,
+    emailVerified: Boolean(user.email_verified),
+    createdAt: user.created_at
+  };
+}
+
+function createUser({
+  fullName,
+  email,
+  phone = null,
+  password = null,
+  googleSubject = null,
+  emailVerified = false,
+  role = 'customer'
+}) {
+  if (!fullName || typeof fullName !== 'string') {
+    throw new Error('Full name is required.');
+  }
+  if (!email || typeof email !== 'string') {
+    throw new Error('Valid email address is required.');
+  }
+  const trimmedEmail = email.trim();
+  const normalizedEmail = trimmedEmail.toLowerCase();
+
+  const existing = db.prepare('SELECT id FROM users WHERE email = ? OR normalized_email = ? OR username = ?').get(trimmedEmail, normalizedEmail, normalizedEmail);
+  if (existing) {
+    const err = new Error('An account with this email address already exists.');
+    err.code = 'DUPLICATE_EMAIL';
+    throw err;
+  }
+
+  let passwordHash = '';
+  let salt = '';
+  if (password) {
+    const hashed = hashPassword(password);
+    passwordHash = hashed.hash;
+    salt = hashed.salt;
+  }
+
+  const stmt = db.prepare(`
+    INSERT INTO users (username, email, normalized_email, phone, password_hash, salt, full_name, role, google_subject, email_verified)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const info = stmt.run(
+    normalizedEmail,
+    trimmedEmail,
+    normalizedEmail,
+    phone ? phone.trim() : null,
+    passwordHash,
+    salt,
+    fullName.trim(),
+    'customer',
+    googleSubject || null,
+    emailVerified ? 1 : 0
+  );
+
+  const userId = info.lastInsertRowid;
+
+  logAudit({
+    userId,
+    action: 'CREATE_USER',
+    entityType: 'user',
+    entityId: userId.toString(),
+    details: `User registered: ${fullName} (${normalizedEmail}) - Role: customer`
+  });
+
+  return getUserById(userId);
+}
+
+function linkGoogleAccount(userId, googleSubject) {
+  db.prepare("UPDATE users SET google_subject = ?, email_verified = 1, updated_at = datetime('now') WHERE id = ?").run(googleSubject, userId);
+  logAudit({
+    userId,
+    action: 'LINK_GOOGLE_ACCOUNT',
+    entityType: 'user',
+    entityId: userId.toString(),
+    details: `Google account linked with subject ID ${googleSubject}`
+  });
+  return getUserById(userId);
 }
 
 function verifyUserLogin(username, password) {
@@ -2472,8 +2596,9 @@ function verifyUserLogin(username, password) {
     return null;
   }
   const cleanUser = username.trim();
-  const user = db.prepare('SELECT * FROM users WHERE (username = ? OR email = ?) AND is_active = 1').get(cleanUser, cleanUser);
-  if (!user) return null;
+  const normalizedUser = cleanUser.toLowerCase();
+  const user = db.prepare('SELECT * FROM users WHERE (username = ? OR username = ? OR email = ? OR normalized_email = ?) AND is_active = 1').get(cleanUser, normalizedUser, cleanUser, normalizedUser);
+  if (!user || !user.password_hash || !user.salt) return null;
 
   const isValid = verifyPassword(password, user.password_hash, user.salt);
   if (!isValid) return null;
@@ -2486,8 +2611,64 @@ function verifyUserLogin(username, password) {
     username: user.username,
     email: user.email,
     fullName: user.full_name,
-    role: user.role
+    role: user.role,
+    phone: user.phone || null,
+    emailVerified: Boolean(user.email_verified)
   };
+}
+
+function createPasswordResetToken(email) {
+  const user = getUserByEmail(email);
+  if (!user) return null;
+
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+  db.prepare("UPDATE users SET reset_token_hash = ?, reset_token_expires = ?, updated_at = datetime('now') WHERE id = ?").run(tokenHash, expiresAt, user.id);
+
+  logAudit({
+    userId: user.id,
+    action: 'PASSWORD_RESET_REQUESTED',
+    entityType: 'user',
+    entityId: user.id.toString(),
+    details: `Password reset token generated for ${user.email}`
+  });
+
+  return {
+    rawToken,
+    email: user.email,
+    fullName: user.full_name,
+    expiresAt
+  };
+}
+
+function resetPasswordWithToken(rawToken, newPassword) {
+  if (!rawToken || typeof rawToken !== 'string' || !newPassword || typeof newPassword !== 'string') {
+    throw new Error('Valid token and password are required.');
+  }
+
+  const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+  const user = db.prepare("SELECT * FROM users WHERE reset_token_hash = ? AND datetime(reset_token_expires) > datetime('now')").get(tokenHash);
+  if (!user) {
+    throw new Error('Invalid or expired password reset token.');
+  }
+
+  const { hash, salt } = hashPassword(newPassword);
+  db.prepare("UPDATE users SET password_hash = ?, salt = ?, reset_token_hash = NULL, reset_token_expires = NULL, updated_at = datetime('now') WHERE id = ?").run(hash, salt, user.id);
+
+  // Invalidate sessions
+  db.prepare('DELETE FROM sessions WHERE user_id = ?').run(user.id);
+
+  logAudit({
+    userId: user.id,
+    action: 'PASSWORD_RESET_COMPLETED',
+    entityType: 'user',
+    entityId: user.id.toString(),
+    details: `Password successfully reset for ${user.email}. All sessions invalidated.`
+  });
+
+  return getUserById(user.id);
 }
 
 function createSession(userId, durationDays = 7) {
@@ -2506,7 +2687,7 @@ function getSessionUser(token) {
   if (!token) return null;
 
   const session = db.prepare(`
-    SELECT s.token, s.expires_at, u.id, u.username, u.email, u.full_name, u.role, u.is_active
+    SELECT s.token, s.expires_at, u.id, u.username, u.email, u.phone, u.full_name, u.role, u.is_active, u.email_verified
     FROM sessions s
     JOIN users u ON s.user_id = u.id
     WHERE s.token = ? AND u.is_active = 1
@@ -2525,7 +2706,9 @@ function getSessionUser(token) {
     username: session.username,
     email: session.email,
     fullName: session.full_name,
-    role: session.role
+    role: session.role,
+    phone: session.phone || null,
+    emailVerified: Boolean(session.email_verified)
   };
 }
 
@@ -2776,7 +2959,12 @@ function dispatch(mongoFn, sqliteFn) {
   return function(...args) {
     if (isMongoConnected()) {
       let syncRes = null;
-      if (sqliteAvailable && typeof sqliteFn === 'function') {
+      const skipSqlite = [
+        mongoRepo.createPasswordResetToken,
+        mongoRepo.resetPasswordWithToken
+      ].includes(mongoFn);
+
+      if (!skipSqlite && sqliteAvailable && typeof sqliteFn === 'function') {
         try {
           syncRes = sqliteFn(...args);
         } catch (err) {
@@ -2791,7 +2979,19 @@ function dispatch(mongoFn, sqliteFn) {
           if (mongoRes !== null && mongoRes !== undefined) {
             return mongoRes;
           }
-          if (sqliteAvailable && syncRes !== null) return syncRes;
+          // Auth operations in MongoDB Atlas are authoritative; do not fall back to SQLite if Mongo returns null/rejected
+          const isAuthFn = [
+            mongoRepo.verifyUserLogin,
+            mongoRepo.getSessionUser,
+            mongoRepo.getUserByEmail,
+            mongoRepo.getUserByGoogleSubject,
+            mongoRepo.createPasswordResetToken,
+            mongoRepo.resetPasswordWithToken
+          ].includes(mongoFn);
+
+          if (!isAuthFn && sqliteAvailable && syncRes !== null) {
+            return syncRes;
+          }
           return mongoRes;
         } catch (err) {
           if (sqliteAvailable && syncRes !== null) return syncRes;
@@ -2877,7 +3077,13 @@ module.exports = {
   hashPassword,
   verifyPassword,
   getUserByUsername: dispatch(mongoRepo.getUserByUsername, getUserByUsername),
+  getUserByEmail: dispatch(mongoRepo.getUserByEmail, getUserByEmail),
+  getUserByGoogleSubject: dispatch(mongoRepo.getUserByGoogleSubject, getUserByGoogleSubject),
   getUserById: dispatch(mongoRepo.getUserById, getUserById),
+  createUser: dispatch(mongoRepo.createUser, createUser),
+  linkGoogleAccount: dispatch(mongoRepo.linkGoogleAccount, linkGoogleAccount),
+  createPasswordResetToken: dispatch(mongoRepo.createPasswordResetToken, createPasswordResetToken),
+  resetPasswordWithToken: dispatch(mongoRepo.resetPasswordWithToken, resetPasswordWithToken),
   verifyUserLogin: dispatch(mongoRepo.verifyUserLogin, verifyUserLogin),
   createSession: dispatch(mongoRepo.createSession, createSession),
   getSessionUser: dispatch(mongoRepo.getSessionUser, getSessionUser),

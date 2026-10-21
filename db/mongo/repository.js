@@ -928,33 +928,263 @@ function hashPassword(password) {
   return { hash, salt };
 }
 
+function verifyPassword(password, hash, salt) {
+  try {
+    if (!password || !hash || !salt) return false;
+    const verifyHash = crypto.scryptSync(password, salt, 64).toString('hex');
+    return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(verifyHash, 'hex'));
+  } catch (e) {
+    return false;
+  }
+}
+
 async function getUserByUsername(username) {
+  if (!username) return null;
   return User.findOne({ username }).lean();
+}
+
+async function getUserByEmail(email) {
+  if (!email || typeof email !== 'string') return null;
+  const trimmed = email.trim();
+  const normalized = trimmed.toLowerCase();
+  return User.findOne({
+    $or: [
+      { email: trimmed },
+      { email: normalized },
+      { normalized_email: normalized },
+      { username: trimmed },
+      { username: normalized }
+    ]
+  }).lean();
+}
+
+async function getUserByGoogleSubject(googleSubject) {
+  if (!googleSubject) return null;
+  return User.findOne({ google_subject: googleSubject }).lean();
 }
 
 async function getUserById(id) {
   const filter = typeof id === 'number' || !isNaN(id) ? { id: Number(id) } : { _id: id };
-  return User.findOne(filter).select('-password_hash -salt').lean();
+  const user = await User.findOne(filter).select('-password_hash -salt').lean();
+  if (!user) return null;
+  return {
+    id: user.id || user._id,
+    username: user.username,
+    email: user.email,
+    normalizedEmail: user.normalized_email,
+    phone: user.phone,
+    fullName: user.full_name,
+    role: user.role,
+    googleSubject: user.google_subject,
+    emailVerified: user.email_verified,
+    createdAt: user.created_at
+  };
+}
+
+async function createUser({
+  fullName,
+  email,
+  phone = null,
+  password = null,
+  googleSubject = null,
+  emailVerified = false,
+  role = 'customer'
+}) {
+  if (!fullName || typeof fullName !== 'string') {
+    throw new Error('Full name is required.');
+  }
+  if (!email || typeof email !== 'string') {
+    throw new Error('Valid email address is required.');
+  }
+  const trimmedEmail = email.trim();
+  const normalizedEmail = trimmedEmail.toLowerCase();
+
+  // Enforce customer role for public registration
+  const safeRole = role === 'customer' ? 'customer' : 'customer';
+
+  // Check duplicate email
+  const existing = await User.findOne({
+    $or: [{ email: trimmedEmail }, { normalized_email: normalizedEmail }, { username: normalizedEmail }]
+  }).lean();
+
+  if (existing) {
+    const err = new Error('An account with this email address already exists.');
+    err.code = 'DUPLICATE_EMAIL';
+    throw err;
+  }
+
+  let passwordHash = null;
+  let salt = null;
+  if (password) {
+    const hashed = hashPassword(password);
+    passwordHash = hashed.hash;
+    salt = hashed.salt;
+  }
+
+  const maxDoc = await User.findOne().sort({ id: -1 }).select('id').lean();
+  const id = maxDoc && maxDoc.id ? maxDoc.id + 1 : 1;
+
+  const user = new User({
+    id,
+    username: normalizedEmail,
+    email: trimmedEmail,
+    normalized_email: normalizedEmail,
+    phone: phone ? phone.trim() : null,
+    password_hash: passwordHash,
+    salt,
+    full_name: fullName.trim(),
+    role: safeRole,
+    google_subject: googleSubject || null,
+    email_verified: Boolean(emailVerified)
+  });
+
+  await user.save();
+
+  await logAudit({
+    userId: id,
+    action: 'CREATE_USER',
+    entityType: 'user',
+    entityId: id.toString(),
+    details: `User registered: ${fullName} (${normalizedEmail}) - Role: ${safeRole}`
+  });
+
+  return {
+    id: user.id || user._id,
+    username: user.username,
+    email: user.email,
+    normalizedEmail: user.normalized_email,
+    phone: user.phone,
+    fullName: user.full_name,
+    role: user.role,
+    googleSubject: user.google_subject,
+    emailVerified: user.email_verified,
+    createdAt: user.created_at
+  };
+}
+
+async function linkGoogleAccount(userId, googleSubject) {
+  const filter = typeof userId === 'number' || !isNaN(userId) ? { id: Number(userId) } : { _id: userId };
+  const updated = await User.findOneAndUpdate(
+    filter,
+    { google_subject: googleSubject, email_verified: true, updated_at: new Date() },
+    { returnDocument: 'after' }
+  ).lean();
+
+  await logAudit({
+    userId,
+    action: 'LINK_GOOGLE_ACCOUNT',
+    entityType: 'user',
+    entityId: userId.toString(),
+    details: `Google account linked with subject ID ${googleSubject}`
+  });
+
+  return updated;
 }
 
 async function verifyUserLogin(username, password) {
   if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
     return null;
   }
+  const clean = username.trim();
+  const normalized = clean.toLowerCase();
   const user = await User.findOne({
-    $or: [{ username: username.trim() }, { email: username.trim() }]
+    $or: [
+      { username: clean },
+      { username: normalized },
+      { email: clean },
+      { email: normalized },
+      { normalized_email: normalized }
+    ]
   }).lean();
-  if (!user) return null;
+  if (!user || !user.password_hash || !user.salt) return null;
 
   const isValid = verifyPassword(password, user.password_hash, user.salt);
   if (!isValid) return null;
+
+  // Update last_login
+  User.updateOne({ _id: user._id }, { $set: { last_login: new Date() } }).exec();
 
   return {
     id: user.id || user._id,
     username: user.username,
     email: user.email,
     fullName: user.full_name,
-    role: user.role
+    role: user.role,
+    phone: user.phone || null,
+    emailVerified: Boolean(user.email_verified)
+  };
+}
+
+async function createPasswordResetToken(email) {
+  const user = await getUserByEmail(email);
+  if (!user) {
+    return null;
+  }
+
+  const rawToken = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+  const filter = typeof user.id === 'number' || !isNaN(user.id) ? { id: Number(user.id) } : { _id: user._id };
+  await User.updateOne(filter, {
+    reset_token_hash: tokenHash,
+    reset_token_expires: expiresAt,
+    updated_at: new Date()
+  });
+
+  await logAudit({
+    userId: user.id || null,
+    action: 'PASSWORD_RESET_REQUESTED',
+    entityType: 'user',
+    entityId: (user.id || user._id).toString(),
+    details: `Password reset token generated for ${user.email}`
+  });
+
+  return {
+    rawToken,
+    email: user.email,
+    fullName: user.full_name,
+    expiresAt
+  };
+}
+
+async function resetPasswordWithToken(rawToken, newPassword) {
+  if (!rawToken || typeof rawToken !== 'string' || !newPassword || typeof newPassword !== 'string') {
+    throw new Error('Valid token and password are required.');
+  }
+
+  const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+  const user = await User.findOne({
+    reset_token_hash: tokenHash,
+    reset_token_expires: { $gt: new Date() }
+  });
+
+  if (!user) {
+    throw new Error('Invalid or expired password reset token.');
+  }
+
+  const { hash, salt } = hashPassword(newPassword);
+  user.password_hash = hash;
+  user.salt = salt;
+  user.reset_token_hash = null;
+  user.reset_token_expires = null;
+  await user.save();
+
+  // Invalidate all existing sessions
+  await Session.deleteMany({ user_id: user.id });
+
+  await logAudit({
+    userId: user.id,
+    action: 'PASSWORD_RESET_COMPLETED',
+    entityType: 'user',
+    entityId: user.id.toString(),
+    details: `Password successfully reset for ${user.email}. All sessions invalidated.`
+  });
+
+  return {
+    id: user.id,
+    email: user.email,
+    fullName: user.full_name
   };
 }
 
@@ -989,7 +1219,9 @@ async function getSessionUser(token) {
     username: user.username,
     email: user.email,
     fullName: user.full_name,
-    role: user.role
+    role: user.role,
+    phone: user.phone || null,
+    emailVerified: Boolean(user.email_verified)
   };
 }
 
@@ -1103,6 +1335,9 @@ module.exports = {
   createWarrantyRecord, getWarrantyBySerialOrCode, getWarrantiesByOrder, getWarranties,
   createSupportTicket, getSupportTickets, getSupportTicketByNumber, getSupportTicketsByOrder, updateSupportTicketStatus,
   hashPassword, verifyPassword,
-  getUserByUsername, getUserById, verifyUserLogin, createSession, getSessionUser, revokeSession,
+  getUserByUsername, getUserByEmail, getUserByGoogleSubject, getUserById,
+  createUser, linkGoogleAccount,
+  createPasswordResetToken, resetPasswordWithToken,
+  verifyUserLogin, createSession, getSessionUser, revokeSession,
   logAudit, getAuditLogs, getDatabaseStats, exportDatabaseBackup
 };

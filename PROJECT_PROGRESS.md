@@ -185,7 +185,7 @@
   - `GET /api/products`: Multi-parameter filtering (category, brand, price min/max, power tier, in_stock), sorting (featured, newest, price asc/desc, name asc), pagination, aggregated brand/category counts, and dynamic price boundaries.
   - `GET /api/products/:slug`: Product detail and related items retrieval.
   - `GET /products` and `GET /products.html`: Serving the dedicated product listing template.
-- [x] Section 1: Slim navy top information bar (`#061C35`) with verified business details (Lagos office, +234 803 123 4567, info@devicepro.com, and social channels).
+- [x] Section 1: Slim navy top information bar (`#061C35`) with verified business details (Lagos office, +234 803 388 2268, deviceprosales@gmail.com, and social channels).
 - [x] Section 2: Pure white navigation header (`#FFFFFF`) featuring authentic DEVICE PRO logo (`images/logo.svg`), active "Products" navigation link with golden yellow indicator (`#FFC400`), search modal button, cart drawer button with live item counter badge, and yellow "Get a Quote →" button.
 - [x] Section 3: Cinematic Hero banner with rooftop solar technician installation photo (`images/hero-solar-technician.jpg`), dark navy gradient overlay, breadcrumb `Home > Products`, heading `Solar Products and Power Equipment`, supporting description, and 3 yellow trust badges ("Quality Products", "Fast Delivery", "Expert Support").
 - [x] Section 4: Horizontal product category navigation selector with 7 categories, simple SVG icons, active yellow pill background (`#FFC400`), and pale blue inactive surfaces (`#F4F8FC`).
@@ -280,7 +280,7 @@
 **Completed Requirements:**
 - [x] Solutions overview and dedicated service page created at [`public/solutions.html`](file:///c:/Users/USER/Desktop/DEVICE%20PRO/public/solutions.html) adhering to [`DEVICE_PRO_ARCHITECTURE.md`](file:///c:/Users/USER/Desktop/DEVICE%20PRO/DEVICE_PRO_ARCHITECTURE.md) Sections 6.2 and 6.3.
 - [x] Express route mapping in [`server.js`](file:///c:/Users/USER/Desktop/DEVICE%20PRO/server.js) for `GET /solutions` and `GET /solutions.html`.
-- [x] Section 1: Slim navy top info bar (`#061C35`) with office address, verified phone number (`+234 803 123 4567`), email, and social icons.
+- [x] Section 1: Slim navy top info bar (`#061C35`) with office address, verified phone number (`+234 803 388 2268`), email, and social icons.
 - [x] Section 2: Pure white header navigation bar with authentic DEVICE PRO logo (`images/logo.svg`), active "Solutions" navigation pill, search trigger, cart counter, and yellow "Get a Quote →" button.
 - [x] Section 3: Cinematic Solutions Hero banner with high-contrast typography, breadcrumbs (`Home > Solutions`), certified clean energy badge, and 4 verified metrics:
   - 500+ Commissioned Sites
@@ -854,6 +854,24 @@
   - Navigation Refinement: Removed "Solutions" link from top navbar across all pages for a cleaner menu structure.
   - Page Deletion: Deleted redundant Generator vs Solar ROI calculator (`public/savings-calculator.html`, `public/css/savings-calculator.css`, `public/js/savings-calculator.js`) and redirected legacy traffic to the primary sizing engine (`/calculator`).
 
+### Stage 19: Complete Responsive Customer & Staff Authentication System
+- **Status:** Complete ✅
+- **Started:** October 2026
+- **Completed:** October 2026
+- **Summary:** Built and verified a complete, accessible, responsive authentication and account creation system adhering strictly to the approved DEVICE PRO design aesthetic.
+- **Key Deliverables:**
+  - `public/css/auth.css`: Bespoke styling for centered card, authentic solar background (`auth-bg.jpg`), official logo branding, geometric top-left & bottom-right SVG corner accents, floating focus states, dynamic password strength meter, dismissible alerts, and mobile-optimized viewports.
+  - `public/login.html` & `public/js/login.js`: Sign In page supporting customer & staff login, remember me (30-day session), password show/hide eye toggle, client-side validation, and Google OAuth entry.
+  - `public/register.html` & `public/js/register.js`: Account creation page with Full Name, Email, optional Nigerian Phone Number (+234 format), 4-tier real-time password strength meter, password match confirmation, and Terms agreement checkbox. Public registration strictly enforces role `'customer'`.
+  - `public/forgot-password.html` & `public/js/forgot-password.js`: Password recovery request UI with anti-enumeration security.
+  - `public/reset-password.html` & `public/js/reset-password.js`: Password reset interface with token verification and complexity enforcement.
+  - `db/mongo/models.js` & `db/mongo/repository.js`: Mongoose models and repository methods (`createUser`, `getUserByEmail`, `getUserByGoogleSubject`, `linkGoogleAccount`, `createPasswordResetToken`, `resetPasswordWithToken`).
+  - `db/database.js`: Dual-engine dispatching for all customer auth methods with authoritative MongoDB resolution and SQLite fallback.
+  - `server.js`: Full REST API suite (`POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`, `POST /api/auth/logout`, `POST /api/auth/forgot-password`, `POST /api/auth/reset-password`, `GET /api/auth/google`, `GET /api/auth/google/callback`) with dual HttpOnly Cookie (`devicepro_session`) and Bearer token support, IP rate-limiting, and clean URL routing (`/login`, `/register`, `/forgot-password`, `/reset-password`).
+  - `vercel.json`: Edge routing rewrites for clean auth URLs.
+  - `tests/stage19_customer_auth.test.js`: 21 automated tests passing 100% covering registration validation, RBAC security, duplicate rejection, cookie sessions, profile protection, single-use password reset tokens, and unconfigured Google OAuth degradation.
+  - `scripts/production-smoke-test.js`: Updated to smoke-test all 4 auth page routes; 27/27 tests pass cleanly.
+
 **Next Permitted Stage:** Project Lifecycle Complete — Ready for Live Production Launch & Commercial Operations
 
 ---
@@ -868,10 +886,10 @@
 | Product categories & specs | ✅ 48 items across 6 categories in SQLite with full specifications | Resolved (Stage 6, 7 & 10) |
 | Product & package pricing | ✅ Realistic Nigerian market Naira pricing with Tier-1 hardware & installation | Resolved (Stage 6 & 10) |
 | Payment gateway (Paystack/Flutterwave) | ✅ Supported: Paystack + Sandbox Engine & HMAC Webhooks | Resolved (Stage 15) |
-| Business phone number(s) | ✅ Verified +234 803 123 4567 deployed across all pages | Resolved |
-| Business email | ✅ Verified info@devicepro.com deployed across all pages | Resolved |
+| Business phone number(s) | ✅ Verified +234 803 388 2268 deployed across all pages | Resolved |
+| Business email | ✅ Verified deviceprosales@gmail.com deployed across all pages | Resolved |
 | Physical address(es) | ✅ Lagos HQ (Victoria Island), Abuja (CBD), Port Harcourt (Trans-Amadi) | Resolved (Stage 11) |
-| WhatsApp number | ✅ Configured direct WhatsApp link +234 803 123 4567 | Resolved (Stage 11) |
+| WhatsApp number | ✅ Configured direct WhatsApp link +234 803 388 2268 | Resolved (Stage 11) |
 | Warranty policy | ✅ Documented in Terms of Service, Packages, About & FAQs | Resolved (Stage 17) |
 | Returns policy | ✅ Documented in Terms of Service & Shipping Policy | Resolved (Stage 17) |
 | Privacy policy | ✅ Full NDPR & NDPA 2023 Policy in `privacy-policy.html` | Resolved (Stage 17) |

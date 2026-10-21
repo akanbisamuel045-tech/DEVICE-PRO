@@ -61,8 +61,11 @@ async function runSmokeTests() {
     { route: '/contact', title: 'Contact & Hubs' },
     { route: '/tracking', title: 'Order Tracking & Warranties' },
     { route: '/privacy-policy', title: 'Privacy Policy (NDPA)' },
-    { route: '/terms', title: 'Terms of Service' },
-    { route: '/shipping-policy', title: 'Shipping & Freight Policy' }
+    { route: '/shipping-policy', title: 'Shipping & Freight Policy' },
+    { route: '/login', title: 'Sign In (Customer & Staff)' },
+    { route: '/register', title: 'Account Registration' },
+    { route: '/forgot-password', title: 'Password Recovery' },
+    { route: '/reset-password', title: 'Password Reset' }
   ];
 
   for (const page of pages) {

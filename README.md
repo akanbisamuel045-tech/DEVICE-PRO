@@ -146,8 +146,8 @@ Comprehensive architectural records and operational guides are maintained in the
 - **Lagos Engineering Headquarters:** Victoria Island, Lagos, Nigeria
 - **Abuja Regional Hub:** Central Business District, Abuja, Nigeria
 - **Port Harcourt Logistics Hub:** Trans-Amadi Industrial Layout, Rivers State, Nigeria
-- **Emergency Hotline & WhatsApp:** `+234 803 123 4567`
-- **General Inquiries:** `info@devicepro.com` / `sales@devicepro.ng`
+- **Emergency Hotline & WhatsApp:** `+234 803 388 2268`
+- **General Inquiries:** `deviceprosales@gmail.com` / `sales@devicepro.ng`
 
 ---
 

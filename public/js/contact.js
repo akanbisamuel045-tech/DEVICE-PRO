@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } catch (err) {
         console.error('[CONTACT INQUIRY ERROR]:', err);
-        feedback.textContent = 'Network or server error. Please call +234 803 123 4567 or reach us via WhatsApp directly.';
+        feedback.textContent = 'Network or server error. Please call +234 803 388 2268 or reach us via WhatsApp directly.';
         feedback.classList.add('error');
         feedback.style.display = 'block';
       } finally {

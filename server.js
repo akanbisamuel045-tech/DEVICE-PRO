@@ -15,6 +15,8 @@ const {
   createWarrantyRecord, getWarrantyBySerialOrCode, getWarrantiesByOrder, getWarranties,
   createPaymentRecord, getPaymentByReference, getPaymentsByOrderNumber,
   updatePaymentStatus, reconcileOrderPayment,
+  createUser, getUserByEmail, getUserByGoogleSubject, linkGoogleAccount,
+  createPasswordResetToken, resetPasswordWithToken,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
   getAuditLogs, getDatabaseStats, exportDatabaseBackup, isMongoConnected, db
 } = require('./db/database');
@@ -114,12 +116,52 @@ function rateLimiter(windowMs, maxRequests) {
   };
 }
 
+// Cookie Session Helpers (Stage 19 Customer Authentication)
+function setSessionCookie(res, req, token, maxAgeSeconds = 7 * 24 * 60 * 60) {
+  const isSecure = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
+  const cookieParts = [
+    `devicepro_session=${encodeURIComponent(token)}`,
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    `Max-Age=${maxAgeSeconds}`
+  ];
+  if (isSecure) {
+    cookieParts.push('Secure');
+  }
+  res.setHeader('Set-Cookie', cookieParts.join('; '));
+}
+
+function clearSessionCookie(res, req) {
+  const isSecure = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
+  const cookieParts = [
+    'devicepro_session=',
+    'Path=/',
+    'HttpOnly',
+    'SameSite=Lax',
+    'Expires=Thu, 01 Jan 1970 00:00:00 GMT',
+    'Max-Age=0'
+  ];
+  if (isSecure) {
+    cookieParts.push('Secure');
+  }
+  res.setHeader('Set-Cookie', cookieParts.join('; '));
+}
+
 // Authentication middleware
 async function authenticate(req, res, next) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.startsWith('Bearer ')
+  let token = authHeader && authHeader.startsWith('Bearer ')
     ? authHeader.slice(7)
     : req.headers['x-auth-token'];
+
+  // Fallback to HttpOnly cookie if header not present
+  if (!token && req.headers.cookie) {
+    const match = req.headers.cookie.match(/(?:^|;\s*)devicepro_session=([^;]+)/);
+    if (match) {
+      token = decodeURIComponent(match[1]);
+    }
+  }
 
   if (!token) {
     req.user = null;
@@ -1311,27 +1353,126 @@ app.post('/api/calculator/savings', rateLimiter(60000, 60), (req, res) => {
 });
 
 // =========================================================================
-// AUTHENTICATION API (Stage 12)
+// AUTHENTICATION API (Stage 12 & Stage 19 Customer System)
 // =========================================================================
-app.post('/api/auth/login', rateLimiter(60000, 100), async (req, res) => {
+
+// POST /api/auth/register — Public customer registration
+app.post('/api/auth/register', rateLimiter(60000, 30), async (req, res) => {
   try {
-    const { username, password } = req.body || {};
-    if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
-      return res.status(400).json({ success: false, error: 'Valid username and password strings are required.' });
+    const { fullName, email, phone, password, termsAccepted } = req.body || {};
+
+    if (!fullName || typeof fullName !== 'string' || fullName.trim().length < 2) {
+      return res.status(400).json({ success: false, error: 'Full name is required (minimum 2 characters).' });
     }
 
-    const user = await verifyUserLogin(username.trim(), password);
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ success: false, error: 'A valid email address is required.' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const cleanEmail = email.trim();
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({ success: false, error: 'Please provide a valid email address.' });
+    }
+
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({ success: false, error: 'Password is required.' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 8 characters long.' });
+    }
+
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNum = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password);
+
+    if (!hasUpper || !hasLower || !hasNum || !hasSpecial) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must include uppercase, lowercase, numbers, and special characters.'
+      });
+    }
+
+    // Check duplicate account
+    const existing = await getUserByEmail(cleanEmail);
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        error: 'An account with this email address already exists. Please sign in instead.'
+      });
+    }
+
+    // Role is strictly locked to 'customer' for all public registrations
+    const newUser = await createUser({
+      fullName: fullName.trim(),
+      email: cleanEmail,
+      phone: phone && typeof phone === 'string' ? phone.trim() : null,
+      password,
+      role: 'customer'
+    });
+
+    const session = await createSession(newUser.id);
+    setSessionCookie(res, req, session.token, 7 * 24 * 60 * 60);
+
+    return res.status(201).json({
+      success: true,
+      message: 'Account created successfully. Welcome to DEVICE PRO!',
+      token: session.token,
+      expiresAt: session.expiresAt,
+      user: {
+        id: newUser.id,
+        fullName: newUser.fullName,
+        email: newUser.email,
+        phone: newUser.phone,
+        role: newUser.role
+      }
+    });
+  } catch (error) {
+    if (error.code === 'DUPLICATE_EMAIL') {
+      return res.status(409).json({
+        success: false,
+        error: 'An account with this email address already exists. Please sign in instead.'
+      });
+    }
+    console.error('[AUTH REGISTER ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to create account. Please try again.' });
+  }
+});
+
+// POST /api/auth/login — Customer & Staff sign-in
+app.post('/api/auth/login', rateLimiter(60000, 30), async (req, res) => {
+  try {
+    const { username, email, password, rememberMe } = req.body || {};
+    const identifier = (email || username || '').toString().trim();
+
+    if (!identifier || !password || typeof password !== 'string') {
+      return res.status(400).json({ success: false, error: 'Email/username and password are required.' });
+    }
+
+    const user = await verifyUserLogin(identifier, password);
     if (!user) {
-      return res.status(401).json({ success: false, error: 'Invalid username or password.' });
+      return res.status(401).json({ success: false, error: 'Invalid email/username or password.' });
     }
 
+    const maxAgeSeconds = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
     const session = await createSession(user.id);
+    setSessionCookie(res, req, session.token, maxAgeSeconds);
+
     res.json({
       success: true,
       message: `Welcome, ${user.fullName}`,
       token: session.token,
       expiresAt: session.expiresAt,
-      user
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        fullName: user.fullName,
+        role: user.role,
+        phone: user.phone || null
+      }
     });
   } catch (error) {
     console.error('[AUTH LOGIN ERROR]:', error);
@@ -1339,6 +1480,7 @@ app.post('/api/auth/login', rateLimiter(60000, 100), async (req, res) => {
   }
 });
 
+// GET /api/auth/me — Current authenticated user profile
 app.get('/api/auth/me', requireAuth, (req, res) => {
   res.json({
     success: true,
@@ -1346,12 +1488,218 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
   });
 });
 
-app.post('/api/auth/logout', requireAuth, async (req, res) => {
+// POST /api/auth/logout — Sign out and revoke active session
+app.post('/api/auth/logout', async (req, res) => {
   try {
-    await revokeSession(req.token);
+    if (req.token) {
+      await revokeSession(req.token);
+    }
+    clearSessionCookie(res, req);
     res.json({ success: true, message: 'Logged out successfully.' });
   } catch (error) {
+    clearSessionCookie(res, req);
     res.status(500).json({ success: false, error: 'Logout failed.' });
+  }
+});
+
+// POST /api/auth/forgot-password — Request password reset link
+app.post('/api/auth/forgot-password', rateLimiter(60000, 10), async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ success: false, error: 'A valid email address is required.' });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const cleanEmail = email.trim();
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({ success: false, error: 'Please enter a valid email address.' });
+    }
+
+    const resetResult = await createPasswordResetToken(cleanEmail);
+
+    // Secure anti-enumeration response
+    const responsePayload = {
+      success: true,
+      message: 'If an account exists with that email address, password reset instructions have been generated.'
+    };
+
+    if (resetResult) {
+      const resetUrl = `/reset-password.html?token=${resetResult.rawToken}`;
+      console.log(`[PASSWORD RESET LINK]: http://${req.headers.host || 'localhost:3000'}${resetUrl}`);
+
+      // In non-production or debug mode, expose test link for automated testing
+      if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_AUTH_DEBUG === 'true') {
+        responsePayload.debugResetToken = resetResult.rawToken;
+        responsePayload.debugResetUrl = resetUrl;
+      }
+    }
+
+    res.json(responsePayload);
+  } catch (error) {
+    console.error('[FORGOT PASSWORD ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to process password reset request.' });
+  }
+});
+
+// POST /api/auth/reset-password — Set new password with verified token
+app.post('/api/auth/reset-password', rateLimiter(60000, 15), async (req, res) => {
+  try {
+    const { token, password } = req.body || {};
+    if (!token || typeof token !== 'string') {
+      return res.status(400).json({ success: false, error: 'Reset token is required.' });
+    }
+
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({ success: false, error: 'New password is required.' });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 8 characters long.' });
+    }
+
+    const hasUpper = /[A-Z]/.test(password);
+    const hasLower = /[a-z]/.test(password);
+    const hasNum = /[0-9]/.test(password);
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password);
+
+    if (!hasUpper || !hasLower || !hasNum || !hasSpecial) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must include uppercase, lowercase, numbers, and special characters.'
+      });
+    }
+
+    await resetPasswordWithToken(token.trim(), password);
+
+    res.json({
+      success: true,
+      message: 'Password has been reset successfully. You may now sign in with your new password.'
+    });
+  } catch (error) {
+    console.error('[RESET PASSWORD ERROR]:', error.message);
+    res.status(400).json({
+      success: false,
+      error: error.message || 'Invalid or expired password reset token. Please request a new one.'
+    });
+  }
+});
+
+// GET /api/auth/google — Initiate Google OAuth authorization flow
+app.get('/api/auth/google', (req, res) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+  if (!clientId || !clientSecret) {
+    const acceptHeader = req.headers['accept'] || '';
+    if (acceptHeader.includes('application/json') || req.xhr) {
+      return res.status(503).json({
+        success: false,
+        error: 'Google OAuth is not configured on this server. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.',
+        configured: false
+      });
+    }
+    return res.redirect('/login.html?error=google_not_configured');
+  }
+
+  const crypto = require('crypto');
+  const state = crypto.randomBytes(16).toString('hex');
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${req.protocol}://${req.get('host')}/api/auth/google/callback`;
+
+  // Set state in temporary cookie for CSRF verification
+  res.setHeader('Set-Cookie', `devicepro_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600`);
+
+  const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' +
+    `client_id=${encodeURIComponent(clientId)}` +
+    `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+    '&response_type=code' +
+    `&scope=${encodeURIComponent('openid email profile')}` +
+    `&state=${encodeURIComponent(state)}` +
+    '&access_type=online' +
+    '&prompt=select_account';
+
+  res.redirect(authUrl);
+});
+
+// GET /api/auth/google/callback — Google OAuth callback handler
+app.get('/api/auth/google/callback', async (req, res) => {
+  const { code, state, error } = req.query;
+
+  if (error || !code) {
+    return res.redirect('/login.html?error=google_auth_failed');
+  }
+
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
+    return res.redirect('/login.html?error=google_not_configured');
+  }
+
+  // Validate CSRF state
+  const cookies = req.headers.cookie || '';
+  const match = cookies.match(/(?:^|;\s*)devicepro_oauth_state=([^;]+)/);
+  const cookieState = match ? decodeURIComponent(match[1]) : null;
+
+  if (!cookieState || cookieState !== state) {
+    return res.redirect('/login.html?error=csrf_state_mismatch');
+  }
+
+  try {
+    const redirectUri = process.env.GOOGLE_REDIRECT_URI || `${req.protocol}://${req.get('host')}/api/auth/google/callback`;
+
+    // Exchange code for token
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: 'authorization_code'
+      })
+    });
+
+    const tokenData = await tokenResponse.json();
+    if (!tokenData.access_token) {
+      throw new Error(tokenData.error_description || 'Failed to exchange authorization code');
+    }
+
+    // Fetch user info from Google
+    const userinfoResponse = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` }
+    });
+    const googleUser = await userinfoResponse.json();
+
+    if (!googleUser.email || !googleUser.sub) {
+      throw new Error('Google did not return verified profile information');
+    }
+
+    // Check if user exists by Google Subject ID or email
+    let user = await getUserByGoogleSubject(googleUser.sub);
+
+    if (!user) {
+      const existingByEmail = await getUserByEmail(googleUser.email);
+      if (existingByEmail) {
+        user = await linkGoogleAccount(existingByEmail.id, googleUser.sub);
+      } else {
+        user = await createUser({
+          fullName: googleUser.name || googleUser.email.split('@')[0],
+          email: googleUser.email,
+          googleSubject: googleUser.sub,
+          emailVerified: true,
+          role: 'customer'
+        });
+      }
+    }
+
+    const session = await createSession(user.id);
+    setSessionCookie(res, req, session.token, 30 * 24 * 60 * 60);
+
+    return res.redirect('/?signed_in=true');
+  } catch (err) {
+    console.error('[GOOGLE OAUTH CALLBACK ERROR]:', err);
+    return res.redirect('/login.html?error=google_login_failed');
   }
 });
 
@@ -1743,6 +2091,10 @@ function safeSendFile(res, relativePath) {
   }
 }
 
+app.get(['/login', '/login.html', '/signin'], (req, res) => safeSendFile(res, 'public/login.html'));
+app.get(['/register', '/register.html', '/signup'], (req, res) => safeSendFile(res, 'public/register.html'));
+app.get(['/forgot-password', '/forgot-password.html'], (req, res) => safeSendFile(res, 'public/forgot-password.html'));
+app.get(['/reset-password', '/reset-password.html'], (req, res) => safeSendFile(res, 'public/reset-password.html'));
 app.get(['/checkout', '/checkout.html'], (req, res) => safeSendFile(res, 'public/checkout.html'));
 app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => safeSendFile(res, 'public/order-confirmation.html'));
 app.get(['/tracking', '/tracking.html'], (req, res) => safeSendFile(res, 'public/tracking.html'));

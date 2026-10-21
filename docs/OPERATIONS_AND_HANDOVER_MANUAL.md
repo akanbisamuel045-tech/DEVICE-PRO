@@ -263,4 +263,4 @@ If a production release introduces unforeseen critical errors:
 - **Electrical Engineering & Safety:** COREN Lead Engineer (`engineering@devicepro.ng`)
 - **Commercial & Customer Operations:** Commercial Director (`sales@devicepro.ng`)
 - **Data Protection & Legal Compliance:** Data Protection Officer (`dpo@devicepro.ng`)
-- **Emergency Escalation Hotline:** `+234 803 123 4567` (24/7 Priority Support)
+- **Emergency Escalation Hotline:** `+234 803 388 2268` (24/7 Priority Support)

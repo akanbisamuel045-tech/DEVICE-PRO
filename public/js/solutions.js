@@ -112,7 +112,7 @@
       } catch (err) {
         if (feedbackMsg) {
           feedbackMsg.className = 'form-feedback-msg error';
-          feedbackMsg.textContent = 'Failed to submit request. Please reach us directly on WhatsApp (+234 803 123 4567).';
+          feedbackMsg.textContent = 'Failed to submit request. Please reach us directly on WhatsApp (+234 803 388 2268).';
           feedbackMsg.style.display = 'block';
         }
       } finally {

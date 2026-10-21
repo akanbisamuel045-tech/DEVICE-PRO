@@ -374,7 +374,7 @@ Unified design pattern for all 4 sectors: Residential, Commercial, Industrial, a
 +------------------------------------------------------------------------------------+
 | [STEP 1: CONTACT IDENTITY]                                                         |
 |  Full Name: [ John Chukwuemeka                             ]                       |
-|  Phone Number: [ +234 803 123 4567                         ] (Must be WhatsApp)    |
+|  Phone Number: [ +234 803 388 2268                         ] (Must be WhatsApp)    |
 |  Email Address: [ john.c@example.com                       ]                       |
 |  Contact Preference: (o) WhatsApp  ( ) Phone Call  ( ) Email                       |
 +------------------------------------------------------------------------------------+

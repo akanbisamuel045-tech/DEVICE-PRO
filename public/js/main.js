@@ -196,4 +196,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // 7. Dynamic User Authentication Header Indicator
+  const checkUserSession = async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          document.querySelectorAll('.header-user-btn').forEach(btn => {
+            btn.setAttribute('title', `Account: ${data.user.fullName || data.user.email} (${data.user.role})`);
+            btn.classList.add('user-logged-in');
+            btn.style.color = '#F59E0B'; // Highlight with DEVICE PRO warm golden yellow
+          });
+        }
+      }
+    } catch (_) {}
+  };
+  checkUserSession();
 });

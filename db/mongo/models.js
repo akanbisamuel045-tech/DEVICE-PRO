@@ -201,12 +201,18 @@ const supportTicketSchema = new mongoose.Schema({
 // 10. User Schema
 const userSchema = new mongoose.Schema({
   id: { type: Number, index: true },
-  username: { type: String, required: true, unique: true, index: true },
+  username: { type: String, unique: true, sparse: true, index: true },
   email: { type: String, required: true, unique: true, index: true },
-  password_hash: { type: String, required: true },
-  salt: { type: String, required: true },
+  normalized_email: { type: String, unique: true, sparse: true, index: true },
+  phone: { type: String },
+  password_hash: { type: String },
+  salt: { type: String },
   full_name: { type: String, required: true },
-  role: { type: String, default: 'sales', index: true }
+  role: { type: String, default: 'customer', index: true },
+  google_subject: { type: String, unique: true, sparse: true, index: true },
+  email_verified: { type: Boolean, default: false },
+  reset_token_hash: { type: String, index: true },
+  reset_token_expires: { type: Date }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
 // 11. Session Schema

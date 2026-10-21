@@ -256,14 +256,14 @@
       resScheduledDate.textContent = comm.installationScheduledDate || 'Pending Schedule Confirmation';
     }
     if (resEngineerPhone) {
-      resEngineerPhone.textContent = comm.engineerPhone || '+234 803 123 4567';
+      resEngineerPhone.textContent = comm.engineerPhone || '+234 803 388 2268';
     }
     if (resCommissioningStatus) {
       resCommissioningStatus.textContent = comm.commissioningStatus.toUpperCase();
     }
     if (resCertIdBadge) {
-      resCertIdBadge.textContent = comm.commissioningCertificateId 
-        ? `Certificate ID: ${comm.commissioningCertificateId}` 
+      resCertIdBadge.textContent = comm.commissioningCertificateId
+        ? `Certificate ID: ${comm.commissioningCertificateId}`
         : 'Certificate: Issued Post-Commissioning';
     }
 
@@ -377,8 +377,8 @@
     if (certYearsText) certYearsText.textContent = `${w.warrantyYears} Years Manufacturer Warranty`;
 
     if (certDaysRemaining) {
-      certDaysRemaining.textContent = w.isExpired 
-        ? 'Warranty Expired' 
+      certDaysRemaining.textContent = w.isExpired
+        ? 'Warranty Expired'
         : `${w.daysRemaining.toLocaleString()} Days Remaining`;
       certDaysRemaining.style.color = w.isExpired ? '#EF4444' : '#15803D';
     }
