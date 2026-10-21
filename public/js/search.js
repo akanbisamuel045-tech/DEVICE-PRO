@@ -33,7 +33,7 @@
       <div class="search-dialog-inner">
         <div class="dialog-header-row">
           <h2 id="search-dialog-title">Search Solar Equipment &amp; Solutions</h2>
-          <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search">✕</button>
+          <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search"><i data-lucide="x" class="lucide-sm"></i></button>
         </div>
 
         <form id="global-search-form" onsubmit="event.preventDefault(); window.DeviceProSearch.submitSearch();">
@@ -43,7 +43,7 @@
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input type="search" id="site-search-input" placeholder="Search solar panels, hybrid inverters, batteries, packages..." autocomplete="off" autofocus>
-            <button type="button" class="btn-clear-search" id="btn-clear-search-input" aria-label="Clear search query">✕</button>
+            <button type="button" class="btn-clear-search" id="btn-clear-search-input" aria-label="Clear search query"><i data-lucide="x" class="lucide-sm"></i></button>
             <div class="search-input-shortcuts">
               <span class="kbd-badge">ESC</span>
             </div>
@@ -260,7 +260,7 @@
           <li>
             <a href="/packages#${pkg.slug}" class="search-result-item" data-url="/packages#${pkg.slug}">
               <div class="result-item-left">
-                <div class="result-icon-box">📦</div>
+                <div class="result-icon-box"><i data-lucide="package" class="lucide-sm" style="color:var(--color-slate-400);"></i></div>
                 <div class="result-text-col">
                   <div class="result-title">${escapeHtml(pkg.name)}</div>
                   <div class="result-sub">${escapeHtml(pkg.power_rating || 'Turnkey System')} • ${escapeHtml(pkg.specifications || '')}</div>
@@ -286,7 +286,7 @@
           <li>
             <a href="/projects#${c.slug}" class="search-result-item" data-url="/projects#${c.slug}">
               <div class="result-item-left">
-                <div class="result-icon-box">⚡</div>
+                <div class="result-icon-box"><i data-lucide="zap" class="lucide-sm" style="color:#FFB90C;"></i></div>
                 <div class="result-text-col">
                   <div class="result-title">${escapeHtml(c.title)}</div>
                   <div class="result-sub">${escapeHtml(c.location || 'Nigeria')} • ${c.capacity_kva || 0}kVA System</div>

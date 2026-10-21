@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="/css/tokens.css?v=12">
   <link rel="stylesheet" href="/css/homepage.css?v=12">
   <link rel="stylesheet" href="/css/products.css?v=2">
-  <link rel="stylesheet" href="/css/product-detail.css?v=2">
+  <link rel="stylesheet" href="/css/product-detail.css?v=3">
   <link rel="stylesheet" href="/css/footer.css?v=1">
 </head>
 <body class="devicepro-body product-detail-page">
@@ -243,7 +243,13 @@
           <div class="buybox-brand-rating-row">
             <span class="buybox-brand-tag" id="buybox-brand">Jinko Solar</span>
             <div class="buybox-rating">
-              <span class="stars" aria-label="5 out of 5 stars">★★★★★</span>
+              <span class="stars" aria-label="5 out of 5 stars" style="display:inline-flex; gap:2px; color:#FFB90C;">
+                <i data-lucide="star" style="width:14px;height:14px;fill:#FFB90C;stroke:#FFB90C;"></i>
+                <i data-lucide="star" style="width:14px;height:14px;fill:#FFB90C;stroke:#FFB90C;"></i>
+                <i data-lucide="star" style="width:14px;height:14px;fill:#FFB90C;stroke:#FFB90C;"></i>
+                <i data-lucide="star" style="width:14px;height:14px;fill:#FFB90C;stroke:#FFB90C;"></i>
+                <i data-lucide="star" style="width:14px;height:14px;fill:#FFB90C;stroke:#FFB90C;"></i>
+              </span>
               <span class="rating-text">Tier-1 Engineered Standard</span>
             </div>
           </div>
@@ -296,18 +302,12 @@
 
             <div class="action-buttons-group">
               <button type="button" class="btn-detail-add-cart" id="btn-add-to-cart">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="9" cy="21" r="1"></circle>
-                  <circle cx="20" cy="21" r="1"></circle>
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                </svg>
+                <i data-lucide="shopping-cart" class="lucide-md"></i>
                 <span>Add to Equipment Cart</span>
               </button>
 
               <button type="button" class="btn-detail-request-quote" id="btn-request-install" data-trigger-quote>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
+                <i data-lucide="zap" class="lucide-md"></i>
                 <span>Request Engineered Installation</span>
               </button>
             </div>
@@ -317,9 +317,7 @@
           <!-- Direct WhatsApp Consultation Link -->
           <div class="whatsapp-consultation-row">
             <a href="https://wa.me/2348031234567?text=Hello%20DEVICE%20PRO%2C%20I%20am%20interested%20in%20pricing%20and%20availability%20for%20this%20product." target="_blank" rel="noopener" class="btn-whatsapp-engineer" id="btn-whatsapp-consult">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366">
-                <path d="M20.52 3.48A11.93 11.93 0 0 0 12.07 0C5.46 0 .09 5.37.09 11.98c0 2.11.55 4.17 1.6 5.99L0 24l6.21-1.63a11.96 11.96 0 0 0 5.86 1.51h.01c6.61 0 11.98-5.37 11.98-11.98 0-3.2-.12-6.22-3.54-8.42zM12.07 21.87h-.01a9.94 9.94 0 0 1-5.07-1.39l-.36-.21-3.76.99 1-3.67-.23-.38a9.92 9.92 0 0 1-1.52-5.23c0-5.5 4.47-9.97 9.98-9.97 2.66 0 5.16 1.04 7.04 2.92a9.91 9.91 0 0 1 2.92 7.05c0 5.5-4.47 9.97-9.97 9.97zm5.47-7.47c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.68.15-.2.3-.78.98-.95 1.18-.18.2-.35.23-.65.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.79-1.68-2.09-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.53.15-.18.2-.3.3-.5.1-.2.05-.38-.03-.53-.08-.15-.68-1.63-.93-2.24-.24-.58-.49-.5-.68-.51h-.58c-.2 0-.53.08-.8.38-.28.3-1.05 1.03-1.05 2.51 0 1.49 1.08 2.92 1.23 3.12.15.2 2.13 3.25 5.16 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.78-.73 2.03-1.43.25-.7.25-1.3.18-1.43-.08-.13-.28-.2-.58-.35z"></path>
-              </svg>
+              <i data-lucide="message-circle" class="lucide-md" style="color:#25D366;"></i>
               <span>Chat with a Solar Sizing Engineer on WhatsApp</span>
             </a>
           </div>
@@ -327,21 +325,14 @@
           <!-- Logistics & Support Box -->
           <div class="logistics-perks-box">
             <div class="perk-row">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#082D50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="1" y="3" width="15" height="13"></rect>
-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                <circle cx="18.5" cy="18.5" r="2.5"></circle>
-              </svg>
+              <i data-lucide="truck" class="lucide-md" style="color: #082D50;"></i>
               <div class="perk-info">
                 <strong>Nationwide Express Dispatch</strong>
                 <span>Lagos 24-48 hrs; South-West, Abuja, Port Harcourt &amp; others 3-5 days.</span>
               </div>
             </div>
             <div class="perk-row">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#082D50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
-              </svg>
+              <i data-lucide="wrench" class="lucide-md" style="color: #082D50;"></i>
               <div class="perk-info">
                 <strong>Certified Installer Dispatch</strong>
                 <span>Optional turnkey installation available across Nigeria with commissioning sign-off.</span>
@@ -616,7 +607,7 @@
     <div class="search-dialog-inner">
       <div class="dialog-header-row">
         <h2 id="search-dialog-title">Search Equipment &amp; Solutions</h2>
-        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search">✕</button>
+        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search"><i data-lucide="x"></i></button>
       </div>
       <form id="global-search-form" onsubmit="event.preventDefault();">
         <div class="search-input-box">
@@ -639,7 +630,7 @@
   <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <h2 id="cart-drawer-title">Your Equipment Cart</h2>
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body" id="cart-drawer-body"></div>
     <div class="drawer-footer">
@@ -656,7 +647,7 @@
 
   <dialog id="quote-modal" aria-labelledby="quote-modal-title">
     <div class="modal-inner">
-      <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close quote modal">✕</button>
+      <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close quote modal"><i data-lucide="x"></i></button>
       <h2 id="quote-modal-title">Request a Custom Solar Quote</h2>
       <p class="modal-subtitle">Get an engineered solar sizing proposal tailored to your roof, appliances, and monthly energy budget.</p>
       
@@ -686,7 +677,7 @@
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <img src="/images/logo.svg" alt="DEVICE PRO" style="height: 32px;" id="mobile-nav-title">
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body">
       <div class="mobile-nav-links-list">
@@ -708,6 +699,8 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Client-side Logic -->
+  <script src="/js/lucide.min.js"></script>
+  <script src="/js/lucide-init.js"></script>
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/product-detail.js?v=1"></script>

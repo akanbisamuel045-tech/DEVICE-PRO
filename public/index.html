@@ -608,15 +608,15 @@
         <div class="layout-container">
           <div class="sector-nav-track">
             <a href="#residential" class="sector-nav-btn active">
-              <span class="sector-nav-icon">🏡</span>
+              <span class="sector-nav-icon"><i data-lucide="home"></i></span>
               <span>Residential Solar</span>
             </a>
             <a href="#commercial" class="sector-nav-btn">
-              <span class="sector-nav-icon">🏢</span>
+              <span class="sector-nav-icon"><i data-lucide="building-2"></i></span>
               <span>Commercial &amp; Business</span>
             </a>
             <a href="#industrial" class="sector-nav-btn">
-              <span class="sector-nav-icon">🏭</span>
+              <span class="sector-nav-icon"><i data-lucide="factory"></i></span>
               <span>Industrial &amp; Micro-Grids</span>
             </a>
           </div>
@@ -631,7 +631,7 @@
             <div class="pillar-image-card">
               <img src="/images/solution-residential.jpg" alt="Modern Nigerian home powered by DEVICE PRO solar panels" class="pillar-img" loading="lazy">
               <div class="pillar-overlay-badge">
-                <span class="badge-icon">⚡</span>
+                <span class="badge-icon"><i data-lucide="zap"></i></span>
                 <span>24/7 Silent Power • Zero Noise</span>
               </div>
             </div>
@@ -682,7 +682,7 @@
             <div class="pillar-image-card">
               <img src="/images/solution-commercial.jpg" alt="Commercial office complex with commercial rooftop solar installation" class="pillar-img" loading="lazy">
               <div class="pillar-overlay-badge">
-                <span class="badge-icon">💼</span>
+                <span class="badge-icon"><i data-lucide="briefcase"></i></span>
                 <span>60% – 75% Reduction in Diesel OPEX</span>
               </div>
             </div>
@@ -733,7 +733,7 @@
             <div class="pillar-image-card">
               <img src="/images/industrial-power-storage-schematic.jpg" alt="Industrial Megawatt BESS storage schematic and hardware" class="pillar-img" loading="lazy">
               <div class="pillar-overlay-badge">
-                <span class="badge-icon">🏭</span>
+                <span class="badge-icon"><i data-lucide="factory"></i></span>
                 <span>Heavy Inductive Surge &amp; High-Voltage BESS</span>
               </div>
             </div>
@@ -1348,7 +1348,7 @@
             <img src="images/consultation-adviser.jpg"
               alt="DevicePro solar consultant discussing equipment options with a customer in the showroom">
             <div class="consultation-visual-badge">
-              ✓ Certified Solar Engineers on Staff · Victoria Island Showroom
+              <i data-lucide="check-circle-2" style="width:16px;height:16px;color:#16A34A;vertical-align:middle;margin-right:6px;"></i>Certified Solar Engineers on Staff · Victoria Island Showroom
             </div>
           </div>
 
@@ -1593,7 +1593,7 @@
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h2 id="search-dialog-title" style="font-size:1.25rem; font-weight:700; margin:0;">Search Equipment &amp;
           Solutions</h2>
-        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search">✕</button>
+        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search"><i data-lucide="x"></i></button>
       </div>
       <form onsubmit="event.preventDefault();">
         <div class="search-input-box">
@@ -1619,7 +1619,7 @@
        ========================================================================= -->
   <dialog id="quote-modal" aria-labelledby="quote-modal-title">
     <div class="modal-inner">
-      <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close quote modal">✕</button>
+      <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close quote modal"><i data-lucide="x"></i></button>
       <h2 id="quote-modal-title" style="font-size:1.5rem; font-weight:800; margin:0 0 0.5rem; color:#0A121F;">Request a
         Custom Solar Quote</h2>
       <p style="font-size:0.875rem; color:#64748B; margin-bottom:1.75rem;">Get an engineered solar sizing proposal
@@ -1655,7 +1655,7 @@
   <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <h2 id="cart-drawer-title">Your Equipment &amp; Package Cart</h2>
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body" id="cart-drawer-body">
       <!-- Empty state or cart item list -->
@@ -1691,7 +1691,7 @@
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <img src="images/logo.svg" alt="DEVICE PRO" style="height: 32px;" id="mobile-nav-title">
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body">
       <div style="display:flex; flex-direction:column; gap:16px;">
@@ -1711,6 +1711,8 @@
   </nav>
 
   <!-- Core JavaScript -->
+  <script src="/js/lucide.min.js"></script>
+  <script src="/js/lucide-init.js"></script>
   <script src="/js/cart.js?v=25"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/solutions.js?v=2"></script>

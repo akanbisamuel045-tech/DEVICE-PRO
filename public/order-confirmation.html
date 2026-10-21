@@ -45,7 +45,7 @@
 
       <div class="header-actions">
         <a href="tel:+2348031234567" class="btn-support-hotline">
-          📞 +234 803 123 4567
+          <i data-lucide="phone" class="lucide-sm" style="margin-right:6px;"></i>+234 803 123 4567
         </a>
       </div>
     </div>
@@ -87,7 +87,7 @@
       <section class="fulfillment-tracker-section" aria-label="Order Tracking Lifecycle">
         <div class="tracker-steps-row">
           <div class="tracker-step completed">
-            <div class="step-dot">✓</div>
+            <div class="step-dot"><i data-lucide="check" class="lucide-sm"></i></div>
             <span class="step-lbl">1. Order Placed</span>
             <span class="step-sub">System Reserved</span>
           </div>
@@ -173,7 +173,7 @@
         <!-- Totals Summary Grid -->
         <div class="invoice-totals-grid">
           <div class="bank-transfer-details-box" id="bank-transfer-details-box">
-            <h4 class="bank-box-title">🏛️ Direct Bank Transfer Settlement</h4>
+            <h4 class="bank-box-title"><i data-lucide="landmark" class="lucide-md lucide-gold" style="margin-right:6px;"></i>Direct Bank Transfer Settlement</h4>
             <p class="bank-box-note">Please initiate payment to our designated corporate collection account:</p>
             <div class="bank-info-grid">
               <div class="bank-row"><span>Bank Name:</span> <strong>Zenith Bank PLC</strong></div>
@@ -186,7 +186,7 @@
 
           <div class="online-payment-confirmed-box" id="online-payment-confirmed-box" style="display:none; background:rgba(22,163,74,0.08); border:1px solid #16A34A; border-radius:8px; padding:1.25rem;">
             <div style="display:flex; align-items:center; gap:8px; color:#16A34A; font-weight:800; font-size:1.05rem; margin-bottom:0.5rem;">
-              <span>✓</span> <span>Payment Confirmed via Paystack</span>
+              <span><i data-lucide="check" class="lucide-sm"></i></span> <span>Payment Confirmed via Paystack</span>
             </div>
             <p style="font-size:0.875rem; color:#475569; margin:0 0 0.75rem; line-height:1.4;">
               Your payment has been verified by the payment gateway and your hardware is reserved for warehouse testing and dispatch.
@@ -223,7 +223,7 @@
       <!-- Action Buttons Row -->
       <div class="confirmation-actions-row">
         <a id="btn-live-tracking" href="/tracking" class="btn-whatsapp-action" style="background: #061C35; color: #FFFFFF; border: 1px solid rgba(255,185,12,0.4);">
-          <span>📍 Live Order &amp; Installation Tracker →</span>
+          <span><i data-lucide="map-pin" class="lucide-sm" style="margin-right:6px;"></i>Live Order &amp; Installation Tracker →</span>
         </a>
 
         <button type="button" class="btn-print-invoice" onclick="window.print();">
@@ -236,7 +236,7 @@
         </button>
 
         <a id="btn-whatsapp-confirm" href="https://wa.me/2348031234567" target="_blank" rel="noopener" class="btn-whatsapp-action">
-          <span>💬 Confirm on WhatsApp</span>
+          <span><i data-lucide="message-circle" class="lucide-sm" style="margin-right:6px;"></i>Confirm on WhatsApp</span>
         </a>
 
         <a href="/products" class="btn-continue-shopping">
@@ -375,6 +375,8 @@
   </footer>
 
   <!-- Scripts -->
+  <script src="/js/lucide.min.js"></script>
+  <script src="/js/lucide-init.js"></script>
   <script src="/js/cart.js?v=2"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/order-confirmation.js?v=1"></script>

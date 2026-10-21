@@ -229,7 +229,7 @@
       resMilestonesTimeline.innerHTML = (tracking.milestones || []).map(m => {
         const isDone = m.status === 'completed';
         const isActive = m.status === 'active' || m.status === 'current';
-        const markerContent = isDone ? '✓' : m.step;
+        const markerContent = isDone ? '<i data-lucide="check" class="lucide-sm"></i>' : m.step;
 
         return `
           <div class="timeline-step ${isDone ? 'completed' : ''} ${isActive ? 'active' : ''}">

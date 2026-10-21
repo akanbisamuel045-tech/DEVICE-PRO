@@ -227,7 +227,7 @@
     <!-- Project Details Modal -->
     <dialog id="project-modal" class="project-detail-modal" aria-labelledby="modal-project-title">
       <div class="project-modal-inner">
-        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close case study details">✕</button>
+        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close case study details"><i data-lucide="x"></i></button>
         <div id="modal-project-content">
           <!-- Populated when user clicks "Read Full Engineering Case Study" -->
         </div>
@@ -393,7 +393,7 @@
     <div class="search-dialog-inner">
       <div class="dialog-header-row">
         <h2 id="search-dialog-title">Search Portfolio &amp; Equipment</h2>
-        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search">✕</button>
+        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search"><i data-lucide="x"></i></button>
       </div>
       <form id="global-search-form" onsubmit="event.preventDefault();">
         <div class="search-input-box">
@@ -410,7 +410,7 @@
   <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <h2 id="cart-drawer-title">Equipment Cart</h2>
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body" id="cart-drawer-body"></div>
     <div class="drawer-footer">
@@ -428,7 +428,7 @@
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <img src="/images/logo.svg" alt="DEVICE PRO" style="height: 32px;" id="mobile-nav-title">
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body">
       <div class="mobile-nav-links-list">
@@ -449,6 +449,8 @@
 
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
+  <script src="/js/lucide.min.js"></script>
+  <script src="/js/lucide-init.js"></script>
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/projects.js?v=1"></script>

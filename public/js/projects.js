@@ -205,7 +205,7 @@
           </div>
 
           <div class="project-outcome-box">
-            <span class="outcome-icon">📈</span>
+            <span class="outcome-icon"><i data-lucide="trending-up" class="lucide-sm"></i></span>
             <span class="outcome-text">${p.outcome}</span>
           </div>
 
@@ -238,7 +238,7 @@
 
     const hardwareList = project.hardware.map(item => `
       <li>
-        <span style="color:#16A34A; font-weight:bold;">✓</span>
+        <span style="color:#16A34A; font-weight:bold;"><i data-lucide="check" class="lucide-sm"></i></span>
         <span>${item}</span>
       </li>
     `).join('');
@@ -247,7 +247,7 @@
       <div class="modal-header-section">
         <span class="modal-proj-tag">${project.sector_label}</span>
         <h2 id="modal-project-title" class="modal-proj-title">${project.title}</h2>
-        <div class="modal-proj-loc">📍 Location: ${project.location}</div>
+        <div class="modal-proj-loc"><i data-lucide="map-pin" class="lucide-sm" style="margin-right:4px;"></i> Location: ${project.location}</div>
       </div>
 
       <img src="/${project.image}" alt="${project.title}" style="width:100%; height:280px; object-fit:cover; border-radius:10px; margin-bottom:1.5rem;">
@@ -265,8 +265,8 @@
 
       <h4 class="modal-section-title">Measured Outcomes &amp; ROI</h4>
       <div class="project-outcome-box" style="margin-bottom:1.5rem;">
-        <span class="outcome-icon">📈</span>
-        <span class="outcome-text" style="font-size:0.9rem;">${project.outcome}</span>
+        <span class="outcome-icon"><i data-lucide="trending-up" class="lucide-sm"></i></span>
+        <span class="outcome-text" style="font-size:0.9rem">${project.outcome}</span>
       </div>
 
       <div class="modal-actions-row">
@@ -274,7 +274,7 @@
           Request Site Survey for Your Building →
         </a>
         <a href="https://wa.me/2348031234567?text=${waText}" target="_blank" rel="noopener" class="wa-direct-btn" style="flex-shrink:0;">
-          <span>💬 WhatsApp Engineer</span>
+          <span><i data-lucide="message-circle" class="lucide-sm" style="margin-right:6px;"></i> WhatsApp Engineer</span>
         </a>
       </div>
     `;

@@ -213,7 +213,7 @@
                 <button type="button" class="cart-qty-btn" data-qty-delta="1" data-id="${item.id}" style="width: 24px; height: 24px; border-radius: 4px; border: 1px solid #CBD5E1; background: #FFFFFF; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;">+</button>
               </div>
             </div>
-            <button type="button" class="cart-remove-btn" data-remove-id="${item.id}" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; font-size: 1.1rem; line-height: 1;" title="Remove item">✕</button>
+            <button type="button" class="cart-remove-btn" data-remove-id="${item.id}" style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; display: inline-flex; align-items: center; justify-content: center;" title="Remove item"><i data-lucide="trash-2" class="lucide-sm"></i></button>
           </div>
         `;
       });
@@ -252,7 +252,8 @@
 
       const toast = document.createElement('div');
       toast.style.cssText = 'background: #061C35; color: #FFFFFF; border-left: 4px solid #FFC400; padding: 12px 18px; border-radius: 6px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-size: 0.875rem; font-weight: 600; display: flex; align-items: center; gap: 8px; pointer-events: auto; animation: toastIn 0.3s ease;';
-      toast.innerHTML = `<span>✓</span> <span>${msg}</span>`;
+      toast.innerHTML = `<span><i data-lucide="check" class="lucide-sm" style="color:#FFC400;"></i></span> <span>${msg}</span>`;
+      if (window.refreshLucideIcons) window.refreshLucideIcons();
 
       container.appendChild(toast);
 
@@ -289,7 +290,7 @@
         drawer.innerHTML = `
           <div class="drawer-header" style="display:flex; justify-content:space-between; align-items:center; padding:18px 24px; border-bottom:1px solid #E2E8F0; background:#FFFFFF;">
             <h2 id="cart-drawer-title" style="font-size:1.15rem; font-weight:700; color:#0F172A; margin:0;">Your Equipment &amp; Package Cart</h2>
-            <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer" style="width:36px; height:36px; border-radius:50%; border:1px solid #E2E8F0; background:#FFFFFF; color:#64748B; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+            <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer" style="width:36px; height:36px; border-radius:50%; border:1px solid #E2E8F0; background:#FFFFFF; color:#64748B; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i data-lucide="x" class="lucide-sm"></i></button>
           </div>
           <div class="drawer-body" id="cart-drawer-body" style="padding:24px; overflow-y:auto; flex:1; background:#FFFFFF;">
             <!-- Rendered dynamically -->

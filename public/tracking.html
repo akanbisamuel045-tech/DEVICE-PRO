@@ -344,7 +344,7 @@
             </button>
 
             <a href="https://wa.me/2348031234567" target="_blank" rel="noopener" class="btn-whatsapp-direct" id="res-whatsapp-link">
-              <span>💬 Contact Dispatch Coordinator</span>
+              <span><i data-lucide="message-circle" class="lucide-sm" style="margin-right:6px;"></i>Contact Dispatch Coordinator</span>
             </a>
           </div>
 
@@ -592,7 +592,7 @@
                 <span>Track This Ticket Status</span>
               </button>
               <a href="https://wa.me/2348031234567" target="_blank" rel="noopener" class="btn-whatsapp-direct">
-                <span>💬 Escalate on WhatsApp</span>
+                <span><i data-lucide="message-circle" class="lucide-sm" style="margin-right:6px;"></i>Escalate on WhatsApp</span>
               </a>
             </div>
           </div>
@@ -826,7 +826,7 @@
     <div class="search-dialog-inner">
       <div class="dialog-header-row">
         <h2 id="search-dialog-title">Search Equipment &amp; Solutions</h2>
-        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search">✕</button>
+        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search"><i data-lucide="x"></i></button>
       </div>
       <form id="global-search-form" onsubmit="event.preventDefault();">
         <div class="search-input-box">
@@ -841,7 +841,7 @@
   <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <h2 id="cart-drawer-title">Your Equipment Cart</h2>
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body" id="cart-drawer-body"></div>
     <div class="drawer-footer">
@@ -860,6 +860,8 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Client-side Scripts -->
+  <script src="/js/lucide.min.js"></script>
+  <script src="/js/lucide-init.js"></script>
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/tracking.js?v=1"></script>

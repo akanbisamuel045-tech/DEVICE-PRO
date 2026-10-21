@@ -219,7 +219,7 @@
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
             <input type="search" id="faq-search-input" placeholder="Type your question (e.g. Inverter AC, battery lifespan, ATS generator, warranty...)" aria-label="Search FAQs">
-            <button type="button" id="faq-search-clear" class="btn-clear-search" aria-label="Clear search">✕</button>
+            <button type="button" id="faq-search-clear" class="btn-clear-search" aria-label="Clear search"><i data-lucide="x" class="lucide-sm"></i></button>
           </div>
         </div>
       </div>
@@ -264,7 +264,7 @@
 
         <!-- Empty search result state -->
         <div id="faq-empty-state" class="faq-empty-state" style="display: none;">
-          <div class="empty-icon">🔍</div>
+          <div class="empty-icon"><i data-lucide="search" class="lucide-xl" style="color:var(--color-slate-400);"></i></div>
           <h3>No matching questions found</h3>
           <p>We couldn't find any questions matching your query. Would you like to consult directly with an engineer?</p>
           <a href="/contact" class="btn-primary-yellow">Ask an Engineer via WhatsApp →</a>
@@ -433,7 +433,7 @@
   <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <h2 id="cart-drawer-title">Your Equipment Cart</h2>
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body" id="cart-drawer-body">
       <!-- Empty state or cart item list -->
@@ -469,7 +469,7 @@
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <img src="/images/logo.svg" alt="DEVICE PRO" style="height: 32px;" id="mobile-nav-title">
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body">
       <div class="mobile-nav-links-list">
@@ -489,6 +489,8 @@
   </nav>
 
   <!-- Client-side Scripts -->
+  <script src="/js/lucide.min.js"></script>
+  <script src="/js/lucide-init.js"></script>
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/main.js?v=12"></script>

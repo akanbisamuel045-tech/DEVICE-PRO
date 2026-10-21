@@ -2468,7 +2468,11 @@ function getUserById(id) {
 }
 
 function verifyUserLogin(username, password) {
-  const user = db.prepare('SELECT * FROM users WHERE (username = ? OR email = ?) AND is_active = 1').get(username, username);
+  if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
+    return null;
+  }
+  const cleanUser = username.trim();
+  const user = db.prepare('SELECT * FROM users WHERE (username = ? OR email = ?) AND is_active = 1').get(cleanUser, cleanUser);
   if (!user) return null;
 
   const isValid = verifyPassword(password, user.password_hash, user.salt);

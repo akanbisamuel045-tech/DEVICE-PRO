@@ -100,7 +100,7 @@
           if (feedbackMsg) {
             feedbackMsg.className = 'form-feedback-msg success';
             feedbackMsg.innerHTML = `
-              <strong>✓ Sizing Request Confirmed!</strong><br>
+              <strong><i data-lucide="check" class="lucide-sm" style="margin-right:4px;"></i> Sizing Request Confirmed!</strong><br>
               Reference ID: <strong>${data.referenceId || 'DP-SOLAR'}</strong>. A DEVICE PRO senior engineer will contact your WhatsApp (${phone}) within 2 business hours with an indicative system design.
             `;
             feedbackMsg.style.display = 'block';

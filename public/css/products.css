@@ -617,10 +617,14 @@ body.products-page-body {
 }
 
 .custom-checkbox input[type="checkbox"]:checked ~ .checkbox-box::after {
-  content: '✓';
-  font-size: 11px;
-  font-weight: 900;
-  color: var(--p-navy);
+  content: '';
+  display: block;
+  width: 4px;
+  height: 8px;
+  border: solid var(--p-navy);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-bottom: 2px;
 }
 
 .custom-checkbox:hover .checkbox-box {

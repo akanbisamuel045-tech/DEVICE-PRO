@@ -1315,9 +1315,9 @@ app.post('/api/calculator/savings', rateLimiter(60000, 60), (req, res) => {
 // =========================================================================
 app.post('/api/auth/login', rateLimiter(60000, 100), async (req, res) => {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ success: false, error: 'Username and password are required.' });
+    const { username, password } = req.body || {};
+    if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
+      return res.status(400).json({ success: false, error: 'Valid username and password strings are required.' });
     }
 
     const user = await verifyUserLogin(username.trim(), password);

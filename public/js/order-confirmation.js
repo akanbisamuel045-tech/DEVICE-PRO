@@ -158,7 +158,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
       navigator.clipboard.writeText(num).then(() => {
-        copyBtn.innerHTML = '✓';
+        copyBtn.innerHTML = '<i data-lucide="check" class="lucide-sm"></i>';
+        if (window.refreshLucideIcons) window.refreshLucideIcons();
         setTimeout(() => {
           copyBtn.innerHTML = `
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -202,7 +203,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (stepPayment) {
       stepPayment.className = 'tracker-step completed';
-      if (dotPayment) dotPayment.textContent = '✓';
+      if (dotPayment) {
+        dotPayment.innerHTML = '<i data-lucide="check" class="lucide-sm"></i>';
+        if (window.refreshLucideIcons) window.refreshLucideIcons();
+      }
       if (subPayment) subPayment.textContent = 'Verified & Settled';
     }
     if (stepQc) {

@@ -1182,5 +1182,54 @@ textarea:focus-visible,
   }
 }
 
+/* =========================================================================
+   LUCIDE ICONS (lucide.dev) DESIGN SYSTEM INTEGRATION
+   ========================================================================= */
+.lucide,
+[data-lucide] {
+  display: inline-block;
+  vertical-align: middle;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+}
+
+.lucide-sm {
+  width: 14px;
+  height: 14px;
+}
+
+.lucide-md {
+  width: 18px;
+  height: 18px;
+}
+
+.lucide-lg {
+  width: 24px;
+  height: 24px;
+}
+
+.lucide-xl {
+  width: 32px;
+  height: 32px;
+}
+
+.lucide-gold {
+  color: #FFB90C;
+}
+
+.lucide-blue {
+  color: #0157A2;
+}
+
+.lucide-green {
+  color: #16A34A;
+}
+
 
 

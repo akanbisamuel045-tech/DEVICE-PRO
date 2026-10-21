@@ -174,8 +174,9 @@ async function getProducts({
   if (inStock !== null && inStock !== undefined) {
     filter.stock_status = inStock ? 'in_stock' : { $ne: 'in_stock' };
   }
-  if (search) {
-    const sRegex = new RegExp(search, 'i');
+  if (search && typeof search === 'string') {
+    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const sRegex = new RegExp(escaped, 'i');
     filter.$or = [
       { name: sRegex },
       { brand: sRegex },
@@ -405,6 +406,16 @@ async function createEnquiry(data) {
     ip_address: data.ipAddress || data.ip_address || ''
   });
   await enquiry.save();
+
+  await logAudit({
+    userId: null,
+    action: 'CREATE_ENQUIRY',
+    entityType: 'enquiry',
+    entityId: referenceId,
+    details: `Solar enquiry received from ${clientName} (${phone}) - Subject: ${enquiry.subject}`,
+    ipAddress: data.ipAddress || data.ip_address || ''
+  });
+
   return enquiry.toObject();
 }
 
@@ -427,7 +438,17 @@ async function getEnquiryByRef(referenceId) {
 
 async function updateEnquiryStatus(id, status, notes = '', adminUserId = null) {
   const filter = typeof id === 'number' || !isNaN(id) ? { id: Number(id) } : { _id: id };
-  return Enquiry.findOneAndUpdate(filter, { status, admin_notes: notes, updated_at: new Date() }, { returnDocument: 'after' }).lean();
+  const updated = await Enquiry.findOneAndUpdate(filter, { status, admin_notes: notes, updated_at: new Date() }, { returnDocument: 'after' }).lean();
+
+  await logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_ENQUIRY_STATUS',
+    entityType: 'enquiry',
+    entityId: id.toString(),
+    details: `Status changed to ${status}. Notes: ${notes}`
+  });
+
+  return updated;
 }
 
 // --- QUOTES ---
@@ -466,6 +487,16 @@ async function createQuote(data) {
     ip_address: data.ipAddress || data.ip_address || ''
   });
   await quote.save();
+
+  await logAudit({
+    userId: null,
+    action: 'CREATE_QUOTE',
+    entityType: 'quote',
+    entityId: referenceId,
+    details: `Solar quote request from ${clientName} (${phone}) - Property: ${quote.property_type}`,
+    ipAddress: data.ipAddress || data.ip_address || ''
+  });
+
   return quote.toObject();
 }
 
@@ -488,7 +519,17 @@ async function getQuoteByRef(referenceId) {
 
 async function updateQuoteStatus(id, status, notes = '', adminUserId = null) {
   const filter = typeof id === 'number' || !isNaN(id) ? { id: Number(id) } : { _id: id };
-  return Quote.findOneAndUpdate(filter, { status, admin_notes: notes, updated_at: new Date() }, { returnDocument: 'after' }).lean();
+  const updated = await Quote.findOneAndUpdate(filter, { status, admin_notes: notes, updated_at: new Date() }, { returnDocument: 'after' }).lean();
+
+  await logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_QUOTE_STATUS',
+    entityType: 'quote',
+    entityId: id.toString(),
+    details: `Quote status updated to ${status}. Notes: ${notes}`
+  });
+
+  return updated;
 }
 
 // --- ORDERS ---
@@ -569,6 +610,16 @@ async function createOrder({
   });
 
   await order.save();
+
+  await logAudit({
+    userId: null,
+    action: 'CREATE_ORDER',
+    entityType: 'order',
+    entityId: orderNumber,
+    details: `Order created by ${customerName} for ₦${totalAmount.toLocaleString()} (${verifiedItems.length} items)`,
+    ipAddress
+  });
+
   return getOrderByNumber(orderNumber);
 }
 
@@ -591,11 +642,21 @@ async function getOrderByNumber(orderNumber) {
 
 async function updateOrderStatus(id, orderStatus, paymentStatus, adminNotes = '', adminUserId = null) {
   const filter = typeof id === 'number' || !isNaN(id) ? { id: Number(id) } : { _id: id };
-  return Order.findOneAndUpdate(
+  const updated = await Order.findOneAndUpdate(
     filter,
     { order_status: orderStatus, payment_status: paymentStatus, admin_notes: adminNotes, updated_at: new Date() },
     { returnDocument: 'after' }
   ).lean();
+
+  await logAudit({
+    userId: adminUserId,
+    action: 'UPDATE_ORDER_STATUS',
+    entityType: 'order',
+    entityId: id.toString(),
+    details: `Order status: ${orderStatus}, Payment: ${paymentStatus}. Notes: ${adminNotes}`
+  });
+
+  return updated;
 }
 
 async function updateOrderFulfillment(id, { waybillNumber, courierPartner, estimatedDelivery, adminNotes = '', adminUserId = null }) {
@@ -877,8 +938,11 @@ async function getUserById(id) {
 }
 
 async function verifyUserLogin(username, password) {
+  if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
+    return null;
+  }
   const user = await User.findOne({
-    $or: [{ username }, { email: username }]
+    $or: [{ username: username.trim() }, { email: username.trim() }]
   }).lean();
   if (!user) return null;
 

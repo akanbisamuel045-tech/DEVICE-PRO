@@ -56,13 +56,13 @@
         <span class="demo-title">Quick Test Accounts (Seeded in SQLite):</span>
         <div class="demo-pills">
           <button type="button" class="demo-pill" data-user="admin" data-pass="Admin@DevicePro2026!">
-            🛡️ Superadmin (admin)
+            <i data-lucide="shield" class="lucide-sm" style="margin-right:4px;"></i> Superadmin (admin)
           </button>
           <button type="button" class="demo-pill" data-user="engineer.babatunde" data-pass="Engineer@DevicePro2026!">
-            ⚡ Lead Engineer (babatunde)
+            <i data-lucide="zap" class="lucide-sm" style="margin-right:4px;"></i> Lead Engineer (babatunde)
           </button>
           <button type="button" class="demo-pill" data-user="sales.lagos" data-pass="Sales@DevicePro2026!">
-            💼 Showroom Sales (lagos)
+            <i data-lucide="briefcase" class="lucide-sm" style="margin-right:4px;"></i> Showroom Sales (lagos)
           </button>
         </div>
       </div>
@@ -614,7 +614,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="modal-order-title">Order Details</h3>
-        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close">✕</button>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close"><i data-lucide="x"></i></button>
       </div>
       <div class="modal-body" id="modal-order-body">
         <!-- Rendered dynamically -->
@@ -631,7 +631,7 @@
     <div class="modal-card" style="max-width: 680px;">
       <div class="modal-header">
         <h3 id="modal-ful-title">Logistics Dispatch &amp; COREN Commissioning</h3>
-        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close">✕</button>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close"><i data-lucide="x"></i></button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="modal-ful-order-id">
@@ -758,7 +758,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="modal-tkt-title">Support Ticket Review</h3>
-        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close">✕</button>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close"><i data-lucide="x"></i></button>
       </div>
       <div class="modal-body">
         <input type="hidden" id="modal-tkt-id">
@@ -817,7 +817,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="modal-quote-title">Solar Consultation Proposal</h3>
-        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close">✕</button>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close"><i data-lucide="x"></i></button>
       </div>
       <div class="modal-body" id="modal-quote-body">
         <!-- Rendered dynamically -->
@@ -834,7 +834,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3 id="modal-product-title">Edit Equipment SKU</h3>
-        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close">✕</button>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close"><i data-lucide="x"></i></button>
       </div>
       <form id="product-edit-form">
         <input type="hidden" id="edit-prod-id">
@@ -881,7 +881,7 @@
     <div class="modal-card">
       <div class="modal-header">
         <h3>Add New Equipment SKU</h3>
-        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close">✕</button>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close"><i data-lucide="x"></i></button>
       </div>
       <form id="add-product-form">
         <div class="modal-body">
@@ -930,6 +930,8 @@
   </dialog>
 
   <!-- Client Script -->
+  <script src="/js/lucide.min.js"></script>
+  <script src="/js/lucide-init.js"></script>
   <script src="/js/admin.js?v=1"></script>
 </body>
 </html>

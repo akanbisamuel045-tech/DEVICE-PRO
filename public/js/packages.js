@@ -58,7 +58,7 @@
     if (!cart || cart.length === 0) {
       drawerBody.innerHTML = `
         <div style="text-align:center; padding: 3rem 1rem; color: #64748B;">
-          <p style="font-size: 2.5rem; margin-bottom: 0.5rem;">🛒</p>
+          <p style="margin-bottom: 0.5rem;"><i data-lucide="shopping-cart" class="lucide-xl" style="width:48px;height:48px;color:#CBD5E1;"></i></p>
           <p style="font-weight: 700; color: #061C35;">Your cart is empty</p>
           <p style="font-size: 0.85rem; margin-top: 0.25rem;">Explore our turnkey solar packages or individual hardware.</p>
         </div>
@@ -79,7 +79,7 @@
             <div style="font-size:0.85rem; font-weight:700; color:#061C35;">${item.name}</div>
             <div style="font-size:0.8rem; color:#64748B;">${formatNaira(item.price)} × ${item.qty}</div>
           </div>
-          <button type="button" class="cart-remove-btn" data-remove-idx="${idx}" style="background:none; border:none; color:#EF4444; font-size:1.1rem; cursor:pointer;" aria-label="Remove item">✕</button>
+          <button type="button" class="cart-remove-btn" data-remove-idx="${idx}" style="background:none; border:none; color:#EF4444; cursor:pointer; padding:4px; display:inline-flex; align-items:center; justify-content:center;" aria-label="Remove item"><i data-lucide="trash-2" class="lucide-sm"></i></button>
         </div>
       `;
     }).join('');
@@ -173,13 +173,13 @@
         <article class="package-card ${isFeatured}" data-pkg-id="${pkg.id}">
           <div class="package-card-header">
             <span class="pkg-type-badge">${d.system_type || 'Hybrid Solar'}</span>
-            ${pkg.featured ? '<span class="pkg-featured-badge">★ Most Popular</span>' : ''}
+            ${pkg.featured ? '<span class="pkg-featured-badge"><i data-lucide="star" class="lucide-sm" style="fill:#FFB90C;stroke:#FFB90C;margin-right:3px;"></i> Most Popular</span>' : ''}
           </div>
 
           <div class="package-img-wrap">
             <img src="/${pkg.image_url}" alt="${pkg.name}" class="package-img" loading="lazy">
             <div class="package-audience-strip">
-              <span>🎯 ${d.intended_audience || 'Residential Power'}</span>
+              <span><i data-lucide="target" class="lucide-sm" style="margin-right:4px;"></i>${d.intended_audience || 'Residential Power'}</span>
             </div>
           </div>
 
@@ -193,7 +193,7 @@
                 <span class="pkg-price-current">${formatNaira(pkg.price_ngn)}</span>
                 ${pkg.previous_price_ngn ? `<span class="pkg-price-previous">${formatNaira(pkg.previous_price_ngn)}</span>` : ''}
               </div>
-              <div class="pkg-price-tax-note">✓ Hardware + Certified Installation Included</div>
+              <div class="pkg-price-tax-note"><i data-lucide="check" class="lucide-sm" style="margin-right:4px;"></i> Hardware + Certified Installation Included</div>
             </div>
 
             <!-- 4 Core Spec Chips -->
@@ -221,7 +221,7 @@
               
               <div class="card-accordion-item open">
                 <button type="button" class="card-acc-btn" aria-expanded="true">
-                  <span>🛠 Included Hardware</span>
+                  <span><i data-lucide="wrench" class="lucide-sm" style="margin-right:6px;"></i>Included Hardware</span>
                   <span class="card-acc-chevron">▾</span>
                 </button>
                 <div class="card-acc-panel">
@@ -234,20 +234,20 @@
 
               <div class="card-accordion-item">
                 <button type="button" class="card-acc-btn" aria-expanded="false">
-                  <span>💡 Supported Loads &amp; Runtimes</span>
+                  <span><i data-lucide="lightbulb" class="lucide-sm" style="margin-right:6px;"></i>Supported Loads &amp; Runtimes</span>
                   <span class="card-acc-chevron">▾</span>
                 </button>
                 <div class="card-acc-panel">
                   <ul class="acc-load-list">
                     ${loadsHtml}
                   </ul>
-                  ${d.load_exclusions_note ? `<p class="acc-notice-text">⚠️ Note: ${d.load_exclusions_note}</p>` : ''}
+                  ${d.load_exclusions_note ? `<p class="acc-notice-text"><i data-lucide="alert-triangle" class="lucide-sm" style="margin-right:4px;"></i> Note: ${d.load_exclusions_note}</p>` : ''}
                 </div>
               </div>
 
               <div class="card-accordion-item">
                 <button type="button" class="card-acc-btn" aria-expanded="false">
-                  <span>🚚 Installation &amp; Warranty</span>
+                  <span><i data-lucide="truck" class="lucide-sm" style="margin-right:6px;"></i>Installation &amp; Warranty</span>
                   <span class="card-acc-chevron">▾</span>
                 </button>
                 <div class="card-acc-panel">
@@ -274,7 +274,7 @@
                   Request Proposal
                 </button>
                 <a href="https://wa.me/2348031234567?text=${waText}" target="_blank" rel="noopener" class="btn-pkg-wa">
-                  <span>💬 WhatsApp</span>
+                  <span><i data-lucide="message-circle" class="lucide-sm" style="margin-right:4px;"></i> WhatsApp</span>
                 </a>
               </div>
             </div>
@@ -424,7 +424,7 @@
           if (feedbackMsg) {
             feedbackMsg.className = 'form-feedback-msg success';
             feedbackMsg.innerHTML = `
-              <strong>✓ Package Sizing Request Confirmed!</strong><br>
+              <strong><i data-lucide="check" class="lucide-sm" style="margin-right:4px;"></i> Package Sizing Request Confirmed!</strong><br>
               Reference ID: <strong>${data.referenceId || 'DP-PKG'}</strong>. Our technical engineering team will review your roof and electrical requirements and contact your WhatsApp (${phone}) within 2 business hours with an official quotation.
             `;
             feedbackMsg.style.display = 'block';

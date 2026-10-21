@@ -802,7 +802,7 @@
     <div class="search-dialog-inner">
       <div class="dialog-header-row">
         <h2 id="search-dialog-title">Search Equipment &amp; Solutions</h2>
-        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search">✕</button>
+        <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close search"><i data-lucide="x"></i></button>
       </div>
       <form id="global-search-form" onsubmit="event.preventDefault();">
         <div class="search-input-box">
@@ -829,7 +829,7 @@
   <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <h2 id="cart-drawer-title">Your Equipment Cart</h2>
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart drawer"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body" id="cart-drawer-body">
       <!-- Empty state or cart item list -->
@@ -861,7 +861,7 @@
        ========================================================================= -->
   <dialog id="quote-modal" aria-labelledby="quote-modal-title">
     <div class="modal-inner">
-      <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close quote modal">✕</button>
+      <button type="button" class="modal-close-btn" data-close-dialog aria-label="Close quote modal"><i data-lucide="x"></i></button>
       <h2 id="quote-modal-title">Request a Custom Solar Quote</h2>
       <p class="modal-subtitle">Get an engineered solar sizing proposal tailored to your roof, appliances, and monthly energy budget.</p>
       
@@ -894,7 +894,7 @@
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <img src="/images/logo.svg" alt="DEVICE PRO" style="height: 32px;" id="mobile-nav-title">
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu">✕</button>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close navigation menu"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body">
       <div class="mobile-nav-links-list">
@@ -919,7 +919,7 @@
   <aside id="mobile-filter-drawer" class="drawer" aria-labelledby="mobile-filter-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
       <h2 id="mobile-filter-title">Filter Products</h2>
-      <button type="button" class="modal-close-btn" id="close-mobile-filters" aria-label="Close filters">✕</button>
+      <button type="button" class="modal-close-btn" id="close-mobile-filters" aria-label="Close filters"><i data-lucide="x"></i></button>
     </div>
     <div class="drawer-body" id="mobile-filters-drawer-content">
       <!-- Sidebar form clones or teleports here on mobile -->
@@ -936,6 +936,8 @@
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Client-side Logic -->
+  <script src="/js/lucide.min.js"></script>
+  <script src="/js/lucide-init.js"></script>
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/products.js?v=2"></script>
