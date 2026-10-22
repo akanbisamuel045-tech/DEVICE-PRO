@@ -175,8 +175,24 @@
           checkoutBtn.removeAttribute('disabled');
           checkoutBtn.style.opacity = '1';
           checkoutBtn.style.cursor = 'pointer';
-          checkoutBtn.onclick = function () {
-            window.location.href = '/checkout';
+          checkoutBtn.onclick = async function (e) {
+            if (e && e.preventDefault) e.preventDefault();
+            const originalText = checkoutBtn.innerHTML;
+            checkoutBtn.disabled = true;
+            checkoutBtn.style.opacity = '0.7';
+
+            try {
+              const res = await fetch('/api/auth/me', { credentials: 'include' });
+              if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.user) {
+                  window.location.href = '/checkout';
+                  return;
+                }
+              }
+            } catch (_) {}
+
+            window.location.href = '/login?redirect=' + encodeURIComponent('/checkout');
           };
         }
       }

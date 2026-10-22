@@ -2353,7 +2353,12 @@ app.get(['/forgot-password', '/forgot-password.html'], (req, res) => safeSendFil
 app.get(['/verify-reset-code', '/verify-reset-code.html'], (req, res) => safeSendFile(res, 'public/verify-reset-code.html'));
 app.get(['/reset-password', '/reset-password.html'], (req, res) => safeSendFile(res, 'public/reset-password.html'));
 app.get(['/profile', '/profile.html', '/account'], (req, res) => safeSendFile(res, 'public/profile.html'));
-app.get(['/checkout', '/checkout.html'], (req, res) => safeSendFile(res, 'public/checkout.html'));
+app.get(['/checkout', '/checkout.html'], authenticate, (req, res) => {
+  if (!req.user) {
+    return res.redirect('/login?redirect=%2Fcheckout');
+  }
+  safeSendFile(res, 'public/checkout.html');
+});
 app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => safeSendFile(res, 'public/order-confirmation.html'));
 app.get(['/tracking', '/tracking.html'], (req, res) => safeSendFile(res, 'public/tracking.html'));
 app.get(['/admin', '/admin.html', '/admin/login'], (req, res) => safeSendFile(res, 'public/admin.html'));

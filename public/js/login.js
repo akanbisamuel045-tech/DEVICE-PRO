@@ -29,6 +29,13 @@
   const rawRedirect = urlParams.get('redirect') || urlParams.get('returnUrl') || '';
   const safeRedirect = validateRedirectUrl(rawRedirect);
 
+  // Forward safe redirect to registration link if specified
+  if (safeRedirect && safeRedirect !== '/') {
+    document.querySelectorAll('.auth-card-footer a, a[href="/register.html"], a[href="/register"]').forEach(a => {
+      a.href = `/register.html?redirect=${encodeURIComponent(safeRedirect)}`;
+    });
+  }
+
   // Validate internal redirect destination to prevent open redirect vulnerabilities
   function validateRedirectUrl(url) {
     if (!url || typeof url !== 'string') return '/';

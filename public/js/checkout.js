@@ -7,6 +7,40 @@
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
+  // Mandatory Customer Authentication Check
+  // Redirect unauthenticated customers immediately to login preserving checkout destination
+  (async function verifyCheckoutAuth() {
+    try {
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (!res.ok) {
+        window.location.href = '/login?redirect=' + encodeURIComponent('/checkout');
+        return;
+      }
+      const data = await res.json();
+      if (!data.success || !data.user) {
+        window.location.href = '/login?redirect=' + encodeURIComponent('/checkout');
+        return;
+      }
+
+      // Pre-fill customer details from authenticated account
+      const user = data.user;
+      const nameInput = document.getElementById('cust-name');
+      const emailInput = document.getElementById('cust-email');
+      const phoneInput = document.getElementById('cust-phone');
+      if (nameInput && !nameInput.value && (user.fullName || user.username)) {
+        nameInput.value = user.fullName || user.username;
+      }
+      if (emailInput && !emailInput.value && user.email) {
+        emailInput.value = user.email;
+      }
+      if (phoneInput && !phoneInput.value && user.phone) {
+        phoneInput.value = user.phone;
+      }
+    } catch (_) {
+      window.location.href = '/login?redirect=' + encodeURIComponent('/checkout');
+    }
+  })();
+
   const cartGrid = document.getElementById('checkout-grid-container');
   const emptyState = document.getElementById('checkout-empty-state');
   const form = document.getElementById('checkout-form');

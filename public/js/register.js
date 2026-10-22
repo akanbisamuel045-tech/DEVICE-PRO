@@ -56,6 +56,13 @@
   const rawRedirect = urlParams.get('redirect') || urlParams.get('returnUrl') || '';
   const safeRedirect = validateRedirectUrl(rawRedirect);
 
+  // Forward safe redirect to login link if specified
+  if (safeRedirect && safeRedirect !== '/') {
+    document.querySelectorAll('.auth-card-footer a, a[href="/login.html"], a[href="/login"]').forEach(a => {
+      a.href = `/login.html?redirect=${encodeURIComponent(safeRedirect)}`;
+    });
+  }
+
   function validateRedirectUrl(url) {
     if (!url || typeof url !== 'string') return '/';
     const trimmed = url.trim();

@@ -119,6 +119,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Checkout Auth Protection: Redirect unauthenticated customers to login
+  document.addEventListener('click', async (e) => {
+    const checkoutBtn = e.target.closest('#btn-cart-checkout, .btn-checkout-submit, [data-trigger-checkout]');
+    if (!checkoutBtn) return;
+    if (checkoutBtn.disabled || checkoutBtn.getAttribute('aria-disabled') === 'true') return;
+
+    // Do not intercept order submission button on checkout page itself
+    if (checkoutBtn.id === 'btn-submit-order' || checkoutBtn.closest('#checkout-form')) {
+      return;
+    }
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (authChecked && cachedUser) {
+      window.location.href = '/checkout';
+      return;
+    }
+
+    try {
+      checkoutBtn.style.opacity = '0.7';
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          cachedUser = data.user;
+          authChecked = true;
+          window.location.href = '/checkout';
+          return;
+        }
+      }
+    } catch (_) {}
+    finally {
+      checkoutBtn.style.opacity = '';
+    }
+
+    window.location.href = '/login?redirect=' + encodeURIComponent('/checkout');
+  }, true);
+
   // Mobile Menu Triggers
   const mobileToggle = document.getElementById('mobile-menu-btn');
   if (mobileToggle) {
