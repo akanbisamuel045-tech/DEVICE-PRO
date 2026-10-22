@@ -1120,6 +1120,232 @@ textarea:focus-visible,
   margin: 12px 0;
 }
 
+/* ==========================================================================
+   MOBILE DRAWER (SIDEBAR) CUSTOMER PROFILE SECTION
+   ========================================================================== */
+.mobile-drawer-profile-section {
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.mobile-drawer-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.mobile-drawer-user-card:hover {
+  background: #E2E8F0;
+  border-color: #CBD5E1;
+}
+
+.mobile-drawer-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 2px solid #F59E0B;
+  color: #B45309;
+  font-size: 1.05rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.mobile-drawer-avatar-status {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #10B981;
+  border: 2px solid #FFFFFF;
+}
+
+.mobile-drawer-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mobile-drawer-user-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0B192C;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.mobile-drawer-user-email {
+  font-size: 0.75rem;
+  color: #64748B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.mobile-drawer-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.mobile-drawer-role-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  background: #EFF6FF;
+  color: #1E40AF;
+  border-radius: 9999px;
+  border: 1px solid #BFDBFE;
+  text-transform: uppercase;
+}
+
+.mobile-drawer-profile-sublinks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-drawer-sublink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.mobile-drawer-sublink:hover,
+.mobile-drawer-sublink.active {
+  background: #F1F5F9;
+  color: #0157A2;
+}
+
+.mobile-drawer-sublink-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-drawer-sublink .tab-counter {
+  background: #E2E8F0;
+  color: #334155;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 9999px;
+}
+
+.mobile-drawer-signout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #FEE2E2;
+  background: #FEF2F2;
+  color: #DC2626;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all 0.2s ease;
+}
+
+.mobile-drawer-signout-btn:hover {
+  background: #FEE2E2;
+  color: #B91C1C;
+}
+
+.mobile-drawer-guest-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #F8FAFC;
+  border: 1px dashed #CBD5E1;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.mobile-drawer-guest-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #E2E8F0;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mobile-drawer-guest-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.mobile-drawer-guest-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0B192C;
+  margin: 0;
+}
+
+.mobile-drawer-guest-desc {
+  font-size: 0.75rem;
+  color: #64748B;
+  margin: 0;
+}
+
+.mobile-drawer-guest-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0B192C;
+  background: #F59E0B;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-top: 4px;
+  width: fit-content;
+}
+
+.mobile-drawer-guest-btn:hover {
+  background: #D97706;
+  color: #FFFFFF;
+}
+
 /* Universal Header Circle Button & Cart Badge */
 .header-circle-btn {
   width: 40px;

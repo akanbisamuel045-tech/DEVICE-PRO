@@ -60,7 +60,7 @@
               d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
             </path>
           </svg>
-          <a href="tel:+2348031234567" class="info-link">+234 803 388 2268</a>
+          <a href="tel:+2348033882268" class="info-link">+234 803 388 2268</a>
         </span>
 
         <span class="info-separator" aria-hidden="true">|</span>
@@ -141,7 +141,8 @@
         </button>
 
         <!-- Profile / Account Trigger -->
-        <a href="/login?redirect=/profile" class="header-circle-btn header-user-btn" aria-label="My Profile" title="My Profile" data-user-profile-btn>
+        <a href="/login?redirect=/profile" class="header-circle-btn header-user-btn" aria-label="My Profile"
+          title="My Profile" data-user-profile-btn>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -851,7 +852,7 @@
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
                 </path>
               </svg>
-              <a href="tel:+2348031234567">+234 803 388 2268</a>
+              <a href="tel:+2348033882268">+234 803 388 2268</a>
             </div>
             <div class="footer-contact-item">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -984,6 +985,80 @@
           data-lucide="x"></i></button>
     </div>
     <div class="drawer-body">
+      <!-- Customer Profile in Mobile Sidebar -->
+      <div class="mobile-drawer-profile-section" id="mobile-drawer-profile-root">
+        <a href="/profile" class="mobile-drawer-user-card" id="mobile-drawer-user-card" data-close-drawer>
+          <div class="mobile-drawer-avatar" aria-hidden="true">
+            <span class="mobile-drawer-initials" id="mobile-drawer-initials">--</span>
+            <span class="mobile-drawer-avatar-status" title="Active"></span>
+          </div>
+          <div class="mobile-drawer-user-info">
+            <h3 class="mobile-drawer-user-name" id="mobile-drawer-name">Customer</h3>
+            <p class="mobile-drawer-user-email" id="mobile-drawer-email">loading...</p>
+            <div class="mobile-drawer-badge-row">
+              <span class="mobile-drawer-role-badge" id="mobile-drawer-role">Verified Customer</span>
+            </div>
+          </div>
+        </a>
+        <div class="mobile-drawer-profile-sublinks" id="mobile-drawer-user-actions">
+          <a href="/profile" class="mobile-drawer-sublink" data-close-drawer data-profile-action="overview">
+            <span class="mobile-drawer-sublink-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              My Profile
+            </span>
+          </a>
+          <a href="/profile#orders" class="mobile-drawer-sublink" data-close-drawer data-profile-action="orders">
+            <span class="mobile-drawer-sublink-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+              Order History
+            </span>
+            <span class="tab-counter mobile-drawer-order-count" id="mobile-drawer-order-count">0</span>
+          </a>
+          <a href="/profile#security" class="mobile-drawer-sublink" data-close-drawer data-profile-action="security">
+            <span class="mobile-drawer-sublink-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Account Security
+            </span>
+          </a>
+          <button type="button" class="mobile-drawer-signout-btn" id="mobile-drawer-signout-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+          </button>
+        </div>
+        <div class="mobile-drawer-guest-card" id="mobile-drawer-guest-card" style="display:none;">
+          <div class="mobile-drawer-guest-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="mobile-drawer-guest-info">
+            <p class="mobile-drawer-guest-title">Customer Account</p>
+            <p class="mobile-drawer-guest-desc">Sign in to track orders &amp; profile</p>
+            <a href="/login?redirect=/profile" class="mobile-drawer-guest-btn" data-close-drawer>
+              Sign In / Register →
+            </a>
+          </div>
+        </div>
+      </div>
+
       <div class="mobile-nav-links-list">
         <a href="/" class="m-nav-link" data-close-drawer>Home</a>
         <a href="/products" class="m-nav-link" data-close-drawer>Products</a>
@@ -992,15 +1067,6 @@
         <a href="/calculator" class="m-nav-link active" data-close-drawer>Calculator</a>
         <a href="/about" class="m-nav-link" data-close-drawer>About</a>
         <a href="/contact" class="m-nav-link" data-close-drawer>Contacts</a>
-        <a href="/login?redirect=/profile" class="m-nav-link" data-close-drawer data-user-profile-btn>
-          <span style="display:inline-flex; align-items:center; gap:8px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span class="mobile-profile-label">My Profile</span>
-          </span>
-        </a>
         <hr class="mobile-divider">
         <a href="/contact" class="btn-get-quote-yellow" style="justify-content:center; width:100%;" data-close-drawer>
           Get a Quote →
@@ -1018,7 +1084,7 @@
   <script src="/js/search.js?v=1"></script>
   <script src="/js/calculator-engine.js?v=1"></script>
   <script src="/js/calculator.js?v=1"></script>
-  <script src="/js/main.js?v=12"></script>
+  <script src="/js/main.js?v=28"></script>
 </body>
 
 </html>

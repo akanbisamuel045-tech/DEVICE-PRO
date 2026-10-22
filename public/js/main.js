@@ -201,6 +201,139 @@ document.addEventListener('DOMContentLoaded', () => {
   let cachedUser = null;
   let authChecked = false;
 
+  const escapeHtml = (str) => {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  };
+
+  const updateMobileDrawerProfile = async (user) => {
+    const drawerBody = document.querySelector('#mobile-nav-drawer .drawer-body');
+    if (!drawerBody) return;
+
+    let profileSection = document.getElementById('mobile-drawer-profile-root');
+    if (!profileSection) {
+      profileSection = document.createElement('div');
+      profileSection.id = 'mobile-drawer-profile-root';
+      profileSection.className = 'mobile-drawer-profile-section';
+      drawerBody.insertBefore(profileSection, drawerBody.firstChild);
+    }
+
+    if (user) {
+      const displayName = user.fullName || user.username || 'Customer';
+      let initials = 'DP';
+      if (displayName) {
+        const parts = displayName.trim().split(/\s+/);
+        initials = parts.length >= 2 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : parts[0].substring(0, 2).toUpperCase();
+      }
+      const roleText = user.role === 'admin' ? 'Administrator' : 'Verified Customer';
+
+      profileSection.innerHTML = `
+        <a href="/profile" class="mobile-drawer-user-card" title="View Customer Profile" data-close-drawer>
+          <div class="mobile-drawer-avatar" aria-hidden="true">
+            <span class="mobile-drawer-initials">${initials}</span>
+            <span class="mobile-drawer-avatar-status" title="Active"></span>
+          </div>
+          <div class="mobile-drawer-user-info">
+            <h3 class="mobile-drawer-user-name">${escapeHtml(displayName)}</h3>
+            <p class="mobile-drawer-user-email">${escapeHtml(user.email || '')}</p>
+            <div class="mobile-drawer-badge-row">
+              <span class="mobile-drawer-role-badge">${roleText}</span>
+            </div>
+          </div>
+        </a>
+        <div class="mobile-drawer-profile-sublinks">
+          <a href="/profile" class="mobile-drawer-sublink" data-close-drawer data-profile-action="overview">
+            <span class="mobile-drawer-sublink-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              My Profile
+            </span>
+          </a>
+          <a href="/profile#orders" class="mobile-drawer-sublink" data-close-drawer data-profile-action="orders">
+            <span class="mobile-drawer-sublink-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+              </svg>
+              Order History
+            </span>
+            <span class="tab-counter mobile-drawer-order-count" id="mobile-drawer-order-count">0</span>
+          </a>
+          <a href="/profile#security" class="mobile-drawer-sublink" data-close-drawer data-profile-action="security">
+            <span class="mobile-drawer-sublink-left">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              Account Security
+            </span>
+          </a>
+          <button type="button" class="mobile-drawer-signout-btn" id="mobile-drawer-signout-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+          </button>
+        </div>
+      `;
+
+      // Order count query
+      try {
+        const orderRes = await fetch('/api/profile/orders?limit=1', { credentials: 'include' });
+        if (orderRes.ok) {
+          const orderData = await orderRes.json();
+          if (orderData.success && typeof orderData.total === 'number') {
+            const countBadge = document.getElementById('mobile-drawer-order-count');
+            if (countBadge) countBadge.textContent = orderData.total;
+          }
+        }
+      } catch (_) {}
+
+      // Bind signout button
+      const signoutBtn = document.getElementById('mobile-drawer-signout-btn');
+      if (signoutBtn) {
+        signoutBtn.addEventListener('click', async () => {
+          signoutBtn.disabled = true;
+          try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+          } catch (_) {}
+          window.location.href = '/login?logged_out=1';
+        });
+      }
+    } else {
+      profileSection.innerHTML = `
+        <div class="mobile-drawer-guest-card">
+          <div class="mobile-drawer-guest-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="mobile-drawer-guest-info">
+            <p class="mobile-drawer-guest-title">Customer Account</p>
+            <p class="mobile-drawer-guest-desc">Sign in to track orders &amp; profile</p>
+            <a href="/login?redirect=/profile" class="mobile-drawer-guest-btn" data-close-drawer>
+              Sign In / Register →
+            </a>
+          </div>
+        </div>
+      `;
+    }
+  };
+
   const checkUserSession = async () => {
     try {
       const res = await fetch('/api/auth/me', { credentials: 'include' });
@@ -220,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
           document.querySelectorAll('.mobile-profile-label').forEach(label => {
             label.textContent = data.user.fullName ? `Profile (${data.user.fullName.split(' ')[0]})` : 'My Profile';
           });
+          updateMobileDrawerProfile(data.user);
           return;
         }
       }
@@ -237,6 +371,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.mobile-profile-label').forEach(label => {
       label.textContent = 'Sign In / Profile';
     });
+    updateMobileDrawerProfile(null);
   };
 
   // Immediate Profile Icon Click Handler

@@ -838,3 +838,89 @@
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* ==========================================================================
+   MOBILE VIEW PROFILE ENHANCEMENTS
+   ========================================================================== */
+@media (max-width: 768px) {
+  .profile-hero {
+    padding: 24px 0 44px;
+  }
+
+  .profile-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .profile-content-container {
+    margin-top: -20px;
+  }
+
+  .profile-sidebar-card {
+    padding: 20px 16px;
+    gap: 16px;
+    border-radius: 14px;
+  }
+
+  .profile-avatar-block {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: 16px;
+  }
+
+  .profile-avatar-circle {
+    width: 64px;
+    height: 64px;
+    font-size: 1.4rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .profile-avatar-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .profile-display-name {
+    font-size: 1.125rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .profile-display-email {
+    font-size: 0.8125rem;
+    margin: 0 0 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .profile-nav-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .profile-nav-btn {
+    padding: 10px 12px;
+    font-size: 0.8125rem;
+  }
+
+  .profile-nav-btn .nav-icon-text {
+    gap: 8px;
+    font-size: 0.8125rem;
+  }
+
+  .profile-panel {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+
+  .panel-title {
+    font-size: 1.25rem;
+  }
+}

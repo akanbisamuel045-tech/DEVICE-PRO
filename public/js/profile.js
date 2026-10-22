@@ -142,10 +142,32 @@
     });
 
     // Check URL hash on load (e.g. #orders, #security, #personal)
-    const hash = window.location.hash.replace('#', '');
-    if (hash && document.getElementById(`panel-${hash}`)) {
-      activateTab(`panel-${hash}`);
-    }
+    const handleHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (hash && document.getElementById(`panel-${hash}`)) {
+        activateTab(`panel-${hash}`);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHash);
+    handleHash();
+
+    // Support mobile drawer profile action clicks directly
+    document.addEventListener('click', (e) => {
+      const actionBtn = e.target.closest('[data-profile-action]');
+      if (!actionBtn) return;
+      const action = actionBtn.getAttribute('data-profile-action');
+      if (action && document.getElementById(`panel-${action}`)) {
+        e.preventDefault();
+        activateTab(`panel-${action}`);
+        window.history.replaceState(null, '', `#${action}`);
+        const drawer = document.getElementById('mobile-nav-drawer');
+        const bd = document.getElementById('modal-backdrop');
+        if (drawer) drawer.classList.remove('open');
+        if (bd) bd.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
   }
 
   // Password Visibility Toggle
