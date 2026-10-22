@@ -197,21 +197,81 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 7. Dynamic User Authentication Header Indicator
+  // 7. Dynamic User Authentication Header Indicator & Profile Navigation
+  let cachedUser = null;
+  let authChecked = false;
+
   const checkUserSession = async () => {
     try {
-      const res = await fetch('/api/auth/me');
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.user) {
-          document.querySelectorAll('.header-user-btn').forEach(btn => {
-            btn.setAttribute('title', `Account: ${data.user.fullName || data.user.email} (${data.user.role})`);
+          cachedUser = data.user;
+          authChecked = true;
+          document.querySelectorAll('.header-user-btn, [data-user-profile-btn]').forEach(btn => {
+            btn.setAttribute('title', `Account: ${data.user.fullName || data.user.email}`);
+            btn.setAttribute('aria-label', `Account: ${data.user.fullName || data.user.email}`);
             btn.classList.add('user-logged-in');
-            btn.style.color = '#F59E0B'; // Highlight with DEVICE PRO warm golden yellow
+            if (btn.tagName === 'A') {
+              btn.setAttribute('href', '/profile');
+            }
           });
+          document.querySelectorAll('.mobile-profile-label').forEach(label => {
+            label.textContent = data.user.fullName ? `Profile (${data.user.fullName.split(' ')[0]})` : 'My Profile';
+          });
+          return;
         }
       }
     } catch (_) {}
+    cachedUser = null;
+    authChecked = true;
+    document.querySelectorAll('.header-user-btn, [data-user-profile-btn]').forEach(btn => {
+      btn.setAttribute('title', 'Sign In / My Profile');
+      btn.setAttribute('aria-label', 'Sign In or View Profile');
+      btn.classList.remove('user-logged-in');
+      if (btn.tagName === 'A') {
+        btn.setAttribute('href', '/login?redirect=/profile');
+      }
+    });
+    document.querySelectorAll('.mobile-profile-label').forEach(label => {
+      label.textContent = 'Sign In / Profile';
+    });
   };
+
+  // Immediate Profile Icon Click Handler
+  document.addEventListener('click', async (e) => {
+    const profileBtn = e.target.closest('.header-user-btn, [data-user-profile-btn]');
+    if (!profileBtn) return;
+
+    // Intercept navigation to verify authoritative server session
+    e.preventDefault();
+
+    if (authChecked && cachedUser) {
+      window.location.href = '/profile';
+      return;
+    }
+
+    try {
+      profileBtn.style.opacity = '0.7';
+      const res = await fetch('/api/auth/me', { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.user) {
+          cachedUser = data.user;
+          authChecked = true;
+          window.location.href = '/profile';
+          return;
+        }
+      }
+    } catch (_) {}
+    finally {
+      profileBtn.style.opacity = '';
+    }
+
+    // Unauthenticated -> redirect to login with intended profile destination preserved
+    window.location.href = '/login?redirect=/profile';
+  });
+
   checkUserSession();
 });

@@ -1912,6 +1912,54 @@ function getOrders({ limit = 50, offset = 0, status = null } = {}) {
   return { orders, total: countStmt.count };
 }
 
+function getOrdersByCustomer({ email, phone, limit = 20, offset = 0 } = {}) {
+  if (!sqliteAvailable) return { orders: [], total: 0 };
+  const conditions = [];
+  const params = [];
+  if (email && typeof email === 'string') {
+    const trimmed = email.trim();
+    const normalized = trimmed.toLowerCase();
+    conditions.push('(customer_email = ? OR customer_email = ?)');
+    params.push(trimmed, normalized);
+  }
+  if (phone && typeof phone === 'string' && phone.trim()) {
+    conditions.push('customer_phone = ?');
+    params.push(phone.trim());
+  }
+
+  if (conditions.length === 0) return { orders: [], total: 0 };
+
+  const whereClause = `WHERE ${conditions.join(' OR ')}`;
+  const countRow = db.prepare(`SELECT COUNT(*) as total FROM orders ${whereClause}`).get(...params);
+  const total = countRow ? countRow.total : 0;
+
+  const rows = db.prepare(`SELECT * FROM orders ${whereClause} ORDER BY id DESC LIMIT ? OFFSET ?`).all(...params, limit, offset);
+  const orders = rows.map(o => ({
+    id: o.id,
+    orderNumber: o.order_number,
+    customerName: o.customer_name,
+    customerEmail: o.customer_email,
+    customerPhone: o.customer_phone,
+    deliveryAddress: o.delivery_address,
+    deliveryState: o.delivery_state,
+    items: JSON.parse(o.items_json || '[]'),
+    subtotalNgn: o.subtotal_ngn,
+    deliveryFeeNgn: o.delivery_fee_ngn || 0,
+    installationFeeNgn: o.installation_fee_ngn || 0,
+    installationOption: o.installation_option,
+    totalNgn: o.total_ngn,
+    paymentMethod: o.payment_method,
+    paymentStatus: o.payment_status,
+    orderStatus: o.order_status,
+    waybillNumber: o.waybill_number || null,
+    courierPartner: o.courier_partner || null,
+    estimatedDelivery: o.estimated_delivery || null,
+    createdAt: o.created_at
+  }));
+
+  return { orders, total };
+}
+
 function getOrderByNumber(orderNumber) {
   const order = db.prepare('SELECT * FROM orders WHERE order_number = ?').get(orderNumber);
   if (!order) return null;
@@ -2875,6 +2923,81 @@ function sqliteExecutePasswordReset(resetAuthToken, newPassword) {
   };
 }
 
+function updateUserProfile(userId, { fullName, phone = null } = {}) {
+  if (!sqliteAvailable) return null;
+  const user = db.prepare('SELECT id, email, full_name, role, google_subject FROM users WHERE id = ?').get(userId);
+  if (!user) return null;
+
+  const updates = [];
+  const params = [];
+  if (fullName && typeof fullName === 'string') {
+    updates.push('full_name = ?');
+    params.push(fullName.trim());
+  }
+  if (phone !== undefined) {
+    updates.push('phone = ?');
+    params.push(phone ? phone.trim() : null);
+  }
+  updates.push("updated_at = datetime('now')");
+  params.push(userId);
+
+  db.prepare(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`).run(...params);
+
+  logAudit({
+    userId,
+    action: 'UPDATE_PROFILE',
+    entityType: 'user',
+    entityId: userId.toString(),
+    details: `Profile updated for ${user.email}`
+  });
+
+  const updated = db.prepare('SELECT id, username, email, full_name, phone, role, google_subject, email_verified, created_at, updated_at FROM users WHERE id = ?').get(userId);
+  return {
+    id: updated.id,
+    username: updated.username,
+    email: updated.email,
+    fullName: updated.full_name,
+    phone: updated.phone || null,
+    role: updated.role,
+    googleSubject: updated.google_subject,
+    emailVerified: Boolean(updated.email_verified),
+    createdAt: updated.created_at,
+    updatedAt: updated.updated_at
+  };
+}
+
+function changeUserPassword(userId, currentPassword, newPassword) {
+  if (!sqliteAvailable) throw new Error('Database unavailable');
+  const user = db.prepare('SELECT id, email, password_hash, salt, google_subject FROM users WHERE id = ?').get(userId);
+  if (!user) throw new Error('User account not found');
+
+  if (!user.password_hash || !user.salt) {
+    const err = new Error('This account was created with Google Sign-In and does not support password login.');
+    err.code = 'OAUTH_ACCOUNT_NO_PASSWORD';
+    throw err;
+  }
+
+  const isValid = verifyPassword(currentPassword, user.password_hash, user.salt);
+  if (!isValid) {
+    const err = new Error('The current password provided is incorrect.');
+    err.code = 'INVALID_CURRENT_PASSWORD';
+    throw err;
+  }
+
+  const { hash, salt } = hashPassword(newPassword);
+  db.prepare("UPDATE users SET password_hash = ?, salt = ?, updated_at = datetime('now') WHERE id = ?").run(hash, salt, userId);
+
+  logAudit({
+    userId,
+    action: 'CHANGE_PASSWORD',
+    entityType: 'user',
+    entityId: userId.toString(),
+    details: `Password changed successfully for ${user.email}`
+  });
+
+  return { success: true };
+}
+
 function createSession(userId, durationDays = 7) {
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
@@ -2891,7 +3014,7 @@ function getSessionUser(token) {
   if (!token) return null;
 
   const session = db.prepare(`
-    SELECT s.token, s.expires_at, u.id, u.username, u.email, u.phone, u.full_name, u.role, u.is_active, u.email_verified
+    SELECT s.token, s.expires_at, u.id, u.username, u.email, u.phone, u.full_name, u.role, u.is_active, u.email_verified, u.google_subject, u.password_hash, u.created_at
     FROM sessions s
     JOIN users u ON s.user_id = u.id
     WHERE s.token = ? AND u.is_active = 1
@@ -2912,7 +3035,10 @@ function getSessionUser(token) {
     fullName: session.full_name,
     role: session.role,
     phone: session.phone || null,
-    emailVerified: Boolean(session.email_verified)
+    emailVerified: Boolean(session.email_verified),
+    createdAt: session.created_at,
+    hasPassword: Boolean(session.password_hash),
+    authMethod: session.google_subject && !session.password_hash ? 'google' : (session.google_subject ? 'google_and_password' : 'password')
   };
 }
 
@@ -3262,6 +3388,7 @@ module.exports = {
   // Orders & Fulfillment
   createOrder: dispatch(mongoRepo.createOrder, createOrder),
   getOrders: dispatch(mongoRepo.getOrders, getOrders),
+  getOrdersByCustomer: dispatch(mongoRepo.getOrdersByCustomer, getOrdersByCustomer),
   getOrderByNumber: dispatch(mongoRepo.getOrderByNumber, getOrderByNumber),
   updateOrderStatus: dispatch(mongoRepo.updateOrderStatus, updateOrderStatus),
   updateOrderFulfillment: dispatch(mongoRepo.updateOrderFulfillment, updateOrderFulfillment),
@@ -3292,6 +3419,8 @@ module.exports = {
   getUserById: dispatch(mongoRepo.getUserById, getUserById),
   createUser: dispatch(mongoRepo.createUser, createUser),
   linkGoogleAccount: dispatch(mongoRepo.linkGoogleAccount, linkGoogleAccount),
+  updateUserProfile: dispatch(mongoRepo.updateUserProfile, updateUserProfile),
+  changeUserPassword: dispatch(mongoRepo.changeUserPassword, changeUserPassword),
   createPasswordResetToken: dispatch(mongoRepo.createPasswordResetToken, createPasswordResetToken),
   resetPasswordWithToken: dispatch(mongoRepo.resetPasswordWithToken, resetPasswordWithToken),
   createVerificationCode: dispatch(mongoRepo.createVerificationCode, sqliteCreateVerificationCode),

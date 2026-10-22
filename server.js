@@ -17,6 +17,7 @@ const {
   createPaymentRecord, getPaymentByReference, getPaymentsByOrderNumber,
   updatePaymentStatus, reconcileOrderPayment,
   createUser, getUserByEmail, getUserByGoogleSubject, linkGoogleAccount,
+  updateUserProfile, changeUserPassword, getOrdersByCustomer,
   createPasswordResetToken, resetPasswordWithToken,
   createVerificationCode, verifyResetCode, executePasswordReset,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
@@ -1498,6 +1499,150 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
   });
 });
 
+// GET /api/profile — Detailed authenticated profile
+app.get('/api/profile', requireAuth, (req, res) => {
+  res.json({
+    success: true,
+    user: {
+      id: req.user.id,
+      username: req.user.username,
+      email: req.user.email,
+      fullName: req.user.fullName,
+      role: req.user.role,
+      phone: req.user.phone || null,
+      emailVerified: Boolean(req.user.emailVerified),
+      createdAt: req.user.createdAt || null,
+      hasPassword: Boolean(req.user.hasPassword),
+      authMethod: req.user.authMethod || (req.user.hasPassword ? 'password' : 'google')
+    }
+  });
+});
+
+// PUT /api/profile — Update customer personal information
+app.put('/api/profile', requireAuth, rateLimiter(60000, 20), async (req, res) => {
+  try {
+    const { fullName, phone } = req.body || {};
+
+    if (fullName !== undefined) {
+      if (typeof fullName !== 'string' || fullName.trim().length < 2 || fullName.trim().length > 100) {
+        return res.status(400).json({ success: false, error: 'Full name must be between 2 and 100 characters.' });
+      }
+    }
+
+    let cleanPhone = undefined;
+    if (phone !== undefined) {
+      if (phone === null || phone === '') {
+        cleanPhone = null;
+      } else if (typeof phone === 'string') {
+        const trimmed = phone.trim();
+        if (!/^(\+?\d{1,4}[\s-]?)?\(?\d{1,4}\)?[\s-]?\d{3,4}[\s-]?\d{3,5}$/.test(trimmed)) {
+          return res.status(400).json({ success: false, error: 'Please enter a valid phone number (e.g. +234 803 123 4567 or 08031234567).' });
+        }
+        cleanPhone = trimmed;
+      } else {
+        return res.status(400).json({ success: false, error: 'Invalid phone number format.' });
+      }
+    }
+
+    const updated = await updateUserProfile(req.user.id, {
+      fullName: fullName ? fullName.trim() : undefined,
+      phone: cleanPhone
+    });
+
+    if (!updated) {
+      return res.status(404).json({ success: false, error: 'User profile not found.' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Profile information updated successfully.',
+      user: {
+        id: updated.id,
+        username: updated.username,
+        email: updated.email,
+        fullName: updated.fullName,
+        phone: updated.phone || null,
+        role: updated.role,
+        createdAt: updated.createdAt,
+        hasPassword: Boolean(updated.hasPassword || req.user.hasPassword),
+        authMethod: req.user.authMethod
+      }
+    });
+  } catch (error) {
+    console.error('[PROFILE UPDATE ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to update profile. Please try again.' });
+  }
+});
+
+// POST /api/auth/change-password — Update password for authenticated account
+app.post('/api/auth/change-password', requireAuth, rateLimiter(60000, 10), async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body || {};
+
+    if (!currentPassword || typeof currentPassword !== 'string') {
+      return res.status(400).json({ success: false, error: 'Current password is required.' });
+    }
+    if (!newPassword || typeof newPassword !== 'string') {
+      return res.status(400).json({ success: false, error: 'New password is required.' });
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ success: false, error: 'New password and confirmation do not match.' });
+    }
+
+    // Complexity requirement: at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+    if (!strongPasswordRegex.test(newPassword)) {
+      return res.status(400).json({
+        success: false,
+        error: 'New password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.'
+      });
+    }
+
+    await changeUserPassword(req.user.id, currentPassword, newPassword);
+
+    try {
+      sendPasswordChangedNotificationEmail(req.user.email, { ipAddress: req.ip }).catch(() => {});
+    } catch (_) {}
+
+    res.json({ success: true, message: 'Password changed successfully.' });
+  } catch (error) {
+    if (error.code === 'INVALID_CURRENT_PASSWORD') {
+      return res.status(401).json({ success: false, error: 'The current password provided is incorrect.' });
+    }
+    if (error.code === 'OAUTH_ACCOUNT_NO_PASSWORD') {
+      return res.status(400).json({ success: false, error: 'This account was created using Google Sign-In and cannot have its password changed here.' });
+    }
+    console.error('[PASSWORD CHANGE ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to change password. Please try again.' });
+  }
+});
+
+// GET /api/profile/orders — Customer orders belonging strictly to the authenticated account
+app.get('/api/profile/orders', requireAuth, async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 20, 50);
+    const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
+
+    const result = await getOrdersByCustomer({
+      email: req.user.email,
+      phone: req.user.phone,
+      limit,
+      offset
+    });
+
+    res.json({
+      success: true,
+      orders: result.orders,
+      total: result.total,
+      limit,
+      offset
+    });
+  } catch (error) {
+    console.error('[PROFILE ORDERS ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to load order history.' });
+  }
+});
+
 // POST /api/auth/logout — Sign out and revoke active session
 app.post('/api/auth/logout', async (req, res) => {
   try {
@@ -2207,6 +2352,7 @@ app.get(['/register', '/register.html', '/signup'], (req, res) => safeSendFile(r
 app.get(['/forgot-password', '/forgot-password.html'], (req, res) => safeSendFile(res, 'public/forgot-password.html'));
 app.get(['/verify-reset-code', '/verify-reset-code.html'], (req, res) => safeSendFile(res, 'public/verify-reset-code.html'));
 app.get(['/reset-password', '/reset-password.html'], (req, res) => safeSendFile(res, 'public/reset-password.html'));
+app.get(['/profile', '/profile.html', '/account'], (req, res) => safeSendFile(res, 'public/profile.html'));
 app.get(['/checkout', '/checkout.html'], (req, res) => safeSendFile(res, 'public/checkout.html'));
 app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => safeSendFile(res, 'public/order-confirmation.html'));
 app.get(['/tracking', '/tracking.html'], (req, res) => safeSendFile(res, 'public/tracking.html'));

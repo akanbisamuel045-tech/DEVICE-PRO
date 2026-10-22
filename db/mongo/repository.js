@@ -631,6 +631,56 @@ async function getOrders({ limit = 50, offset = 0, status = null } = {}) {
   return { orders, total };
 }
 
+async function getOrdersByCustomer({ email, phone, limit = 20, offset = 0 } = {}) {
+  const orConditions = [];
+  if (email && typeof email === 'string') {
+    const trimmed = email.trim();
+    const normalized = trimmed.toLowerCase();
+    orConditions.push({ customer_email: trimmed });
+    orConditions.push({ customer_email: normalized });
+  }
+  if (phone && typeof phone === 'string' && phone.trim()) {
+    orConditions.push({ customer_phone: phone.trim() });
+  }
+
+  if (orConditions.length === 0) {
+    return { orders: [], total: 0 };
+  }
+
+  const filter = { $or: orConditions };
+  const rawOrders = await Order.find(filter)
+    .sort({ id: -1, created_at: -1 })
+    .skip(offset)
+    .limit(limit)
+    .lean();
+  const total = await Order.countDocuments(filter);
+
+  const orders = rawOrders.map(o => ({
+    id: o.id || o._id,
+    orderNumber: o.order_number,
+    customerName: o.customer_name,
+    customerEmail: o.customer_email,
+    customerPhone: o.customer_phone,
+    deliveryAddress: o.delivery_address,
+    deliveryState: o.delivery_state,
+    items: typeof o.items_json === 'string' ? JSON.parse(o.items_json || '[]') : (o.items || []),
+    subtotalNgn: o.subtotal_ngn,
+    deliveryFeeNgn: o.delivery_fee_ngn || 0,
+    installationFeeNgn: o.installation_fee_ngn || 0,
+    installationOption: o.installation_option,
+    totalNgn: o.total_ngn,
+    paymentMethod: o.payment_method,
+    paymentStatus: o.payment_status,
+    orderStatus: o.order_status,
+    waybillNumber: o.waybill_number || null,
+    courierPartner: o.courier_partner || null,
+    estimatedDelivery: o.estimated_delivery || null,
+    createdAt: o.created_at
+  }));
+
+  return { orders, total };
+}
+
 async function getOrderByNumber(orderNumber) {
   const order = await Order.findOne({ order_number: orderNumber }).lean();
   if (!order) return null;
@@ -1189,6 +1239,79 @@ async function resetPasswordWithToken(rawToken, newPassword) {
   };
 }
 
+async function updateUserProfile(userId, { fullName, phone = null } = {}) {
+  const filter = typeof userId === 'number' || !isNaN(userId) ? { id: Number(userId) } : { _id: userId };
+  const updateData = { updated_at: new Date() };
+  if (fullName && typeof fullName === 'string') {
+    updateData.full_name = fullName.trim();
+  }
+  if (phone !== undefined) {
+    updateData.phone = phone ? phone.trim() : null;
+  }
+
+  const updated = await User.findOneAndUpdate(filter, { $set: updateData }, { returnDocument: 'after' }).lean();
+  if (!updated) return null;
+
+  await logAudit({
+    userId,
+    action: 'UPDATE_PROFILE',
+    entityType: 'user',
+    entityId: userId.toString(),
+    details: `Profile updated for ${updated.email}`
+  });
+
+  return {
+    id: updated.id || updated._id,
+    username: updated.username,
+    email: updated.email,
+    normalizedEmail: updated.normalized_email,
+    phone: updated.phone || null,
+    fullName: updated.full_name,
+    role: updated.role,
+    googleSubject: updated.google_subject,
+    emailVerified: Boolean(updated.email_verified),
+    createdAt: updated.created_at,
+    updatedAt: updated.updated_at
+  };
+}
+
+async function changeUserPassword(userId, currentPassword, newPassword) {
+  const filter = typeof userId === 'number' || !isNaN(userId) ? { id: Number(userId) } : { _id: userId };
+  const user = await User.findOne(filter);
+  if (!user) {
+    throw new Error('User account not found.');
+  }
+
+  if (!user.password_hash || !user.salt) {
+    const err = new Error('This account was created with Google Sign-In and does not support password login.');
+    err.code = 'OAUTH_ACCOUNT_NO_PASSWORD';
+    throw err;
+  }
+
+  const isValid = verifyPassword(currentPassword, user.password_hash, user.salt);
+  if (!isValid) {
+    const err = new Error('The current password provided is incorrect.');
+    err.code = 'INVALID_CURRENT_PASSWORD';
+    throw err;
+  }
+
+  const { hash, salt } = hashPassword(newPassword);
+  user.password_hash = hash;
+  user.salt = salt;
+  user.updated_at = new Date();
+  await user.save();
+
+  await logAudit({
+    userId,
+    action: 'CHANGE_PASSWORD',
+    entityType: 'user',
+    entityId: userId.toString(),
+    details: `Password changed successfully for ${user.email}`
+  });
+
+  return { success: true };
+}
+
 /**
  * Stage 20: 6-Digit Email Verification Code System
  */
@@ -1460,7 +1583,10 @@ async function getSessionUser(token) {
     fullName: user.full_name,
     role: user.role,
     phone: user.phone || null,
-    emailVerified: Boolean(user.email_verified)
+    emailVerified: Boolean(user.email_verified),
+    createdAt: user.created_at,
+    hasPassword: Boolean(user.password_hash),
+    authMethod: user.google_subject && !user.password_hash ? 'google' : (user.google_subject ? 'google_and_password' : 'password')
   };
 }
 
@@ -1568,14 +1694,14 @@ module.exports = {
   getCategories, getCaseStudies, getCaseStudyBySlug,
   createEnquiry, getEnquiries, getEnquiryById, getEnquiryByRef, updateEnquiryStatus,
   createQuote, getQuotes, getQuoteById, getQuoteByRef, updateQuoteStatus,
-  createOrder, getOrders, getOrderByNumber, updateOrderStatus,
+  createOrder, getOrders, getOrdersByCustomer, getOrderByNumber, updateOrderStatus,
   updateOrderFulfillment, updateOrderCommissioning,
   createPaymentRecord, getPaymentByReference, getPaymentsByOrderNumber, updatePaymentStatus, reconcileOrderPayment,
   createWarrantyRecord, getWarrantyBySerialOrCode, getWarrantiesByOrder, getWarranties,
   createSupportTicket, getSupportTickets, getSupportTicketByNumber, getSupportTicketsByOrder, updateSupportTicketStatus,
   hashPassword, verifyPassword,
   getUserByUsername, getUserByEmail, getUserByGoogleSubject, getUserById,
-  createUser, linkGoogleAccount,
+  createUser, linkGoogleAccount, updateUserProfile, changeUserPassword,
   createPasswordResetToken, resetPasswordWithToken,
   createVerificationCode, verifyResetCode, executePasswordReset,
   verifyUserLogin, createSession, getSessionUser, revokeSession,

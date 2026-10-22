@@ -138,6 +138,15 @@
           <span class="cart-badge" aria-label="0 items in cart">0</span>
         </button>
 
+        <!-- Profile / Account Trigger -->
+        <a href="/login?redirect=/profile" class="header-circle-btn header-user-btn" aria-label="My Profile" title="My Profile" data-user-profile-btn>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </a>
+
         <a href="#consultation-form-section" class="btn-get-quote-yellow" data-trigger-quote>
           Get a Quote <span class="arrow">→</span>
         </a>
@@ -929,6 +938,15 @@
         <a href="/calculator" class="m-nav-link" data-close-drawer>Calculator</a>
         <a href="/about" class="m-nav-link" data-close-drawer>About</a>
         <a href="/contact" class="m-nav-link" data-close-drawer>Contacts</a>
+        <a href="/login?redirect=/profile" class="m-nav-link" data-close-drawer data-user-profile-btn>
+          <span style="display:inline-flex; align-items:center; gap:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="mobile-profile-label">My Profile</span>
+          </span>
+        </a>
         <hr class="mobile-divider">
         <a href="/contact" class="btn-get-quote-yellow" style="justify-content:center; width:100%;" data-close-drawer>
           Get a Quote →
@@ -945,6 +963,7 @@
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/search.js?v=1"></script>
   <script src="/js/packages.js?v=1"></script>
+  <script src="/js/main.js?v=26"></script>
 </body>
 
 </html>

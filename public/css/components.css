@@ -1162,6 +1162,48 @@ textarea:focus-visible,
   line-height: 1;
 }
 
+/* User Profile Navigation Button */
+.header-user-btn {
+  color: #061C35;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.header-user-btn:hover {
+  background: #F4F8FC;
+  border-color: #0157A2;
+  color: #0157A2;
+}
+
+.header-user-btn:focus-visible {
+  outline: 2px solid #FFB90C;
+  outline-offset: 2px;
+}
+
+.header-user-btn.user-logged-in {
+  border-color: #F59E0B;
+  color: #0B192C;
+  background: #FFFBEB;
+}
+
+.header-user-btn.user-logged-in:hover {
+  background: #FEF3C7;
+  border-color: #D97706;
+  color: #92400E;
+}
+
+.header-user-btn.user-logged-in::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  border: 1.5px solid #FFFFFF;
+}
+
 /* Mobile Nav Toggle: Hidden on Desktop (min-width: 1025px) */
 .mobile-nav-toggle,
 .mobile-menu-trigger {
