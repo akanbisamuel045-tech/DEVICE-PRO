@@ -233,6 +233,24 @@ const auditLogSchema = new mongoose.Schema({
   ip_address: { type: String }
 }, { timestamps: { createdAt: 'created_at' } });
 
+// 13. PasswordReset Schema (Stage 20 Verification Code System)
+const passwordResetSchema = new mongoose.Schema({
+  email: { type: String, required: true, lowercase: true, trim: true, index: true },
+  user_id: { type: Number, index: true },
+  code_hash: { type: String, required: true },
+  code_salt: { type: String, required: true },
+  attempts: { type: Number, default: 0 },
+  max_attempts: { type: Number, default: 5 },
+  expires_at: { type: Date, required: true, index: true },
+  resend_available_at: { type: Date, required: true },
+  reset_token_hash: { type: String, sparse: true, index: true },
+  reset_token_expires_at: { type: Date },
+  used: { type: Boolean, default: false, index: true }
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+
+// Background cleanup TTL index on created_at (1 hour)
+passwordResetSchema.index({ created_at: 1 }, { expireAfterSeconds: 3600 });
+
 module.exports = {
   Category: mongoose.models.Category || mongoose.model('Category', categorySchema),
   Product: mongoose.models.Product || mongoose.model('Product', productSchema),
@@ -245,5 +263,6 @@ module.exports = {
   SupportTicket: mongoose.models.SupportTicket || mongoose.model('SupportTicket', supportTicketSchema),
   User: mongoose.models.User || mongoose.model('User', userSchema),
   Session: mongoose.models.Session || mongoose.model('Session', sessionSchema),
-  AuditLog: mongoose.models.AuditLog || mongoose.model('AuditLog', auditLogSchema)
+  AuditLog: mongoose.models.AuditLog || mongoose.model('AuditLog', auditLogSchema),
+  PasswordReset: mongoose.models.PasswordReset || mongoose.model('PasswordReset', passwordResetSchema)
 };

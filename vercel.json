@@ -51,6 +51,10 @@
       "destination": "/forgot-password.html"
     },
     {
+      "source": "/verify-reset-code",
+      "destination": "/verify-reset-code.html"
+    },
+    {
       "source": "/reset-password",
       "destination": "/reset-password.html"
     },

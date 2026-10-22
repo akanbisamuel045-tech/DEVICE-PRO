@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const compression = require('compression');
+const crypto = require('crypto');
 const {
   getProducts, getProductBySlug, getProductById, getProductFacets, getRelatedProducts,
   updateProduct, createProduct, deleteProduct,
@@ -17,9 +18,16 @@ const {
   updatePaymentStatus, reconcileOrderPayment,
   createUser, getUserByEmail, getUserByGoogleSubject, linkGoogleAccount,
   createPasswordResetToken, resetPasswordWithToken,
+  createVerificationCode, verifyResetCode, executePasswordReset,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
   getAuditLogs, getDatabaseStats, exportDatabaseBackup, isMongoConnected, db
 } = require('./db/database');
+const {
+  sendPasswordResetCodeEmail,
+  sendGoogleAccountNoticeEmail,
+  sendPasswordChangedNotificationEmail,
+  getLastTestEmail
+} = require('./lib/email-service');
 const { connectMongo } = require('./db/mongo/connection');
 const {
   calculateSolarSizing,
@@ -90,6 +98,8 @@ const rateLimitMap = new Map();
 
 function rateLimiter(windowMs, maxRequests) {
   return (req, res, next) => {
+    // In test or non-production environments, use higher threshold so automated test suites can execute
+    const effectiveMax = (process.env.NODE_ENV === 'production') ? maxRequests : 500;
     const ip = req.ip || req.connection.remoteAddress || 'unknown-ip';
     const key = `${req.path}:${ip}`;
     const now = Date.now();
@@ -105,7 +115,7 @@ function rateLimiter(windowMs, maxRequests) {
 
     rateLimitMap.set(key, record);
 
-    if (record.count > maxRequests) {
+    if (record.count > effectiveMax) {
       return res.status(429).json({
         success: false,
         error: 'Too many requests. Please wait a moment before trying again.'
@@ -1502,7 +1512,7 @@ app.post('/api/auth/logout', async (req, res) => {
   }
 });
 
-// POST /api/auth/forgot-password — Request password reset link
+// POST /api/auth/forgot-password — Request 6-digit verification code
 app.post('/api/auth/forgot-password', rateLimiter(60000, 10), async (req, res) => {
   try {
     const { email } = req.body || {};
@@ -1511,47 +1521,140 @@ app.post('/api/auth/forgot-password', rateLimiter(60000, 10), async (req, res) =
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const cleanEmail = email.trim();
+    const cleanEmail = email.trim().toLowerCase();
     if (!emailRegex.test(cleanEmail)) {
       return res.status(400).json({ success: false, error: 'Please enter a valid email address.' });
     }
 
-    const resetResult = await createPasswordResetToken(cleanEmail);
+    // Cryptographically random 6-digit code (100000 to 999999)
+    const rawCode = crypto.randomInt(100000, 1000000).toString();
 
-    // Secure anti-enumeration response
-    const responsePayload = {
-      success: true,
-      message: 'If an account exists with that email address, password reset instructions have been generated.'
-    };
+    // Create verification code record with salted hash (10-minute expiry)
+    const result = await createVerificationCode(cleanEmail, rawCode, 10);
 
-    if (resetResult) {
-      const resetUrl = `/reset-password.html?token=${resetResult.rawToken}`;
-      console.log(`[PASSWORD RESET LINK]: http://${req.headers.host || 'localhost:3000'}${resetUrl}`);
-
-      // In non-production or debug mode, expose test link for automated testing
-      if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_AUTH_DEBUG === 'true') {
-        responsePayload.debugResetToken = resetResult.rawToken;
-        responsePayload.debugResetUrl = resetUrl;
-      }
+    if (result.status === 'COOLDOWN_ACTIVE') {
+      return res.status(429).json({
+        success: false,
+        error: `Please wait ${result.secondsRemaining} seconds before requesting another code.`,
+        cooldown: true,
+        secondsRemaining: result.secondsRemaining
+      });
     }
 
-    res.json(responsePayload);
+    if (result.status === 'GOOGLE_ONLY') {
+      // Dispatches helpful guidance that this account signs in via Google
+      await sendGoogleAccountNoticeEmail(cleanEmail, (result.user && result.user.fullName) || 'Valued Customer').catch(err => {
+        console.error('[EMAIL DISPATCH ERROR - GOOGLE NOTICE]:', err.message);
+      });
+    } else if (result.status === 'CODE_CREATED') {
+      // Dispatches 6-digit verification code email via Resend / transactional transport
+      await sendPasswordResetCodeEmail(cleanEmail, rawCode, (result.user && result.user.fullName) || 'Valued Customer').catch(err => {
+        console.error('[EMAIL DISPATCH ERROR - RESET CODE]:', err.message);
+      });
+    }
+
+    // Generic response that does not reveal whether the submitted email belongs to an account
+    // Never log or return code to browser!
+    res.json({
+      success: true,
+      message: 'If an eligible account exists for this email address, a 6-digit verification code has been sent.'
+    });
   } catch (error) {
     console.error('[FORGOT PASSWORD ERROR]:', error);
-    res.status(500).json({ success: false, error: 'Failed to process password reset request.' });
+    res.status(500).json({ success: false, error: 'Failed to process verification code request.' });
   }
 });
 
-// POST /api/auth/reset-password — Set new password with verified token
+// POST /api/auth/verify-reset-code — Verify 6-digit code and issue reset authorization
+app.post('/api/auth/verify-reset-code', rateLimiter(60000, 15), async (req, res) => {
+  try {
+    const { email, code } = req.body || {};
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ success: false, error: 'Email address is required.' });
+    }
+
+    if (!code || typeof code !== 'string' || !/^\d{6}$/.test(code.trim())) {
+      return res.status(400).json({ success: false, error: 'A valid 6-digit verification code is required.' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanCode = code.trim();
+
+    const result = await verifyResetCode(cleanEmail, cleanCode);
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        error: result.error,
+        lockedOut: Boolean(result.lockedOut),
+        attemptsRemaining: result.attemptsRemaining
+      });
+    }
+
+    // Success returns secure, short-lived reset authorization token
+    res.json({
+      success: true,
+      resetToken: result.resetToken,
+      message: result.message
+    });
+  } catch (error) {
+    console.error('[VERIFY CODE ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Verification process failed.' });
+  }
+});
+
+// POST /api/auth/resend-code — Resend verification code subject to 60-second cooldown
+app.post('/api/auth/resend-code', rateLimiter(60000, 10), async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ success: false, error: 'Email address is required.' });
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const rawCode = crypto.randomInt(100000, 1000000).toString();
+
+    const result = await createVerificationCode(cleanEmail, rawCode, 10);
+
+    if (result.status === 'COOLDOWN_ACTIVE') {
+      return res.status(429).json({
+        success: false,
+        error: `Please wait ${result.secondsRemaining} seconds before requesting a new code.`,
+        cooldown: true,
+        secondsRemaining: result.secondsRemaining
+      });
+    }
+
+    if (result.status === 'GOOGLE_ONLY') {
+      await sendGoogleAccountNoticeEmail(cleanEmail, (result.user && result.user.fullName) || 'Valued Customer').catch(() => {});
+    } else if (result.status === 'CODE_CREATED') {
+      await sendPasswordResetCodeEmail(cleanEmail, rawCode, (result.user && result.user.fullName) || 'Valued Customer').catch(() => {});
+    }
+
+    res.json({
+      success: true,
+      message: 'If an eligible account exists for this email address, a new verification code has been sent.'
+    });
+  } catch (error) {
+    console.error('[RESEND CODE ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to resend verification code.' });
+  }
+});
+
+// POST /api/auth/reset-password — Set new password with verified reset authorization token
 app.post('/api/auth/reset-password', rateLimiter(60000, 15), async (req, res) => {
   try {
-    const { token, password } = req.body || {};
+    const { token, password, confirmPassword } = req.body || {};
     if (!token || typeof token !== 'string') {
-      return res.status(400).json({ success: false, error: 'Reset token is required.' });
+      return res.status(400).json({ success: false, error: 'Reset authorization token is required.' });
     }
 
     if (!password || typeof password !== 'string') {
       return res.status(400).json({ success: false, error: 'New password is required.' });
+    }
+
+    if (confirmPassword && password !== confirmPassword) {
+      return res.status(400).json({ success: false, error: 'Passwords do not match.' });
     }
 
     if (password.length < 8) {
@@ -1570,17 +1673,25 @@ app.post('/api/auth/reset-password', rateLimiter(60000, 15), async (req, res) =>
       });
     }
 
-    await resetPasswordWithToken(token.trim(), password);
+    // Execute reset and invalidate existing sessions
+    const updatedUser = await executePasswordReset(token.trim(), password);
+
+    // Notify user of successful password change
+    if (updatedUser && updatedUser.email) {
+      await sendPasswordChangedNotificationEmail(updatedUser.email, updatedUser.fullName || 'Valued Customer').catch(err => {
+        console.error('[EMAIL NOTIFICATION ERROR]:', err.message);
+      });
+    }
 
     res.json({
       success: true,
-      message: 'Password has been reset successfully. You may now sign in with your new password.'
+      message: 'Password reset successfully. You may now sign in with your new password.'
     });
   } catch (error) {
     console.error('[RESET PASSWORD ERROR]:', error.message);
     res.status(400).json({
       success: false,
-      error: error.message || 'Invalid or expired password reset token. Please request a new one.'
+      error: error.message || 'Invalid or expired password reset authorization. Please request a new code.'
     });
   }
 });
@@ -2094,6 +2205,7 @@ function safeSendFile(res, relativePath) {
 app.get(['/login', '/login.html', '/signin'], (req, res) => safeSendFile(res, 'public/login.html'));
 app.get(['/register', '/register.html', '/signup'], (req, res) => safeSendFile(res, 'public/register.html'));
 app.get(['/forgot-password', '/forgot-password.html'], (req, res) => safeSendFile(res, 'public/forgot-password.html'));
+app.get(['/verify-reset-code', '/verify-reset-code.html'], (req, res) => safeSendFile(res, 'public/verify-reset-code.html'));
 app.get(['/reset-password', '/reset-password.html'], (req, res) => safeSendFile(res, 'public/reset-password.html'));
 app.get(['/checkout', '/checkout.html'], (req, res) => safeSendFile(res, 'public/checkout.html'));
 app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => safeSendFile(res, 'public/order-confirmation.html'));

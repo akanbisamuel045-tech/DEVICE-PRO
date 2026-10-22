@@ -189,6 +189,26 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
 
+  CREATE TABLE IF NOT EXISTS password_resets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    user_id INTEGER,
+    code_hash TEXT NOT NULL,
+    code_salt TEXT NOT NULL,
+    attempts INTEGER DEFAULT 0,
+    max_attempts INTEGER DEFAULT 5,
+    expires_at TEXT NOT NULL,
+    resend_available_at TEXT NOT NULL,
+    reset_token_hash TEXT,
+    reset_token_expires_at TEXT,
+    used INTEGER DEFAULT 0,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now'))
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_password_resets_email ON password_resets(email);
+  CREATE INDEX IF NOT EXISTS idx_password_resets_token ON password_resets(reset_token_hash);
+
   CREATE TABLE IF NOT EXISTS case_studies (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slug TEXT NOT NULL UNIQUE,
@@ -2671,6 +2691,190 @@ function resetPasswordWithToken(rawToken, newPassword) {
   return getUserById(user.id);
 }
 
+// Stage 20: 6-Digit Email Verification Code System (SQLite Fallback)
+function sqliteCreateVerificationCode(email, rawCode, durationMinutes = 10) {
+  if (!email || typeof email !== 'string') return { status: 'INVALID_EMAIL' };
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const user = getUserByEmail(normalizedEmail);
+  if (!user) {
+    return { status: 'NOT_FOUND', email: normalizedEmail };
+  }
+
+  // Google-Only Account Check (Step 7)
+  const isGoogleOnly = Boolean(user.googleSubject && (!user.password_hash || user.password_hash === ''));
+  if (isGoogleOnly) {
+    return { status: 'GOOGLE_ONLY', user, email: normalizedEmail };
+  }
+
+  // Check resend cooldown on active pending requests (60 seconds)
+  const activeRecord = db.prepare(`
+    SELECT * FROM password_resets 
+    WHERE email = ? AND used = 0 AND datetime(expires_at) > datetime('now')
+    ORDER BY id DESC LIMIT 1
+  `).get(normalizedEmail);
+
+  if (activeRecord && new Date(activeRecord.resend_available_at) > new Date()) {
+    const secondsRemaining = Math.max(1, Math.ceil((new Date(activeRecord.resend_available_at).getTime() - Date.now()) / 1000));
+    return { status: 'COOLDOWN_ACTIVE', secondsRemaining, email: normalizedEmail, user };
+  }
+
+  // Invalidate any existing unused records for this email
+  db.prepare('UPDATE password_resets SET used = 1 WHERE email = ? AND used = 0').run(normalizedEmail);
+
+  // Hash code with random salt
+  const salt = crypto.randomBytes(16).toString('hex');
+  const codeHash = crypto.createHash('sha256').update(rawCode + salt).digest('hex');
+  const expiresAt = new Date(Date.now() + durationMinutes * 60 * 1000).toISOString();
+  const resendAvailableAt = new Date(Date.now() + 60 * 1000).toISOString();
+
+  db.prepare(`
+    INSERT INTO password_resets (email, user_id, code_hash, code_salt, attempts, max_attempts, expires_at, resend_available_at, used)
+    VALUES (?, ?, ?, ?, 0, 5, ?, ?, 0)
+  `).run(normalizedEmail, user.id, codeHash, salt, expiresAt, resendAvailableAt);
+
+  logAudit({
+    userId: user.id || null,
+    action: 'VERIFICATION_CODE_GENERATED',
+    entityType: 'user',
+    entityId: (user.id || '').toString(),
+    details: `Verification code generated for ${normalizedEmail}. Expires in ${durationMinutes} minutes.`
+  });
+
+  return {
+    status: 'CODE_CREATED',
+    user,
+    email: normalizedEmail,
+    expiresAt
+  };
+}
+
+function sqliteVerifyResetCode(email, rawCode) {
+  if (!email || !rawCode || typeof email !== 'string' || typeof rawCode !== 'string') {
+    return { success: false, error: 'Valid email and 6-digit code are required.' };
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const cleanCode = rawCode.trim();
+
+  const record = db.prepare(`
+    SELECT * FROM password_resets 
+    WHERE email = ? AND used = 0
+    ORDER BY id DESC LIMIT 1
+  `).get(normalizedEmail);
+
+  if (!record) {
+    return { success: false, error: 'Invalid or expired verification code. Please request a new one.' };
+  }
+
+  if (new Date() > new Date(record.expires_at)) {
+    db.prepare('UPDATE password_resets SET used = 1 WHERE id = ?').run(record.id);
+    return { success: false, error: 'Verification code has expired. Please request a new code.' };
+  }
+
+  if (record.attempts >= record.max_attempts) {
+    db.prepare('UPDATE password_resets SET used = 1 WHERE id = ?').run(record.id);
+    return {
+      success: false,
+      error: 'Maximum verification attempts exceeded. For your security, this code has been deactivated. Please request a new code.',
+      lockedOut: true
+    };
+  }
+
+  const calculatedHash = crypto.createHash('sha256').update(cleanCode + record.code_salt).digest('hex');
+  let isMatch = false;
+  try {
+    isMatch = crypto.timingSafeEqual(Buffer.from(record.code_hash, 'hex'), Buffer.from(calculatedHash, 'hex'));
+  } catch (e) {
+    isMatch = false;
+  }
+
+  if (!isMatch) {
+    const nextAttempts = record.attempts + 1;
+    db.prepare('UPDATE password_resets SET attempts = ? WHERE id = ?').run(nextAttempts, record.id);
+    const attemptsLeft = Math.max(0, record.max_attempts - nextAttempts);
+    if (attemptsLeft === 0) {
+      db.prepare('UPDATE password_resets SET used = 1 WHERE id = ?').run(record.id);
+      return {
+        success: false,
+        error: 'Incorrect verification code. Maximum attempts reached. Please request a new code.',
+        lockedOut: true
+      };
+    }
+    return {
+      success: false,
+      error: `Incorrect verification code. ${attemptsLeft} attempt${attemptsLeft === 1 ? '' : 's'} remaining.`,
+      attemptsRemaining: attemptsLeft
+    };
+  }
+
+  const rawResetAuthToken = crypto.randomBytes(32).toString('hex');
+  const resetTokenHash = crypto.createHash('sha256').update(rawResetAuthToken).digest('hex');
+  const tokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
+  db.prepare(`
+    UPDATE password_resets 
+    SET used = 1, reset_token_hash = ?, reset_token_expires_at = ?, updated_at = datetime('now')
+    WHERE id = ?
+  `).run(resetTokenHash, tokenExpiresAt, record.id);
+
+  logAudit({
+    userId: record.user_id,
+    action: 'VERIFICATION_CODE_VERIFIED',
+    entityType: 'user',
+    entityId: record.user_id ? record.user_id.toString() : 'unknown',
+    details: `Verification code successfully verified for ${normalizedEmail}. Reset authorization token issued.`
+  });
+
+  return {
+    success: true,
+    resetToken: rawResetAuthToken,
+    message: 'Verification code confirmed. You may now reset your password.'
+  };
+}
+
+function sqliteExecutePasswordReset(resetAuthToken, newPassword) {
+  if (!resetAuthToken || typeof resetAuthToken !== 'string' || !newPassword || typeof newPassword !== 'string') {
+    throw new Error('Reset authorization token and new password are required.');
+  }
+
+  const tokenHash = crypto.createHash('sha256').update(resetAuthToken.trim()).digest('hex');
+  const record = db.prepare(`
+    SELECT * FROM password_resets 
+    WHERE reset_token_hash = ? AND datetime(reset_token_expires_at) > datetime('now')
+    ORDER BY id DESC LIMIT 1
+  `).get(tokenHash);
+
+  if (!record) {
+    return resetPasswordWithToken(resetAuthToken, newPassword);
+  }
+
+  const user = db.prepare('SELECT * FROM users WHERE email = ? OR normalized_email = ? OR id = ?').get(record.email, record.email, record.user_id);
+  if (!user) {
+    throw new Error('Associated account could not be found.');
+  }
+
+  const { hash, salt } = hashPassword(newPassword);
+  db.prepare("UPDATE users SET password_hash = ?, salt = ?, reset_token_hash = NULL, reset_token_expires = NULL, updated_at = datetime('now') WHERE id = ?").run(hash, salt, user.id);
+  db.prepare("UPDATE password_resets SET reset_token_hash = NULL, reset_token_expires_at = NULL, updated_at = datetime('now') WHERE id = ?").run(record.id);
+
+  db.prepare('DELETE FROM sessions WHERE user_id = ?').run(user.id);
+
+  logAudit({
+    userId: user.id,
+    action: 'PASSWORD_RESET_COMPLETED',
+    entityType: 'user',
+    entityId: user.id.toString(),
+    details: `Password reset successfully completed for ${user.email} using verified code authorization.`
+  });
+
+  return {
+    id: user.id,
+    email: user.email,
+    fullName: user.full_name
+  };
+}
+
 function createSession(userId, durationDays = 7) {
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000).toISOString();
@@ -2961,7 +3165,10 @@ function dispatch(mongoFn, sqliteFn) {
       let syncRes = null;
       const skipSqlite = [
         mongoRepo.createPasswordResetToken,
-        mongoRepo.resetPasswordWithToken
+        mongoRepo.resetPasswordWithToken,
+        mongoRepo.createVerificationCode,
+        mongoRepo.verifyResetCode,
+        mongoRepo.executePasswordReset
       ].includes(mongoFn);
 
       if (!skipSqlite && sqliteAvailable && typeof sqliteFn === 'function') {
@@ -2986,7 +3193,10 @@ function dispatch(mongoFn, sqliteFn) {
             mongoRepo.getUserByEmail,
             mongoRepo.getUserByGoogleSubject,
             mongoRepo.createPasswordResetToken,
-            mongoRepo.resetPasswordWithToken
+            mongoRepo.resetPasswordWithToken,
+            mongoRepo.createVerificationCode,
+            mongoRepo.verifyResetCode,
+            mongoRepo.executePasswordReset
           ].includes(mongoFn);
 
           if (!isAuthFn && sqliteAvailable && syncRes !== null) {
@@ -3084,6 +3294,9 @@ module.exports = {
   linkGoogleAccount: dispatch(mongoRepo.linkGoogleAccount, linkGoogleAccount),
   createPasswordResetToken: dispatch(mongoRepo.createPasswordResetToken, createPasswordResetToken),
   resetPasswordWithToken: dispatch(mongoRepo.resetPasswordWithToken, resetPasswordWithToken),
+  createVerificationCode: dispatch(mongoRepo.createVerificationCode, sqliteCreateVerificationCode),
+  verifyResetCode: dispatch(mongoRepo.verifyResetCode, sqliteVerifyResetCode),
+  executePasswordReset: dispatch(mongoRepo.executePasswordReset, sqliteExecutePasswordReset),
   verifyUserLogin: dispatch(mongoRepo.verifyUserLogin, verifyUserLogin),
   createSession: dispatch(mongoRepo.createSession, createSession),
   getSessionUser: dispatch(mongoRepo.getSessionUser, getSessionUser),

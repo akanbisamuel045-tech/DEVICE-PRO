@@ -90,21 +90,29 @@
         btnSubmit.disabled = false;
 
         if (response.ok && data.success) {
+          try {
+            sessionStorage.setItem('reset_email', email);
+          } catch (e) {}
+
           showAlert(
-            data.message || 'If an account exists for this email address, password reset instructions have been sent.',
+            data.message || 'If an eligible account exists for this email address, a 6-digit verification code has been sent.',
             'success'
           );
 
-          // If development reset link is provided (when email provider is not yet set up), show helpful testing note
-          if (data.devResetUrl) {
-            console.log('[DEV RESET URL]:', data.devResetUrl);
-            const devNote = document.createElement('div');
-            devNote.style.cssText = 'margin-top: 10px; font-size: 12px; word-break: break-all; color: #1e40af; background: #eff6ff; padding: 10px; border-radius: 8px; border: 1px dashed #93c5fd;';
-            devNote.innerHTML = `<strong>Developer Testing Mode:</strong><br><a href="${data.devResetUrl}" style="color: #0866d9;">Click here to reset password directly</a>`;
-            authAlert.appendChild(devNote);
-          }
+          // Add transition button directly into the alert
+          const proceedBtn = document.createElement('a');
+          proceedBtn.href = `/verify-reset-code.html?email=${encodeURIComponent(email)}`;
+          proceedBtn.className = 'btn-auth-submit';
+          proceedBtn.style.cssText = 'display: inline-flex; align-items: center; justify-content: center; margin-top: 14px; text-decoration: none; width: 100%; height: 44px; font-size: 14px;';
+          proceedBtn.innerHTML = '<span>Enter 6-Digit Code &rarr;</span>';
+          authAlert.appendChild(proceedBtn);
 
-          if (emailInput) emailInput.value = '';
+          // Auto-redirect after 1.8 seconds to verify code page
+          setTimeout(() => {
+            window.location.href = `/verify-reset-code.html?email=${encodeURIComponent(email)}`;
+          }, 1800);
+        } else if (response.status === 429) {
+          showAlert(data.error || 'Please wait a moment before requesting another verification code.', 'error');
         } else {
           showAlert(data.error || 'Unable to process recovery request. Please try again.', 'error');
         }

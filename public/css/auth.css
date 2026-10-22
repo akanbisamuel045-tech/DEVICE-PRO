@@ -604,3 +604,187 @@ body.auth-page {
     align-self: flex-end;
   }
 }
+
+/* =========================================================================
+   6-Digit Verification Code (OTP) & Cooldown Styles
+   ========================================================================= */
+.otp-email-banner {
+  background: var(--dp-bg-pill);
+  border: 1px solid #bfdbfe;
+  color: var(--dp-deep-blue);
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 22px;
+  text-align: center;
+  word-break: break-all;
+}
+
+.otp-email-banner strong {
+  color: var(--dp-primary);
+}
+
+.otp-email-change {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--dp-primary);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.otp-container {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.otp-digit {
+  width: 48px;
+  height: 56px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dp-deep-blue);
+  background: #ffffff;
+  border: 1.5px solid var(--dp-border-light);
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.otp-digit:focus {
+  border-color: var(--dp-primary);
+  box-shadow: 0 0 0 3px rgba(8, 102, 217, 0.15);
+  background: #fcfdff;
+}
+
+.otp-digit.has-value {
+  border-color: var(--dp-deep-blue);
+  background: #f8fafc;
+}
+
+.otp-digit.error {
+  border-color: #ef4444;
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+@media (max-width: 420px) {
+  .otp-container {
+    gap: 6px;
+  }
+  .otp-digit {
+    width: 40px;
+    height: 48px;
+    font-size: 20px;
+  }
+}
+
+.resend-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--dp-text-muted);
+}
+
+.btn-resend-link {
+  background: none;
+  border: none;
+  color: var(--dp-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: 13px;
+  font-family: inherit;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.btn-resend-link:hover:not(:disabled) {
+  color: var(--dp-primary-hover);
+}
+
+.btn-resend-link:disabled {
+  color: var(--dp-text-subtle);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.attempts-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #92400e;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+/* =========================================================================
+   Password Strength & Requirements Checklist
+   ========================================================================= */
+.password-requirements-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  margin-bottom: 18px;
+  font-size: 12.5px;
+}
+
+.password-requirements-title {
+  font-weight: 600;
+  color: var(--dp-deep-blue);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.password-req-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+@media (max-width: 440px) {
+  .password-req-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.password-req-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dp-text-muted);
+  transition: color 0.15s ease;
+}
+
+.password-req-item.met {
+  color: #15803d;
+  font-weight: 500;
+}
+
+.password-req-icon {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+

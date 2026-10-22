@@ -246,7 +246,7 @@ async function runTests() {
 
   let resetToken = null;
 
-  await test('POST /api/auth/forgot-password generates token with anti-enumeration', async () => {
+  await test('POST /api/auth/forgot-password dispatches verification code with anti-enumeration', async () => {
     const res = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -255,9 +255,28 @@ async function runTests() {
     assert.strictEqual(res.status, 200);
     const data = await res.json();
     assert.strictEqual(data.success, true);
-    assert(data.message.includes('password reset instructions'));
-    assert(data.debugResetToken, 'In development test mode, debugResetToken is provided');
-    resetToken = data.debugResetToken;
+    assert(data.message.includes('verification code') || data.message.includes('password reset instructions'));
+
+    // Retrieve dispatched verification code from email service test mailbox
+    const { getLastTestEmail } = require('../lib/email-service');
+    const sentEmail = getLastTestEmail();
+    assert(sentEmail, 'Verification email must be captured in test mailbox');
+    assert(sentEmail.code, 'Sent email must contain 6-digit verification code');
+
+    // Verify 6-digit code to generate secure reset authorization token
+    const verifyRes = await fetch(`${BASE_URL}/api/auth/verify-reset-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: testEmail,
+        code: sentEmail.code
+      })
+    });
+    assert.strictEqual(verifyRes.status, 200);
+    const verifyData = await verifyRes.json();
+    assert.strictEqual(verifyData.success, true);
+    assert(verifyData.resetToken, 'Verification must yield a resetToken');
+    resetToken = verifyData.resetToken;
   });
 
   await test('POST /api/auth/forgot-password returns identical success for non-existent email', async () => {
@@ -269,8 +288,7 @@ async function runTests() {
     assert.strictEqual(res.status, 200);
     const data = await res.json();
     assert.strictEqual(data.success, true);
-    assert(data.message.includes('password reset instructions'));
-    assert(!data.debugResetToken, 'Non-existent account must not return a reset token');
+    assert(data.message.includes('verification code') || data.message.includes('password reset instructions'));
   });
 
   const newPassword = 'NewSecretPassword2026!';

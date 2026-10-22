@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Reset Code | DEVICE PRO — Clean Energy Solutions Nigeria</title>
+  <meta name="description" content="Verify your 6-digit password recovery code securely to set a new password for your DEVICE PRO account.">
+  <link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg">
+  <link rel="stylesheet" href="/css/auth.css?v=3">
+  <script defer src="/js/lucide.min.js"></script>
+  <script defer src="/js/lucide-init.js"></script>
+  <script defer src="/js/verify-reset-code.js?v=1"></script>
+</head>
+<body class="auth-page">
+
+  <!-- Accessible Skip to Form Link -->
+  <a href="#verify-form" class="auth-back-link" style="position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden;" onfocus="this.style.position='static'; this.style.width='auto'; this.style.height='auto';">Skip to Verification Form</a>
+
+  <!-- Top-Left Corner Geometric Accent -->
+  <svg class="auth-corner-accent auth-corner-top-left" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <polygon points="0,0 120,0 0,120" fill="#0866D9" />
+    <polygon points="0,70 170,0 135,0 0,135" fill="#FFBF00" />
+    <polygon points="0,110 200,0 170,0 0,170" fill="#073B82" />
+  </svg>
+
+  <!-- Bottom-Right Corner Geometric Accent -->
+  <svg class="auth-corner-accent auth-corner-bottom-right" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <polygon points="200,90 200,60 60,200 90,200" fill="#FFBF00" />
+    <polygon points="200,140 200,95 95,200 140,200" fill="#0866D9" />
+    <polygon points="200,200 200,145 145,200" fill="#073B82" />
+  </svg>
+
+  <!-- Main Verification Card -->
+  <main class="auth-card-container">
+    <div class="auth-card" id="auth-card">
+      
+      <!-- Logo Header -->
+      <header class="auth-brand-header">
+        <a href="/" class="auth-brand-logo-link" aria-label="DEVICE PRO Homepage">
+          <img src="/images/devicepro-original-transparent.png" alt="DEVICE PRO Logo" class="auth-brand-logo-img">
+        </a>
+        <p class="auth-brand-tagline">Powering Your Devices. Enriching Your Life.</p>
+      </header>
+
+      <!-- Heading -->
+      <h1 class="auth-title">Verify Reset Code</h1>
+      <p class="auth-subtitle">Enter the 6-digit verification code sent to your registered email address.</p>
+
+      <!-- Target Email Banner -->
+      <div class="otp-email-banner" id="email-banner" role="status">
+        Sent to: <strong id="target-email">your email</strong>
+        <a href="/forgot-password.html" class="otp-email-change">Change</a>
+      </div>
+
+      <!-- Feedback Alert -->
+      <div id="auth-alert" class="auth-alert" role="alert" aria-live="polite">
+        <i data-lucide="alert-circle" id="alert-icon" style="flex-shrink: 0; width: 18px; height: 18px;"></i>
+        <span id="alert-message"></span>
+      </div>
+
+      <!-- Verification Form -->
+      <form id="verify-form" class="auth-form" novalidate>
+        <input type="hidden" id="email-hidden" name="email">
+
+        <!-- 6-Digit OTP Container -->
+        <div class="otp-container" id="otp-container" aria-label="Enter 6-digit code">
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-digit" data-index="0" autocomplete="one-time-code" aria-label="Digit 1" autofocus required>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-digit" data-index="1" aria-label="Digit 2" required>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-digit" data-index="2" aria-label="Digit 3" required>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-digit" data-index="3" aria-label="Digit 4" required>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-digit" data-index="4" aria-label="Digit 5" required>
+          <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" class="otp-digit" data-index="5" aria-label="Digit 6" required>
+        </div>
+
+        <!-- Cooldown and Attempts Section -->
+        <div class="resend-container">
+          <button type="button" class="btn-resend-link" id="btn-resend" disabled>
+            Resend Code (<span id="cooldown-timer">60</span>s)
+          </button>
+          <span class="attempts-badge" id="attempts-badge">
+            <i data-lucide="shield" style="width: 13px; height: 13px;"></i>
+            <span id="attempts-text">5 attempts remaining</span>
+          </span>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-auth-submit" id="btn-submit" style="margin-top: 14px;">
+          <span class="btn-text-content">Verify Code & Continue &rarr;</span>
+          <span class="auth-spinner" aria-hidden="true"></span>
+        </button>
+
+      </form>
+
+      <!-- Bottom Card Footer (Back to Login) -->
+      <footer class="auth-card-footer">
+        Remembered your password? 
+        <a href="/login.html" class="auth-card-footer-link">Back to Sign In &rarr;</a>
+      </footer>
+
+    </div>
+
+    <!-- Back to Store Link -->
+    <a href="/" class="auth-back-link">&larr; Return to DEVICE PRO Store</a>
+
+  </main>
+
+</body>
+</html>

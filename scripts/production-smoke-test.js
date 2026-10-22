@@ -65,6 +65,7 @@ async function runSmokeTests() {
     { route: '/login', title: 'Sign In (Customer & Staff)' },
     { route: '/register', title: 'Account Registration' },
     { route: '/forgot-password', title: 'Password Recovery' },
+    { route: '/verify-reset-code', title: 'Verify Reset Code' },
     { route: '/reset-password', title: 'Password Reset' }
   ];
 

@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const {
   Product, Category, CaseStudy, Enquiry, Quote,
-  Order, Payment, Warranty, SupportTicket, User, Session, AuditLog
+  Order, Payment, Warranty, SupportTicket, User, Session, AuditLog, PasswordReset
 } = require('./models');
 
 // Password verification helper (consistent with SQLite implementation)
@@ -987,6 +987,7 @@ async function createUser({
   phone = null,
   password = null,
   googleSubject = null,
+  google_subject = null,
   emailVerified = false,
   role = 'customer'
 }) {
@@ -1034,7 +1035,7 @@ async function createUser({
     salt,
     full_name: fullName.trim(),
     role: safeRole,
-    google_subject: googleSubject || null,
+    google_subject: googleSubject || google_subject || null,
     email_verified: Boolean(emailVerified)
   });
 
@@ -1188,13 +1189,246 @@ async function resetPasswordWithToken(rawToken, newPassword) {
   };
 }
 
+/**
+ * Stage 20: 6-Digit Email Verification Code System
+ */
+async function createVerificationCode(email, rawCode, durationMinutes = 10) {
+  if (!email || typeof email !== 'string') return { status: 'INVALID_EMAIL' };
+  const normalizedEmail = email.trim().toLowerCase();
+
+  const user = await getUserByEmail(normalizedEmail);
+  if (!user) {
+    return { status: 'NOT_FOUND', email: normalizedEmail };
+  }
+
+  // Google-Only Account Check (Step 7)
+  const isGoogleOnly = Boolean(user.google_subject && (!user.password_hash || user.password_hash === ''));
+  if (isGoogleOnly) {
+    return { status: 'GOOGLE_ONLY', user, email: normalizedEmail };
+  }
+
+  // Check resend cooldown on active pending requests (60 seconds)
+  const activeRecord = await PasswordReset.findOne({
+    email: normalizedEmail,
+    used: false,
+    expires_at: { $gt: new Date() }
+  }).sort({ created_at: -1 });
+
+  if (activeRecord && activeRecord.resend_available_at > new Date()) {
+    const secondsRemaining = Math.max(1, Math.ceil((activeRecord.resend_available_at.getTime() - Date.now()) / 1000));
+    return { status: 'COOLDOWN_ACTIVE', secondsRemaining, email: normalizedEmail, user };
+  }
+
+  // Invalidate any existing unused records for this email
+  await PasswordReset.updateMany({ email: normalizedEmail, used: false }, { $set: { used: true } });
+
+  // Hash code with random salt
+  const salt = crypto.randomBytes(16).toString('hex');
+  const codeHash = crypto.createHash('sha256').update(rawCode + salt).digest('hex');
+  const expiresAt = new Date(Date.now() + durationMinutes * 60 * 1000);
+  const resendAvailableAt = new Date(Date.now() + 60 * 1000);
+
+  const resetDoc = new PasswordReset({
+    email: normalizedEmail,
+    user_id: user.id || null,
+    code_hash: codeHash,
+    code_salt: salt,
+    attempts: 0,
+    max_attempts: 5,
+    expires_at: expiresAt,
+    resend_available_at: resendAvailableAt,
+    used: false
+  });
+
+  await resetDoc.save();
+
+  await logAudit({
+    userId: user.id || null,
+    action: 'VERIFICATION_CODE_GENERATED',
+    entityType: 'user',
+    entityId: (user.id || user._id).toString(),
+    details: `Verification code generated for ${normalizedEmail}. Expires in ${durationMinutes} minutes.`
+  });
+
+  return {
+    status: 'CODE_CREATED',
+    user,
+    email: normalizedEmail,
+    expiresAt
+  };
+}
+
+async function verifyResetCode(email, rawCode) {
+  if (!email || !rawCode || typeof email !== 'string' || typeof rawCode !== 'string') {
+    return { success: false, error: 'Valid email and 6-digit code are required.' };
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const cleanCode = rawCode.trim();
+
+  // Find latest code record for this email
+  const record = await PasswordReset.findOne({
+    email: normalizedEmail
+  }).sort({ created_at: -1 });
+
+  if (!record) {
+    return { success: false, error: 'Invalid or expired verification code. Please request a new one.' };
+  }
+
+  // Max 5 attempts check (lockout takes precedence)
+  if (record.attempts >= record.max_attempts) {
+    record.used = true;
+    await record.save();
+    return {
+      success: false,
+      error: 'Maximum verification attempts exceeded. For your security, this code has been deactivated. Please request a new code.',
+      lockedOut: true,
+      attemptsRemaining: 0
+    };
+  }
+
+  // Single-use check: if already used
+  if (record.used) {
+    return { success: false, error: 'This verification code has already been used. Please request a new code.' };
+  }
+
+  // Explicit expiry check on every request
+  if (new Date() > new Date(record.expires_at)) {
+    record.used = true;
+    await record.save();
+    return { success: false, error: 'Verification code has expired. Please request a new code.' };
+  }
+
+  // Timing-safe code comparison
+  const calculatedHash = crypto.createHash('sha256').update(cleanCode + record.code_salt).digest('hex');
+  let isMatch = false;
+  try {
+    isMatch = crypto.timingSafeEqual(Buffer.from(record.code_hash, 'hex'), Buffer.from(calculatedHash, 'hex'));
+  } catch (e) {
+    isMatch = false;
+  }
+
+  if (!isMatch) {
+    record.attempts += 1;
+    await record.save();
+    const attemptsLeft = Math.max(0, record.max_attempts - record.attempts);
+    if (attemptsLeft === 0) {
+      record.used = true;
+      await record.save();
+      return {
+        success: false,
+        error: 'Too many incorrect attempts. This verification code has been invalidated for security. Please request a new code.',
+        lockedOut: true,
+        attemptsRemaining: 0
+      };
+    }
+    return {
+      success: false,
+      error: `Incorrect verification code. ${attemptsLeft} attempt${attemptsLeft === 1 ? '' : 's'} remaining.`,
+      attemptsRemaining: attemptsLeft
+    };
+  }
+
+  // Code verified! Issue single-use 15-minute reset authorization token
+  const rawResetAuthToken = crypto.randomBytes(32).toString('hex');
+  const resetTokenHash = crypto.createHash('sha256').update(rawResetAuthToken).digest('hex');
+  const tokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+
+  record.used = true;
+  record.reset_token_hash = resetTokenHash;
+  record.reset_token_expires_at = tokenExpiresAt;
+  await record.save();
+
+  await logAudit({
+    userId: record.user_id,
+    action: 'VERIFICATION_CODE_VERIFIED',
+    entityType: 'user',
+    entityId: record.user_id ? record.user_id.toString() : 'unknown',
+    details: `Verification code successfully verified for ${normalizedEmail}. Reset authorization token issued.`
+  });
+
+  return {
+    success: true,
+    resetToken: rawResetAuthToken,
+    message: 'Verification code confirmed. You may now reset your password.'
+  };
+}
+
+async function executePasswordReset(resetAuthToken, newPassword) {
+  if (!resetAuthToken || typeof resetAuthToken !== 'string' || !newPassword || typeof newPassword !== 'string') {
+    throw new Error('Reset authorization token and new password are required.');
+  }
+
+  const tokenHash = crypto.createHash('sha256').update(resetAuthToken.trim()).digest('hex');
+  
+  const record = await PasswordReset.findOne({
+    reset_token_hash: tokenHash,
+    reset_token_expires_at: { $gt: new Date() }
+  });
+
+  if (!record) {
+    // Check legacy user table for backwards compatibility
+    const legacyUser = await User.findOne({
+      reset_token_hash: tokenHash,
+      reset_token_expires: { $gt: new Date() }
+    });
+    if (legacyUser) {
+      return resetPasswordWithToken(resetAuthToken, newPassword);
+    }
+    throw new Error('Invalid or expired password reset authorization. Please start over.');
+  }
+
+  const user = await User.findOne({
+    $or: [
+      { email: record.email },
+      { normalized_email: record.email },
+      { id: record.user_id }
+    ]
+  });
+
+  if (!user) {
+    throw new Error('Associated account could not be found.');
+  }
+
+  // Hash new password using scrypt
+  const { hash, salt } = hashPassword(newPassword);
+  user.password_hash = hash;
+  user.salt = salt;
+  user.reset_token_hash = null;
+  user.reset_token_expires = null;
+  await user.save();
+
+  // Invalidate authorization token after single use
+  record.reset_token_hash = null;
+  record.reset_token_expires_at = null;
+  await record.save();
+
+  // Invalidate all active sessions for this user across all devices
+  await Session.deleteMany({ user_id: user.id });
+
+  await logAudit({
+    userId: user.id,
+    action: 'PASSWORD_RESET_COMPLETED',
+    entityType: 'user',
+    entityId: user.id.toString(),
+    details: `Password reset successfully completed for ${user.email} using verified code authorization.`
+  });
+
+  return {
+    id: user.id,
+    email: user.email,
+    fullName: user.full_name
+  };
+}
+
 async function createSession(userId, durationDays = 7) {
   const token = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
 
+  const numericUserId = Number(userId) || 1;
   const session = new Session({
     token,
-    user_id: typeof userId === 'number' ? userId : 1,
+    user_id: numericUserId,
     expires_at: expiresAt
   });
   await session.save();
@@ -1211,7 +1445,12 @@ async function getSessionUser(token) {
     return null;
   }
 
-  const user = await User.findOne({ id: session.user_id }).lean();
+  const user = await User.findOne({
+    $or: [
+      { id: Number(session.user_id) },
+      { id: session.user_id }
+    ]
+  }).lean();
   if (!user) return null;
 
   return {
@@ -1338,6 +1577,7 @@ module.exports = {
   getUserByUsername, getUserByEmail, getUserByGoogleSubject, getUserById,
   createUser, linkGoogleAccount,
   createPasswordResetToken, resetPasswordWithToken,
+  createVerificationCode, verifyResetCode, executePasswordReset,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
   logAudit, getAuditLogs, getDatabaseStats, exportDatabaseBackup
 };
