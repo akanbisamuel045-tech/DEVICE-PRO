@@ -1910,7 +1910,7 @@ dialog#search-dialog::backdrop {
   }
 }
 
-/* 600px and below (Mobile standard with 80% zoom support) */
+/* 600px and below (Mobile standard with 90% zoom support) */
 @media (max-width: 600px) {
   .top-info-right {
     gap: 10px;
