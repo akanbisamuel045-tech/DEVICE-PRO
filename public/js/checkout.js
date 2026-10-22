@@ -247,4 +247,47 @@ document.addEventListener('DOMContentLoaded', () => {
       recalculateTotals();
     }
   });
+
+  // ==========================================
+  // Book a Call Consultation Modal Handlers
+  // ==========================================
+  const bookCallBtn = document.getElementById('btn-book-call-checkout');
+  const bookCallModal = document.getElementById('book-call-modal');
+  const closeCallModalBtn = document.getElementById('btn-close-call-modal');
+
+  if (bookCallBtn && bookCallModal) {
+    function openBookCallModal(e) {
+      if (e) e.preventDefault();
+      bookCallModal.classList.add('is-open');
+      bookCallModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (closeCallModalBtn) closeCallModalBtn.focus();
+    }
+
+    function closeBookCallModal() {
+      bookCallModal.classList.remove('is-open');
+      bookCallModal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (bookCallBtn) bookCallBtn.focus();
+    }
+
+    bookCallBtn.addEventListener('click', openBookCallModal);
+
+    if (closeCallModalBtn) {
+      closeCallModalBtn.addEventListener('click', closeBookCallModal);
+    }
+
+    bookCallModal.addEventListener('click', (e) => {
+      if (e.target === bookCallModal) {
+        closeBookCallModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && bookCallModal.classList.contains('is-open')) {
+        closeBookCallModal();
+      }
+    });
+  }
 });
+

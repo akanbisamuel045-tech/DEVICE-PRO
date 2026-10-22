@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="/css/components.css?v=17">
   <link rel="stylesheet" href="/css/header.css?v=1">
   <link rel="stylesheet" href="/css/footer.css?v=2">
-  <link rel="stylesheet" href="/css/checkout.css?v=1">
+  <link rel="stylesheet" href="/css/checkout.css?v=2">
 </head>
 
 <body class="devicepro-body">
@@ -30,32 +30,24 @@
   <!-- Accessible Skip Link (WCAG 2.2 AA) -->
   <a href="#checkout-main" class="skip-to-content">Skip to checkout form</a>
 
-  <!-- Header -->
-  <header class="site-header" role="banner">
-    <div class="layout-container header-inner">
-      <a href="/" class="brand-logo-link" aria-label="DEVICE PRO Homepage">
-        <img src="/images/logo.svg" alt="DEVICE PRO" class="brand-logo-img" width="130" height="28"
-          style="height: 28px; width: auto; max-width: 140px; object-fit: contain;">
+  <!-- Header (Clean Minimalist Checkout Navbar) -->
+  <header class="site-header checkout-navbar" role="banner">
+    <div class="layout-container checkout-navbar-inner">
+      <a href="/" class="checkout-logo-link" aria-label="DEVICE PRO Homepage">
+        <img src="/images/logo.svg" alt="DEVICE PRO" class="checkout-logo-img" width="145" height="32"
+          style="height: 32px; width: auto; max-width: 160px; object-fit: contain;">
       </a>
 
-      <nav class="header-nav" aria-label="Primary Navigation">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/products" class="nav-link">Products</a>
-        <a href="/packages" class="nav-link">Solar Package</a>
-        <a href="/projects" class="nav-link">Projects</a>
-        <a href="/calculator" class="nav-link">Calculator</a>
-        <a href="/about" class="nav-link">About</a>
-        <a href="/contact" class="nav-link">Contacts</a>
-      </nav>
-
-      <div class="header-actions">
-        <div class="checkout-secure-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5"
-            aria-hidden="true">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-          </svg>
-          <span>256-Bit SSL Encrypted</span>
-        </div>
+      <div class="checkout-navbar-actions">
+        <a href="tel:+2348033882268" class="btn-book-call" id="btn-book-call-checkout" aria-label="Book a call with a solar engineer">
+          <span class="btn-book-call-icon-wrap" aria-hidden="true">
+            <svg class="phone-call-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+          </span>
+          <span class="btn-book-call-label">Book a call</span>
+          <span class="btn-book-call-badge">Free</span>
+        </a>
       </div>
     </div>
   </header>
@@ -549,12 +541,84 @@
     <div class="footer-watermark" aria-hidden="true">DEVICE PRO</div>
   </footer>
 
+  <!-- Book a Call Dialog / Modal -->
+  <div id="book-call-modal" class="book-call-modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modal-call-title">
+    <div class="book-call-modal-dialog">
+      <div class="book-call-modal-header">
+        <div class="modal-icon-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F9B000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+        </div>
+        <div class="modal-title-wrap">
+          <h3 id="modal-call-title" class="book-call-modal-title">Book a Call with an Engineer</h3>
+          <p class="book-call-modal-subtitle">Need immediate technical guidance or custom inverter/battery sizing for your order?</p>
+        </div>
+        <button type="button" class="book-call-modal-close" id="btn-close-call-modal" aria-label="Close dialog">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="book-call-modal-body">
+        <div class="call-options-list">
+          <!-- Direct Phone Call -->
+          <a href="tel:+2348033882268" class="call-option-card">
+            <div class="option-icon-box call-phone-bg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+            </div>
+            <div class="option-content">
+              <div class="option-title-row">
+                <span class="option-title">Direct Engineer Hotline</span>
+                <span class="option-status-badge available"><span class="status-pulse-dot"></span> Live Now</span>
+              </div>
+              <div class="option-phone">+234 803 388 2268</div>
+              <p class="option-note">Direct desk at Victoria Island engineering hub • Mon–Sat 8:00 AM – 6:00 PM</p>
+            </div>
+            <div class="option-arrow">→</div>
+          </a>
+
+          <!-- WhatsApp Chat -->
+          <a href="https://wa.me/2348031234567?text=Hello%20DEVICE%20PRO%20Engineering%2C%20I%20am%20at%20checkout%20and%20need%20assistance%20with%20my%20solar%20order." target="_blank" rel="noopener noreferrer" class="call-option-card whatsapp-card">
+            <div class="option-icon-box call-whatsapp-bg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+              </svg>
+            </div>
+            <div class="option-content">
+              <div class="option-title-row">
+                <span class="option-title">WhatsApp Technical Desk</span>
+                <span class="option-status-badge fast">Fast Response</span>
+              </div>
+              <div class="option-phone">Instant Engineer Chat</div>
+              <p class="option-note">Share load lists, distribution board photos, or delivery questions</p>
+            </div>
+            <div class="option-arrow">→</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="book-call-modal-footer">
+        <div class="modal-footer-guarantee">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          <span>Free 15-Minute COREN Solar Engineering Consultation. Zero obligation.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script src="/js/lucide.min.js"></script>
   <script src="/js/lucide-init.js"></script>
   <script src="/js/cart.js?v=2"></script>
   <script src="/js/search.js?v=1"></script>
-  <script src="/js/checkout.js?v=1"></script>
+  <script src="/js/checkout.js?v=2"></script>
 </body>
 
 </html>

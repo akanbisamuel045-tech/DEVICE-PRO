@@ -3,37 +3,156 @@
    Layout Archetype 4: Progressive Multi-Step Form
    ============================================================================= */
 
-/* Header & Brand Logo Styling */
-.site-header {
-  background-color: #0A121F;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 14px 0;
+/* =============================================================================
+   Header & Brand Logo Styling (Clean Minimalist Checkout Navbar)
+   ============================================================================= */
+.site-header.checkout-navbar {
+  background: #080E1A;
+  background-color: rgba(8, 14, 26, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.35);
+  padding: 16px 0;
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: all 0.25s ease;
+  height: auto !important;
+  min-height: 72px;
+  display: flex !important;
+  align-items: center !important;
 }
 
-.header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+.checkout-navbar-inner {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 20px;
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
-.brand-logo-link {
+.checkout-logo-link {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
   flex-shrink: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.brand-logo-img {
-  height: 28px !important;
-  max-height: 28px !important;
+.checkout-logo-link:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.checkout-logo-link:focus-visible {
+  outline: 2px solid #F9B000;
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.checkout-logo-img {
+  height: 32px !important;
+  max-height: 32px !important;
   width: auto !important;
-  max-width: 140px !important;
+  max-width: 160px !important;
   object-fit: contain;
   display: block;
+}
+
+.checkout-navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* "Book a call" Action Button */
+.btn-book-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 22px;
+  background: linear-gradient(135deg, #F9B000 0%, #FFB703 100%);
+  color: #07111D !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-decoration: none !important;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 18px rgba(249, 176, 0, 0.32);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn-book-call:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(249, 176, 0, 0.48);
+  filter: brightness(1.04);
+}
+
+.btn-book-call:active {
+  transform: translateY(0);
+  filter: brightness(0.96);
+  box-shadow: 0 2px 8px rgba(249, 176, 0, 0.3);
+}
+
+.btn-book-call:focus {
+  outline: none;
+}
+
+.btn-book-call:focus-visible {
+  outline: 2px solid #F9B000;
+  outline-offset: 3px;
+}
+
+.btn-book-call-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(7, 17, 29, 0.12);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.btn-book-call:hover .btn-book-call-icon-wrap {
+  transform: scale(1.1) rotate(-8deg);
+}
+
+.phone-call-svg {
+  display: block;
+}
+
+.btn-book-call-label {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.btn-book-call-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(7, 17, 29, 0.14);
+  color: #07111D;
+  border-radius: 9999px;
+  line-height: 1.2;
 }
 
 .checkout-main-content {
@@ -679,3 +798,274 @@
     display: none;
   }
 }
+
+@media (max-width: 480px) {
+  .site-header.checkout-navbar {
+    padding: 12px 0;
+  }
+  .checkout-logo-img {
+    height: 28px !important;
+    max-height: 28px !important;
+  }
+  .btn-book-call {
+    padding: 8px 14px;
+    gap: 7px;
+    font-size: 0.8125rem;
+  }
+  .btn-book-call-badge {
+    display: none;
+  }
+}
+
+/* =============================================================================
+   Book a Call Consultation Modal
+   ============================================================================= */
+.book-call-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 10, 18, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.book-call-modal-backdrop.is-open,
+.book-call-modal-backdrop.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.book-call-modal-dialog {
+  background: #FFFFFF;
+  border-radius: 20px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 24px 60px -8px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+  transform: translateY(16px) scale(0.97);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #E2E8F0;
+}
+
+.book-call-modal-backdrop.is-open .book-call-modal-dialog,
+.book-call-modal-backdrop.active .book-call-modal-dialog {
+  transform: translateY(0) scale(1);
+}
+
+.book-call-modal-header {
+  padding: 24px 24px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  position: relative;
+  background: #0A121F;
+  color: #FFFFFF;
+}
+
+.modal-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(249, 176, 0, 0.12);
+  border: 1px solid rgba(249, 176, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-title-wrap {
+  flex: 1;
+  padding-right: 28px;
+}
+
+.book-call-modal-title {
+  margin: 0 0 4px;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.25;
+}
+
+.book-call-modal-subtitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #94A3B8;
+  line-height: 1.4;
+}
+
+.book-call-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #94A3B8;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.book-call-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.book-call-modal-body {
+  padding: 20px 24px;
+  background: #F8FAFC;
+}
+
+.call-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.call-option-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 16px;
+  text-decoration: none !important;
+  color: #0F172A !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.call-option-card:hover {
+  border-color: #F9B000;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.call-option-card.whatsapp-card:hover {
+  border-color: #25D366;
+}
+
+.option-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.call-phone-bg {
+  background: linear-gradient(135deg, #0A121F 0%, #1E293B 100%);
+}
+
+.call-whatsapp-bg {
+  background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+}
+
+.option-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.option-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.option-title {
+  font-size: 0.78125rem;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.option-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.option-status-badge.available {
+  background: #DCFCE7;
+  color: #16A34A;
+}
+
+.option-status-badge.fast {
+  background: #FEF3C7;
+  color: #B45309;
+}
+
+.status-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16A34A;
+  animation: statusPulse 1.8s infinite;
+}
+
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.option-phone {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 2px;
+}
+
+.option-note {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #64748B;
+}
+
+.option-arrow {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #CBD5E1;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.call-option-card:hover .option-arrow {
+  color: #0F172A;
+  transform: translateX(3px);
+}
+
+.book-call-modal-footer {
+  padding: 14px 24px;
+  background: #FFFFFF;
+  border-top: 1px solid #E2E8F0;
+}
+
+.modal-footer-guarantee {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #16A34A;
+}
+
