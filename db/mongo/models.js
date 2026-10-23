@@ -26,6 +26,8 @@ const productSchema = new mongoose.Schema({
   power_tier: { type: String, index: true },
   specifications: { type: String },
   image_url: { type: String },
+  cost_price_ngn: { type: Number, default: 0 },
+  warranty_years: { type: Number, default: 5 },
   stock_status: { type: String, default: 'in_stock', index: true },
   stock_quantity: { type: Number, default: 50 },
   featured: { type: Number, default: 0, index: true },

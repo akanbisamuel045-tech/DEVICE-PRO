@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const mongoose = require('mongoose');
 const {
   Product, Category, CaseStudy, Enquiry, Quote,
   Order, Payment, Warranty, SupportTicket, User, Session, AuditLog, PasswordReset
@@ -162,54 +163,91 @@ async function getProducts({
   brand = null,
   powerTier = null,
   inStock = null,
+  stockStatus = null,
+  status = 'active', // 'active' (published: 1), 'archived' (published: 0), 'all' (all items)
   search = null,
   limit = 50,
   offset = 0,
-  sort = 'featured'
+  page = 1,
+  sort = 'featured',
+  includeSupplierCost = false
 } = {}) {
-  const filter = { published: 1 };
-  if (category) filter.category = category;
-  if (brand) filter.brand = brand;
-  if (powerTier) filter.power_tier = powerTier;
-  if (inStock !== null && inStock !== undefined) {
+  const filter = {};
+  
+  if (status === 'active') {
+    filter.published = 1;
+  } else if (status === 'archived') {
+    filter.published = 0;
+  }
+  // if status === 'all', no published filter is applied
+
+  if (category && category !== 'all') filter.category = category;
+  if (brand && brand !== 'all') filter.brand = brand;
+  if (powerTier && powerTier !== 'all') filter.power_tier = powerTier;
+  
+  if (stockStatus && stockStatus !== 'all') {
+    filter.stock_status = stockStatus;
+  } else if (inStock !== null && inStock !== undefined) {
     filter.stock_status = inStock ? 'in_stock' : { $ne: 'in_stock' };
   }
-  if (search && typeof search === 'string') {
-    const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  if (search && typeof search === 'string' && search.trim()) {
+    const escaped = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const sRegex = new RegExp(escaped, 'i');
     filter.$or = [
       { name: sRegex },
       { brand: sRegex },
       { sku: sRegex },
+      { category: sRegex },
       { specifications: sRegex },
       { description: sRegex }
     ];
   }
 
-  let sortOption = { featured: -1, price_ngn: 1 };
+  let sortOption = { id: 1 };
   if (sort === 'price_asc') sortOption = { price_ngn: 1 };
   else if (sort === 'price_desc') sortOption = { price_ngn: -1 };
   else if (sort === 'name_asc') sortOption = { name: 1 };
+  else if (sort === 'newest') sortOption = { created_at: -1, id: -1 };
+  else if (sort === 'featured') sortOption = { featured: -1, price_ngn: 1 };
 
-  const products = await Product.find(filter)
+  const safeLimit = Math.max(1, Math.min(parseInt(limit, 10) || 50, 100));
+  const calculatedOffset = offset ? parseInt(offset, 10) : ((Math.max(1, parseInt(page, 10) || 1) - 1) * safeLimit);
+  const safeOffset = Math.max(0, calculatedOffset);
+
+  const projection = includeSupplierCost ? {} : { cost_price_ngn: 0 };
+
+  const products = await Product.find(filter, projection)
     .sort(sortOption)
-    .skip(offset)
-    .limit(limit)
+    .skip(safeOffset)
+    .limit(safeLimit)
     .lean();
 
   const total = await Product.countDocuments(filter);
-  return { products, total };
+  return { products, total, page: Math.floor(safeOffset / safeLimit) + 1, limit: safeLimit };
 }
 
 async function getProductBySlug(slug) {
-  return Product.findOne({ slug, published: 1 }).lean();
+  return Product.findOne({ slug, published: 1 }, { cost_price_ngn: 0 }).lean();
 }
 
-async function getProductById(id) {
-  if (typeof id === 'number' || !isNaN(id)) {
-    return Product.findOne({ id: Number(id) }).lean();
+function buildProductFilter(id) {
+  if (id === null || id === undefined || id === '') return null;
+  if (typeof id === 'number' || (/^\d+$/.test(String(id).trim()))) {
+    return { id: Number(id) };
   }
-  return Product.findById(id).lean();
+  const strId = String(id).trim();
+  if (mongoose.Types.ObjectId.isValid(strId)) {
+    return { _id: strId };
+  }
+  return null;
+}
+
+async function getProductById(id, { includeSupplierCost = false } = {}) {
+  const filter = buildProductFilter(id);
+  if (!filter) return null;
+  const projection = includeSupplierCost ? {} : { cost_price_ngn: 0 };
+  return Product.findOne(filter, projection).lean();
 }
 
 async function getProductFacets() {
@@ -246,25 +284,68 @@ async function getRelatedProducts(category, productId, limit = 3) {
     published: 1,
     ...(isNaN(numId) ? {} : { id: { $ne: numId } })
   };
-  return Product.find(filter).limit(limit).lean();
+  return Product.find(filter, { cost_price_ngn: 0 }).limit(limit).lean();
 }
 
 async function createProduct(productData = {}, adminUserId = null) {
-  const {
+  let {
     name, brand = 'DEVICE PRO', category = 'accessories',
-    category_label = 'Accessories', sku, description = '',
-    price_ngn = 0, previous_price_ngn = null, power_rating = 'Standard',
-    power_tier = 'standard', specifications = '', image_url = 'images/products/jinko-solar-panel.png',
-    stock_status = 'in_stock', featured = 0, published = 1
+    category_label, sku, description = '',
+    price_ngn, previous_price_ngn = null, cost_price_ngn = 0,
+    power_rating = 'Standard', power_tier = 'standard',
+    specifications = '', image_url,
+    stock_status = 'in_stock', stock_quantity = 50,
+    warranty_years = 5, featured = 0, published = 1
   } = productData;
 
-  if (!name) {
+  // 1. Mandatory field validation
+  if (!name || typeof name !== 'string' || !name.trim()) {
     throw new Error('Product name is required.');
+  }
+  name = name.trim();
+
+  if (price_ngn === undefined || price_ngn === null || isNaN(price_ngn) || Number(price_ngn) < 0) {
+    throw new Error('Selling price must be a valid non-negative number.');
+  }
+  const numericPrice = Math.round(Number(price_ngn));
+
+  const numericCost = (cost_price_ngn !== undefined && cost_price_ngn !== null && !isNaN(cost_price_ngn))
+    ? Math.max(0, Math.round(Number(cost_price_ngn)))
+    : 0;
+
+  if (!category || typeof category !== 'string' || !category.trim()) {
+    throw new Error('Category is required.');
+  }
+
+  // 2. SKU normalization & uniqueness check
+  let finalSku = (sku || '').trim().toUpperCase();
+  if (!finalSku) {
+    throw new Error('SKU is required.');
+  }
+  const existingSku = await Product.findOne({ sku: finalSku, published: 1 }).lean();
+  if (existingSku) {
+    throw new Error(`SKU "${finalSku}" is already in use by product "${existingSku.name}". Please specify a unique SKU.`);
+  }
+
+  // 3. Stock status & quantity validation
+  const validStatuses = ['in_stock', 'low_stock', 'out_of_stock', 'discontinued'];
+  if (!validStatuses.includes(stock_status)) {
+    stock_status = 'in_stock';
+  }
+  const numericQty = !isNaN(stock_quantity) ? Math.max(0, parseInt(stock_quantity, 10)) : 50;
+
+  // 4. Safe image URL check
+  let finalImageUrl = (image_url || '').trim();
+  if (finalImageUrl) {
+    if (!/^(https?:\/\/|\/|images\/)/i.test(finalImageUrl)) {
+      throw new Error('Image URL must start with http://, https://, or a valid path (/images/...). Unsafe protocols are prohibited.');
+    }
+  } else {
+    finalImageUrl = '/images/products/jinko-solar-panel.png';
   }
 
   const baseSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const slug = productData.slug || `${baseSlug}-${Math.floor(1000 + Math.random() * 9000)}`;
-  const finalSku = sku || `DP-${Math.floor(10000 + Math.random() * 90000)}`;
 
   let id = productData.id;
   if (!id) {
@@ -276,20 +357,23 @@ async function createProduct(productData = {}, adminUserId = null) {
     id,
     name,
     slug,
-    brand,
-    category,
-    category_label,
+    brand: (brand || 'DEVICE PRO').trim(),
+    category: category.trim(),
+    category_label: category_label || category.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
     sku: finalSku,
-    description,
-    price_ngn: parseInt(price_ngn, 10) || 0,
-    previous_price_ngn: previous_price_ngn ? parseInt(previous_price_ngn, 10) : null,
+    description: (description || '').trim(),
+    price_ngn: numericPrice,
+    previous_price_ngn: previous_price_ngn && !isNaN(previous_price_ngn) ? Math.round(Number(previous_price_ngn)) : null,
+    cost_price_ngn: numericCost,
     power_rating,
     power_tier,
-    specifications,
-    image_url,
+    specifications: (specifications || '').trim(),
+    image_url: finalImageUrl,
     stock_status,
+    stock_quantity: numericQty,
+    warranty_years: parseInt(warranty_years, 10) || 5,
     featured: featured ? 1 : 0,
-    published: published !== undefined ? published : 1
+    published: published !== undefined ? (published ? 1 : 0) : 1
   });
 
   const saved = await product.save();
@@ -299,17 +383,78 @@ async function createProduct(productData = {}, adminUserId = null) {
     action: 'CREATE_PRODUCT',
     entityType: 'product',
     entityId: (saved.id || saved._id).toString(),
-    details: `Created new product ${name} (${finalSku}) at ₦${parseInt(price_ngn, 10).toLocaleString()}`
+    details: `Created new product ${name} (${finalSku}) at ₦${numericPrice.toLocaleString()} (Supplier Cost: ₦${numericCost.toLocaleString()})`
   });
 
   return saved.toObject ? saved.toObject() : saved;
 }
 
-async function updateProduct(id, updates = {}, adminUserId = null) {
-  const filter = typeof id === 'number' || !isNaN(id) ? { id: Number(id) } : { _id: id };
+async function updateProduct(id, updates = {}, adminUserId = null, { canEditPrice = true } = {}) {
+  const filter = buildProductFilter(id);
+  if (!filter) {
+    throw new Error(`Product with ID "${id}" not found.`);
+  }
   const existing = await Product.findOne(filter).lean();
   if (!existing) {
-    throw new Error(`Product with ID ${id} not found.`);
+    throw new Error(`Product with ID "${id}" not found.`);
+  }
+
+  // Prevent mass-assignment of sensitive internal fields
+  delete updates._id;
+  delete updates.id;
+  delete updates.created_at;
+
+  // Commercial price protection for roles lacking permission (e.g. engineer)
+  if (!canEditPrice) {
+    delete updates.price_ngn;
+    delete updates.previous_price_ngn;
+    delete updates.cost_price_ngn;
+  }
+
+  if (updates.price_ngn !== undefined) {
+    if (isNaN(updates.price_ngn) || Number(updates.price_ngn) < 0) {
+      throw new Error('Selling price must be a valid non-negative number.');
+    }
+    updates.price_ngn = Math.round(Number(updates.price_ngn));
+  }
+
+  if (updates.cost_price_ngn !== undefined) {
+    if (isNaN(updates.cost_price_ngn) || Number(updates.cost_price_ngn) < 0) {
+      throw new Error('Supplier cost must be a valid non-negative number.');
+    }
+    updates.cost_price_ngn = Math.round(Number(updates.cost_price_ngn));
+  }
+
+  if (updates.previous_price_ngn !== undefined && updates.previous_price_ngn !== null) {
+    if (isNaN(updates.previous_price_ngn) || Number(updates.previous_price_ngn) < 0) {
+      throw new Error('Previous price must be a valid non-negative number.');
+    }
+    updates.previous_price_ngn = Math.round(Number(updates.previous_price_ngn));
+  }
+
+  // If SKU is being updated, check uniqueness
+  if (updates.sku !== undefined) {
+    const normSku = (updates.sku || '').trim().toUpperCase();
+    if (!normSku) {
+      throw new Error('SKU cannot be empty.');
+    }
+    const duplicate = await Product.findOne({ sku: normSku, published: 1, id: { $ne: existing.id } }).lean();
+    if (duplicate) {
+      throw new Error(`SKU "${normSku}" is already in use by product "${duplicate.name}".`);
+    }
+    updates.sku = normSku;
+  }
+
+  // If image_url is updated, check protocol
+  if (updates.image_url) {
+    if (!/^(https?:\/\/|\/|images\/)/i.test(updates.image_url.trim())) {
+      throw new Error('Image URL must start with http://, https://, or a valid path (/images/...).');
+    }
+    updates.image_url = updates.image_url.trim();
+  }
+
+  if (updates.stock_quantity !== undefined) {
+    updates.stock_quantity = Math.max(0, parseInt(updates.stock_quantity, 10) || 0);
   }
 
   updates.updated_at = new Date();
@@ -319,32 +464,57 @@ async function updateProduct(id, updates = {}, adminUserId = null) {
     userId: adminUserId,
     action: 'UPDATE_PRODUCT',
     entityType: 'product',
-    entityId: id.toString(),
+    entityId: (existing.id || existing._id).toString(),
     details: `Updated fields: ${Object.keys(updates).join(', ')} on product ${existing.name} (${existing.sku})`
   });
 
   return updated;
 }
 
-async function deleteProduct(id, adminUserId = null) {
-  const filter = typeof id === 'number' || !isNaN(id) ? { id: Number(id) } : { _id: id };
+async function archiveProduct(id, archiveState = true, adminUserId = null, { action = null } = {}) {
+  const filter = buildProductFilter(id);
+  if (!filter) {
+    throw new Error(`Product with ID "${id}" not found.`);
+  }
   const product = await Product.findOne(filter).lean();
   if (!product) {
-    throw new Error(`Product with ID ${id} not found.`);
+    throw new Error(`Product with ID "${id}" not found.`);
   }
 
-  // Soft delete / archive
-  await Product.updateOne(filter, { $set: { published: 0, updated_at: new Date() } });
+  const publishedVal = archiveState ? 0 : 1;
+  const actionLabel = action || (archiveState ? 'ARCHIVE_PRODUCT' : 'RESTORE_PRODUCT');
+  const descLabel = archiveState ? 'archived' : 'restored';
+
+  // Check if historical orders reference this product
+  let orderRefCount = 0;
+  try {
+    orderRefCount = await Order.countDocuments({
+      items_json: new RegExp(`\"(id|slug)\":\\s*\"?(${product.id}|${product.slug})\"?`, 'i')
+    });
+  } catch (e) {
+    orderRefCount = 0;
+  }
+
+  await Product.updateOne(filter, { $set: { published: publishedVal, updated_at: new Date() } });
 
   await logAudit({
     userId: adminUserId,
-    action: 'DELETE_PRODUCT',
+    action: actionLabel,
     entityType: 'product',
-    entityId: id.toString(),
-    details: `Unpublished/archived product ${product.name} (${product.sku})`
+    entityId: (product.id || product._id).toString(),
+    details: `${descLabel.toUpperCase()} product ${product.name} (${product.sku}). Historical order references: ${orderRefCount} (preserved intact).`
   });
 
-  return { success: true, message: `Product ${product.name} archived.` };
+  return {
+    success: true,
+    message: `Product "${product.name}" successfully ${descLabel}.`,
+    product: { ...product, published: publishedVal },
+    orderRefCount
+  };
+}
+
+async function deleteProduct(id, adminUserId = null) {
+  return archiveProduct(id, true, adminUserId, { action: 'DELETE_PRODUCT' });
 }
 
 // --- PACKAGES ---
@@ -547,24 +717,37 @@ async function createOrder({
   totalNgn = null
 }) {
   let calculatedSubtotal = 0;
-  const verifiedItems = items.map(item => {
+  const verifiedItems = await Promise.all(items.map(async item => {
     const qty = Math.max(1, parseInt(item.quantity || item.qty || 1, 10));
-    const price = parseInt(item.unitPriceNgn || item.price || item.price_ngn || 0, 10);
+    let price = parseInt(item.unitPriceNgn || item.price || item.price_ngn || 0, 10);
+    
+    // Server-authoritative price lookup from Product catalogue
+    let dbProd = null;
+    if (item.id !== undefined && item.id !== null) {
+      const pFilter = buildProductFilter(item.id);
+      if (pFilter) dbProd = await Product.findOne(pFilter).lean();
+    }
+    if (!dbProd && item.slug) {
+      dbProd = await Product.findOne({ slug: item.slug }).lean();
+    }
+    if (dbProd && typeof dbProd.price_ngn === 'number') {
+      price = dbProd.price_ngn;
+    }
+
     const itemSubtotal = price * qty;
     calculatedSubtotal += itemSubtotal;
     return {
-      id: item.id,
-      slug: item.slug,
-      name: item.name || item.title,
+      id: (dbProd && dbProd.id) || item.id,
+      slug: (dbProd && dbProd.slug) || item.slug,
+      name: (dbProd && dbProd.name) || item.name || item.title,
       price,
+      price_ngn: price,
       quantity: qty,
       subtotal: itemSubtotal
     };
-  });
+  }));
 
-  const finalSubtotal = subtotalNgn !== null && subtotalNgn !== undefined
-    ? parseInt(subtotalNgn, 10)
-    : calculatedSubtotal;
+  const finalSubtotal = calculatedSubtotal;
 
   const orderNumber = customOrderNumber || ('DP-ORD-' + Math.floor(100000 + Math.random() * 900000));
   const deliveryFee = deliveryFeeNgn !== null && deliveryFeeNgn !== undefined
@@ -1708,7 +1891,7 @@ async function exportDatabaseBackup() {
 
 module.exports = {
   getProducts, getProductBySlug, getProductById, getProductFacets, getRelatedProducts,
-  createProduct, updateProduct, deleteProduct,
+  createProduct, updateProduct, deleteProduct, archiveProduct,
   getPackages, getPackageBySlug,
   getCategories, getCaseStudies, getCaseStudyBySlug,
   createEnquiry, getEnquiries, getEnquiryById, getEnquiryByRef, updateEnquiryStatus,

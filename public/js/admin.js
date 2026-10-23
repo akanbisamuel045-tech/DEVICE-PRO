@@ -17,6 +17,10 @@
   let cachedQuotes = [];
   let cachedEnquiries = [];
   let cachedProducts = [];
+  let productPagination = { page: 1, limit: 20, total: 0, totalPages: 1 };
+  let currentEditingProductId = null;
+  let currentArchiveProductId = null;
+  let currentArchiveTargetState = true;
   let currentEditingOrderId = null;
   let currentEditingQuoteId = null;
   let currentEditingFulfillmentId = null;
@@ -60,6 +64,8 @@
   const quoteModal = document.getElementById('quote-details-modal');
   const productEditModal = document.getElementById('product-edit-modal');
   const addProductModal = document.getElementById('add-product-modal');
+  const productInspectModal = document.getElementById('product-inspect-modal');
+  const productArchiveModal = document.getElementById('product-archive-modal');
 
   // Formatters
   function formatNaira(num) {
@@ -149,6 +155,133 @@
     showAuthScreen();
   }
 
+  // Stage 3: Authoritative Section Metadata Registry for all 16 navigation areas
+  const SECTION_REGISTRY = {
+    'overview': {
+      title: 'Operational Overview',
+      breadcrumb: 'Overview',
+      panelId: 'panel-overview',
+      roles: ['superadmin', 'admin', 'engineer', 'sales', 'staff']
+    },
+    'products': {
+      title: 'Equipment Catalogue & Stock Control',
+      breadcrumb: 'Products',
+      panelId: 'panel-products',
+      roles: ['superadmin', 'admin', 'engineer']
+    },
+    'supplier-imports': {
+      title: 'Supplier Price List Importer',
+      breadcrumb: 'Supplier Price Imports',
+      panelId: 'panel-supplier-imports',
+      roles: ['superadmin', 'admin']
+    },
+    'supplier-price-imports': {
+      aliasOf: 'supplier-imports'
+    },
+    'categories': {
+      title: 'Equipment Categories Architecture',
+      breadcrumb: 'Categories',
+      panelId: 'panel-categories',
+      roles: ['superadmin', 'admin', 'engineer']
+    },
+    'brands': {
+      title: 'Manufacturer & OEM Brands',
+      breadcrumb: 'Brands',
+      panelId: 'panel-brands',
+      roles: ['superadmin', 'admin', 'engineer']
+    },
+    'solar-packages': {
+      title: 'Turnkey Solar Package Configurator',
+      breadcrumb: 'Solar Packages',
+      panelId: 'panel-solar-packages',
+      roles: ['superadmin', 'admin', 'engineer']
+    },
+    'content': {
+      title: 'Website Content & Copy CMS',
+      breadcrumb: 'Website Content',
+      panelId: 'panel-content',
+      roles: ['superadmin', 'admin']
+    },
+    'website-content': {
+      aliasOf: 'content'
+    },
+    'images': {
+      title: 'Image & Media Asset Manager',
+      breadcrumb: 'Image Manager',
+      panelId: 'panel-images',
+      roles: ['superadmin', 'admin']
+    },
+    'image-manager': {
+      aliasOf: 'images'
+    },
+    'orders': {
+      title: 'Commerce Orders & Fulfillment Center',
+      breadcrumb: 'Orders',
+      panelId: 'panel-orders',
+      roles: ['superadmin', 'admin', 'sales']
+    },
+    'customers': {
+      title: 'Customer Directory & CRM',
+      breadcrumb: 'Customers',
+      panelId: 'panel-customers',
+      roles: ['superadmin', 'admin', 'sales']
+    },
+    'quotes-enquiries': {
+      title: 'Solar Engineering Quotes & Customer Enquiries',
+      breadcrumb: 'Quotes & Enquiries',
+      panelId: 'panel-quotes-enquiries',
+      roles: ['superadmin', 'admin', 'sales', 'engineer']
+    },
+    'quotes': {
+      aliasOf: 'quotes-enquiries'
+    },
+    'enquiries': {
+      aliasOf: 'quotes-enquiries'
+    },
+    'projects': {
+      title: 'Turnkey Projects Showcase & Case Studies',
+      breadcrumb: 'Projects',
+      panelId: 'panel-projects',
+      roles: ['superadmin', 'admin', 'engineer']
+    },
+    'import-history': {
+      title: 'Supplier Price Import History & Diffs',
+      breadcrumb: 'Import History',
+      panelId: 'panel-import-history',
+      roles: ['superadmin', 'admin']
+    },
+    'audit-logs': {
+      title: 'Immutable Security Audit Trail',
+      breadcrumb: 'Audit Logs',
+      panelId: 'panel-audit-logs',
+      roles: ['superadmin']
+    },
+    'audit': {
+      aliasOf: 'audit-logs'
+    },
+    'admin-users': {
+      title: 'Administrator Accounts & RBAC Management',
+      breadcrumb: 'Admin Users',
+      panelId: 'panel-admin-users',
+      roles: ['superadmin']
+    },
+    'settings': {
+      title: 'Platform & Energy Benchmarks Settings',
+      breadcrumb: 'Settings',
+      panelId: 'panel-settings',
+      roles: ['superadmin', 'admin']
+    }
+  };
+
+  function resolveSection(sectionName) {
+    if (!sectionName) return 'overview';
+    const clean = sectionName.toLowerCase().trim();
+    const entry = SECTION_REGISTRY[clean];
+    if (entry && entry.aliasOf) return entry.aliasOf;
+    if (entry) return clean;
+    return 'overview';
+  }
+
   function showAuthScreen() {
     currentUser = null;
     if (authView) authView.style.display = 'flex';
@@ -159,31 +292,101 @@
     if (authView) authView.style.display = 'none';
     if (dashboardView) dashboardView.style.display = 'flex';
 
-    // Set profile info
-    if (nameEl) nameEl.textContent = currentUser.fullName || currentUser.username;
+    const displayName = currentUser.fullName || currentUser.username;
+    const roleUpper = (currentUser.role || 'ADMIN').toUpperCase();
+    const initials = displayName
+      .split(' ')
+      .map(n => n[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || 'DP';
+
+    // Set sidebar profile info
+    if (nameEl) nameEl.textContent = displayName;
     if (roleEl) {
-      roleEl.textContent = currentUser.role.toUpperCase();
+      roleEl.textContent = roleUpper;
       roleEl.className = `user-role-badge ${currentUser.role}`;
     }
-    if (avatarEl) {
-      const initials = (currentUser.fullName || currentUser.username)
-        .split(' ')
-        .map(n => n[0])
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
-      avatarEl.textContent = initials || 'DP';
+    if (avatarEl) avatarEl.textContent = initials;
+
+    // Set topbar & user menu profile info
+    const topbarAvatar = document.getElementById('topbar-user-avatar');
+    const topbarName = document.getElementById('topbar-user-name');
+    const topbarMenuName = document.getElementById('topbar-menu-user-fullname');
+    const topbarMenuEmail = document.getElementById('topbar-menu-user-email');
+    const topbarMenuRole = document.getElementById('topbar-menu-user-role');
+    const overviewName = document.getElementById('overview-welcome-name');
+    const liveClock = document.getElementById('overview-live-clock');
+
+    if (topbarAvatar) topbarAvatar.textContent = initials;
+    if (topbarName) topbarName.textContent = displayName;
+    if (topbarMenuName) topbarMenuName.textContent = displayName;
+    if (topbarMenuEmail) topbarMenuEmail.textContent = currentUser.email || `${currentUser.username}@devicepro.ng`;
+    if (topbarMenuRole) {
+      topbarMenuRole.textContent = roleUpper;
+      topbarMenuRole.className = `user-role-badge ${currentUser.role}`;
+    }
+    if (overviewName) overviewName.textContent = displayName;
+    if (liveClock) {
+      try {
+        liveClock.textContent = new Date().toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+      } catch (e) {
+        liveClock.textContent = 'October 2026';
+      }
     }
 
-    // Role-based visibility
+    // Role-based navigation visibility
     const isSuperadmin = currentUser.role === 'superadmin';
+    const isAdminOrSuper = ['superadmin', 'admin'].includes(currentUser.role);
     document.querySelectorAll('.superadmin-only').forEach(el => {
       el.style.display = isSuperadmin ? '' : 'none';
     });
+    document.querySelectorAll('.superadmin-or-admin-only').forEach(el => {
+      el.style.display = isAdminOrSuper ? '' : 'none';
+    });
 
-    // Load initial data
+    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+      const allowedRolesStr = btn.getAttribute('data-roles');
+      if (allowedRolesStr) {
+        const allowed = allowedRolesStr.split(',').map(r => r.trim());
+        if (!allowed.includes(currentUser.role)) {
+          btn.style.display = 'none';
+        } else if (!btn.classList.contains('superadmin-only') || isSuperadmin) {
+          btn.style.display = '';
+        }
+      }
+    });
+
+    // Hide navigation groups if all their items are hidden
+    document.querySelectorAll('.nav-group').forEach(group => {
+      const buttons = Array.from(group.querySelectorAll('.nav-tab-btn'));
+      if (buttons.length > 0) {
+        const anyVisible = buttons.some(b => b.style.display !== 'none');
+        group.style.display = anyVisible ? '' : 'none';
+      }
+    });
+
+    // Determine initial section from URL path or hash
+    let initialSection = 'overview';
+    const pathMatch = window.location.pathname.match(/^\/admin\/([a-zA-Z0-9_-]+)/);
+    if (pathMatch && pathMatch[1]) {
+      initialSection = resolveSection(pathMatch[1]);
+    } else if (window.location.hash) {
+      initialSection = resolveSection(window.location.hash.replace('#', ''));
+    }
+
+    // Check permission for initial section
+    const secConfig = SECTION_REGISTRY[initialSection];
+    if (secConfig && secConfig.roles && !secConfig.roles.includes(currentUser.role)) {
+      initialSection = 'overview';
+    }
+
+    switchTab(initialSection, false);
     loadDashboardStats();
-    loadCurrentTab();
   }
 
   // ==========================================================================
@@ -252,17 +455,25 @@
       });
     }
 
-    // Logout Button
+    // Sidebar Sign Out Button
     if (btnLogout) {
-      btnLogout.addEventListener('click', async () => {
-        try {
-          await apiFetch('/api/auth/logout', { method: 'POST' });
-        } catch (e) {
-          // ignore
-        }
-        clearToken();
-        showAuthScreen();
-      });
+      btnLogout.addEventListener('click', handleLogout);
+    }
+
+    // Topbar Sign Out Button
+    const btnTopbarLogout = document.getElementById('btn-topbar-logout');
+    if (btnTopbarLogout) {
+      btnTopbarLogout.addEventListener('click', handleLogout);
+    }
+
+    async function handleLogout() {
+      try {
+        await apiFetch('/api/auth/logout', { method: 'POST' });
+      } catch (e) {
+        // ignore
+      }
+      clearToken();
+      showAuthScreen();
     }
 
     // Refresh Live Data Button
@@ -273,13 +484,111 @@
       });
     }
 
-    // Navigation Tabs
+    // Collapsible Sidebar (Desktop)
+    const collapseBtn = document.getElementById('btn-collapse-sidebar');
+    const sidebar = document.getElementById('admin-sidebar');
+    if (collapseBtn && sidebar) {
+      const savedState = localStorage.getItem('dp_admin_sidebar_collapsed');
+      if (savedState === 'true') {
+        sidebar.classList.add('sidebar-collapsed');
+      }
+      collapseBtn.addEventListener('click', () => {
+        const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
+        localStorage.setItem('dp_admin_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+      });
+    }
+
+    // Mobile Navigation Drawer (Hamburger & Close)
+    const mobileToggleBtn = document.getElementById('sidebar-toggle-btn');
+    const mobileCloseBtn = document.getElementById('sidebar-close-btn');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    
+    const closeMobileSidebar = () => {
+      if (sidebar) sidebar.classList.remove('mobile-open');
+      if (sidebarBackdrop) sidebarBackdrop.classList.remove('active');
+      if (mobileToggleBtn) mobileToggleBtn.setAttribute('aria-expanded', 'false');
+    };
+
+    if (mobileToggleBtn && sidebar) {
+      mobileToggleBtn.addEventListener('click', () => {
+        const isOpen = sidebar.classList.toggle('mobile-open');
+        if (sidebarBackdrop) sidebarBackdrop.classList.toggle('active', isOpen);
+        mobileToggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+    }
+    if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', closeMobileSidebar);
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+    // User Account Popover Dropdown
+    const userMenuBtn = document.getElementById('user-menu-btn');
+    const userMenuDropdown = document.getElementById('user-menu-dropdown');
+    if (userMenuBtn && userMenuDropdown) {
+      userMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = userMenuDropdown.style.display === 'block';
+        userMenuDropdown.style.display = isOpen ? 'none' : 'block';
+        userMenuBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#user-account-menu')) {
+          userMenuDropdown.style.display = 'none';
+          userMenuBtn.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    const btnMenuSettings = document.getElementById('menu-btn-settings');
+    if (btnMenuSettings) {
+      btnMenuSettings.addEventListener('click', () => {
+        if (userMenuDropdown) {
+          userMenuDropdown.style.display = 'none';
+          if (userMenuBtn) userMenuBtn.setAttribute('aria-expanded', 'false');
+        }
+        switchTab('settings');
+      });
+    }
+
+    // Global Escape Key Listener for Accessible Overlay Dismissal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMobileSidebar();
+        if (userMenuDropdown) {
+          userMenuDropdown.style.display = 'none';
+          if (userMenuBtn) userMenuBtn.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
+
+    // Navigation Tabs Event Listeners
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const targetTab = btn.getAttribute('data-tab');
-        switchTab(targetTab);
+        const target = btn.getAttribute('data-section') || btn.getAttribute('data-tab');
+        switchTab(target);
       });
     });
+
+    // Return to Overview actions
+    document.querySelectorAll('[data-action="go-overview"]').forEach(btn => {
+      btn.addEventListener('click', () => switchTab('overview'));
+    });
+
+    // Quick navigation actions from cards
+    document.querySelectorAll('[data-action-nav]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const sec = btn.getAttribute('data-action-nav');
+        if (sec) switchTab(sec);
+      });
+    });
+
+    // Topbar breadcrumb home link
+    const breadcrumbHome = document.getElementById('breadcrumb-home-link');
+    if (breadcrumbHome) {
+      breadcrumbHome.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchTab('overview');
+      });
+    }
 
     // Filter controls - Orders
     const ordersSearch = document.getElementById('orders-search-input');
@@ -347,26 +656,157 @@
       btnSaveQuote.addEventListener('click', saveQuoteUpdates);
     }
 
-    // Add Product Modal trigger
-    const btnAddProd = document.getElementById('btn-add-product-modal');
-    if (btnAddProd && addProductModal) {
-      btnAddProd.addEventListener('click', () => {
+    // Stage 4: Products Management Event Listeners
+    const btnOpenAddProd = document.getElementById('btn-open-add-product') || document.getElementById('btn-add-product-modal');
+    if (btnOpenAddProd && addProductModal) {
+      btnOpenAddProd.addEventListener('click', () => {
         const form = document.getElementById('add-product-form');
         if (form) form.reset();
+        document.getElementById('add-prod-error-alert').style.display = 'none';
+        document.querySelectorAll('#add-product-modal .field-error-msg').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('#add-product-modal .form-input').forEach(el => el.classList.remove('input-error'));
+        const preview = document.getElementById('add-prod-img-preview');
+        if (preview) preview.src = '/images/logo-mark.svg';
+        const marginEl = document.getElementById('add-prod-margin-preview');
+        if (marginEl) marginEl.textContent = '—';
         addProductModal.showModal();
       });
     }
 
-    // Add Product Form Submit
+    // Products Search & Filters
+    const prodSearch = document.getElementById('products-search-input');
+    if (prodSearch) {
+      prodSearch.addEventListener('input', debounce(() => {
+        productPagination.page = 1;
+        loadProducts(1);
+      }, 300));
+    }
+
+    ['products-category-filter', 'products-brand-filter', 'products-stock-filter', 'products-status-filter', 'products-limit-select'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', () => {
+          if (id === 'products-limit-select') {
+            productPagination.limit = parseInt(el.value, 10) || 20;
+          }
+          productPagination.page = 1;
+          loadProducts(1);
+        });
+      }
+    });
+
+    const btnResetProdFilters = document.getElementById('btn-products-reset-filters');
+    if (btnResetProdFilters) {
+      btnResetProdFilters.addEventListener('click', () => {
+        if (prodSearch) prodSearch.value = '';
+        const catFilter = document.getElementById('products-category-filter');
+        if (catFilter) catFilter.value = 'all';
+        const brandFilter = document.getElementById('products-brand-filter');
+        if (brandFilter) brandFilter.value = 'all';
+        const stockFilter = document.getElementById('products-stock-filter');
+        if (stockFilter) stockFilter.value = 'all';
+        const statusFilter = document.getElementById('products-status-filter');
+        if (statusFilter) statusFilter.value = 'all';
+        productPagination.page = 1;
+        loadProducts(1);
+      });
+    }
+
+    // Products Pagination Buttons
+    const btnProdPrev = document.getElementById('btn-prod-prev-page');
+    if (btnProdPrev) {
+      btnProdPrev.addEventListener('click', () => {
+        if (productPagination.page > 1) {
+          loadProducts(productPagination.page - 1);
+        }
+      });
+    }
+
+    const btnProdNext = document.getElementById('btn-prod-next-page');
+    if (btnProdNext) {
+      btnProdNext.addEventListener('click', () => {
+        if (productPagination.page < productPagination.totalPages) {
+          loadProducts(productPagination.page + 1);
+        }
+      });
+    }
+
+    // Real-time margin calculator helper
+    function updateMarginDisplay(priceInputId, costInputId, displayId) {
+      const priceVal = parseFloat(document.getElementById(priceInputId)?.value) || 0;
+      const costVal = parseFloat(document.getElementById(costInputId)?.value) || 0;
+      const displayEl = document.getElementById(displayId);
+      if (!displayEl) return;
+
+      if (priceVal <= 0 || costVal <= 0) {
+        displayEl.textContent = '—';
+        displayEl.className = '';
+        return;
+      }
+
+      const grossProfit = priceVal - costVal;
+      const marginPct = ((grossProfit / priceVal) * 100).toFixed(1);
+      const pillClass = marginPct >= 15 ? 'healthy' : (marginPct >= 5 ? 'tight' : 'negative');
+      displayEl.innerHTML = `<span class="margin-pill ${pillClass}">₦${grossProfit.toLocaleString()} (${marginPct}%)</span>`;
+    }
+
+    // Edit form pricing listeners
+    const editPriceInput = document.getElementById('edit-prod-price');
+    const editCostInput = document.getElementById('edit-prod-cost');
+    if (editPriceInput) editPriceInput.addEventListener('input', () => updateMarginDisplay('edit-prod-price', 'edit-prod-cost', 'edit-prod-margin-preview'));
+    if (editCostInput) editCostInput.addEventListener('input', () => updateMarginDisplay('edit-prod-price', 'edit-prod-cost', 'edit-prod-margin-preview'));
+
+    // Add form pricing listeners
+    const addPriceInput = document.getElementById('add-prod-price');
+    const addCostInput = document.getElementById('add-prod-cost');
+    if (addPriceInput) addPriceInput.addEventListener('input', () => updateMarginDisplay('add-prod-price', 'add-prod-cost', 'add-prod-margin-preview'));
+    if (addCostInput) addCostInput.addEventListener('input', () => updateMarginDisplay('add-prod-price', 'add-prod-cost', 'add-prod-margin-preview'));
+
+    // Image URL Live Previews
+    const editImgInput = document.getElementById('edit-prod-image');
+    if (editImgInput) {
+      editImgInput.addEventListener('input', () => {
+        const url = editImgInput.value.trim();
+        const preview = document.getElementById('edit-prod-img-preview');
+        if (preview) preview.src = url || '/images/logo-mark.svg';
+      });
+    }
+
+    const addImgInput = document.getElementById('add-prod-image');
+    if (addImgInput) {
+      addImgInput.addEventListener('input', () => {
+        const url = addImgInput.value.trim();
+        const preview = document.getElementById('add-prod-img-preview');
+        if (preview) preview.src = url || '/images/logo-mark.svg';
+      });
+    }
+
+    // Form Submits
     const addProductForm = document.getElementById('add-product-form');
     if (addProductForm) {
       addProductForm.addEventListener('submit', handleAddProductSubmit);
     }
 
-    // Edit Product Form Submit
     const editProductForm = document.getElementById('product-edit-form');
     if (editProductForm) {
       editProductForm.addEventListener('submit', handleEditProductSubmit);
+    }
+
+    // Inspect to Edit button
+    const btnInspectToEdit = document.getElementById('btn-inspect-to-edit');
+    if (btnInspectToEdit) {
+      btnInspectToEdit.addEventListener('click', () => {
+        if (productInspectModal) productInspectModal.close();
+        if (currentEditingProductId) {
+          window.adminOpenEditProductModal(currentEditingProductId);
+        }
+      });
+    }
+
+    // Archive confirmation
+    const btnConfirmArchive = document.getElementById('btn-confirm-archive-action');
+    if (btnConfirmArchive) {
+      btnConfirmArchive.addEventListener('click', executeArchiveProduct);
     }
 
     // Export Database Backup Button
@@ -376,6 +816,20 @@
     }
   }
 
+  // Handle popstate for browser back/forward buttons
+  window.addEventListener('popstate', (e) => {
+    if (currentUser) {
+      let sec = 'overview';
+      if (e.state && e.state.section) {
+        sec = e.state.section;
+      } else {
+        const match = window.location.pathname.match(/^\/admin\/([a-zA-Z0-9_-]+)/);
+        if (match && match[1]) sec = resolveSection(match[1]);
+      }
+      switchTab(sec, false);
+    }
+  });
+
   function showAuthError(msg) {
     if (authErrorBox) {
       authErrorBox.textContent = msg;
@@ -383,28 +837,52 @@
     }
   }
 
-  function switchTab(tabName) {
-    activeTab = tabName;
+  function switchTab(tabName, updateHistory = true) {
+    const canonical = resolveSection(tabName);
+    const secConfig = SECTION_REGISTRY[canonical] || SECTION_REGISTRY['overview'];
+
+    // Role-based authorization gate
+    if (currentUser && secConfig.roles && !secConfig.roles.includes(currentUser.role)) {
+      alert(`Access restricted: Your role (${currentUser.role}) does not have permission to access ${secConfig.title}.`);
+      return switchTab('overview', updateHistory);
+    }
+
+    activeTab = canonical;
+
+    // Update active tab buttons and accessibility states
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+      const sec = btn.getAttribute('data-section') || btn.getAttribute('data-tab');
+      const isMatch = resolveSection(sec) === canonical;
+      btn.classList.toggle('active', isMatch);
+      btn.setAttribute('aria-current', isMatch ? 'page' : 'false');
     });
 
+    // Update active tab panel
     document.querySelectorAll('.tab-panel').forEach(panel => {
-      panel.classList.toggle('active', panel.id === `panel-${tabName}`);
+      const isMatch = panel.id === secConfig.panelId;
+      panel.classList.toggle('active', isMatch);
     });
 
-    // Update Topbar Title
-    const titles = {
-      overview: 'Operational Overview',
-      orders: 'Commercial Order Management & Fulfillment',
-      fulfillment: 'Fulfillment, Waybills & Commissioning Operations',
-      support: 'After-Sales Support, Field Claims & Digital Warranties',
-      quotes: 'Solar Engineering Quotation Pipeline',
-      enquiries: 'Customer Support & Inquiries Desk',
-      products: 'Equipment Catalogue & Stock Control',
-      audit: 'Tamper-Evident Audit Trail & Backups'
-    };
-    if (topbarTitle) topbarTitle.textContent = titles[tabName] || 'Operations Console';
+    // Update Topbar Title & Breadcrumbs
+    if (topbarTitle) topbarTitle.textContent = secConfig.title;
+    const breadcrumbSection = document.getElementById('breadcrumb-current-section');
+    if (breadcrumbSection) breadcrumbSection.textContent = secConfig.breadcrumb;
+
+    // Close mobile drawer on navigation
+    const sidebar = document.getElementById('admin-sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+    const toggleBtn = document.getElementById('sidebar-toggle-btn');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('active');
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+
+    // Update browser URL
+    if (updateHistory && window.history && window.history.pushState) {
+      const newPath = canonical === 'overview' ? '/admin' : `/admin/${canonical}`;
+      if (window.location.pathname !== newPath) {
+        window.history.pushState({ section: canonical }, secConfig.title, newPath);
+      }
+    }
 
     loadCurrentTab();
   }
@@ -423,6 +901,7 @@
       case 'support':
         loadSupportData();
         break;
+      case 'quotes-enquiries':
       case 'quotes':
         loadQuotes();
         break;
@@ -432,6 +911,7 @@
       case 'products':
         loadProducts();
         break;
+      case 'audit-logs':
       case 'audit':
         loadAuditLogs();
         break;
@@ -1427,28 +1907,47 @@
   };
 
   // ==========================================================================
-  // TAB 5: PRODUCT CATALOGUE & STOCK CONTROL
   // ==========================================================================
-  async function loadProducts() {
+  // STAGE 4: PRODUCT CATALOGUE & INVENTORY OPERATIONS
+  // ==========================================================================
+  async function loadProducts(page = 1) {
     const tbody = document.getElementById('products-table-body');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">Loading catalogue from SQLite...</td></tr>';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">Retrieving catalogue records from MongoDB Atlas...</td></tr>';
 
-    const category = document.getElementById('products-category-filter')?.value || '';
-    const search = document.getElementById('products-search-input')?.value || '';
+    const category = document.getElementById('products-category-filter')?.value || 'all';
+    const brand = document.getElementById('products-brand-filter')?.value || 'all';
+    const stockStatus = document.getElementById('products-stock-filter')?.value || 'all';
+    const status = document.getElementById('products-status-filter')?.value || 'all';
+    const search = document.getElementById('products-search-input')?.value.trim() || '';
+    const limit = productPagination.limit || 20;
 
     try {
       const queryParams = new URLSearchParams();
-      if (category) queryParams.set('category', category);
+      queryParams.set('page', page);
+      queryParams.set('limit', limit);
+      if (category && category !== 'all') queryParams.set('category', category);
+      if (brand && brand !== 'all') queryParams.set('brand', brand);
+      if (stockStatus && stockStatus !== 'all') queryParams.set('stockStatus', stockStatus);
+      if (status && status !== 'all') queryParams.set('status', status);
       if (search) queryParams.set('search', search);
 
       const res = await apiFetch(`/api/admin/products?${queryParams.toString()}`);
       const data = await res.json();
+
       if (data.success) {
         cachedProducts = data.products || [];
+        productPagination.page = data.page || page;
+        productPagination.limit = data.limit || limit;
+        productPagination.total = data.total || 0;
+        productPagination.totalPages = data.totalPages || Math.ceil((data.total || 0) / limit) || 1;
+
         renderProductsTable();
+        renderProductsPagination();
+      } else {
+        if (tbody) tbody.innerHTML = `<tr><td colspan="9" class="empty-cell">Error: ${escapeHtml(data.error || 'Failed to load products')}</td></tr>`;
       }
     } catch (err) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">Network error loading products.</td></tr>';
+      if (tbody) tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">Network error loading products from Atlas.</td></tr>';
     }
   }
 
@@ -1456,46 +1955,301 @@
     const tbody = document.getElementById('products-table-body');
     if (!tbody) return;
 
+    const canSeeCost = currentUser && ['superadmin', 'admin'].includes(currentUser.role);
+    const canMutate = currentUser && ['superadmin', 'admin'].includes(currentUser.role);
+
+    // Show or hide supplier cost header and notice
+    document.querySelectorAll('.col-supplier-cost').forEach(el => {
+      el.style.display = canSeeCost ? '' : 'none';
+    });
+    const costNotice = document.getElementById('products-supplier-cost-notice');
+    if (costNotice) costNotice.style.display = canSeeCost ? 'inline-flex' : 'none';
+
+    // Update summary text
+    const summaryText = document.getElementById('products-summary-text');
+    if (summaryText) {
+      const start = productPagination.total === 0 ? 0 : (productPagination.page - 1) * productPagination.limit + 1;
+      const end = Math.min(productPagination.total, productPagination.page * productPagination.limit);
+      summaryText.textContent = `Showing ${start}–${end} of ${productPagination.total} inventory records`;
+    }
+
     if (!cachedProducts || cachedProducts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">No equipment SKUs found in catalogue.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">No equipment products match the selected criteria.</td></tr>';
       return;
     }
 
-    tbody.innerHTML = cachedProducts.map(p => `
-      <tr>
-        <td>
-          <img src="/${p.image_url || 'images/products/jinko-solar-panel.png'}" alt="${escapeHtml(p.name)}" class="prod-table-thumb" onerror="this.src='/images/logo-mark.svg'">
-        </td>
-        <td><code>${escapeHtml(p.sku || 'N/A')}</code></td>
-        <td>
-          <div style="font-weight: 600;">${escapeHtml(p.name)}</div>
-          <div style="font-size: 0.72rem; color: rgba(238,241,248,0.5);">${escapeHtml(p.specifications || '')}</div>
-        </td>
-        <td>${escapeHtml(p.brand || 'DEVICE PRO')}</td>
-        <td><span style="font-size: 0.75rem; text-transform: uppercase;">${escapeHtml(p.category_label || p.category)}</span></td>
-        <td>${escapeHtml(p.power_rating || '—')}</td>
-        <td style="font-weight: 700; color: #FFFFFF;">${formatNaira(p.price_ngn)}</td>
-        <td><span class="status-pill status-${p.stock_status || 'in_stock'}">${p.stock_status || 'in_stock'}</span></td>
-        <td style="text-align: center;">
-          <div class="table-actions-cell">
-            <button type="button" class="btn-table-action" onclick="window.adminOpenEditProductModal(${p.id})">Edit</button>
-            <button type="button" class="btn-table-action delete" onclick="window.adminArchiveProduct(${p.id}, '${escapeHtml(p.name)}')">Archive</button>
-          </div>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = cachedProducts.map(p => {
+      const rawPrice = Number(p.price_ngn) || 0;
+      const rawCost = Number(p.cost_price_ngn) || 0;
+      const hasCost = canSeeCost && p.cost_price_ngn !== undefined && rawCost > 0;
+      const grossProfit = rawPrice - rawCost;
+      const marginPct = (hasCost && rawPrice > 0) ? ((grossProfit / rawPrice) * 100).toFixed(1) : null;
+      const marginClass = marginPct !== null ? (marginPct >= 15 ? 'healthy' : (marginPct >= 5 ? 'tight' : 'negative')) : '';
+
+      const isArchived = p.published === 0;
+      const stateBadge = isArchived
+        ? '<span class="status-pill status-archived">Archived</span>'
+        : '<span class="status-pill status-active">Live</span>';
+
+      const stockBadge = `<span class="status-pill status-${p.stock_status || 'in_stock'}">${(p.stock_status || 'in_stock').replace('_', ' ')}</span>`;
+
+      // Cost column HTML
+      let costColHtml = '';
+      if (canSeeCost) {
+        costColHtml = `
+          <td class="col-supplier-cost" style="text-align: right;">
+            ${hasCost ? `
+              <div style="font-weight: 600;">${formatNaira(rawCost)}</div>
+              <div style="margin-top: 2px;"><span class="margin-pill ${marginClass}">${marginPct}%</span></div>
+            ` : `<span style="color: rgba(238,241,248,0.4); font-size: 0.75rem;">—</span>`}
+          </td>
+        `;
+      }
+
+      // Actions
+      const editBtn = `<button type="button" class="btn-table-action" onclick="window.adminOpenEditProductModal('${p.id || p._id}')" title="Edit specifications">Edit</button>`;
+      const inspectBtn = `<button type="button" class="btn-table-action" onclick="window.adminInspectProduct('${p.id || p._id}')" title="Inspect full record">Inspect</button>`;
+      const archiveBtn = canMutate ? `
+        <button type="button" class="btn-table-action ${isArchived ? '' : 'delete'}" onclick="window.adminPromptArchive('${p.id || p._id}', ${p.published}, '${escapeHtml(p.name)}')" title="${isArchived ? 'Restore to live store' : 'Unpublish from store'}">
+          ${isArchived ? 'Restore' : 'Archive'}
+        </button>
+      ` : '';
+
+      const imgUrl = (p.image_url && (p.image_url.startsWith('http') || p.image_url.startsWith('/')))
+        ? p.image_url
+        : (p.image_url ? `/${p.image_url}` : '/images/products/jinko-solar-panel.png');
+
+      return `
+        <tr data-product-id="${p.id || p._id}">
+          <td>
+            <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(p.name)}" class="prod-table-thumb" onerror="this.src='/images/logo-mark.svg'">
+          </td>
+          <td><code>${escapeHtml(p.sku || 'N/A')}</code></td>
+          <td>
+            <div style="font-weight: 700; color: #FFFFFF;">${escapeHtml(p.name)}</div>
+            <div style="font-size: 0.72rem; color: rgba(238,241,248,0.5); max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(p.specifications || '')}">
+              ${escapeHtml(p.specifications || 'Standard specifications')}
+            </div>
+          </td>
+          <td>
+            <div style="font-weight: 600;">${escapeHtml(p.brand || 'DEVICE PRO')}</div>
+            <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-brand-yellow);">${escapeHtml(p.category_label || p.category)}</span>
+          </td>
+          <td style="text-align: right;">
+            <div style="font-weight: 800; color: #FFFFFF;">${formatNaira(p.price_ngn)}</div>
+            ${p.previous_price_ngn ? `<div style="font-size: 0.7rem; color: rgba(238,241,248,0.4); text-decoration: line-through;">${formatNaira(p.previous_price_ngn)}</div>` : ''}
+          </td>
+          ${costColHtml}
+          <td>
+            ${stockBadge}
+            <div style="font-size: 0.7rem; color: rgba(238,241,248,0.5); margin-top: 2px;">Qty: ${p.stock_quantity ?? 50}</div>
+          </td>
+          <td>${stateBadge}</td>
+          <td style="text-align: center;">
+            <div class="table-actions-cell">
+              ${inspectBtn}
+              ${editBtn}
+              ${archiveBtn}
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
+  function renderProductsPagination() {
+    const infoEl = document.getElementById('products-pagination-info');
+    const prevBtn = document.getElementById('btn-prod-prev-page');
+    const nextBtn = document.getElementById('btn-prod-next-page');
+    const pagesContainer = document.getElementById('products-page-numbers');
+
+    const { page, totalPages, total, limit } = productPagination;
+    const start = total === 0 ? 0 : (page - 1) * limit + 1;
+    const end = Math.min(total, page * limit);
+
+    if (infoEl) infoEl.textContent = `Showing ${start}–${end} of ${total} products (Page ${page} of ${totalPages})`;
+    if (prevBtn) prevBtn.disabled = page <= 1;
+    if (nextBtn) nextBtn.disabled = page >= totalPages;
+
+    if (pagesContainer) {
+      let html = '';
+      const maxButtons = 5;
+      let startPage = Math.max(1, page - Math.floor(maxButtons / 2));
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      if (endPage - startPage + 1 < maxButtons) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        html += `<button type="button" class="pagination-btn ${i === page ? 'active' : ''}" onclick="window.adminGoToProductPage(${i})">${i}</button>`;
+      }
+      pagesContainer.innerHTML = html;
+    }
+  }
+
+  window.adminGoToProductPage = function (pageNum) {
+    if (pageNum >= 1 && pageNum <= productPagination.totalPages) {
+      loadProducts(pageNum);
+    }
+  };
+
+  // Inspect Modal
+  window.adminInspectProduct = async function (id) {
+    const prod = cachedProducts.find(p => String(p.id) === String(id) || String(p._id) === String(id));
+    if (!prod || !productInspectModal) return;
+
+    currentEditingProductId = prod.id || prod._id;
+    const titleEl = document.getElementById('modal-inspect-prod-title');
+    const bodyEl = document.getElementById('modal-inspect-prod-body');
+
+    if (titleEl) titleEl.textContent = `${prod.name} (${prod.sku})`;
+
+    const canSeeCost = currentUser && ['superadmin', 'admin'].includes(currentUser.role);
+    const rawPrice = Number(prod.price_ngn) || 0;
+    const rawCost = Number(prod.cost_price_ngn) || 0;
+    const grossProfit = rawPrice - rawCost;
+    const marginPct = (canSeeCost && rawCost > 0 && rawPrice > 0) ? ((grossProfit / rawPrice) * 100).toFixed(1) : null;
+
+    const imgUrl = (prod.image_url && (prod.image_url.startsWith('http') || prod.image_url.startsWith('/')))
+      ? prod.image_url
+      : (prod.image_url ? `/${prod.image_url}` : '/images/products/jinko-solar-panel.png');
+
+    bodyEl.innerHTML = `
+      <div style="display: flex; gap: 1.25rem; align-items: flex-start; margin-bottom: 1.25rem;">
+        <div class="image-preview-box" style="width: 100px; height: 100px;">
+          <img src="${escapeHtml(imgUrl)}" alt="${escapeHtml(prod.name)}" onerror="this.src='/images/logo-mark.svg'">
+        </div>
+        <div style="flex-grow: 1;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span class="user-role-badge" style="background: rgba(255,185,12,0.15); color: var(--color-brand-yellow);">${escapeHtml(prod.brand || 'DEVICE PRO')}</span>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: rgba(238,241,248,0.6);">${escapeHtml(prod.category_label || prod.category)}</span>
+            <span class="status-pill status-${prod.stock_status || 'in_stock'}">${(prod.stock_status || 'in_stock').replace('_', ' ')}</span>
+            ${prod.published === 0 ? '<span class="status-pill status-archived">Archived</span>' : '<span class="status-pill status-active">Active</span>'}
+          </div>
+          <h4 style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; margin: 0 0 0.5rem 0;">${escapeHtml(prod.name)}</h4>
+          <div style="font-size: 0.8rem; color: rgba(238,241,248,0.7);">
+            <strong>SKU:</strong> <code>${escapeHtml(prod.sku)}</code> • <strong>ID:</strong> ${prod.id || prod._id}
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-info-grid">
+        <div class="detail-group">
+          <span class="detail-label">Retail Selling Price</span>
+          <span class="detail-value" style="font-size: 1.1rem; font-weight: 800; color: #FFFFFF;">${formatNaira(prod.price_ngn)}</span>
+          ${prod.previous_price_ngn ? `<div style="font-size: 0.72rem; color: rgba(238,241,248,0.4); text-decoration: line-through;">List: ${formatNaira(prod.previous_price_ngn)}</div>` : ''}
+        </div>
+        ${canSeeCost ? `
+          <div class="detail-group">
+            <span class="detail-label">Supplier Wholesale Cost &amp; Margin</span>
+            <span class="detail-value">${rawCost > 0 ? formatNaira(rawCost) : 'Not specified'}</span>
+            ${marginPct !== null ? `<div style="margin-top: 3px;"><span class="margin-pill ${marginPct >= 15 ? 'healthy' : 'tight'}">₦${grossProfit.toLocaleString()} (${marginPct}% gross margin)</span></div>` : ''}
+          </div>
+        ` : `
+          <div class="detail-group">
+            <span class="detail-label">Commercial Authorization</span>
+            <span class="detail-value" style="font-size: 0.75rem; color: #93C5FD;">Cost details restricted to administrative finance roles</span>
+          </div>
+        `}
+        <div class="detail-group">
+          <span class="detail-label">Inventory &amp; Stock</span>
+          <span class="detail-value">${prod.stock_quantity ?? 50} units on hand (${(prod.stock_status || 'in_stock').replace('_', ' ')})</span>
+        </div>
+        <div class="detail-group">
+          <span class="detail-label">Manufacturer Warranty</span>
+          <span class="detail-value">${prod.warranty_years || 5} Years Certified Warranty</span>
+        </div>
+        <div class="detail-group">
+          <span class="detail-label">Power Rating / Specs</span>
+          <span class="detail-value">${escapeHtml(prod.power_rating || 'Standard')} (${escapeHtml(prod.power_tier || 'standard')})</span>
+        </div>
+        <div class="detail-group">
+          <span class="detail-label">Database Record Timestamps</span>
+          <span class="detail-value" style="font-size: 0.75rem;">Created: ${formatDate(prod.created_at)}<br>Updated: ${formatDate(prod.updated_at)}</span>
+        </div>
+      </div>
+
+      <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 1rem;">
+        <span class="detail-label" style="display: block; margin-bottom: 0.4rem;">Engineering Specifications</span>
+        <div style="font-size: 0.82rem; line-height: 1.5; color: #EEF1F8;">
+          ${escapeHtml(prod.specifications || 'No technical specifications provided.')}
+        </div>
+      </div>
+
+      ${prod.description ? `
+        <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+          <span class="detail-label" style="display: block; margin-bottom: 0.4rem;">Commercial Description</span>
+          <div style="font-size: 0.82rem; line-height: 1.5; color: rgba(238,241,248,0.8);">
+            ${escapeHtml(prod.description)}
+          </div>
+        </div>
+      ` : ''}
+    `;
+
+    productInspectModal.showModal();
+  };
+
+  // Open Edit Modal
   window.adminOpenEditProductModal = function (id) {
-    const prod = cachedProducts.find(p => p.id === id);
+    const prod = cachedProducts.find(p => String(p.id) === String(id) || String(p._id) === String(id));
     if (!prod || !productEditModal) return;
 
-    document.getElementById('edit-prod-id').value = prod.id;
-    document.getElementById('edit-prod-name').value = prod.name;
-    document.getElementById('edit-prod-price').value = prod.price_ngn;
+    currentEditingProductId = prod.id || prod._id;
+    document.getElementById('edit-prod-error-alert').style.display = 'none';
+    document.querySelectorAll('#product-edit-modal .field-error-msg').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#product-edit-modal .form-input').forEach(el => el.classList.remove('input-error'));
+
+    document.getElementById('edit-prod-id').value = prod.id || prod._id;
+    document.getElementById('edit-prod-name').value = prod.name || '';
+    document.getElementById('edit-prod-sku').value = prod.sku || '';
+    document.getElementById('edit-prod-brand').value = prod.brand || 'DEVICE PRO';
+    document.getElementById('edit-prod-category').value = prod.category || 'inverters';
+    document.getElementById('edit-prod-price').value = prod.price_ngn !== undefined ? prod.price_ngn : '';
     document.getElementById('edit-prod-prev-price').value = prod.previous_price_ngn || '';
+    document.getElementById('edit-prod-cost').value = prod.cost_price_ngn !== undefined ? prod.cost_price_ngn : '';
     document.getElementById('edit-prod-stock').value = prod.stock_status || 'in_stock';
+    document.getElementById('edit-prod-stock-qty').value = prod.stock_quantity ?? 50;
+    document.getElementById('edit-prod-power-rating').value = prod.power_rating || '';
+    document.getElementById('edit-prod-warranty').value = prod.warranty_years || 5;
+    document.getElementById('edit-prod-image').value = prod.image_url || '';
     document.getElementById('edit-prod-specs').value = prod.specifications || '';
+    document.getElementById('edit-prod-desc').value = prod.description || '';
+
+    // Image preview
+    const preview = document.getElementById('edit-prod-img-preview');
+    if (preview) {
+      const img = prod.image_url || '/images/logo-mark.svg';
+      preview.src = (img.startsWith('http') || img.startsWith('/')) ? img : `/${img}`;
+    }
+
+    // Role-based Price Permissions
+    const canEditPrice = currentUser && ['superadmin', 'admin'].includes(currentUser.role);
+    const priceInput = document.getElementById('edit-prod-price');
+    const prevPriceInput = document.getElementById('edit-prod-prev-price');
+    const costGroup = document.getElementById('edit-cost-group');
+    const engineerNotice = document.getElementById('edit-engineer-price-notice');
+
+    if (priceInput) priceInput.disabled = !canEditPrice;
+    if (prevPriceInput) prevPriceInput.disabled = !canEditPrice;
+    if (costGroup) costGroup.style.display = canEditPrice ? 'grid' : 'none';
+    if (engineerNotice) engineerNotice.style.display = canEditPrice ? 'none' : 'block';
+
+    // Calculate initial margin
+    if (canEditPrice) {
+      const priceVal = parseFloat(prod.price_ngn) || 0;
+      const costVal = parseFloat(prod.cost_price_ngn) || 0;
+      const marginEl = document.getElementById('edit-prod-margin-preview');
+      if (marginEl) {
+        if (priceVal > 0 && costVal > 0) {
+          const grossProfit = priceVal - costVal;
+          const marginPct = ((grossProfit / priceVal) * 100).toFixed(1);
+          const pillClass = marginPct >= 15 ? 'healthy' : (marginPct >= 5 ? 'tight' : 'negative');
+          marginEl.innerHTML = `<span class="margin-pill ${pillClass}">₦${grossProfit.toLocaleString()} (${marginPct}%)</span>`;
+        } else {
+          marginEl.textContent = '—';
+        }
+      }
+    }
 
     const titleEl = document.getElementById('modal-product-title');
     if (titleEl) titleEl.textContent = `Edit SKU: ${prod.sku} (${prod.brand})`;
@@ -1506,43 +2260,200 @@
   async function handleEditProductSubmit(e) {
     e.preventDefault();
     const id = document.getElementById('edit-prod-id').value;
-    const name = document.getElementById('edit-prod-name').value;
-    const price_ngn = parseInt(document.getElementById('edit-prod-price').value, 10);
-    const previous_price_ngn = document.getElementById('edit-prod-prev-price').value ? parseInt(document.getElementById('edit-prod-prev-price').value, 10) : null;
+    const name = document.getElementById('edit-prod-name').value.trim();
+    const sku = document.getElementById('edit-prod-sku').value.trim().toUpperCase();
+    const brand = document.getElementById('edit-prod-brand').value.trim();
+    const category = document.getElementById('edit-prod-category').value;
+    const priceRaw = document.getElementById('edit-prod-price').value;
+    const prevPriceRaw = document.getElementById('edit-prod-prev-price').value;
+    const costRaw = document.getElementById('edit-prod-cost').value;
     const stock_status = document.getElementById('edit-prod-stock').value;
-    const specifications = document.getElementById('edit-prod-specs').value;
+    const stock_quantity = parseInt(document.getElementById('edit-prod-stock-qty').value, 10);
+    const power_rating = document.getElementById('edit-prod-power-rating').value.trim();
+    const warranty_years = parseInt(document.getElementById('edit-prod-warranty').value, 10);
+    const image_url = document.getElementById('edit-prod-image').value.trim();
+    const specifications = document.getElementById('edit-prod-specs').value.trim();
+    const description = document.getElementById('edit-prod-desc').value.trim();
+
+    const errBox = document.getElementById('edit-prod-error-alert');
+    errBox.style.display = 'none';
+
+    // Client-side validations
+    let hasClientErrors = false;
+    function flagError(inputId, errId, msg) {
+      hasClientErrors = true;
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(errId);
+      if (input) input.classList.add('input-error');
+      if (errEl) {
+        if (msg) errEl.textContent = msg;
+        errEl.style.display = 'block';
+      }
+    }
+
+    document.querySelectorAll('#product-edit-modal .field-error-msg').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#product-edit-modal .form-input').forEach(el => el.classList.remove('input-error'));
+
+    if (!name) flagError('edit-prod-name', 'error-edit-name', 'Product name is required.');
+    if (!sku) flagError('edit-prod-sku', 'error-edit-sku', 'SKU is required.');
+    if (!brand) flagError('edit-prod-brand', 'error-edit-brand', 'Brand is required.');
+
+    const canEditPrice = currentUser && ['superadmin', 'admin'].includes(currentUser.role);
+    if (canEditPrice) {
+      if (priceRaw === '' || isNaN(priceRaw) || Number(priceRaw) < 0) {
+        flagError('edit-prod-price', 'error-edit-price', 'Valid non-negative selling price is required.');
+      }
+      if (prevPriceRaw && (isNaN(prevPriceRaw) || Number(prevPriceRaw) < 0)) {
+        flagError('edit-prod-prev-price', 'error-edit-prev-price', 'Previous price must be non-negative.');
+      }
+      if (costRaw && (isNaN(costRaw) || Number(costRaw) < 0)) {
+        flagError('edit-prod-cost', 'error-edit-cost', 'Supplier cost must be non-negative.');
+      }
+    }
+
+    if (image_url) {
+      const isAllowedScheme = image_url.startsWith('http://') || image_url.startsWith('https://') || image_url.startsWith('/images/') || image_url.startsWith('/');
+      if (!isAllowedScheme) {
+        flagError('edit-prod-image', 'error-edit-image', 'Image URL must use http://, https://, or /images/ path.');
+      }
+    }
+
+    if (hasClientErrors) return;
+
+    const btnSubmit = document.getElementById('btn-edit-prod-submit');
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Saving changes...';
+    }
+
+    const payload = {
+      name,
+      sku,
+      brand,
+      category,
+      stock_status,
+      stock_quantity: isNaN(stock_quantity) ? 50 : stock_quantity,
+      power_rating,
+      warranty_years: isNaN(warranty_years) ? 5 : warranty_years,
+      image_url: image_url || undefined,
+      specifications,
+      description
+    };
+
+    if (canEditPrice) {
+      payload.price_ngn = Math.round(Number(priceRaw));
+      if (prevPriceRaw !== '') payload.previous_price_ngn = Math.round(Number(prevPriceRaw));
+      if (costRaw !== '') payload.cost_price_ngn = Math.round(Number(costRaw));
+    }
 
     try {
       const res = await apiFetch(`/api/admin/products/${id}`, {
         method: 'PATCH',
-        body: JSON.stringify({ name, price_ngn, previous_price_ngn, stock_status, specifications })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
-        throw new Error(data.error || 'Failed to update equipment SKU');
+        throw new Error(data.error || 'Failed to update equipment SKU.');
       }
 
       productEditModal.close();
-      loadProducts();
+      loadProducts(productPagination.page);
       loadDashboardStats();
     } catch (err) {
-      alert('Error updating product: ' + err.message);
+      errBox.textContent = err.message;
+      errBox.style.display = 'block';
+    } finally {
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Save SKU Changes';
+      }
     }
   }
 
   async function handleAddProductSubmit(e) {
     e.preventDefault();
-    const name = document.getElementById('add-prod-name').value;
+    const name = document.getElementById('add-prod-name').value.trim();
+    const sku = document.getElementById('add-prod-sku').value.trim().toUpperCase();
+    const brand = document.getElementById('add-prod-brand').value.trim();
     const category = document.getElementById('add-prod-category').value;
-    const brand = document.getElementById('add-prod-brand').value;
-    const price_ngn = parseInt(document.getElementById('add-prod-price').value, 10);
-    const sku = document.getElementById('add-prod-sku').value;
-    const specifications = document.getElementById('add-prod-specs').value;
+    const priceRaw = document.getElementById('add-prod-price').value;
+    const prevPriceRaw = document.getElementById('add-prod-prev-price').value;
+    const costRaw = document.getElementById('add-prod-cost').value;
+    const stock_status = document.getElementById('add-prod-stock').value;
+    const stock_quantity = parseInt(document.getElementById('add-prod-stock-qty').value, 10);
+    const power_rating = document.getElementById('add-prod-power-rating').value.trim();
+    const warranty_years = parseInt(document.getElementById('add-prod-warranty').value, 10);
+    const image_url = document.getElementById('add-prod-image').value.trim();
+    const specifications = document.getElementById('add-prod-specs').value.trim();
+    const description = document.getElementById('add-prod-desc').value.trim();
+
+    const errBox = document.getElementById('add-prod-error-alert');
+    errBox.style.display = 'none';
+
+    let hasClientErrors = false;
+    function flagError(inputId, errId, msg) {
+      hasClientErrors = true;
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(errId);
+      if (input) input.classList.add('input-error');
+      if (errEl) {
+        if (msg) errEl.textContent = msg;
+        errEl.style.display = 'block';
+      }
+    }
+
+    document.querySelectorAll('#add-product-modal .field-error-msg').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#add-product-modal .form-input').forEach(el => el.classList.remove('input-error'));
+
+    if (!name) flagError('add-prod-name', 'error-add-name', 'Product name is required.');
+    if (!sku) flagError('add-prod-sku', 'error-add-sku', 'SKU is required.');
+    if (!brand) flagError('add-prod-brand', 'error-add-brand', 'Brand is required.');
+    if (priceRaw === '' || isNaN(priceRaw) || Number(priceRaw) < 0) {
+      flagError('add-prod-price', 'error-add-price', 'Valid non-negative selling price is required.');
+    }
+    if (prevPriceRaw && (isNaN(prevPriceRaw) || Number(prevPriceRaw) < 0)) {
+      flagError('add-prod-prev-price', 'error-add-prev-price', 'Previous price must be non-negative.');
+    }
+    if (costRaw && (isNaN(costRaw) || Number(costRaw) < 0)) {
+      flagError('add-prod-cost', 'error-add-cost', 'Supplier cost must be non-negative.');
+    }
+
+    if (image_url) {
+      const isAllowedScheme = image_url.startsWith('http://') || image_url.startsWith('https://') || image_url.startsWith('/images/') || image_url.startsWith('/');
+      if (!isAllowedScheme) {
+        flagError('add-prod-image', 'error-add-image', 'Image URL must use http://, https://, or /images/ path.');
+      }
+    }
+
+    if (hasClientErrors) return;
+
+    const btnSubmit = document.getElementById('btn-add-prod-submit');
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Publishing...';
+    }
+
+    const payload = {
+      name,
+      sku,
+      brand,
+      category,
+      price_ngn: Math.round(Number(priceRaw)),
+      previous_price_ngn: prevPriceRaw ? Math.round(Number(prevPriceRaw)) : null,
+      cost_price_ngn: costRaw ? Math.round(Number(costRaw)) : 0,
+      stock_status,
+      stock_quantity: isNaN(stock_quantity) ? 50 : stock_quantity,
+      power_rating,
+      warranty_years: isNaN(warranty_years) ? 5 : warranty_years,
+      image_url: image_url || undefined,
+      specifications,
+      description
+    };
 
     try {
       const res = await apiFetch('/api/admin/products', {
         method: 'POST',
-        body: JSON.stringify({ name, category, brand, price_ngn, sku, specifications })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -1550,29 +2461,94 @@
       }
 
       addProductModal.close();
-      loadProducts();
+      loadProducts(1);
       loadDashboardStats();
     } catch (err) {
-      alert('Error adding product: ' + err.message);
+      errBox.textContent = err.message;
+      errBox.style.display = 'block';
+    } finally {
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Publish to Catalogue';
+      }
     }
   }
 
-  window.adminArchiveProduct = async function (id, name) {
-    if (!confirm(`Are you sure you want to unpublish/archive "${name}" from the live store catalogue?`)) {
-      return;
+  // Archive / Restore flow
+  window.adminPromptArchive = function (id, currentPublished, name) {
+    const isCurrentlyPublished = Number(currentPublished) === 1;
+    currentArchiveProductId = id;
+    currentArchiveTargetState = isCurrentlyPublished; // true = archive (unpublish), false = restore
+
+    const modal = productArchiveModal;
+    if (!modal) return;
+
+    const titleEl = document.getElementById('modal-archive-title');
+    const bodyEl = document.getElementById('modal-archive-body');
+    const confirmBtn = document.getElementById('btn-confirm-archive-action');
+
+    const actionWord = isCurrentlyPublished ? 'Archive & Unpublish' : 'Restore & Publish';
+    if (titleEl) titleEl.textContent = `${actionWord} Product`;
+    if (confirmBtn) {
+      confirmBtn.textContent = actionWord;
+      confirmBtn.className = isCurrentlyPublished ? 'btn-secondary' : 'btn-primary-yellow';
+      if (isCurrentlyPublished) {
+        confirmBtn.style.background = '#EF4444';
+        confirmBtn.style.color = '#FFFFFF';
+        confirmBtn.style.borderColor = '#DC2626';
+      } else {
+        confirmBtn.style.background = '';
+        confirmBtn.style.color = '';
+        confirmBtn.style.borderColor = '';
+      }
+    }
+
+    bodyEl.innerHTML = `
+      <p style="font-size: 0.9rem; line-height: 1.5; color: #EEF1F8; margin-bottom: 1rem;">
+        Are you sure you want to <strong>${isCurrentlyPublished ? 'unpublish/archive' : 'reactivate and restore'}</strong>:
+      </p>
+      <div style="background: rgba(255,255,255,0.03); padding: 0.85rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1rem;">
+        <div style="font-weight: 700; color: #FFFFFF;">${escapeHtml(name)}</div>
+        <div style="font-size: 0.75rem; color: rgba(238,241,248,0.6); margin-top: 2px;">Record ID: ${id}</div>
+      </div>
+      <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; padding: 0.75rem; font-size: 0.78rem; color: #93C5FD; line-height: 1.4;">
+        🔒 <strong>Database Integrity Guarantee:</strong> Historical customer orders and invoices referencing this product remain intact and authoritative. Archiving only removes the item from new catalog checkout.
+      </div>
+    `;
+
+    modal.showModal();
+  };
+
+  async function executeArchiveProduct() {
+    if (!currentArchiveProductId) return;
+    const btn = document.getElementById('btn-confirm-archive-action');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Processing...';
     }
 
     try {
-      const res = await apiFetch(`/api/admin/products/${id}`, { method: 'DELETE' });
+      const res = await apiFetch(`/api/admin/products/${currentArchiveProductId}/archive`, {
+        method: 'POST',
+        body: JSON.stringify({ archive: currentArchiveTargetState })
+      });
       const data = await res.json();
-      if (data.success) {
-        loadProducts();
-        loadDashboardStats();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to toggle product archive state.');
       }
+
+      if (productArchiveModal) productArchiveModal.close();
+      loadProducts(productPagination.page);
+      loadDashboardStats();
     } catch (err) {
-      alert('Failed to archive product: ' + err.message);
+      alert('Archive operation error: ' + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Confirm Action';
+      }
     }
-  };
+  }
 
   // ==========================================================================
   // TAB 6: AUDIT TRAIL & BACKUP

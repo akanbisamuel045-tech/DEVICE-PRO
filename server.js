@@ -5,7 +5,7 @@ const compression = require('compression');
 const crypto = require('crypto');
 const {
   getProducts, getProductBySlug, getProductById, getProductFacets, getRelatedProducts,
-  updateProduct, createProduct, deleteProduct,
+  updateProduct, createProduct, deleteProduct, archiveProduct,
   getPackages, getPackageBySlug,
   getCategories, getCaseStudies, getCaseStudyBySlug,
   createEnquiry, getEnquiries, getEnquiryById, updateEnquiryStatus,
@@ -78,53 +78,25 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve static assets from public directory with optimized caching for static files
-app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: 0,
-  etag: true,
-  setHeaders: (res, filePath) => {
-    // Cache static images, fonts, and scripts for 24h
-    if (/\.(jpg|jpeg|png|gif|svg|webp|ico|css|js|woff|woff2)$/i.test(filePath)) {
-      res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
-    } else {
-      res.setHeader('Cache-Control', 'no-cache');
-    }
+// Safe HTML file streamer with path resolution and error boundaries
+function safeSendFile(res, relativePath) {
+  const primary = path.join(__dirname, relativePath);
+  const secondary = path.join(process.cwd(), relativePath);
+  const target = fs.existsSync(primary) ? primary : (fs.existsSync(secondary) ? secondary : null);
+
+  if (target) {
+    return res.sendFile(target, err => {
+      if (err && !res.headersSent) {
+        console.error(`[STATIC SEND ERROR] Could not stream ${relativePath}:`, err.message);
+        res.status(404).send('Not Found');
+      }
+    });
   }
-}));
 
-// =========================================================================
-// RATE LIMITING & SECURITY MIDDLEWARE
-// =========================================================================
-const rateLimitMap = new Map();
-
-function rateLimiter(windowMs, maxRequests) {
-  return (req, res, next) => {
-    // In test or non-production environments, use higher threshold so automated test suites can execute
-    const effectiveMax = (process.env.NODE_ENV === 'production') ? maxRequests : 500;
-    const ip = req.ip || req.connection.remoteAddress || 'unknown-ip';
-    const key = `${req.path}:${ip}`;
-    const now = Date.now();
-
-    const record = rateLimitMap.get(key) || { count: 0, startTime: now };
-
-    if (now - record.startTime > windowMs) {
-      record.count = 1;
-      record.startTime = now;
-    } else {
-      record.count += 1;
-    }
-
-    rateLimitMap.set(key, record);
-
-    if (record.count > effectiveMax) {
-      return res.status(429).json({
-        success: false,
-        error: 'Too many requests. Please wait a moment before trying again.'
-      });
-    }
-
-    next();
-  };
+  if (!res.headersSent) {
+    console.error(`[STATIC FILE MISSING] ${relativePath} not found on server disk.`);
+    res.status(404).send('Not Found');
+  }
 }
 
 // Session Cookie Signing & Verification (HMAC SHA-256)
@@ -238,6 +210,210 @@ async function authenticate(req, res, next) {
   }
 }
 
+const ADMIN_ROLES = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
+
+// Stage 3: Section permissions matrix for all 16 administration modules
+const ADMIN_SECTION_PERMISSIONS = {
+  'overview': ['superadmin', 'admin', 'engineer', 'sales', 'staff'],
+  'products': ['superadmin', 'admin', 'engineer'],
+  'supplier-imports': ['superadmin', 'admin'],
+  'supplier-price-imports': ['superadmin', 'admin'],
+  'categories': ['superadmin', 'admin', 'engineer'],
+  'brands': ['superadmin', 'admin', 'engineer'],
+  'solar-packages': ['superadmin', 'admin', 'engineer'],
+  'content': ['superadmin', 'admin'],
+  'website-content': ['superadmin', 'admin'],
+  'images': ['superadmin', 'admin'],
+  'image-manager': ['superadmin', 'admin'],
+  'orders': ['superadmin', 'admin', 'sales'],
+  'customers': ['superadmin', 'admin', 'sales'],
+  'quotes-enquiries': ['superadmin', 'admin', 'sales', 'engineer'],
+  'quotes': ['superadmin', 'admin', 'sales', 'engineer'],
+  'enquiries': ['superadmin', 'admin', 'sales', 'engineer'],
+  'projects': ['superadmin', 'admin', 'engineer'],
+  'import-history': ['superadmin', 'admin'],
+  'audit-logs': ['superadmin'],
+  'admin-users': ['superadmin'],
+  'settings': ['superadmin', 'admin']
+};
+
+function handleAdminPageRoute(req, res, next) {
+  // If request is targeting an API route under /api/admin, let it pass to API handlers
+  const fullPath = (req.originalUrl || req.url || req.path || '').split('?')[0].replace(/\/+$/, '') || '/admin';
+  if (fullPath.startsWith('/api/') || req.path.startsWith('/api/')) {
+    if (typeof next === 'function') return next();
+    return;
+  }
+
+  // Determine requested section from URL path, e.g. /admin/orders -> 'orders'
+  let section = null;
+  if (fullPath === '/admin' || fullPath === '/admin.html' || fullPath === '/admin/login') {
+    section = 'overview';
+  } else {
+    const match = fullPath.match(/^\/admin\/([a-zA-Z0-9_-]+)/);
+    if (match) {
+      section = match[1];
+    } else {
+      const subMatch = (req.path || '').replace(/\/+$/, '').match(/^\/([a-zA-Z0-9_-]+)/);
+      if (subMatch && subMatch[1] && subMatch[1] !== 'admin') {
+        section = subMatch[1];
+      }
+    }
+  }
+
+  // 1. Authenticated customer check (strictly denied access to admin console)
+  if (req.user && req.user.role === 'customer') {
+    if (req.headers['content-type']?.includes('application/json') || req.headers.accept?.includes('application/json')) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access forbidden: Insufficient administrative privileges.'
+      });
+    }
+    return res.status(403).send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 Forbidden | DEVICE PRO</title>
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body" style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;">
+  <div class="auth-card" style="text-align:center;max-width:480px;">
+    <h1 style="color:#EF4444;margin-bottom:0.75rem;font-size:1.75rem;">403 Forbidden</h1>
+    <p style="color:var(--color-d-text-muted);margin-bottom:1.5rem;font-size:0.95rem;">
+      Access denied: Customer accounts do not have administrative console permissions.
+    </p>
+    <a href="/" class="btn-auth-submit" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+      Return to Store
+    </a>
+  </div>
+</body>
+</html>`);
+  }
+
+  // 2. Unauthenticated visitor check
+  if (!req.user) {
+    // If requesting the main console landing or login, serve admin.html so staff can authenticate
+    if (fullPath === '/admin' || fullPath === '/admin.html' || fullPath === '/admin/login' || (!section || section === 'overview')) {
+      return safeSendFile(res, 'public/admin.html');
+    }
+    // For direct deep-linked section URLs without credentials, require sign in
+    if (req.headers['content-type']?.includes('application/json') || req.headers.accept?.includes('application/json')) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required. Please sign in to access this resource.'
+      });
+    }
+    return res.redirect(`/admin?redirect=${encodeURIComponent(req.originalUrl || fullPath)}`);
+  }
+
+  // 3. Authenticated administrative user check
+  const userRole = req.user.role;
+  if (!ADMIN_ROLES.includes(userRole)) {
+    return res.status(403).json({
+      success: false,
+      error: 'Access forbidden: Insufficient administrative privileges.'
+    });
+  }
+
+  // Check section-specific permissions
+  if (section && section !== 'overview') {
+    const allowedRoles = ADMIN_SECTION_PERMISSIONS[section];
+    if (!allowedRoles) {
+      // Unknown section -> redirect to main overview
+      return res.redirect('/admin');
+    }
+
+    if (!allowedRoles.includes(userRole)) {
+      if (req.headers['content-type']?.includes('application/json') || req.headers.accept?.includes('application/json')) {
+        return res.status(403).json({
+          success: false,
+          error: allowedRoles.includes('superadmin') && allowedRoles.length === 1
+            ? 'Access forbidden: Superadmin privileges required.'
+            : 'Access forbidden: Insufficient administrative privileges for this section.'
+        });
+      }
+      return res.status(403).send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>403 Forbidden | DEVICE PRO</title>
+  <link rel="stylesheet" href="/css/tokens.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body" style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1.5rem;">
+  <div class="auth-card" style="text-align:center;max-width:480px;">
+    <h1 style="color:#EF4444;margin-bottom:0.75rem;font-size:1.75rem;">403 Forbidden</h1>
+    <p style="color:var(--color-d-text-muted);margin-bottom:1.5rem;font-size:0.95rem;">
+      Access forbidden: Your role (${userRole}) does not have permission to access the "${section}" administration section.
+    </p>
+    <a href="/admin" class="btn-auth-submit" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
+      Return to Admin Overview
+    </a>
+  </div>
+</body>
+</html>`);
+    }
+  }
+
+  // Authorized administrator -> serve admin shell
+  safeSendFile(res, 'public/admin.html');
+}
+
+// Stage 3 Gatekeeper: Intercept /admin, /admin.html, and /admin/* BEFORE express.static to enforce auth & RBAC
+app.use(['/admin', '/admin.html', '/admin/*'], authenticate, handleAdminPageRoute);
+
+// Serve static assets from public directory with optimized caching for static files
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: 0,
+  etag: true,
+  setHeaders: (res, filePath) => {
+    // Cache static images, fonts, and scripts for 24h
+    if (/\.(jpg|jpeg|png|gif|svg|webp|ico|css|js|woff|woff2)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+    } else {
+      res.setHeader('Cache-Control', 'no-cache');
+    }
+  }
+}));
+
+// =========================================================================
+// RATE LIMITING & SECURITY MIDDLEWARE
+// =========================================================================
+const rateLimitMap = new Map();
+
+function rateLimiter(windowMs, maxRequests) {
+  return (req, res, next) => {
+    // In test or non-production environments, use higher threshold so automated test suites can execute
+    const effectiveMax = (process.env.NODE_ENV === 'production') ? maxRequests : 500;
+    const ip = req.ip || req.connection.remoteAddress || 'unknown-ip';
+    const key = `${req.path}:${ip}`;
+    const now = Date.now();
+
+    const record = rateLimitMap.get(key) || { count: 0, startTime: now };
+
+    if (now - record.startTime > windowMs) {
+      record.count = 1;
+      record.startTime = now;
+    } else {
+      record.count += 1;
+    }
+
+    rateLimitMap.set(key, record);
+
+    if (record.count > effectiveMax) {
+      return res.status(429).json({
+        success: false,
+        error: 'Too many requests. Please wait a moment before trying again.'
+      });
+    }
+
+    next();
+  };
+}
+
 app.use(authenticate);
 
 function requireAuth(req, res, next) {
@@ -249,8 +425,6 @@ function requireAuth(req, res, next) {
   }
   next();
 }
-
-const ADMIN_ROLES = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
 
 function requireRole(...roles) {
   return (req, res, next) => {
@@ -2238,45 +2412,121 @@ app.get('/api/admin/backup', requireAuth, requireRole('superadmin'), async (req,
   }
 });
 
-// Product Catalogue Administration (Stage 13)
-app.get('/api/admin/products', requireAuth, async (req, res) => {
+// Product Catalogue Administration (Stage 4)
+// List products with server-side pagination, search, category, stockStatus, status filters, and role-based supplier cost protection
+app.get('/api/admin/products', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'sales', 'staff'), async (req, res) => {
   try {
-    const category = req.query.category && req.query.category !== 'all' ? req.query.category : undefined;
-    const search = req.query.search || undefined;
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const category = req.query.category && req.query.category !== 'all' ? String(req.query.category).trim() : undefined;
+    const brand = req.query.brand && req.query.brand !== 'all' ? String(req.query.brand).trim() : undefined;
+    const stockStatus = req.query.stockStatus && req.query.stockStatus !== 'all' ? String(req.query.stockStatus).trim() : undefined;
+    const status = req.query.status || 'all'; // 'active', 'archived', 'all'
+    const search = req.query.search ? String(req.query.search).trim() : undefined;
+    const sort = req.query.sort || 'featured';
+
+    const includeSupplierCost = ['superadmin', 'admin'].includes(req.user.role);
+
     const result = await getProducts({
+      page,
+      limit,
       category,
+      brand,
+      stockStatus,
+      status,
       search,
-      limit: 100
+      sort,
+      includeSupplierCost
     });
-    res.json({ success: true, products: result.products, total: result.total });
+
+    res.json({
+      success: true,
+      products: result.products,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
+      totalPages: Math.ceil(result.total / limit) || 1
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.patch('/api/admin/products/:id', requireAuth, async (req, res) => {
+// Single product details for admin inspection
+app.get('/api/admin/products/:id', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'sales', 'staff'), async (req, res) => {
   try {
-    const updated = await updateProduct(req.params.id, req.body, req.user.id);
-    res.json({ success: true, product: updated });
+    const includeSupplierCost = ['superadmin', 'admin'].includes(req.user.role);
+    const product = await getProductById(req.params.id, { includeSupplierCost });
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
+    }
+    res.json({ success: true, product });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.post('/api/admin/products', requireAuth, async (req, res) => {
+// Create product (restricted to superadmin and admin)
+app.post('/api/admin/products', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
   try {
     const created = await createProduct(req.body, req.user.id);
-    res.status(201).json({ success: true, product: created });
+    res.status(201).json({ success: true, product: created, message: 'Product created successfully' });
   } catch (error) {
+    const statusCode = error.message && (
+      error.message.includes('required') ||
+      error.message.includes('already in use') ||
+      error.message.includes('must be a valid') ||
+      error.message.includes('non-negative') ||
+      error.message.includes('protocol')
+    ) ? 400 : 500;
+    res.status(statusCode).json({ success: false, error: error.message });
+  }
+});
+
+// Update product (restricted to superadmin, admin, and engineer)
+app.patch('/api/admin/products/:id', requireAuth, requireRole('superadmin', 'admin', 'engineer'), async (req, res) => {
+  try {
+    const canEditPrice = ['superadmin', 'admin'].includes(req.user.role);
+    const updated = await updateProduct(req.params.id, req.body, req.user.id, { canEditPrice });
+    res.json({ success: true, product: updated, message: 'Product updated successfully' });
+  } catch (error) {
+    if (error.message && error.message.includes('not found')) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
+    const statusCode = error.message && (
+      error.message.includes('required') ||
+      error.message.includes('already in use') ||
+      error.message.includes('must be a valid') ||
+      error.message.includes('non-negative') ||
+      error.message.includes('protocol')
+    ) ? 400 : 500;
+    res.status(statusCode).json({ success: false, error: error.message });
+  }
+});
+
+// Archive / restore product (restricted to superadmin and admin)
+app.post('/api/admin/products/:id/archive', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const archiveState = req.body && req.body.archive !== undefined ? Boolean(req.body.archive) : true;
+    const result = await archiveProduct(req.params.id, archiveState, req.user.id);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    if (error.message && error.message.includes('not found')) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.delete('/api/admin/products/:id', requireAuth, async (req, res) => {
+// Delete product / soft-archive endpoint for backwards compatibility
+app.delete('/api/admin/products/:id', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
   try {
     const result = await deleteProduct(req.params.id, req.user.id);
-    res.json(result);
+    res.json({ success: true, ...result });
   } catch (error) {
+    if (error.message && error.message.includes('not found')) {
+      return res.status(404).json({ success: false, error: error.message });
+    }
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -2407,27 +2657,6 @@ app.get('/sitemap.xml', async (req, res) => {
 // =========================================================================
 // STATIC HTML PAGE ROUTES
 // =========================================================================
-// Safe HTML file streamer with path resolution and error boundaries
-function safeSendFile(res, relativePath) {
-  const primary = path.join(__dirname, relativePath);
-  const secondary = path.join(process.cwd(), relativePath);
-  const target = fs.existsSync(primary) ? primary : (fs.existsSync(secondary) ? secondary : null);
-
-  if (target) {
-    return res.sendFile(target, err => {
-      if (err && !res.headersSent) {
-        console.error(`[STATIC SEND ERROR] Could not stream ${relativePath}:`, err.message);
-        res.status(404).send('Not Found');
-      }
-    });
-  }
-
-  if (!res.headersSent) {
-    console.error(`[STATIC FILE MISSING] ${relativePath} not found on server disk.`);
-    res.status(404).send('Not Found');
-  }
-}
-
 app.get(['/login', '/login.html', '/signin'], (req, res) => safeSendFile(res, 'public/login.html'));
 app.get(['/register', '/register.html', '/signup'], (req, res) => safeSendFile(res, 'public/register.html'));
 app.get(['/forgot-password', '/forgot-password.html'], (req, res) => safeSendFile(res, 'public/forgot-password.html'));
@@ -2445,7 +2674,7 @@ app.get(['/checkout', '/checkout.html'], authenticate, (req, res) => {
 });
 app.get(['/order-confirmation', '/order-confirmation.html'], (req, res) => safeSendFile(res, 'public/order-confirmation.html'));
 app.get(['/tracking', '/tracking.html'], (req, res) => safeSendFile(res, 'public/tracking.html'));
-app.get(['/admin', '/admin.html', '/admin/login'], (req, res) => safeSendFile(res, 'public/admin.html'));
+app.get(['/admin', '/admin.html', '/admin/login', '/admin/:section'], authenticate, handleAdminPageRoute);
 app.get(['/calculator', '/calculator.html'], (req, res) => safeSendFile(res, 'public/calculator.html'));
 app.get(['/savings-calculator', '/savings-calculator.html'], (req, res) => res.redirect(301, '/calculator'));
 app.get(['/packages', '/packages.html', '/pricing', '/pricing.html'], (req, res) => safeSendFile(res, 'public/packages.html'));

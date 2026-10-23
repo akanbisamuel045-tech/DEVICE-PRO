@@ -3290,6 +3290,14 @@ function dispatch(mongoFn, sqliteFn) {
     if (isMongoConnected()) {
       let syncRes = null;
       const skipSqlite = [
+        mongoRepo.createProduct,
+        mongoRepo.updateProduct,
+        mongoRepo.deleteProduct,
+        mongoRepo.archiveProduct,
+        mongoRepo.getProducts,
+        mongoRepo.getProductById,
+        mongoRepo.getProductBySlug,
+        mongoRepo.createOrder,
         mongoRepo.createSession,
         mongoRepo.getSessionUser,
         mongoRepo.revokeSession,
@@ -3335,7 +3343,7 @@ function dispatch(mongoFn, sqliteFn) {
           }
           return mongoRes;
         } catch (err) {
-          if (sqliteAvailable && syncRes !== null) return syncRes;
+          if (!skipSqlite && sqliteAvailable && syncRes !== null) return syncRes;
           throw err;
         }
       })();
@@ -3372,6 +3380,7 @@ module.exports = {
   updateProduct: dispatch(mongoRepo.updateProduct, updateProduct),
   createProduct: dispatch(mongoRepo.createProduct, createProduct),
   deleteProduct: dispatch(mongoRepo.deleteProduct, deleteProduct),
+  archiveProduct: dispatch(mongoRepo.archiveProduct, null),
   getPackages: dispatch(mongoRepo.getPackages, getPackages),
   getPackageBySlug: dispatch(mongoRepo.getPackageBySlug, getPackageBySlug),
   // Categories & Case Studies
