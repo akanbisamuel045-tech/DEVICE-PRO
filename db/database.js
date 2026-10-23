@@ -3465,6 +3465,12 @@ module.exports = {
   reviewPriceImport: dispatch(mongoRepo.reviewPriceImport, null),
   approvePriceImportRows: dispatch(mongoRepo.approvePriceImportRows, null),
   applyPriceImport: dispatch(mongoRepo.applyPriceImport, null),
-  cancelPriceImport: dispatch(mongoRepo.cancelPriceImport, null)
+  cancelPriceImport: dispatch(mongoRepo.cancelPriceImport, null),
+  // Stage 7: Price Intelligence & Margin Analysis
+  getPriceIntelligenceSettings: dispatch(mongoRepo.getPriceIntelligenceSettings, null),
+  updatePriceIntelligenceSettings: dispatch(mongoRepo.updatePriceIntelligenceSettings, null),
+  getPriceIntelligenceProducts: dispatch(mongoRepo.getPriceIntelligenceProducts, null),
+  getPriceIntelligenceSummary: dispatch(mongoRepo.getPriceIntelligenceSummary, null),
+  getProductCostHistory: dispatch(mongoRepo.getProductCostHistory, null)
 };
 

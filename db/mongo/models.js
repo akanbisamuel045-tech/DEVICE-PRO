@@ -370,6 +370,16 @@ const priceImportSchema = new mongoose.Schema({
   notes: { type: String, default: '' }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
+// 15. PriceIntelligenceSettings Schema (Stage 7 Margin Configuration)
+const priceIntelligenceSettingsSchema = new mongoose.Schema({
+  key: { type: String, default: 'default', unique: true, index: true },
+  target_margin_percent: { type: Number, default: 15.0, min: 1, max: 99 },
+  warning_low_margin_threshold: { type: Number, default: 10.0, min: 1, max: 99 },
+  significant_cost_increase_percent: { type: Number, default: 20.0, min: 1, max: 500 },
+  updated_by_email: { type: String, default: '' },
+  updated_by_role: { type: String, default: '' }
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+
 module.exports = {
   Category: mongoose.models.Category || mongoose.model('Category', categorySchema),
   Product: mongoose.models.Product || mongoose.model('Product', productSchema),
@@ -384,5 +394,7 @@ module.exports = {
   Session: mongoose.models.Session || mongoose.model('Session', sessionSchema),
   AuditLog: mongoose.models.AuditLog || mongoose.model('AuditLog', auditLogSchema),
   PasswordReset: mongoose.models.PasswordReset || mongoose.model('PasswordReset', passwordResetSchema),
-  PriceImport: mongoose.models.PriceImport || mongoose.model('PriceImport', priceImportSchema)
+  PriceImport: mongoose.models.PriceImport || mongoose.model('PriceImport', priceImportSchema),
+  PriceIntelligenceSettings: mongoose.models.PriceIntelligenceSettings || mongoose.model('PriceIntelligenceSettings', priceIntelligenceSettingsSchema)
 };
+

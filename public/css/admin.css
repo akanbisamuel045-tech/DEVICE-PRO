@@ -2411,5 +2411,58 @@ dialog.admin-modal::backdrop {
   background: rgba(239, 68, 68, 0.3) !important;
 }
 
+/* =========================================================================
+   STAGE 7: PRICE INTELLIGENCE & MARGIN ANALYSIS STYLES
+   ========================================================================= */
+
+#pi-products-table th {
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-d-text-muted);
+}
+
+#pi-products-table td {
+  vertical-align: middle;
+}
+
+#sim-target-margin-slider {
+  cursor: pointer;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
+}
+
+#sim-target-margin-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-brand-yellow);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(245, 166, 35, 0.5);
+  border: 2px solid #0A192F;
+}
+
+.btn-quick-margin {
+  padding: 0.25rem 0.6rem !important;
+  font-size: 0.72rem !important;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.btn-quick-margin:hover {
+  background: rgba(245, 166, 35, 0.2);
+  border-color: var(--color-brand-yellow);
+  color: var(--color-brand-yellow);
+}
+
+
 
 

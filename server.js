@@ -23,8 +23,11 @@ const {
   verifyUserLogin, createSession, getSessionUser, revokeSession,
   logAudit, getAuditLogs, getDatabaseStats, exportDatabaseBackup, isMongoConnected, db,
   createPriceImport, getPriceImports, getPriceImportById, deletePriceImport,
-  reviewPriceImport, approvePriceImportRows, applyPriceImport, cancelPriceImport
+  reviewPriceImport, approvePriceImportRows, applyPriceImport, cancelPriceImport,
+  getPriceIntelligenceSettings, updatePriceIntelligenceSettings,
+  getPriceIntelligenceProducts, getPriceIntelligenceSummary, getProductCostHistory
 } = require('./db/database');
+const { evaluateProductProfitability } = require('./lib/price-intelligence-engine');
 const {
   sendPasswordResetCodeEmail,
   sendGoogleAccountNoticeEmail,
@@ -2902,6 +2905,165 @@ app.post('/api/admin/price-imports/:id/cancel', requireAuth, requireRole('supera
     res.json(result);
   } catch (error) {
     const status = error.statusCode || (error.message.includes('not found') ? 404 : 400);
+    res.status(status).json({ success: false, error: error.message });
+  }
+});
+
+// =========================================================================
+// STAGE 7: SUPPLIER PRICE INTELLIGENCE, MARGIN ANALYSIS & ADVISORY RECOMMENDATIONS
+// Access is strictly restricted to commercial pricing authority: ['superadmin', 'admin']
+// Analytical endpoints are strictly READ-ONLY and NEVER modify product prices or stock.
+// =========================================================================
+
+// Catalog-wide profitability summary metrics
+app.get('/api/admin/price-intelligence/summary', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const data = await getPriceIntelligenceSummary();
+    res.json({
+      success: true,
+      ...data
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Searchable, filterable, and paginated product profitability list
+app.get('/api/admin/price-intelligence/products', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const search = req.query.search || '';
+    const category = req.query.category || '';
+    const brand = req.query.brand || '';
+    const status = req.query.status || 'active';
+    const margin_filter = req.query.margin_filter || req.query.margin_health || 'all';
+    const missing_cost = req.query.missing_cost;
+    const cost_increased = req.query.cost_increased;
+    const recommendation = req.query.recommendation || '';
+    const sort = req.query.sort || 'margin_asc';
+
+    const result = await getPriceIntelligenceProducts({
+      page,
+      limit,
+      search,
+      category,
+      brand,
+      status,
+      margin_filter,
+      missing_cost,
+      cost_increased,
+      recommendation,
+      sort
+    });
+
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Single product profitability and advisory recommendation analysis
+app.get('/api/admin/price-intelligence/products/:id', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const product = await getProductById(req.params.id, { includeSupplierCost: true });
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found.' });
+    }
+    const settings = await getPriceIntelligenceSettings();
+    const evaluated = evaluateProductProfitability(product, settings);
+
+    res.json({
+      success: true,
+      product: evaluated
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Historical supplier cost movements from genuine applied imports
+app.get('/api/admin/price-intelligence/products/:id/cost-history', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const historyData = await getProductCostHistory(req.params.id);
+    if (!historyData) {
+      return res.status(404).json({ success: false, error: 'Product not found.' });
+    }
+    res.json({
+      success: true,
+      ...historyData
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Advisory recommendations list
+app.get('/api/admin/price-intelligence/recommendations', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const type = req.query.type || '';
+
+    const result = await getPriceIntelligenceProducts({
+      page,
+      limit,
+      recommendation: type,
+      status: 'active'
+    });
+
+    res.json({
+      success: true,
+      ...result,
+      notice: 'Recommendations are strictly advisory. No prices have been or will be changed automatically.'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get current price intelligence settings
+app.get('/api/admin/price-intelligence/settings', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const settings = await getPriceIntelligenceSettings();
+    res.json({
+      success: true,
+      settings
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Update price intelligence target margin and thresholds
+app.patch('/api/admin/price-intelligence/settings', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const updated = await updatePriceIntelligenceSettings(req.body, req.user);
+    if (typeof logAudit === 'function') {
+      try {
+        await logAudit({
+          userId: req.user.id || req.user._id,
+          action: 'UPDATE_PRICE_INTELLIGENCE_SETTINGS',
+          entityType: 'price_intelligence_settings',
+          entityId: 'default',
+          details: `Updated target margin to ${updated.target_margin_percent}% (warning threshold: ${updated.warning_low_margin_threshold}%).`,
+          ipAddress: req.ip || ''
+        });
+      } catch (auditErr) {
+        // Safe degradation for MongoDB Atlas test users
+      }
+    }
+
+    res.json({
+      success: true,
+      settings: updated,
+      message: 'Price intelligence settings updated successfully.'
+    });
+  } catch (error) {
+    const status = error.statusCode || 400;
     res.status(status).json({ success: false, error: error.message });
   }
 });

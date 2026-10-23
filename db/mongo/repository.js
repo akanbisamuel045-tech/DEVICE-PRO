@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const {
   Product, Category, CaseStudy, Enquiry, Quote,
   Order, Payment, Warranty, SupportTicket, User, Session, AuditLog, PasswordReset,
-  PriceImport
+  PriceImport, PriceIntelligenceSettings
 } = require('./models');
 
 // Password verification helper (consistent with SQLite implementation)
@@ -2611,6 +2611,348 @@ async function exportDatabaseBackup() {
   };
 }
 
+// =========================================================================
+// STAGE 7: PRICE INTELLIGENCE, MARGIN ANALYSIS & ADVISORY RECOMMENDATIONS
+// =========================================================================
+
+const {
+  DEFAULT_SETTINGS: DEFAULT_PRICE_INTELLIGENCE_SETTINGS,
+  calculateGrossProfit,
+  calculateGrossMarginPercent,
+  calculateMarkupPercent,
+  calculateIndicativePrice,
+  evaluateProductProfitability,
+  calculateCatalogSummaryMetrics
+} = require('../../lib/price-intelligence-engine');
+
+function escapeRegex(string) {
+  return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function getPriceIntelligenceSettings() {
+  let settings = await PriceIntelligenceSettings.findOne({ key: 'default' }).lean();
+  if (!settings) {
+    try {
+      settings = await PriceIntelligenceSettings.create({
+        key: 'default',
+        target_margin_percent: DEFAULT_PRICE_INTELLIGENCE_SETTINGS.target_margin_percent,
+        warning_low_margin_threshold: DEFAULT_PRICE_INTELLIGENCE_SETTINGS.warning_low_margin_threshold,
+        significant_cost_increase_percent: DEFAULT_PRICE_INTELLIGENCE_SETTINGS.significant_cost_increase_percent
+      });
+      if (settings.toObject) settings = settings.toObject();
+    } catch (e) {
+      settings = await PriceIntelligenceSettings.findOne({ key: 'default' }).lean() || DEFAULT_PRICE_INTELLIGENCE_SETTINGS;
+    }
+  }
+  return {
+    target_margin_percent: Number(settings.target_margin_percent) || 15.0,
+    warning_low_margin_threshold: Number(settings.warning_low_margin_threshold) || 10.0,
+    significant_cost_increase_percent: Number(settings.significant_cost_increase_percent) || 20.0,
+    updated_at: settings.updated_at || null,
+    updated_by_email: settings.updated_by_email || ''
+  };
+}
+
+async function updatePriceIntelligenceSettings(updates = {}, user = null) {
+  const {
+    target_margin_percent,
+    warning_low_margin_threshold,
+    significant_cost_increase_percent
+  } = updates;
+
+  const updateFields = {};
+
+  if (target_margin_percent !== undefined) {
+    const val = Number(target_margin_percent);
+    if (isNaN(val) || val <= 0 || val >= 100) {
+      const err = new Error('Target gross margin percentage must be a number strictly between 0% and 100%.');
+      err.statusCode = 400;
+      throw err;
+    }
+    updateFields.target_margin_percent = Math.round(val * 100) / 100;
+  }
+
+  if (warning_low_margin_threshold !== undefined) {
+    const val = Number(warning_low_margin_threshold);
+    if (isNaN(val) || val <= 0 || val >= 100) {
+      const err = new Error('Warning low margin threshold must be a number strictly between 0% and 100%.');
+      err.statusCode = 400;
+      throw err;
+    }
+    updateFields.warning_low_margin_threshold = Math.round(val * 100) / 100;
+  }
+
+  if (significant_cost_increase_percent !== undefined) {
+    const val = Number(significant_cost_increase_percent);
+    if (isNaN(val) || val <= 0 || val > 500) {
+      const err = new Error('Significant cost increase threshold must be a positive number up to 500%.');
+      err.statusCode = 400;
+      throw err;
+    }
+    updateFields.significant_cost_increase_percent = Math.round(val * 100) / 100;
+  }
+
+  if (user) {
+    updateFields.updated_by_email = user.email || '';
+    updateFields.updated_by_role = user.role || '';
+  }
+
+  const updated = await PriceIntelligenceSettings.findOneAndUpdate(
+    { key: 'default' },
+    { $set: updateFields },
+    { new: true, upsert: true, setDefaultsOnInsert: true }
+  ).lean();
+
+  return {
+    target_margin_percent: Number(updated.target_margin_percent),
+    warning_low_margin_threshold: Number(updated.warning_low_margin_threshold),
+    significant_cost_increase_percent: Number(updated.significant_cost_increase_percent),
+    updated_at: updated.updated_at,
+    updated_by_email: updated.updated_by_email
+  };
+}
+
+async function getPriceIntelligenceProducts(options = {}) {
+  const {
+    page = 1,
+    limit = 20,
+    search = '',
+    category = '',
+    brand = '',
+    status = 'active',
+    margin_filter = 'all',
+    missing_cost = null,
+    cost_increased = null,
+    recommendation = '',
+    sort = 'margin_asc'
+  } = options;
+
+  const settings = await getPriceIntelligenceSettings();
+  const safeLimit = Math.max(1, Math.min(parseInt(limit, 10) || 20, 100));
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+
+  const query = {};
+
+  if (status === 'archived') {
+    query.published = 0;
+  } else if (status === 'all') {
+    // all products
+  } else {
+    // default: active commercial products (strictly published: 1, excluding benchmark records)
+    query.published = 1;
+  }
+
+  if (category && category !== 'all') {
+    query.category = String(category).trim().toLowerCase();
+  }
+
+  if (brand && brand !== 'all') {
+    query.brand = new RegExp(`^${escapeRegex(String(brand).trim())}$`, 'i');
+  }
+
+  if (search && String(search).trim()) {
+    const sRegex = new RegExp(escapeRegex(String(search).trim()), 'i');
+    query.$or = [{ name: sRegex }, { sku: sRegex }, { brand: sRegex }];
+  }
+
+  if (missing_cost === true || missing_cost === 'true') {
+    const costOr = [{ cost_price_ngn: { $exists: false } }, { cost_price_ngn: 0 }, { cost_price_ngn: null }];
+    if (query.$or) {
+      query.$and = [{ $or: query.$or }, { $or: costOr }];
+      delete query.$or;
+    } else {
+      query.$or = costOr;
+    }
+  }
+
+  // Fetch candidate products (READ-ONLY)
+  const rawProducts = await Product.find(query).lean();
+
+  // Evaluate profitability and advisory recommendations for each product
+  let evaluated = rawProducts.map(prod => evaluateProductProfitability(prod, settings));
+
+  // In-memory filters for calculated properties
+  if (margin_filter && margin_filter !== 'all') {
+    if (margin_filter === 'positive' || margin_filter === 'healthy') {
+      evaluated = evaluated.filter(p => p.gross_margin_percent != null && p.gross_margin_percent >= settings.target_margin_percent);
+    } else if (margin_filter === 'low') {
+      evaluated = evaluated.filter(p => p.gross_margin_percent != null && p.gross_margin_percent < settings.target_margin_percent && p.estimated_gross_profit_ngn >= 0);
+    } else if (margin_filter === 'negative') {
+      evaluated = evaluated.filter(p => p.estimated_gross_profit_ngn != null && p.estimated_gross_profit_ngn < 0);
+    } else if (margin_filter === 'unavailable') {
+      evaluated = evaluated.filter(p => p.gross_margin_percent == null);
+    } else if (margin_filter === 'missing_cost') {
+      evaluated = evaluated.filter(p => p.data_quality && p.data_quality.has_missing_cost);
+    }
+  }
+
+  if (recommendation && recommendation !== 'all') {
+    const recUpper = String(recommendation).toUpperCase();
+    evaluated = evaluated.filter(p => p.recommendation && p.recommendation.status === recUpper);
+  }
+
+  if (cost_increased === true || cost_increased === 'true') {
+    evaluated = evaluated.filter(p => p.cost_history && p.cost_history.has_increased_significantly);
+  }
+
+  // Sorting
+  evaluated.sort((a, b) => {
+    switch (sort) {
+      case 'margin_asc':
+        if (a.gross_margin_percent == null && b.gross_margin_percent == null) return 0;
+        if (a.gross_margin_percent == null) return 1;
+        if (b.gross_margin_percent == null) return -1;
+        return a.gross_margin_percent - b.gross_margin_percent;
+      case 'margin_desc':
+        if (a.gross_margin_percent == null && b.gross_margin_percent == null) return 0;
+        if (a.gross_margin_percent == null) return 1;
+        if (b.gross_margin_percent == null) return -1;
+        return b.gross_margin_percent - a.gross_margin_percent;
+      case 'profit_asc':
+        if (a.estimated_gross_profit_ngn == null && b.estimated_gross_profit_ngn == null) return 0;
+        if (a.estimated_gross_profit_ngn == null) return 1;
+        if (b.estimated_gross_profit_ngn == null) return -1;
+        return a.estimated_gross_profit_ngn - b.estimated_gross_profit_ngn;
+      case 'profit_desc':
+        if (a.estimated_gross_profit_ngn == null && b.estimated_gross_profit_ngn == null) return 0;
+        if (a.estimated_gross_profit_ngn == null) return 1;
+        if (b.estimated_gross_profit_ngn == null) return -1;
+        return b.estimated_gross_profit_ngn - a.estimated_gross_profit_ngn;
+      case 'markup_desc':
+        if (a.markup_percent == null && b.markup_percent == null) return 0;
+        if (a.markup_percent == null) return 1;
+        if (b.markup_percent == null) return -1;
+        return b.markup_percent - a.markup_percent;
+      case 'markup_asc':
+        if (a.markup_percent == null && b.markup_percent == null) return 0;
+        if (a.markup_percent == null) return 1;
+        if (b.markup_percent == null) return -1;
+        return a.markup_percent - b.markup_percent;
+      case 'name_asc':
+        return (a.name || '').localeCompare(b.name || '');
+      case 'name_desc':
+        return (b.name || '').localeCompare(a.name || '');
+      case 'price_asc':
+        return (a.selling_price_ngn || 0) - (b.selling_price_ngn || 0);
+      case 'price_desc':
+        return (b.selling_price_ngn || 0) - (a.selling_price_ngn || 0);
+      case 'cost_desc':
+        return (b.supplier_cost_ngn || 0) - (a.supplier_cost_ngn || 0);
+      case 'cost_asc':
+        return (a.supplier_cost_ngn || 0) - (b.supplier_cost_ngn || 0);
+      case 'newest':
+      default:
+        return new Date(b.updated_at || 0) - new Date(a.updated_at || 0);
+    }
+  });
+
+  const total = evaluated.length;
+  const totalPages = Math.ceil(total / safeLimit) || 1;
+  const offset = (safePage - 1) * safeLimit;
+  const pagedProducts = evaluated.slice(offset, offset + safeLimit);
+
+  return {
+    products: pagedProducts,
+    total,
+    page: safePage,
+    limit: safeLimit,
+    totalPages,
+    settings,
+    metric_label: 'Estimated Gross Profit Before Other Costs'
+  };
+}
+
+async function getPriceIntelligenceSummary(options = {}) {
+  const settings = await getPriceIntelligenceSettings();
+  // Strictly query active products (published: 1), excluding benchmark records
+  const rawProducts = await Product.find({ published: 1 }).lean();
+  const evaluated = rawProducts.map(prod => evaluateProductProfitability(prod, settings));
+  const metrics = calculateCatalogSummaryMetrics(evaluated, settings);
+
+  return {
+    summary: metrics,
+    settings,
+    active_catalog_total: rawProducts.length,
+    generated_at: new Date()
+  };
+}
+
+async function getProductCostHistory(productId) {
+  const filter = buildProductFilter(productId);
+  if (!filter) return null;
+
+  const product = await Product.findOne(filter).lean();
+  if (!product) return null;
+
+  const targetIdStr = String(product._id || product.id);
+  const sku = product.sku;
+
+  // Search AuditLog for PRICE_IMPORT_APPLIED_ROW records
+  const auditEntries = await AuditLog.find({
+    action: 'PRICE_IMPORT_APPLIED_ROW',
+    $or: [
+      { 'metadata.product_id': targetIdStr },
+      { 'metadata.sku': sku },
+      { target_id: targetIdStr }
+    ]
+  }).sort({ created_at: -1 }).lean();
+
+  // Search PriceImport for verified applied records
+  const appliedImports = await PriceImport.find({
+    status: { $in: ['successfully_applied', 'partially_applied'] },
+    rows_preview: {
+      $elemMatch: {
+        application_status: 'applied',
+        $or: [
+          { matched_product_id: product._id },
+          { normalized_sku: sku }
+        ]
+      }
+    }
+  }).sort({ applied_at: -1, updated_at: -1 }).lean();
+
+  const history = [];
+
+  for (const imp of appliedImports) {
+    const matchingRows = (imp.rows_preview || []).filter(r => 
+      r.application_status === 'applied' &&
+      (String(r.matched_product_id) === String(product._id) || r.normalized_sku === sku)
+    );
+
+    for (const r of matchingRows) {
+      history.push({
+        applied_at: r.applied_at || imp.applied_at || imp.updated_at,
+        previous_cost_ngn: r.applied_previous_cost_ngn ?? r.matched_current_cost_ngn ?? null,
+        applied_cost_ngn: r.approved_cost_ngn ?? r.normalized_cost_ngn,
+        cost_change_ngn: r.cost_diff_ngn || 0,
+        cost_change_percent: r.cost_diff_percent || 0,
+        import_id: imp.import_id || String(imp._id || imp.id),
+        import_filename: imp.filename || imp.original_filename || 'supplier_prices.xlsx',
+        supplier_name: imp.supplier_name || 'Generic Supplier',
+        applied_by_email: imp.applied_by_email || imp.approved_by_email || 'Administrator'
+      });
+    }
+  }
+
+  history.sort((a, b) => new Date(b.applied_at || 0) - new Date(a.applied_at || 0));
+
+  return {
+    product_id: String(product._id || product.id),
+    id: product.id || null,
+    sku: product.sku,
+    name: product.name,
+    current_supplier_cost_ngn: product.cost_price_ngn || null,
+    current_selling_price_ngn: product.price_ngn || 0,
+    has_history: history.length > 0,
+    history_count: history.length,
+    history,
+    audit_references_count: auditEntries.length,
+    message: history.length > 0 
+      ? 'Verified historical supplier cost changes from applied imports.' 
+      : 'No historical supplier cost movements recorded from applied imports for this product.'
+  };
+}
+
 module.exports = {
   getProducts, getProductBySlug, getProductById, getProductFacets, getRelatedProducts,
   createProduct, updateProduct, deleteProduct, archiveProduct,
@@ -2631,5 +2973,12 @@ module.exports = {
   verifyUserLogin, createSession, getSessionUser, revokeSession,
   logAudit, getAuditLogs, getDatabaseStats, exportDatabaseBackup,
   createPriceImport, getPriceImports, getPriceImportById, deletePriceImport,
-  reviewPriceImport, approvePriceImportRows, applyPriceImport, cancelPriceImport
+  reviewPriceImport, approvePriceImportRows, applyPriceImport, cancelPriceImport,
+  // Stage 7: Price Intelligence & Margin Analysis
+  getPriceIntelligenceSettings,
+  updatePriceIntelligenceSettings,
+  getPriceIntelligenceProducts,
+  getPriceIntelligenceSummary,
+  getProductCostHistory
 };
+

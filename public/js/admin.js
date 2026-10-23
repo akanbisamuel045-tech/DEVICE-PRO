@@ -179,6 +179,15 @@
     'supplier-price-imports': {
       aliasOf: 'supplier-imports'
     },
+    'price-intelligence': {
+      title: 'Supplier Price Intelligence & Margin Analysis',
+      breadcrumb: 'Price Intelligence',
+      panelId: 'panel-price-intelligence',
+      roles: ['superadmin', 'admin']
+    },
+    'margin-analysis': {
+      aliasOf: 'price-intelligence'
+    },
     'categories': {
       title: 'Equipment Categories Architecture',
       breadcrumb: 'Categories',
@@ -917,6 +926,10 @@
         break;
       case 'supplier-imports':
         loadSupplierImportsModule();
+        break;
+      case 'price-intelligence':
+      case 'margin-analysis':
+        loadPriceIntelligenceModule();
         break;
       case 'import-history':
         loadImportHistoryModule();
@@ -3829,6 +3842,610 @@
   window.adminOpenReview = openImportReviewModal;
   window.adminInspectImport = openImportReviewModal;
   window.adminGoHistoryPage = (p) => loadImportHistoryModule(p);
+
+  // =========================================================================
+  // STAGE 7: PRICE INTELLIGENCE & MARGIN ANALYSIS CONTROLLER
+  // =========================================================================
+
+  const priceIntelligenceState = {
+    page: 1,
+    limit: 20,
+    search: '',
+    category: 'all',
+    brand: 'all',
+    marginFilter: 'all',
+    sort: 'margin_asc',
+    settings: {
+      target_margin_percent: 15.0,
+      warning_low_margin_threshold: 10.0,
+      significant_cost_increase_percent: 20.0
+    },
+    initialized: false
+  };
+
+  async function loadPriceIntelligenceModule() {
+    if (!priceIntelligenceState.initialized) {
+      initPriceIntelligenceEvents();
+      await loadPriceIntelligenceFilters();
+      priceIntelligenceState.initialized = true;
+    }
+    await Promise.all([
+      loadPriceIntelligenceSummary(),
+      loadPriceIntelligenceProducts(priceIntelligenceState.page)
+    ]);
+  }
+
+  async function loadPriceIntelligenceSummary() {
+    try {
+      const res = await apiFetch('/api/admin/price-intelligence/summary');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.success || !data.summary) return;
+
+      const s = data.summary;
+      const settings = data.settings || {};
+      priceIntelligenceState.settings = { ...priceIntelligenceState.settings, ...settings };
+
+      // Update KPI cards
+      const kpiTotal = document.getElementById('kpi-pi-total-active');
+      const kpiComplete = document.getElementById('kpi-pi-complete');
+      const kpiMissing = document.getElementById('kpi-pi-missing-cost');
+      const kpiLow = document.getElementById('kpi-pi-low-margin');
+      const kpiNeg = document.getElementById('kpi-pi-negative-margin');
+
+      if (kpiTotal) kpiTotal.textContent = s.total_active_products.toLocaleString();
+      if (kpiComplete) kpiComplete.textContent = s.products_with_complete_pricing.toLocaleString();
+      if (kpiMissing) kpiMissing.textContent = s.products_with_missing_cost.toLocaleString();
+      if (kpiLow) kpiLow.textContent = s.products_below_target_margin.toLocaleString();
+      if (kpiNeg) kpiNeg.textContent = s.products_with_negative_margin.toLocaleString();
+
+      // Update labels
+      const targetPercent = settings.target_margin_percent || 15;
+      document.querySelectorAll('.pi-target-label').forEach(el => el.textContent = `${targetPercent}%`);
+      const targetBadge = document.getElementById('pi-target-margin-badge');
+      if (targetBadge) targetBadge.textContent = `${targetPercent}%`;
+    } catch (err) {
+      console.warn('Failed to load price intelligence summary:', err.message);
+    }
+  }
+
+  async function loadPriceIntelligenceFilters() {
+    try {
+      const res = await apiFetch('/api/products/facets');
+      if (!res.ok) return;
+      const facets = await res.json();
+
+      const catSelect = document.getElementById('pi-category-filter');
+      const brandSelect = document.getElementById('pi-brand-filter');
+
+      if (catSelect && facets.categories) {
+        catSelect.innerHTML = '<option value="all">All Categories</option>' + 
+          facets.categories.map(c => `<option value="${escapeHtml(c.category)}">${escapeHtml(c.category_label || c.category)} (${c.count})</option>`).join('');
+      }
+
+      if (brandSelect && facets.brands) {
+        brandSelect.innerHTML = '<option value="all">All Brands</option>' + 
+          facets.brands.map(b => `<option value="${escapeHtml(b.brand)}">${escapeHtml(b.brand)} (${b.count})</option>`).join('');
+      }
+    } catch (err) {
+      console.warn('Failed to populate price intelligence filters:', err.message);
+    }
+  }
+
+  async function loadPriceIntelligenceProducts(page = 1) {
+    const tbody = document.getElementById('pi-table-tbody');
+    const loading = document.getElementById('pi-loading');
+    const empty = document.getElementById('pi-empty');
+    const countLabel = document.getElementById('pi-table-count');
+
+    priceIntelligenceState.page = page;
+
+    if (loading) loading.style.display = 'block';
+    if (empty) empty.style.display = 'none';
+    if (tbody) tbody.innerHTML = '';
+
+    try {
+      const params = new URLSearchParams({
+        page,
+        limit: priceIntelligenceState.limit,
+        search: priceIntelligenceState.search,
+        category: priceIntelligenceState.category,
+        brand: priceIntelligenceState.brand,
+        margin_filter: priceIntelligenceState.marginFilter,
+        sort: priceIntelligenceState.sort,
+        status: 'active'
+      });
+
+      const res = await apiFetch(`/api/admin/price-intelligence/products?${params.toString()}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (loading) loading.style.display = 'none';
+
+      if (!data.success || !data.products || data.products.length === 0) {
+        if (empty) empty.style.display = 'block';
+        if (countLabel) countLabel.textContent = '0';
+        updatePriceIntelligencePagination(0, 1, 1);
+        return;
+      }
+
+      if (countLabel) countLabel.textContent = data.total.toLocaleString();
+      renderPriceIntelligenceTable(data.products, data.settings || priceIntelligenceState.settings);
+      updatePriceIntelligencePagination(data.total, data.page, data.totalPages);
+    } catch (err) {
+      if (loading) loading.style.display = 'none';
+      if (tbody) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: #EF4444; padding: 2rem;">Error loading profitability data: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+  }
+
+  function renderPriceIntelligenceTable(products = [], settings = {}) {
+    const tbody = document.getElementById('pi-table-tbody');
+    if (!tbody) return;
+
+    const targetMargin = settings.target_margin_percent || 15;
+
+    tbody.innerHTML = products.map(p => {
+      // Data quality badge
+      let qualityBadge = '<span class="status-pill live" style="font-size: 0.68rem;">COMPLETE</span>';
+      if (p.data_quality.status === 'MISSING_COST') {
+        qualityBadge = '<span class="status-pill" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; font-size: 0.68rem;">MISSING COST</span>';
+      } else if (p.data_quality.status === 'INVALID_PRICE') {
+        qualityBadge = '<span class="status-pill" style="background: rgba(239, 68, 68, 0.15); color: #EF4444; font-size: 0.68rem;">INVALID PRICE</span>';
+      }
+
+      // Recommendation badge
+      let recBadge = `<span class="status-pill live" style="font-size: 0.68rem;" title="${escapeHtml(p.recommendation.explanation)}">HEALTHY</span>`;
+      if (p.recommendation.status === 'MISSING_COST') {
+        recBadge = `<span class="status-pill" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B; font-size: 0.68rem;" title="${escapeHtml(p.recommendation.explanation)}">NEEDS COST</span>`;
+      } else if (p.recommendation.status === 'NEGATIVE_MARGIN') {
+        recBadge = `<span class="status-pill" style="background: rgba(239, 68, 68, 0.2); color: #EF4444; font-size: 0.68rem; font-weight: 700;" title="${escapeHtml(p.recommendation.explanation)}">NEGATIVE PROFIT</span>`;
+      } else if (p.recommendation.status === 'LOW_MARGIN') {
+        recBadge = `<span class="status-pill" style="background: rgba(249, 115, 22, 0.18); color: #F97316; font-size: 0.68rem;" title="${escapeHtml(p.recommendation.explanation)}">BELOW TARGET</span>`;
+      } else if (p.recommendation.status === 'COST_INCREASED') {
+        recBadge = `<span class="status-pill" style="background: rgba(56, 189, 248, 0.18); color: #38BDF8; font-size: 0.68rem;" title="${escapeHtml(p.recommendation.explanation)}">COST INCREASED</span>`;
+      }
+
+      // Cost & Selling Price display
+      const costDisplay = p.supplier_cost_ngn != null ? `₦${Number(p.supplier_cost_ngn).toLocaleString()}` : '<span style="color: #F59E0B;">Unrecorded</span>';
+      const priceDisplay = p.selling_price_ngn != null ? `₦${Number(p.selling_price_ngn).toLocaleString()}` : '<span style="color: #EF4444;">₦0</span>';
+
+      // Promo display
+      let promoDisplay = '—';
+      if (p.regular_price_ngn && p.regular_price_ngn > (p.selling_price_ngn || 0)) {
+        promoDisplay = `<span style="text-decoration: line-through; color: var(--color-d-text-muted); font-size: 0.75rem;">₦${Number(p.regular_price_ngn).toLocaleString()}</span>`;
+      }
+
+      // Gross profit display
+      let profitDisplay = '<span style="color: var(--color-d-text-muted);">Unavailable</span>';
+      if (p.estimated_gross_profit_ngn != null) {
+        const isNeg = p.estimated_gross_profit_ngn < 0;
+        const color = isNeg ? '#EF4444' : '#10B981';
+        profitDisplay = `<strong style="color: ${color};">${isNeg ? '-' : ''}₦${Math.abs(p.estimated_gross_profit_ngn).toLocaleString()}</strong>`;
+      }
+
+      // Margin display
+      let marginDisplay = '<span style="color: var(--color-d-text-muted);">Unavailable</span>';
+      if (p.gross_margin_percent != null) {
+        let marginColor = '#10B981';
+        if (p.gross_margin_percent < 0) marginColor = '#EF4444';
+        else if (p.gross_margin_percent < targetMargin) marginColor = '#F97316';
+        marginDisplay = `<span style="color: ${marginColor}; font-weight: 700;">${p.gross_margin_percent}%</span>`;
+      }
+
+      // Markup display
+      let markupDisplay = '<span style="color: var(--color-d-text-muted);">Unavailable</span>';
+      if (p.markup_percent != null) {
+        markupDisplay = `<span style="color: rgba(255,255,255,0.85);">${p.markup_percent}%</span>`;
+      }
+
+      const prodJson = escapeHtml(JSON.stringify({
+        id: p.product_id,
+        sku: p.sku,
+        name: p.name,
+        cost: p.supplier_cost_ngn,
+        price: p.selling_price_ngn,
+        margin: p.gross_margin_percent,
+        targetMargin: targetMargin,
+        status: p.recommendation.status,
+        explanation: p.recommendation.explanation
+      }));
+
+      return `
+        <tr>
+          <td>
+            <strong style="color: #FFFFFF; font-size: 0.88rem; display: block;">${escapeHtml(p.name)}</strong>
+            <span style="font-family: monospace; font-size: 0.74rem; color: var(--color-d-text-muted);">${escapeHtml(p.sku)}</span>
+          </td>
+          <td>
+            <span style="display: block; font-size: 0.82rem; color: rgba(255,255,255,0.9);">${escapeHtml(p.category_label)}</span>
+            <span style="font-size: 0.74rem; color: var(--color-d-text-muted);">${escapeHtml(p.brand)}</span>
+          </td>
+          <td style="font-size: 0.85rem; font-weight: 600;">${costDisplay}</td>
+          <td style="font-size: 0.85rem; font-weight: 600;">${priceDisplay}</td>
+          <td style="font-size: 0.82rem;">${promoDisplay}</td>
+          <td>${profitDisplay}</td>
+          <td>${marginDisplay}</td>
+          <td>${markupDisplay}</td>
+          <td>${qualityBadge}</td>
+          <td>${recBadge}</td>
+          <td style="text-align: right; white-space: nowrap;">
+            <button type="button" class="btn-table-action btn-pi-simulate" data-product="${prodJson}" title="Simulate Target Margin Indicative Price" style="padding: 0.35rem 0.65rem; font-size: 0.72rem;">
+              <span>Simulate</span>
+            </button>
+            <button type="button" class="btn-table-action btn-pi-history" data-id="${p.product_id}" data-name="${escapeHtml(p.name)}" data-sku="${escapeHtml(p.sku)}" title="View Verified Cost Movement History" style="padding: 0.35rem 0.65rem; font-size: 0.72rem; margin-left: 0.25rem;">
+              <span>History</span>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // Attach row button events
+    tbody.querySelectorAll('.btn-pi-simulate').forEach(btn => {
+      btn.addEventListener('click', () => {
+        try {
+          const prodData = JSON.parse(btn.getAttribute('data-product'));
+          openIndicativePriceSimulator(prodData);
+        } catch (e) {}
+      });
+    });
+
+    tbody.querySelectorAll('.btn-pi-history').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const prodId = btn.getAttribute('data-id');
+        const prodName = btn.getAttribute('data-name');
+        const prodSku = btn.getAttribute('data-sku');
+        openCostHistoryModal(prodId, prodName, prodSku);
+      });
+    });
+  }
+
+  function updatePriceIntelligencePagination(total, page, totalPages) {
+    const curLabel = document.getElementById('pi-current-page');
+    const totLabel = document.getElementById('pi-total-pages');
+    const countLabel = document.getElementById('pi-total-items');
+    const prevBtn = document.getElementById('btn-pi-prev');
+    const nextBtn = document.getElementById('btn-pi-next');
+
+    if (curLabel) curLabel.textContent = page;
+    if (totLabel) totLabel.textContent = totalPages;
+    if (countLabel) countLabel.textContent = total.toLocaleString();
+
+    if (prevBtn) prevBtn.disabled = page <= 1;
+    if (nextBtn) nextBtn.disabled = page >= totalPages;
+  }
+
+  function initPriceIntelligenceEvents() {
+    const searchInput = document.getElementById('pi-search-input');
+    const catSelect = document.getElementById('pi-category-filter');
+    const brandSelect = document.getElementById('pi-brand-filter');
+    const marginSelect = document.getElementById('pi-margin-filter');
+    const sortSelect = document.getElementById('pi-sort-filter');
+    const resetBtn = document.getElementById('pi-reset-btn');
+    const refreshBtn = document.getElementById('btn-pi-refresh');
+    const settingsBtn = document.getElementById('btn-pi-settings');
+    const prevBtn = document.getElementById('btn-pi-prev');
+    const nextBtn = document.getElementById('btn-pi-next');
+
+    if (searchInput) {
+      searchInput.addEventListener('input', debounce((e) => {
+        priceIntelligenceState.search = e.target.value.trim();
+        priceIntelligenceState.page = 1;
+        loadPriceIntelligenceProducts(1);
+      }, 350));
+    }
+
+    if (catSelect) {
+      catSelect.addEventListener('change', (e) => {
+        priceIntelligenceState.category = e.target.value;
+        priceIntelligenceState.page = 1;
+        loadPriceIntelligenceProducts(1);
+      });
+    }
+
+    if (brandSelect) {
+      brandSelect.addEventListener('change', (e) => {
+        priceIntelligenceState.brand = e.target.value;
+        priceIntelligenceState.page = 1;
+        loadPriceIntelligenceProducts(1);
+      });
+    }
+
+    if (marginSelect) {
+      marginSelect.addEventListener('change', (e) => {
+        priceIntelligenceState.marginFilter = e.target.value;
+        priceIntelligenceState.page = 1;
+        loadPriceIntelligenceProducts(1);
+      });
+    }
+
+    if (sortSelect) {
+      sortSelect.addEventListener('change', (e) => {
+        priceIntelligenceState.sort = e.target.value;
+        priceIntelligenceState.page = 1;
+        loadPriceIntelligenceProducts(1);
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        priceIntelligenceState.search = '';
+        priceIntelligenceState.category = 'all';
+        priceIntelligenceState.brand = 'all';
+        priceIntelligenceState.marginFilter = 'all';
+        priceIntelligenceState.sort = 'margin_asc';
+
+        if (searchInput) searchInput.value = '';
+        if (catSelect) catSelect.value = 'all';
+        if (brandSelect) brandSelect.value = 'all';
+        if (marginSelect) marginSelect.value = 'all';
+        if (sortSelect) sortSelect.value = 'margin_asc';
+
+        loadPriceIntelligenceProducts(1);
+      });
+    }
+
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', () => {
+        loadPriceIntelligenceSummary();
+        loadPriceIntelligenceProducts(priceIntelligenceState.page);
+      });
+    }
+
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', openPriceIntelligenceSettingsModal);
+    }
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        if (priceIntelligenceState.page > 1) {
+          loadPriceIntelligenceProducts(priceIntelligenceState.page - 1);
+        }
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        loadPriceIntelligenceProducts(priceIntelligenceState.page + 1);
+      });
+    }
+
+    // Settings Form submit
+    const settingsForm = document.getElementById('form-pi-settings');
+    if (settingsForm) {
+      settingsForm.addEventListener('submit', handleSavePriceIntelligenceSettings);
+    }
+  }
+
+  async function openPriceIntelligenceSettingsModal() {
+    const modal = document.getElementById('modal-price-intelligence-settings');
+    if (!modal) return;
+
+    const targetInput = document.getElementById('pi-target-margin-input');
+    const warnInput = document.getElementById('pi-warning-margin-input');
+    const costIncInput = document.getElementById('pi-cost-increase-input');
+    const errBox = document.getElementById('pi-settings-error');
+
+    if (errBox) errBox.style.display = 'none';
+
+    // Populate current settings
+    if (targetInput) targetInput.value = priceIntelligenceState.settings.target_margin_percent || 15.0;
+    if (warnInput) warnInput.value = priceIntelligenceState.settings.warning_low_margin_threshold || 10.0;
+    if (costIncInput) costIncInput.value = priceIntelligenceState.settings.significant_cost_increase_percent || 20.0;
+
+    modal.showModal();
+  }
+
+  async function handleSavePriceIntelligenceSettings(e) {
+    e.preventDefault();
+    const modal = document.getElementById('modal-price-intelligence-settings');
+    const errBox = document.getElementById('pi-settings-error');
+    const saveBtn = document.getElementById('btn-save-pi-settings');
+
+    const targetMargin = parseFloat(document.getElementById('pi-target-margin-input').value);
+    const warningMargin = parseFloat(document.getElementById('pi-warning-margin-input').value);
+    const costInc = parseFloat(document.getElementById('pi-cost-increase-input').value);
+
+    if (isNaN(targetMargin) || targetMargin <= 0 || targetMargin >= 100) {
+      if (errBox) {
+        errBox.textContent = 'Target margin must be a number strictly between 0% and 100%.';
+        errBox.style.display = 'block';
+      }
+      return;
+    }
+
+    if (saveBtn) saveBtn.disabled = true;
+
+    try {
+      const res = await apiFetch('/api/admin/price-intelligence/settings', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          target_margin_percent: targetMargin,
+          warning_low_margin_threshold: warningMargin,
+          significant_cost_increase_percent: costInc
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update settings');
+      }
+
+      priceIntelligenceState.settings = { ...priceIntelligenceState.settings, ...data.settings };
+      if (modal) modal.close();
+
+      await Promise.all([
+        loadPriceIntelligenceSummary(),
+        loadPriceIntelligenceProducts(priceIntelligenceState.page)
+      ]);
+    } catch (err) {
+      if (errBox) {
+        errBox.textContent = err.message;
+        errBox.style.display = 'block';
+      }
+    } finally {
+      if (saveBtn) saveBtn.disabled = false;
+    }
+  }
+
+  function openIndicativePriceSimulator(product) {
+    const modal = document.getElementById('modal-indicative-price');
+    if (!modal) return;
+
+    const nameEl = document.getElementById('sim-product-name');
+    const skuEl = document.getElementById('sim-product-sku');
+    const costEl = document.getElementById('sim-cost-val');
+    const priceEl = document.getElementById('sim-price-val');
+    const marginEl = document.getElementById('sim-margin-val');
+    const pillEl = document.getElementById('sim-status-pill');
+    const slider = document.getElementById('sim-target-margin-slider');
+    const sliderVal = document.getElementById('sim-target-margin-display');
+    const resultPrice = document.getElementById('sim-result-price');
+    const formulaText = document.getElementById('sim-result-formula');
+
+    const cost = product.cost ? Number(product.cost) : 0;
+    const price = product.price ? Number(product.price) : 0;
+
+    if (nameEl) nameEl.textContent = product.name;
+    if (skuEl) skuEl.textContent = `SKU: ${product.sku}`;
+    if (costEl) costEl.textContent = cost > 0 ? `₦${cost.toLocaleString()}` : 'Unrecorded';
+    if (priceEl) priceEl.textContent = price > 0 ? `₦${price.toLocaleString()}` : '₦0';
+
+    if (marginEl) {
+      if (product.margin != null) {
+        const color = product.margin < 0 ? '#EF4444' : (product.margin < (product.targetMargin || 15) ? '#F97316' : '#10B981');
+        marginEl.innerHTML = `<span style="color: ${color};">${product.margin}%</span>`;
+      } else {
+        marginEl.innerHTML = '<span style="color: var(--color-d-text-muted);">Unavailable</span>';
+      }
+    }
+
+    if (pillEl) {
+      pillEl.textContent = product.status || 'HEALTHY';
+      pillEl.className = 'status-pill' + (product.status === 'HEALTHY_MARGIN' ? ' live' : '');
+    }
+
+    const defaultTarget = product.targetMargin || priceIntelligenceState.settings.target_margin_percent || 15;
+    if (slider) slider.value = defaultTarget;
+    if (sliderVal) sliderVal.textContent = `${defaultTarget}%`;
+
+    function updateSimulation(targetPercent) {
+      if (sliderVal) sliderVal.textContent = `${targetPercent}%`;
+
+      if (cost <= 0) {
+        if (resultPrice) resultPrice.textContent = 'Unavailable (Cost Missing)';
+        if (formulaText) formulaText.textContent = 'Supplier cost is not recorded. Enter cost first to calculate indicative price.';
+        return;
+      }
+
+      const decimal = targetPercent / 100;
+      const indicative = Math.round(cost / (1 - decimal));
+
+      if (resultPrice) resultPrice.textContent = `₦${indicative.toLocaleString()}`;
+      if (formulaText) formulaText.textContent = `Formula: ₦${cost.toLocaleString()} ÷ (1 - ${decimal}) = ₦${indicative.toLocaleString()} for advisory review`;
+    }
+
+    updateSimulation(defaultTarget);
+
+    if (slider) {
+      slider.oninput = (e) => updateSimulation(parseFloat(e.target.value));
+    }
+
+    modal.querySelectorAll('.btn-quick-margin').forEach(btn => {
+      btn.onclick = () => {
+        const val = parseFloat(btn.getAttribute('data-val'));
+        if (slider) slider.value = val;
+        updateSimulation(val);
+      };
+    });
+
+    modal.showModal();
+  }
+
+  async function openCostHistoryModal(productId, productName, productSku) {
+    const modal = document.getElementById('modal-cost-history');
+    if (!modal) return;
+
+    const titleEl = document.getElementById('hist-modal-title');
+    const subEl = document.getElementById('hist-modal-subtitle');
+    const contentArea = document.getElementById('hist-content-area');
+
+    if (titleEl) titleEl.textContent = `Cost Movement: ${productName}`;
+    if (subEl) subEl.textContent = `SKU: ${productSku} • Genuine records from approved & applied supplier imports`;
+    if (contentArea) contentArea.innerHTML = '<div style="padding: 2rem; text-align: center;"><div class="spinner"></div><p style="color: var(--color-d-text-muted); font-size: 0.8rem; margin-top: 0.5rem;">Loading verified cost history...</p></div>';
+
+    modal.showModal();
+
+    try {
+      const res = await apiFetch(`/api/admin/price-intelligence/products/${productId}/cost-history`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      if (!data.success || !data.has_history || !data.history || data.history.length === 0) {
+        if (contentArea) {
+          contentArea.innerHTML = `
+            <div style="text-align: center; padding: 2.5rem 1rem;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-d-text-muted)" stroke-width="1.5" style="margin-bottom: 0.75rem;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+              <h4 style="color: #FFFFFF; font-size: 1rem; margin-bottom: 0.25rem;">No Historical Cost Movements Recorded</h4>
+              <p style="color: var(--color-d-text-muted); font-size: 0.82rem; max-width: 480px; margin: 0 auto 1rem;">
+                No supplier price imports have been approved and applied to this product yet. Current supplier cost is ${data.current_supplier_cost_ngn ? '₦' + Number(data.current_supplier_cost_ngn).toLocaleString() : 'not recorded'}.
+              </p>
+              <span class="status-pill" style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); font-size: 0.75rem;">
+                UNMODIFIED ORIGINAL CATALOG RECORD
+              </span>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      if (contentArea) {
+        contentArea.innerHTML = `
+          <div class="table-responsive">
+            <table class="dash-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>Application Date</th>
+                  <th>Previous Cost</th>
+                  <th>Applied Cost</th>
+                  <th>Cost Change</th>
+                  <th>Source Import / File</th>
+                  <th>Applied By</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.history.map(h => {
+                  const diffColor = h.cost_change_ngn > 0 ? '#EF4444' : (h.cost_change_ngn < 0 ? '#10B981' : 'rgba(255,255,255,0.7)');
+                  const sign = h.cost_change_ngn > 0 ? '+' : '';
+                  return `
+                    <tr>
+                      <td style="font-size: 0.8rem;">${formatDate(h.applied_at)}</td>
+                      <td style="font-size: 0.82rem;">₦${Number(h.previous_cost_ngn || 0).toLocaleString()}</td>
+                      <td style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF;">₦${Number(h.applied_cost_ngn).toLocaleString()}</td>
+                      <td style="font-size: 0.82rem; font-weight: 700; color: ${diffColor};">
+                        ${sign}₦${Number(h.cost_change_ngn).toLocaleString()} (${sign}${h.cost_change_percent}%)
+                      </td>
+                      <td style="font-size: 0.78rem;">
+                        <span style="display: block; color: #FFFFFF;">${escapeHtml(h.import_filename)}</span>
+                        <span style="font-family: monospace; color: var(--color-d-text-muted); font-size: 0.72rem;">${escapeHtml(h.import_id)}</span>
+                      </td>
+                      <td style="font-size: 0.78rem; color: var(--color-d-text-muted);">${escapeHtml(h.applied_by_email)}</td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+    } catch (err) {
+      if (contentArea) {
+        contentArea.innerHTML = `<div style="padding: 2rem; text-align: center; color: #EF4444;">Error retrieving cost movements: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+  }
 
   // Utilities
   function debounce(func, wait) {

@@ -197,7 +197,34 @@ This file records important architectural and design decisions for the DEVICE PR
 4. Enforce strict lifecycle gating (`analysed` -> `awaiting_approval` -> `approved_for_application` -> `applying` -> `successfully_applied` / `partially_applied` / `cancelled`) with concurrency locks and tamper-evident audit logging (`APPROVE_PRICE_IMPORT`, `PRICE_IMPORT_APPLIED_ROW`, `APPLY_PRICE_IMPORT`, `CANCEL_PRICE_IMPORT`).
 
 **Rationale:** Aligns with Mongoose schema definitions, catalog management forms in `admin.html`, and Stage 4 test assertions, providing absolute price separation and zero risk of live retail price disruption.  
-**Consequences:** Internal cost reporting uses `cost_price_ngn`. Public product APIs continue stripping all cost fields to maintain confidentiality.
+---
+
+## ADR-015: Supplier Price Intelligence, Margin Analysis & Advisory Pricing Recommendation Architecture
+
+**Date:** 2026-10-23  
+**Status:** Accepted  
+**Context:** Stage 7 required the introduction of a comprehensive profit margin analysis and advisory pricing intelligence system within the administrative console. The core requirement was providing executives with visibility into unit gross profit, margin percentages, cost markups, genuine historical cost trends, and target margin simulations, while maintaining a strict prohibition against automated catalog repricing or unintended exposure of confidential supplier metrics.
+
+**Decision:**
+1. **Advisory Semantics Only (Zero Automated Mutations):**
+   - The price intelligence system is strictly analytical. No recommendation, simulation, or threshold alert can modify customer retail selling prices (`price_ngn`), supplier costs (`cost_price_ngn`), promotional prices (`previous_price_ngn`), or inventory quantities (`stock_quantity`).
+   - Calculated indicative selling prices ($\text{Supplier Cost} / (1 - \text{Target Margin})$) are displayed exclusively in an interactive simulator dialog (`#modal-indicative-price`) with prominent advisory disclosures. They are never persisted automatically to the catalog.
+2. **Standardized Profitability Formulations:**
+   - $\text{Estimated Gross Profit Before Other Costs} = \text{Selling Price} - \text{Supplier Cost}$.
+   - $\text{Gross Margin \%} = ((\text{Selling Price} - \text{Supplier Cost}) / \text{Selling Price}) \times 100$. Division by zero is protected ($Selling Price \le 0$ results in `Unavailable`).
+   - $\text{Markup \%} = ((\text{Selling Price} - \text{Supplier Cost}) / \text{Supplier Cost}) \times 100$.
+   - Operating expenses (shipping, duties, payment fees, installation labour, warranty, VAT) are explicitly excluded and disclosed as such.
+3. **Verified Supplier Cost History Only:**
+   - Historical supplier cost movements are derived solely from verified applied price imports (`status: 'successfully_applied' | 'partially_applied'` with item status `applied`) and correlated `PRICE_IMPORT_APPLIED_ROW` audit log events. Analysed, unapplied, or cancelled imports are strictly excluded.
+4. **Data Isolation & Active Product Filtering:**
+   - Commercial profitability dashboards evaluate only active commercial items (`published: 1`), explicitly excluding the 69 archived benchmark records (`SG-10K-HYBRID-NG`) created during stress testing.
+   - Products lacking supplier costs are labeled honestly with `has_missing_cost: true` and display `Unavailable` margins rather than fabricating zero-cost statistics.
+5. **Role-Based Confidentiality & Server Enforcement:**
+   - Access to `/api/admin/price-intelligence/*` is restricted to `superadmin` and `admin`. Customers, unauthenticated visitors, and unprivileged staff (`sales`, `engineer`) receive 401 or 403. Public product APIs continue stripping all cost and margin fields.
+
+**Rationale:** Prevents unintended pricing errors, maintains data confidentiality, upholds financial integrity through transparent disclaimers, and ensures all repricing decisions require explicit human authorization.  
+**Consequences:** Administrators gain clear visibility into product margins and cost movements without any risk of inadvertent catalog disruptions.
+
 
 
 
