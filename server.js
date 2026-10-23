@@ -21,7 +21,9 @@ const {
   createPasswordResetToken, resetPasswordWithToken,
   createVerificationCode, verifyResetCode, executePasswordReset,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
-  getAuditLogs, getDatabaseStats, exportDatabaseBackup, isMongoConnected, db
+  logAudit, getAuditLogs, getDatabaseStats, exportDatabaseBackup, isMongoConnected, db,
+  createPriceImport, getPriceImports, getPriceImportById, deletePriceImport,
+  reviewPriceImport, approvePriceImportRows, applyPriceImport, cancelPriceImport
 } = require('./db/database');
 const {
   sendPasswordResetCodeEmail,
@@ -57,11 +59,12 @@ app.use(compression());
 
 // Middleware for parsing JSON with raw body capture for webhook signature verification
 app.use(express.json({
+  limit: '10mb',
   verify: (req, res, buf) => {
     req.rawBody = buf;
   }
 }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Comprehensive Security Headers (Stage 17 Hardening)
 app.use((req, res, next) => {
@@ -2528,6 +2531,375 @@ app.delete('/api/admin/products/:id', requireAuth, requireRole('superadmin', 'ad
       return res.status(404).json({ success: false, error: error.message });
     }
     res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// =========================================================================
+// STAGE 5: SUPPLIER PRICE IMPORT INFRASTRUCTURE
+// Security Notice: Analysed supplier price data NEVER updates live prices or supplier costs.
+// Access is strictly restricted to roles with commercial pricing authority: ['superadmin', 'admin']
+// =========================================================================
+
+const multer = require('multer');
+const {
+  processSupplierPriceFile,
+  generateImportTemplate,
+  MAX_FILE_SIZE_BYTES,
+  MAX_ROW_COUNT
+} = require('./lib/price-import-engine');
+
+const priceImportUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: MAX_FILE_SIZE_BYTES, // 4 MB maximum
+    files: 1
+  }
+});
+
+function handlePriceUpload(req, res, next) {
+  priceImportUpload.single('file')(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({
+          success: false,
+          error: `File size exceeds the maximum permitted limit of 4MB (${MAX_FILE_SIZE_BYTES} bytes).`
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        error: err.message || 'File upload failed.'
+      });
+    }
+    next();
+  });
+}
+
+// Download import template in .xlsx or .csv format
+app.get('/api/admin/price-imports/template/:format', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const format = (req.params.format || '').toLowerCase();
+    if (!['xlsx', 'csv'].includes(format)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid template format "${req.params.format}". Supported formats: xlsx, csv.`
+      });
+    }
+
+    const { buffer, contentType, filename } = await generateImportTemplate(format);
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Upload and analyze supplier price list without updating live database
+app.post('/api/admin/price-imports/upload', requireAuth, requireRole('superadmin', 'admin'), handlePriceUpload, async (req, res) => {
+  try {
+    let fileBuffer = null;
+    let originalFilename = '';
+
+    if (req.file && req.file.buffer) {
+      fileBuffer = req.file.buffer;
+      originalFilename = req.file.originalname || 'supplier_price_list';
+    } else if (req.body && req.body.fileBase64) {
+      fileBuffer = Buffer.from(req.body.fileBase64, 'base64');
+      originalFilename = req.body.filename || 'supplier_price_list.xlsx';
+    } else if (req.body && typeof req.body.csvText === 'string') {
+      fileBuffer = Buffer.from(req.body.csvText, 'utf8');
+      originalFilename = req.body.filename || 'supplier_price_list.csv';
+    } else {
+      return res.status(400).json({
+        success: false,
+        error: 'No file provided. Please upload an Excel (.xlsx) or CSV (.csv) file.'
+      });
+    }
+
+    // Parse custom mapping if sent from frontend
+    let customMapping = null;
+    if (req.body && req.body.mapping) {
+      try {
+        customMapping = typeof req.body.mapping === 'string' ? JSON.parse(req.body.mapping) : req.body.mapping;
+      } catch (e) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid column mapping format. Expected valid JSON.'
+        });
+      }
+    }
+
+    const supplierName = (req.body && req.body.supplierName) ? String(req.body.supplierName).trim() : 'Solar Equipment Supplier';
+
+    // Retrieve active catalog products for conservative matching
+    const catalogData = await getProducts({ status: 'all', limit: 1000, includeSupplierCost: true });
+    const allProducts = Array.isArray(catalogData) ? catalogData : (catalogData.products || []);
+
+    const analysisResult = await processSupplierPriceFile({
+      buffer: fileBuffer,
+      filename: originalFilename,
+      activeProducts: allProducts,
+      customMapping,
+      supplierName
+    });
+
+    res.json({
+      success: true,
+      ...analysisResult,
+      format: analysisResult.file_format,
+      file_format: analysisResult.file_format,
+      mappingConfig: analysisResult.active_mapping,
+      detectedMapping: analysisResult.detected_mapping,
+      availableColumns: analysisResult.headers,
+      headers: analysisResult.headers,
+      rows: analysisResult.rows,
+      rowsPreview: analysisResult.rows,
+      notice: 'Import analysed successfully. No live product prices or supplier costs have been changed.'
+    });
+  } catch (error) {
+    const statusCode = error.message && (
+      error.message.includes('not supported') ||
+      error.message.includes('Unsupported') ||
+      error.message.includes('Empty') ||
+      error.message.includes('exceeds') ||
+      error.message.includes('corrupt') ||
+      error.message.includes('Corrupted') ||
+      error.message.includes('No valid headers') ||
+      error.message.includes('required') ||
+      error.message.includes('must contain at least')
+    ) ? 400 : 500;
+
+    res.status(statusCode).json({
+      success: false,
+      error: error.message || 'Failed to process supplier price file'
+    });
+  }
+});
+
+// Save persistent import analysis record (Strictly 'analysed', never applied)
+app.post('/api/admin/price-imports', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const { filename, supplier_name, file_format, mapping_config, summary, rows_preview, notes } = req.body || {};
+
+    if (!filename || !file_format || !summary) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing required import analysis payload (filename, file_format, and summary are required).'
+      });
+    }
+
+    // Ensure rows_preview is bounded and sanitized
+    const safeRows = Array.isArray(rows_preview) ? rows_preview.slice(0, 1000) : [];
+
+    const importRecord = await createPriceImport({
+      filename: String(filename).trim().slice(0, 255),
+      supplier_name: String(supplier_name || 'Generic Supplier').trim().slice(0, 150),
+      file_format: String(file_format).toLowerCase(),
+      uploaded_by: req.user.id,
+      uploaded_by_email: req.user.email,
+      uploaded_by_role: req.user.role,
+      status: 'analysed', // Stage 5 restriction: strictly analysed
+      mapping_config: typeof mapping_config === 'object' ? mapping_config : {},
+      summary: {
+        total_rows: Number(summary.total_rows || 0),
+        valid_rows: Number(summary.valid_rows || 0),
+        matched_rows: Number(summary.matched_rows || 0),
+        unmatched_rows: Number(summary.unmatched_rows || 0),
+        duplicate_in_file_rows: Number(summary.duplicate_in_file_rows || 0),
+        duplicate_in_catalog_rows: Number(summary.duplicate_in_catalog_rows || 0),
+        invalid_rows: Number(summary.invalid_rows || 0),
+        requires_review_rows: Number(summary.requires_review_rows || 0)
+      },
+      rows_preview: safeRows,
+      notes: notes ? String(notes).slice(0, 500) : ''
+    });
+
+    if (typeof logAudit === 'function') {
+      await logAudit({
+        userId: req.user.id,
+        action: 'ANALYSE_PRICE_IMPORT',
+        entityType: 'price_import',
+        entityId: String(importRecord.id || importRecord._id),
+        details: `Saved supplier price analysis for "${importRecord.filename}" (${importRecord.summary.total_rows} rows analysed, ${importRecord.summary.matched_rows} matched). No live prices changed.`,
+        ipAddress: req.ip || ''
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      importRecord,
+      message: 'Import analysed successfully. No live product prices or supplier costs have been changed.'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// List price import history with pagination and search
+app.get('/api/admin/price-imports', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const status = req.query.status || '';
+    const format = req.query.format || '';
+    const search = req.query.search || '';
+
+    const result = await getPriceImports({ page, limit, status, format, search });
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Get detailed import record by ID (including preview rows)
+app.get('/api/admin/price-imports/:id', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const importRecord = await getPriceImportById(req.params.id);
+    if (!importRecord) {
+      return res.status(404).json({
+        success: false,
+        error: 'Price import record not found.'
+      });
+    }
+    res.json({
+      success: true,
+      importRecord
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Revalidate a saved import record against current catalog state
+app.post('/api/admin/price-imports/:id/validate', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const importRecord = await getPriceImportById(req.params.id);
+    if (!importRecord) {
+      return res.status(404).json({
+        success: false,
+        error: 'Price import record not found.'
+      });
+    }
+
+    // Retrieve active catalog products
+    const catalogData = await getProducts({ status: 'all', limit: 1000, includeSupplierCost: true });
+    const allProducts = Array.isArray(catalogData) ? catalogData : (catalogData.products || []);
+
+    const { matchSupplierItemsAgainstCatalog } = require('./lib/price-import-engine');
+    const revalidated = matchSupplierItemsAgainstCatalog(importRecord.rows_preview || [], allProducts);
+
+    res.json({
+      success: true,
+      summary: revalidated.summary,
+      rows: revalidated.rows,
+      notice: 'Import analysed successfully. No live product prices or supplier costs have been changed.'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Delete an import record (restricted to superadmin)
+app.delete('/api/admin/price-imports/:id', requireAuth, requireRole('superadmin'), async (req, res) => {
+  try {
+    const success = await deletePriceImport(req.params.id);
+    if (!success) {
+      return res.status(404).json({
+        success: false,
+        error: 'Price import record not found.'
+      });
+    }
+    res.json({
+      success: true,
+      message: 'Price import record deleted successfully.'
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// =========================================================================
+// STAGE 6: SUPPLIER PRICE REVIEW, APPROVAL & CONTROLLED APPLICATION
+// =========================================================================
+
+// Open a previously analysed import for review (computes diffs, variance, eligibility)
+app.get('/api/admin/price-imports/:id/review', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const importRecord = await reviewPriceImport(req.params.id, req.user);
+    if (!importRecord) {
+      return res.status(404).json({
+        success: false,
+        error: 'Price import record not found.'
+      });
+    }
+
+    res.json({
+      success: true,
+      importRecord,
+      notice: 'Reviewing proposed supplier costs. Live product selling prices and supplier costs remain unchanged until explicit approval and application.'
+    });
+  } catch (error) {
+    const status = error.statusCode || 500;
+    res.status(status).json({ success: false, error: error.message });
+  }
+});
+
+// Explicitly approve selected rows for application
+app.post('/api/admin/price-imports/:id/approve', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const { approvedRowNumbers, rowIds, acknowledgeHighVariance, notes } = req.body || {};
+    const rowsToApprove = approvedRowNumbers || rowIds;
+
+    const importRecord = await approvePriceImportRows(req.params.id, {
+      approvedRowNumbers: rowsToApprove,
+      acknowledgeHighVariance: Boolean(acknowledgeHighVariance),
+      notes,
+      user: req.user
+    });
+
+    res.json({
+      success: true,
+      importRecord,
+      message: 'Supplier costs approved for application. No live prices or costs have been modified yet. Proceed to application to execute.'
+    });
+  } catch (error) {
+    const status = error.statusCode || (error.message.includes('not found') ? 404 : 400);
+    const resp = { success: false, error: error.message };
+    if (error.highVariance) {
+      resp.highVariance = true;
+      resp.highVarianceRows = error.highVarianceRows || [];
+    }
+    res.status(status).json(resp);
+  }
+});
+
+// Apply approved supplier price changes to live catalog (strictly updates cost_price_ngn only)
+app.post('/api/admin/price-imports/:id/apply', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const { rowIds, approvedRowNumbers } = req.body || {};
+    const result = await applyPriceImport(req.params.id, req.user, { rowIds: rowIds || approvedRowNumbers });
+    res.json(result);
+  } catch (error) {
+    const status = error.statusCode || (error.message.includes('not found') ? 404 : 400);
+    res.status(status).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Cancel a price import (preventing further review, approval, or application)
+app.post('/api/admin/price-imports/:id/cancel', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const { reason } = req.body || {};
+    const result = await cancelPriceImport(req.params.id, req.user, reason);
+    res.json(result);
+  } catch (error) {
+    const status = error.statusCode || (error.message.includes('not found') ? 404 : 400);
+    res.status(status).json({ success: false, error: error.message });
   }
 });
 

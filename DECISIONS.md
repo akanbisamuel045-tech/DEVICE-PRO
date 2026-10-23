@@ -180,4 +180,24 @@ This file records important architectural and design decisions for the DEVICE PR
 **Rationale:** Directly fulfills user aesthetic requests with custom, uncropped 3D assets, produces an expansive modern look on desktop viewports, and preserves DEVICE PRO's brand integrity, performance, and accessibility.
 **Consequences:** The homepage adopts a modern, luminous, Scandinavian-inspired architectural solar aesthetic, fully compliant with WCAG 2.1 AA contrast requirements with zero horizontal overflow.
 
+---
+
+## ADR-014: Canonical Supplier Cost Field Resolution & Controlled Application Architecture
+
+**Date:** 2026-10-23  
+**Status:** Accepted  
+**Context:** During Stage 6 implementation of the Supplier Price Review, Approval and Controlled Application workflow, an inspection of the repository revealed historical usage of both `cost_price_ngn` and `supplier_cost_ngn`. A canonical supplier purchasing cost field was required to ensure database consistency, prevent silent data reinterpretation, and strictly preserve customer-facing retail selling price isolation.
+
+**Decision:**
+1. Formally designate `cost_price_ngn` as the authoritative canonical supplier purchasing cost field for DEVICE PRO across all database models, repository methods, administrative catalog forms, and supplier import applications.
+2. Maintain conservative backward compatibility for read queries by evaluating `product.cost_price_ngn !== undefined ? product.cost_price_ngn : (product.supplier_cost_ngn || 0)`.
+3. Enforce strict isolation between supplier purchasing costs (`cost_price_ngn`) and customer retail selling prices (`price_ngn`):
+   - Approved supplier cost applications update exclusively `cost_price_ngn` via atomic `$set`.
+   - Retail selling prices (`price_ngn`), promotional pricing, active inventory stock quantities (`stock_quantity`), active customer orders, quotations, and turnkey solar package prices are never modified by supplier cost updates.
+4. Enforce strict lifecycle gating (`analysed` -> `awaiting_approval` -> `approved_for_application` -> `applying` -> `successfully_applied` / `partially_applied` / `cancelled`) with concurrency locks and tamper-evident audit logging (`APPROVE_PRICE_IMPORT`, `PRICE_IMPORT_APPLIED_ROW`, `APPLY_PRICE_IMPORT`, `CANCEL_PRICE_IMPORT`).
+
+**Rationale:** Aligns with Mongoose schema definitions, catalog management forms in `admin.html`, and Stage 4 test assertions, providing absolute price separation and zero risk of live retail price disruption.  
+**Consequences:** Internal cost reporting uses `cost_price_ngn`. Public product APIs continue stripping all cost fields to maintain confidentiality.
+
+
 

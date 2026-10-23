@@ -2,7 +2,8 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const {
   Product, Category, CaseStudy, Enquiry, Quote,
-  Order, Payment, Warranty, SupportTicket, User, Session, AuditLog, PasswordReset
+  Order, Payment, Warranty, SupportTicket, User, Session, AuditLog, PasswordReset,
+  PriceImport
 } = require('./models');
 
 // Password verification helper (consistent with SQLite implementation)
@@ -1822,6 +1823,530 @@ async function getAuditLogs({ limit = 50, offset = 0 } = {}) {
   return { logs, total };
 }
 
+// --- STAGE 5: SUPPLIER PRICE IMPORT INFRASTRUCTURE ---
+
+async function createPriceImport(importData) {
+  const maxDoc = await PriceImport.findOne().sort({ id: -1 }).select('id').lean();
+  const nextId = (maxDoc && maxDoc.id) ? maxDoc.id + 1 : 1;
+  const filename = importData.filename || importData.original_filename || 'supplier_prices.xlsx';
+  const importIdStr = importData.import_id || `IMP-${Date.now().toString().slice(-6)}-${nextId}`;
+
+  const doc = new PriceImport({
+    ...importData,
+    id: importData.id || nextId,
+    import_id: importIdStr,
+    filename: filename,
+    original_filename: filename,
+    file_size_bytes: importData.file_size_bytes || 0,
+    status: 'analysed' // Stage 5 restriction: Never auto-applied
+  });
+  await doc.save();
+  const obj = doc.toObject();
+  obj.id = obj.id || nextId;
+  return obj;
+}
+
+async function getPriceImports({ page = 1, limit = 20, status = '', format = '', search = '' } = {}) {
+  const query = {};
+  if (status) {
+    query.status = status;
+  }
+  if (format) {
+    query.file_format = format.toLowerCase();
+  }
+  if (search && typeof search === 'string') {
+    const safeRegex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    query.$or = [
+      { filename: safeRegex },
+      { supplier_name: safeRegex },
+      { uploaded_by_email: safeRegex }
+    ];
+  }
+
+  const safePage = Math.max(1, parseInt(page, 10) || 1);
+  const safeLimit = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
+  const skip = (safePage - 1) * safeLimit;
+
+  const [imports, total] = await Promise.all([
+    PriceImport.find(query)
+      .select('-rows_preview')
+      .sort({ created_at: -1 })
+      .skip(skip)
+      .limit(safeLimit)
+      .lean(),
+    PriceImport.countDocuments(query)
+  ]);
+
+  return {
+    imports,
+    total,
+    page: safePage,
+    limit: safeLimit,
+    totalPages: Math.ceil(total / safeLimit) || 1
+  };
+}
+
+async function getPriceImportById(id) {
+  if (!id) return null;
+  let query = null;
+  if (mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id)) {
+    query = { $or: [{ _id: id }, { id: isNaN(id) ? -1 : Number(id) }] };
+  } else if (!isNaN(id)) {
+    query = { id: Number(id) };
+  } else {
+    return null;
+  }
+  return PriceImport.findOne(query).lean();
+}
+
+async function deletePriceImport(id) {
+  if (!id) return false;
+  let query = null;
+  if (mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id)) {
+    query = { $or: [{ _id: id }, { id: isNaN(id) ? -1 : Number(id) }] };
+  } else if (!isNaN(id)) {
+    query = { id: Number(id) };
+  } else {
+    return false;
+  }
+  const res = await PriceImport.deleteOne(query);
+  return res.deletedCount > 0;
+}
+
+// --- STAGE 6: SUPPLIER PRICE REVIEW, APPROVAL & CONTROLLED APPLICATION ---
+
+async function reviewPriceImport(id, user = {}) {
+  if (!id) return null;
+  const query = (mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id))
+    ? { $or: [{ _id: id }, { id: isNaN(id) ? -1 : Number(id) }] }
+    : (!isNaN(id) ? { id: Number(id) } : null);
+
+  if (!query) return null;
+  const importDoc = await PriceImport.findOne(query);
+  if (!importDoc) return null;
+
+  if (importDoc.status === 'cancelled') {
+    const err = new Error('Cannot review a cancelled price import.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // Load active products from MongoDB Atlas
+  const activeProducts = await Product.find({ published: 1 }).lean();
+  const { preparePriceImportForReview } = require('../../lib/price-import-engine');
+  const reviewData = preparePriceImportForReview(importDoc, activeProducts);
+
+  importDoc.rows_preview = reviewData.rows;
+  importDoc.summary.eligible_for_approval_rows = reviewData.summaryMetrics.eligible_for_approval_rows;
+  importDoc.summary.high_variance_rows = reviewData.summaryMetrics.high_variance_rows;
+
+  // Transition from 'analysed' to 'awaiting_approval'
+  if (importDoc.status === 'analysed') {
+    importDoc.status = 'awaiting_approval';
+    importDoc.reviewed_by = user.id || null;
+    importDoc.reviewed_by_email = user.email || '';
+    importDoc.reviewed_at = new Date();
+
+    await logAudit({
+      userId: user.id || null,
+      action: 'SUBMIT_PRICE_IMPORT_REVIEW',
+      entityType: 'price_import',
+      entityId: String(importDoc.id || importDoc._id),
+      details: `Opened supplier price import review for "${importDoc.filename}". Eligible for approval: ${reviewData.summaryMetrics.eligible_for_approval_rows} rows. High variance (>30%): ${reviewData.summaryMetrics.high_variance_rows} rows.`,
+      ipAddress: user.ip || ''
+    });
+  }
+
+  await importDoc.save();
+  return importDoc.toObject();
+}
+
+async function approvePriceImportRows(id, { approvedRowNumbers = [], acknowledgeHighVariance = false, notes = '', user = {} } = {}) {
+  if (!id) {
+    const err = new Error('Price import record not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+  const query = (mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id))
+    ? { $or: [{ _id: id }, { id: isNaN(id) ? -1 : Number(id) }] }
+    : (!isNaN(id) ? { id: Number(id) } : null);
+
+  if (!query) {
+    const err = new Error('Price import record not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const importDoc = await PriceImport.findOne(query);
+  if (!importDoc) {
+    const err = new Error('Price import record not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  // Lifecycle state checks
+  if (importDoc.status === 'successfully_applied') {
+    const err = new Error('Import has already been applied. Completed imports cannot be approved again.');
+    err.statusCode = 400;
+    throw err;
+  }
+  if (importDoc.status === 'cancelled') {
+    const err = new Error('Cannot approve a cancelled price import.');
+    err.statusCode = 400;
+    throw err;
+  }
+  if (importDoc.status === 'applying') {
+    const err = new Error('Import application is currently in progress.');
+    err.statusCode = 409;
+    throw err;
+  }
+
+  if (!Array.isArray(approvedRowNumbers) || approvedRowNumbers.length === 0) {
+    const err = new Error('Please select at least one eligible row to approve.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  // Refresh review state against current catalog before checking
+  const activeProducts = await Product.find({ published: 1 }).lean();
+  const { preparePriceImportForReview } = require('../../lib/price-import-engine');
+  const reviewData = preparePriceImportForReview(importDoc, activeProducts);
+  importDoc.rows_preview = reviewData.rows;
+
+  // Validate every selected row
+  const selectedRows = [];
+  const highVarianceRows = [];
+
+  const targetIdentifiers = approvedRowNumbers.map(String);
+
+  for (const idOrNum of approvedRowNumbers) {
+    const row = importDoc.rows_preview.find(r => r.row_number === Number(idOrNum) || String(r.row_number) === String(idOrNum) || (r._id && String(r._id) === String(idOrNum)));
+    if (!row) {
+      const err = new Error(`Row #${idOrNum} does not belong to this price import.`);
+      err.statusCode = 400;
+      throw err;
+    }
+    if (!row.is_eligible_for_approval) {
+      const reason = row.validation_errors && row.validation_errors.length > 0
+        ? row.validation_errors.join(', ')
+        : (row.status || 'ineligible');
+      const err = new Error(`Row #${idOrNum} (${row.raw_sku || 'No SKU'}) is not eligible for approval (${reason}). Only valid, matched active products can be approved.`);
+      err.statusCode = 400;
+      throw err;
+    }
+
+    if (row.variance_warning && row.variance_warning !== 'NONE') {
+      highVarianceRows.push({
+        rowNumber: row.row_number,
+        sku: row.matched_product_sku,
+        currentCost: row.matched_current_cost_ngn,
+        proposedCost: row.normalized_cost_ngn,
+        diffPercent: row.cost_diff_percent,
+        warning: row.variance_warning
+      });
+    }
+
+    selectedRows.push(row);
+  }
+
+  // Require explicit acknowledgement for high variance warnings
+  if (highVarianceRows.length > 0 && !acknowledgeHighVariance) {
+    const err = new Error(`High variance (> 30%) detected on ${highVarianceRows.length} selected row(s). Explicit acknowledgement is required.`);
+    err.statusCode = 400;
+    err.highVariance = true;
+    err.highVarianceRows = highVarianceRows;
+    throw err;
+  }
+
+  // Apply row approval markings
+  let approvedCount = 0;
+  importDoc.rows_preview.forEach(row => {
+    const isSelected = targetIdentifiers.includes(String(row.row_number)) || (row._id && targetIdentifiers.includes(String(row._id)));
+    if (isSelected && row.is_eligible_for_approval) {
+      row.approval_status = 'approved';
+      row.approved_cost_ngn = row.normalized_cost_ngn;
+      row.approved_at = new Date();
+      row.approved_by_email = user.email || '';
+      approvedCount++;
+    } else {
+      if (row.approval_status === 'approved') {
+        // Unselecting a previously approved row
+        row.approval_status = row.is_eligible_for_approval ? 'unapproved' : 'ineligible';
+        row.approved_cost_ngn = null;
+      }
+    }
+  });
+
+  importDoc.status = 'approved_for_application';
+  importDoc.approved_by = user.id || null;
+  importDoc.approved_by_email = user.email || '';
+  importDoc.approved_by_role = user.role || 'admin';
+  importDoc.approved_at = new Date();
+  importDoc.approved_row_count = approvedCount;
+  importDoc.approval_notes = notes ? String(notes).slice(0, 500) : '';
+  importDoc.summary.approved_rows = approvedCount;
+
+  await importDoc.save();
+
+  await logAudit({
+    userId: user.id || null,
+    action: 'APPROVE_PRICE_IMPORT',
+    entityType: 'price_import',
+    entityId: String(importDoc.id || importDoc._id),
+    details: `Approved ${approvedCount} supplier price rows for "${importDoc.filename}". No live product prices or costs were modified during approval.`,
+    ipAddress: user.ip || ''
+  });
+
+  return importDoc.toObject();
+}
+
+async function applyPriceImport(id, user = {}, options = {}) {
+  if (!id) {
+    const err = new Error('Price import record not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+  const query = (mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id))
+    ? { $or: [{ _id: id }, { id: isNaN(id) ? -1 : Number(id) }] }
+    : (!isNaN(id) ? { id: Number(id) } : null);
+
+  if (!query) {
+    const err = new Error('Price import record not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  // Atomic state transition to prevent concurrent application runs
+  const importDoc = await PriceImport.findOneAndUpdate(
+    {
+      ...query,
+      status: { $in: ['approved_for_application', 'partially_applied'] }
+    },
+    { $set: { status: 'applying' } },
+    { returnDocument: 'after' }
+  );
+
+  if (!importDoc) {
+    const existing = await PriceImport.findOne(query).lean();
+    if (!existing) {
+      const err = new Error('Price import record not found.');
+      err.statusCode = 404;
+      throw err;
+    }
+    if (existing.status === 'applying') {
+      const err = new Error('Import application is currently in progress by another request.');
+      err.statusCode = 409;
+      throw err;
+    }
+    if (existing.status === 'successfully_applied') {
+      const err = new Error('Import has already been successfully applied. Completed imports cannot be applied again.');
+      err.statusCode = 400;
+      throw err;
+    }
+    if (existing.status === 'cancelled') {
+      const err = new Error('Cancelled imports cannot be applied.');
+      err.statusCode = 400;
+      throw err;
+    }
+    const err = new Error(`Import must be approved before application. Current status is "${existing.status}".`);
+    err.statusCode = 400;
+    throw err;
+  }
+
+  let pendingRows = importDoc.rows_preview.filter(r => r.approval_status === 'approved' && r.application_status !== 'applied');
+  if (options && Array.isArray(options.rowIds) && options.rowIds.length > 0) {
+    const filterIds = options.rowIds.map(String);
+    pendingRows = pendingRows.filter(r => filterIds.includes(String(r.row_number)) || (r._id && filterIds.includes(String(r._id))));
+  }
+
+  if (pendingRows.length === 0) {
+    importDoc.status = 'approved_for_application';
+    await importDoc.save();
+    const err = new Error('No pending approved rows found to apply.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const { normalizeSku } = require('../../lib/price-import-engine');
+  let appliedCount = 0;
+  let failedCount = 0;
+  const appliedRowsList = [];
+  const failedRowsList = [];
+
+  for (const row of pendingRows) {
+    try {
+      // Find product in catalog
+      const prodQuery = (mongoose.Types.ObjectId.isValid(row.matched_product_id) && String(new mongoose.Types.ObjectId(row.matched_product_id)) === String(row.matched_product_id))
+        ? { $or: [{ _id: row.matched_product_id }, { id: isNaN(row.matched_product_id) ? -1 : Number(row.matched_product_id) }] }
+        : { id: Number(row.matched_product_id) };
+
+      const prod = await Product.findOne(prodQuery);
+
+      if (!prod) {
+        row.application_status = 'failed';
+        row.application_error = 'Referenced product no longer exists in catalog.';
+        failedCount++;
+        failedRowsList.push({ rowNumber: row.row_number, error: row.application_error });
+        continue;
+      }
+
+      // Safeguard: archived products must NEVER be modified
+      if (prod.published !== 1) {
+        row.application_status = 'failed';
+        row.application_error = `Product "${prod.name}" (SKU: ${prod.sku}) is archived. Archived products cannot be modified.`;
+        failedCount++;
+        failedRowsList.push({ rowNumber: row.row_number, error: row.application_error });
+        continue;
+      }
+
+      // Safeguard: SKU match verification
+      if (normalizeSku(prod.sku) !== normalizeSku(row.matched_product_sku)) {
+        row.application_status = 'failed';
+        row.application_error = `Product SKU in catalog ("${prod.sku}") no longer matches approved SKU ("${row.matched_product_sku}").`;
+        failedCount++;
+        failedRowsList.push({ rowNumber: row.row_number, error: row.application_error });
+        continue;
+      }
+
+      const previousCost = prod.cost_price_ngn !== undefined ? prod.cost_price_ngn : (prod.supplier_cost_ngn || 0);
+      const newCost = Math.round(Number(row.approved_cost_ngn));
+
+      if (isNaN(newCost) || newCost < 0) {
+        row.application_status = 'failed';
+        row.application_error = `Invalid approved price value "${row.approved_cost_ngn}".`;
+        failedCount++;
+        failedRowsList.push({ rowNumber: row.row_number, error: row.application_error });
+        continue;
+      }
+
+      // CRITICAL STAGE 6 BOUNDARY:
+      // Update ONLY cost_price_ngn!
+      // price_ngn (selling price), stock_quantity, published, specs, warranty are 100% UNTOUCHED!
+      await Product.updateOne(
+        { _id: prod._id },
+        {
+          $set: {
+            cost_price_ngn: newCost,
+            updated_at: new Date()
+          }
+        }
+      );
+
+      row.application_status = 'applied';
+      row.applied_at = new Date();
+      row.applied_previous_cost_ngn = previousCost;
+      appliedCount++;
+      appliedRowsList.push({ rowNumber: row.row_number, sku: prod.sku, previousCost, newCost });
+
+      await logAudit({
+        userId: user.id || null,
+        action: 'PRICE_IMPORT_APPLIED_ROW',
+        entityType: 'product',
+        entityId: String(prod.id || prod._id),
+        details: `Updated supplier cost for SKU "${prod.sku}" from ₦${previousCost.toLocaleString()} to ₦${newCost.toLocaleString()} (Import: ${importDoc.filename}, Row #${row.row_number}). Retail selling price (₦${prod.price_ngn.toLocaleString()}) strictly unchanged.`,
+        ipAddress: user.ip || ''
+      });
+    } catch (rowErr) {
+      row.application_status = 'failed';
+      row.application_error = rowErr.message;
+      failedCount++;
+      failedRowsList.push({ rowNumber: row.row_number, error: rowErr.message });
+    }
+  }
+
+  // Update import lifecycle status
+  const totalApproved = importDoc.rows_preview.filter(r => r.approval_status === 'approved').length;
+  const totalApplied = importDoc.rows_preview.filter(r => r.application_status === 'applied').length;
+
+  if (totalApplied === totalApproved && failedCount === 0) {
+    importDoc.status = 'successfully_applied';
+  } else if (totalApplied > 0) {
+    importDoc.status = 'partially_applied';
+  } else {
+    importDoc.status = 'failed';
+  }
+
+  importDoc.applied_by = user.id || null;
+  importDoc.applied_by_email = user.email || '';
+  importDoc.applied_by_role = user.role || 'admin';
+  importDoc.applied_at = new Date();
+  importDoc.applied_row_count = totalApplied;
+  importDoc.failed_row_count = failedCount;
+  importDoc.summary.applied_rows = totalApplied;
+  importDoc.summary.failed_rows = failedCount;
+
+  await importDoc.save();
+
+  await logAudit({
+    userId: user.id || null,
+    action: 'APPLY_PRICE_IMPORT',
+    entityType: 'price_import',
+    entityId: String(importDoc.id || importDoc._id),
+    details: `Applied supplier costs for import "${importDoc.filename}". Applied: ${appliedCount}, Failed: ${failedCount}. Status: ${importDoc.status}. Retail selling prices strictly untouched.`,
+    ipAddress: user.ip || ''
+  });
+
+  return {
+    success: true,
+    status: importDoc.status,
+    appliedCount,
+    failedCount,
+    appliedRows: appliedRowsList,
+    failedRows: failedRowsList,
+    importRecord: importDoc.toObject(),
+    notice: 'Supplier costs successfully applied to catalog. Retail selling prices and stock quantities were not changed.'
+  };
+}
+
+async function cancelPriceImport(id, user = {}, reason = '') {
+  if (!id) {
+    const err = new Error('Price import record not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+  const query = (mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id))
+    ? { $or: [{ _id: id }, { id: isNaN(id) ? -1 : Number(id) }] }
+    : (!isNaN(id) ? { id: Number(id) } : null);
+
+  if (!query) {
+    const err = new Error('Price import record not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  const importDoc = await PriceImport.findOne(query);
+  if (!importDoc) {
+    const err = new Error('Price import record not found.');
+    err.statusCode = 404;
+    throw err;
+  }
+
+  if (importDoc.status === 'successfully_applied') {
+    const err = new Error('Cannot cancel an import that has already been successfully applied.');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  importDoc.status = 'cancelled';
+  importDoc.cancelled_by = user.id || null;
+  importDoc.cancelled_by_email = user.email || '';
+  importDoc.cancelled_at = new Date();
+  importDoc.cancellation_reason = reason ? String(reason).slice(0, 500) : 'Administrator cancelled.';
+
+  await importDoc.save();
+
+  await logAudit({
+    userId: user.id || null,
+    action: 'CANCEL_PRICE_IMPORT',
+    entityType: 'price_import',
+    entityId: String(importDoc.id || importDoc._id),
+    details: `Cancelled supplier price import "${importDoc.filename}". Reason: ${importDoc.cancellation_reason}`,
+    ipAddress: user.ip || ''
+  });
+
+  return { success: true, message: 'Price import cancelled successfully.' };
+}
+
 async function getDatabaseStats() {
   const [products, orders, quotes, enquiries, warranties, tickets, categories, caseStudies, users, sessions, auditLogs, payments] = await Promise.all([
     Product.countDocuments(),
@@ -1907,5 +2432,7 @@ module.exports = {
   createPasswordResetToken, resetPasswordWithToken,
   createVerificationCode, verifyResetCode, executePasswordReset,
   verifyUserLogin, createSession, getSessionUser, revokeSession,
-  logAudit, getAuditLogs, getDatabaseStats, exportDatabaseBackup
+  logAudit, getAuditLogs, getDatabaseStats, exportDatabaseBackup,
+  createPriceImport, getPriceImports, getPriceImportById, deletePriceImport,
+  reviewPriceImport, approvePriceImportRows, applyPriceImport, cancelPriceImport
 };

@@ -2031,3 +2031,385 @@ dialog.admin-modal::backdrop {
   object-fit: contain;
 }
 
+/* ==========================================================================
+   STAGE 5: SUPPLIER PRICE IMPORT INFRASTRUCTURE STYLES
+   ========================================================================== */
+
+.import-dropzone {
+  border: 2px dashed rgba(255, 185, 12, 0.4);
+  background: rgba(13, 23, 40, 0.5);
+  border-radius: 12px;
+  padding: 2.75rem 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.import-dropzone:hover,
+.import-dropzone.drag-over {
+  border-color: var(--color-brand-yellow, #FFB90C);
+  background: rgba(255, 185, 12, 0.06);
+  transform: translateY(-1px);
+}
+
+.dropzone-icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 185, 12, 0.12);
+  color: var(--color-brand-yellow, #FFB90C);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 0.85rem;
+}
+
+.selected-file-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(13, 23, 40, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.selected-file-badge {
+  background: var(--color-brand-yellow, #FFB90C);
+  color: #060B14;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 185, 12, 0.2);
+  border-top-color: var(--color-brand-yellow, #FFB90C);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.mapping-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.mapping-item {
+  background: rgba(13, 23, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  transition: border-color 0.15s ease;
+}
+
+.mapping-item:focus-within {
+  border-color: var(--color-brand-yellow, #FFB90C);
+}
+
+.mapping-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.mapping-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.mapping-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.mapping-badge.auto {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.mapping-badge.manual {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(238, 241, 248, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.import-kpi-strip {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(6, 11, 20, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  overflow-x: auto;
+  flex-wrap: wrap;
+}
+
+.kpi-mini-card {
+  background: rgba(13, 23, 40, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  min-width: 110px;
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-mini-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--color-d-text-subtle, rgba(238, 241, 248, 0.5));
+}
+
+.kpi-mini-val {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  margin-top: 0.15rem;
+}
+
+.text-emerald { color: #34D399 !important; }
+.text-amber { color: #FBBF24 !important; }
+.text-rose { color: #F87171 !important; }
+.text-slate { color: #94A3B8 !important; }
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.badge-matched {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-unmatched {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94A3B8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+.badge-duplicate {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-invalid {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.badge-review {
+  background: rgba(234, 179, 8, 0.15);
+  color: #FACC15;
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.badge-analysed {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Stage 6 Lifecycle Badges */
+.badge-awaiting_approval {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.badge-approved_for_application,
+.badge-approved {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.badge-applying {
+  background: rgba(14, 165, 233, 0.2);
+  color: #38BDF8;
+  border: 1px solid rgba(14, 165, 233, 0.4);
+  animation: pulse 1.8s infinite;
+}
+
+.badge-successfully_applied,
+.badge-applied {
+  background: rgba(5, 150, 105, 0.25);
+  color: #10B981;
+  border: 1px solid rgba(16, 185, 129, 0.5);
+  font-weight: 800;
+}
+
+.badge-partially_applied {
+  background: rgba(249, 115, 22, 0.2);
+  color: #FB923C;
+  border: 1px solid rgba(249, 115, 22, 0.45);
+}
+
+.badge-failed {
+  background: rgba(239, 68, 68, 0.2);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.badge-cancelled {
+  background: rgba(100, 116, 139, 0.2);
+  color: #94A3B8;
+  border: 1px solid rgba(100, 116, 139, 0.35);
+}
+
+.badge-unapproved {
+  background: rgba(148, 163, 184, 0.12);
+  color: #CBD5E1;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.badge-ineligible {
+  background: rgba(239, 68, 68, 0.1);
+  color: #FCA5A5;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Cost Difference Badges & Indicators */
+.diff-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: monospace;
+  letter-spacing: -0.02em;
+}
+
+.diff-increase {
+  background: rgba(239, 68, 68, 0.15);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.diff-decrease {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.diff-neutral {
+  background: rgba(148, 163, 184, 0.1);
+  color: #94A3B8;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.badge-variance-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(245, 158, 11, 0.2);
+  color: #FBBF24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Review Table & Row States */
+.tr-ineligible {
+  opacity: 0.55;
+  background: rgba(15, 23, 42, 0.3) !important;
+}
+
+.tr-approved {
+  background: rgba(16, 185, 129, 0.04) !important;
+}
+
+.tr-applied {
+  background: rgba(5, 150, 105, 0.06) !important;
+}
+
+.tr-high-variance {
+  background: rgba(245, 158, 11, 0.04) !important;
+}
+
+.review-checkbox {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--color-brand-yellow, #F5A623);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.review-checkbox:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.variance-ack-box {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 8px;
+  padding: 0.85rem 1.15rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.apply-confirm-box {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 8px;
+  padding: 0.85rem 1.15rem;
+  margin-top: 1rem;
+}
+
+.btn-apply-action {
+  background: #059669 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #10B981 !important;
+}
+
+.btn-apply-action:hover {
+  background: #047857 !important;
+}
+
+.btn-danger-action {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #F87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.35) !important;
+}
+
+.btn-danger-action:hover {
+  background: rgba(239, 68, 68, 0.3) !important;
+}
+
+
+

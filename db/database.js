@@ -3305,7 +3305,15 @@ function dispatch(mongoFn, sqliteFn) {
         mongoRepo.resetPasswordWithToken,
         mongoRepo.createVerificationCode,
         mongoRepo.verifyResetCode,
-        mongoRepo.executePasswordReset
+        mongoRepo.executePasswordReset,
+        mongoRepo.createPriceImport,
+        mongoRepo.getPriceImports,
+        mongoRepo.getPriceImportById,
+        mongoRepo.deletePriceImport,
+        mongoRepo.reviewPriceImport,
+        mongoRepo.approvePriceImportRows,
+        mongoRepo.applyPriceImport,
+        mongoRepo.cancelPriceImport
       ].includes(mongoFn);
 
       if (!skipSqlite && sqliteAvailable && typeof sqliteFn === 'function') {
@@ -3448,6 +3456,15 @@ module.exports = {
   logAudit: dispatch(mongoRepo.logAudit, logAudit),
   getAuditLogs: dispatch(mongoRepo.getAuditLogs, getAuditLogs),
   getDatabaseStats: dispatch(mongoRepo.getDatabaseStats, getDatabaseStats),
-  exportDatabaseBackup: dispatch(mongoRepo.exportDatabaseBackup, exportDatabaseBackup)
+  exportDatabaseBackup: dispatch(mongoRepo.exportDatabaseBackup, exportDatabaseBackup),
+  // Supplier Price Import Infrastructure & Approval Workflow (Stage 5 & Stage 6)
+  createPriceImport: dispatch(mongoRepo.createPriceImport, null),
+  getPriceImports: dispatch(mongoRepo.getPriceImports, null),
+  getPriceImportById: dispatch(mongoRepo.getPriceImportById, null),
+  deletePriceImport: dispatch(mongoRepo.deletePriceImport, null),
+  reviewPriceImport: dispatch(mongoRepo.reviewPriceImport, null),
+  approvePriceImportRows: dispatch(mongoRepo.approvePriceImportRows, null),
+  applyPriceImport: dispatch(mongoRepo.applyPriceImport, null),
+  cancelPriceImport: dispatch(mongoRepo.cancelPriceImport, null)
 };
 

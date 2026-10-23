@@ -107,10 +107,11 @@
   // API Request Wrapper with Auth Header
   async function apiFetch(url, options = {}) {
     const token = getToken();
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    };
+    const headers = { ...(options.headers || {}) };
+
+    if (!(options.body instanceof FormData) && !headers['Content-Type']) {
+      headers['Content-Type'] = 'application/json';
+    }
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -814,6 +815,9 @@
     if (btnExportBackup) {
       btnExportBackup.addEventListener('click', exportDatabaseBackup);
     }
+
+    // Stage 5: Supplier Price Import Listeners
+    setupPriceImportListeners();
   }
 
   // Handle popstate for browser back/forward buttons
@@ -910,6 +914,12 @@
         break;
       case 'products':
         loadProducts();
+        break;
+      case 'supplier-imports':
+        loadSupplierImportsModule();
+        break;
+      case 'import-history':
+        loadImportHistoryModule();
         break;
       case 'audit-logs':
       case 'audit':
@@ -2628,6 +2638,1197 @@
       }
     }
   }
+
+  // ==========================================================================
+  // STAGE 5: SUPPLIER PRICE IMPORT INFRASTRUCTURE CLIENT LOGIC
+  // ==========================================================================
+  let currentImportFile = null;
+  let currentAnalysisData = null;
+  let previewFilterState = { search: '', status: 'all', page: 1, limit: 25 };
+  let importHistoryState = { search: '', format: '', status: '', page: 1, limit: 20, totalPages: 1 };
+
+  function setupPriceImportListeners() {
+    const dropzone = document.getElementById('import-dropzone');
+    const fileInput = document.getElementById('price-import-file-input');
+    const btnCancelSelection = document.getElementById('btn-cancel-file-selection');
+    const btnParseUpload = document.getElementById('btn-parse-upload-file');
+    const btnCancelMapping = document.getElementById('btn-cancel-mapping');
+    const btnApplyMapping = document.getElementById('btn-apply-custom-mapping');
+    const btnEditMappingToggle = document.getElementById('btn-edit-mapping-toggle');
+    const previewSearch = document.getElementById('preview-search-input');
+    const previewStatus = document.getElementById('preview-status-filter');
+    const btnPrevPreview = document.getElementById('btn-prev-preview-page');
+    const btnNextPreview = document.getElementById('btn-next-preview-page');
+    const btnResetAll = document.getElementById('btn-reset-import-all');
+    const btnSaveRecord = document.getElementById('btn-save-import-record');
+
+    // History panel filters
+    const historySearch = document.getElementById('history-search-input');
+    const historyFormat = document.getElementById('history-format-filter');
+    const historyStatus = document.getElementById('history-status-filter');
+    const btnHistoryRefresh = document.getElementById('btn-history-refresh');
+    const btnHistoryPrev = document.getElementById('btn-history-prev');
+    const btnHistoryNext = document.getElementById('btn-history-next');
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', () => fileInput.click());
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('drag-over');
+      });
+      dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('drag-over');
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          handlePriceImportFileSelected(e.dataTransfer.files[0]);
+        }
+      });
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          handlePriceImportFileSelected(e.target.files[0]);
+        }
+      });
+    }
+
+    if (btnCancelSelection) {
+      btnCancelSelection.addEventListener('click', resetPriceImportWorkflow);
+    }
+
+    if (btnParseUpload) {
+      btnParseUpload.addEventListener('click', () => parseAndAnalyzePriceImport());
+    }
+
+    if (btnCancelMapping) {
+      btnCancelMapping.addEventListener('click', resetPriceImportWorkflow);
+    }
+
+    if (btnApplyMapping) {
+      btnApplyMapping.addEventListener('click', () => {
+        const customMapping = gatherCustomMappingFromUI();
+        parseAndAnalyzePriceImport(customMapping);
+      });
+    }
+
+    if (btnEditMappingToggle) {
+      btnEditMappingToggle.addEventListener('click', () => {
+        const mappingCard = document.getElementById('import-mapping-card');
+        if (mappingCard) {
+          const isShown = mappingCard.style.display !== 'none';
+          mappingCard.style.display = isShown ? 'none' : 'block';
+          btnEditMappingToggle.textContent = isShown ? 'Adjust Mapping' : 'Hide Mapping';
+        }
+      });
+    }
+
+    if (previewSearch) {
+      previewSearch.addEventListener('input', debounce(() => {
+        previewFilterState.search = previewSearch.value.trim();
+        previewFilterState.page = 1;
+        renderPreviewRows();
+      }, 250));
+    }
+
+    if (previewStatus) {
+      previewStatus.addEventListener('change', () => {
+        previewFilterState.status = previewStatus.value;
+        previewFilterState.page = 1;
+        renderPreviewRows();
+      });
+    }
+
+    if (btnPrevPreview) {
+      btnPrevPreview.addEventListener('click', () => {
+        if (previewFilterState.page > 1) {
+          previewFilterState.page--;
+          renderPreviewRows();
+        }
+      });
+    }
+
+    if (btnNextPreview) {
+      btnNextPreview.addEventListener('click', () => {
+        previewFilterState.page++;
+        renderPreviewRows();
+      });
+    }
+
+    if (btnResetAll) {
+      btnResetAll.addEventListener('click', () => {
+        if (confirm('Discard current supplier import analysis? Any unsaved preview data will be lost.')) {
+          resetPriceImportWorkflow();
+        }
+      });
+    }
+
+    if (btnSaveRecord) {
+      btnSaveRecord.addEventListener('click', saveImportAnalysisRecord);
+    }
+
+    if (historySearch) {
+      historySearch.addEventListener('input', debounce(() => {
+        importHistoryState.search = historySearch.value.trim();
+        importHistoryState.page = 1;
+        loadImportHistoryModule(1);
+      }, 300));
+    }
+
+    if (historyFormat) {
+      historyFormat.addEventListener('change', () => {
+        importHistoryState.format = historyFormat.value;
+        importHistoryState.page = 1;
+        loadImportHistoryModule(1);
+      });
+    }
+
+    if (historyStatus) {
+      historyStatus.addEventListener('change', () => {
+        importHistoryState.status = historyStatus.value;
+        importHistoryState.page = 1;
+        loadImportHistoryModule(1);
+      });
+    }
+
+    if (btnHistoryRefresh) {
+      btnHistoryRefresh.addEventListener('click', () => loadImportHistoryModule(importHistoryState.page));
+    }
+
+    if (btnHistoryPrev) {
+      btnHistoryPrev.addEventListener('click', () => {
+        if (importHistoryState.page > 1) {
+          loadImportHistoryModule(importHistoryState.page - 1);
+        }
+      });
+    }
+
+    if (btnHistoryNext) {
+      btnHistoryNext.addEventListener('click', () => {
+        if (importHistoryState.page < importHistoryState.totalPages) {
+          loadImportHistoryModule(importHistoryState.page + 1);
+        }
+      });
+    }
+  }
+
+  function handlePriceImportFileSelected(file) {
+    const errorBox = document.getElementById('import-upload-error');
+    if (errorBox) errorBox.style.display = 'none';
+
+    if (!file) return;
+
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['xlsx', 'csv'].includes(ext)) {
+      if (errorBox) {
+        errorBox.textContent = `Unsupported file format ".${ext}". Please upload a Microsoft Excel (.xlsx) or CSV (.csv) price sheet.`;
+        errorBox.style.display = 'block';
+      }
+      return;
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      if (errorBox) {
+        errorBox.textContent = `File size exceeds the 4MB limit (${(file.size / (1024 * 1024)).toFixed(2)} MB). Please upload a smaller file.`;
+        errorBox.style.display = 'block';
+      }
+      return;
+    }
+
+    currentImportFile = file;
+
+    // Display selected file card
+    const dropzone = document.getElementById('import-dropzone');
+    const selectedFileCard = document.getElementById('import-selected-file-card');
+    const nameEl = document.getElementById('selected-file-name');
+    const metaEl = document.getElementById('selected-file-meta');
+    const badgeEl = document.getElementById('selected-file-format-badge');
+
+    if (dropzone) dropzone.style.display = 'none';
+    if (selectedFileCard) selectedFileCard.style.display = 'flex';
+    if (nameEl) nameEl.textContent = file.name;
+    if (metaEl) metaEl.textContent = `${(file.size / 1024).toFixed(1)} KB • Ready for analysis`;
+    if (badgeEl) badgeEl.textContent = ext.toUpperCase();
+  }
+
+  function resetPriceImportWorkflow() {
+    currentImportFile = null;
+    currentAnalysisData = null;
+    previewFilterState = { search: '', status: 'all', page: 1, limit: 25 };
+
+    const fileInput = document.getElementById('price-import-file-input');
+    if (fileInput) fileInput.value = '';
+
+    const dropzone = document.getElementById('import-dropzone');
+    const selectedFileCard = document.getElementById('import-selected-file-card');
+    const loadingState = document.getElementById('import-loading-state');
+    const mappingCard = document.getElementById('import-mapping-card');
+    const previewCard = document.getElementById('import-preview-card');
+    const errorBox = document.getElementById('import-upload-error');
+
+    if (dropzone) dropzone.style.display = 'block';
+    if (selectedFileCard) selectedFileCard.style.display = 'none';
+    if (loadingState) loadingState.style.display = 'none';
+    if (mappingCard) mappingCard.style.display = 'none';
+    if (previewCard) previewCard.style.display = 'none';
+    if (errorBox) errorBox.style.display = 'none';
+  }
+
+  async function parseAndAnalyzePriceImport(customMapping = null) {
+    if (!currentImportFile) return;
+
+    const errorBox = document.getElementById('import-upload-error');
+    const selectedFileCard = document.getElementById('import-selected-file-card');
+    const loadingState = document.getElementById('import-loading-state');
+    const mappingCard = document.getElementById('import-mapping-card');
+    const previewCard = document.getElementById('import-preview-card');
+    const supplierInput = document.getElementById('import-supplier-name-input');
+
+    if (errorBox) errorBox.style.display = 'none';
+    if (selectedFileCard) selectedFileCard.style.display = 'none';
+    if (loadingState) loadingState.style.display = 'block';
+
+    try {
+      const formData = new FormData();
+      formData.append('file', currentImportFile);
+      if (supplierInput && supplierInput.value) {
+        formData.append('supplierName', supplierInput.value.trim());
+      }
+      if (customMapping) {
+        formData.append('mapping', JSON.stringify(customMapping));
+      }
+
+      const res = await apiFetch('/api/admin/price-imports/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to analyze supplier price file');
+      }
+
+      currentAnalysisData = data;
+      if (loadingState) loadingState.style.display = 'none';
+
+      // Render Step 2: Mapping card
+      renderMappingControls(data.availableColumns, data.mappingConfig);
+      if (mappingCard) mappingCard.style.display = customMapping ? 'none' : 'block';
+
+      // Render Step 3: Preview card & KPIs
+      renderPreviewKpis(data.summary);
+      previewFilterState.page = 1;
+      renderPreviewRows();
+      if (previewCard) previewCard.style.display = 'block';
+
+    } catch (err) {
+      if (loadingState) loadingState.style.display = 'none';
+      if (selectedFileCard) selectedFileCard.style.display = 'flex';
+      if (errorBox) {
+        errorBox.textContent = err.message;
+        errorBox.style.display = 'block';
+      }
+    }
+  }
+
+  function renderMappingControls(availableColumns = [], mappingConfig = {}) {
+    const container = document.getElementById('mapping-selectors-container');
+    if (!container) return;
+
+    const fields = [
+      { key: 'sku', label: 'Supplier SKU *', required: true, desc: 'Unique manufacturer or supplier part identifier' },
+      { key: 'cost', label: 'Supplier Cost / Price (₦) *', required: true, desc: 'Net supplier wholesale acquisition cost in NGN' },
+      { key: 'name', label: 'Product / Model Name', required: false, desc: 'Equipment name or title' },
+      { key: 'brand', label: 'Manufacturer Brand', required: false, desc: 'e.g. Sungrow, Growatt, Deye, Felicity' },
+      { key: 'category', label: 'Equipment Category', required: false, desc: 'e.g. Inverters, Batteries, Solar PV Panels' },
+      { key: 'currency', label: 'Currency Field', required: false, desc: 'Source currency indicator (must be NGN)' },
+      { key: 'stock', label: 'Stock / Availability', required: false, desc: 'Inventory status or warehouse quantities' },
+      { key: 'supplier_ref', label: 'Supplier Reference / Code', required: false, desc: 'Distributor internal tracking tag' }
+    ];
+
+    container.innerHTML = fields.map(f => {
+      const selectedCol = mappingConfig[f.key] || '';
+      const isAuto = Boolean(selectedCol);
+      const optionsHtml = ['<option value="">-- None / Not in File --</option>']
+        .concat(availableColumns.map(col => {
+          const isSel = col === selectedCol ? 'selected' : '';
+          return `<option value="${escapeHtml(col)}" ${isSel}>${escapeHtml(col)}</option>`;
+        }))
+        .join('');
+
+      return `
+        <div class="mapping-item">
+          <div class="mapping-header-row">
+            <span class="mapping-label">${escapeHtml(f.label)}</span>
+            <span class="mapping-badge ${isAuto ? 'auto' : 'manual'}">${isAuto ? 'Auto-Mapped' : 'Optional'}</span>
+          </div>
+          <select class="form-select mapping-select" data-mapping-key="${f.key}" ${f.required ? 'required' : ''}>
+            ${optionsHtml}
+          </select>
+          <div class="field-hint">${escapeHtml(f.desc)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function gatherCustomMappingFromUI() {
+    const mapping = {};
+    document.querySelectorAll('.mapping-select').forEach(sel => {
+      const key = sel.getAttribute('data-mapping-key');
+      const val = sel.value;
+      if (key && val) {
+        mapping[key] = val;
+      }
+    });
+    return mapping;
+  }
+
+  function renderPreviewKpis(summary = {}) {
+    const totalEl = document.getElementById('kpi-import-total');
+    const validEl = document.getElementById('kpi-import-valid');
+    const matchedEl = document.getElementById('kpi-import-matched');
+    const unmatchedEl = document.getElementById('kpi-import-unmatched');
+    const dupEl = document.getElementById('kpi-import-dup-file');
+    const invalidEl = document.getElementById('kpi-import-invalid');
+    const reviewEl = document.getElementById('kpi-import-review');
+
+    if (totalEl) totalEl.textContent = summary.total_rows || 0;
+    if (validEl) validEl.textContent = summary.valid_rows || 0;
+    if (matchedEl) matchedEl.textContent = summary.matched_rows || 0;
+    if (unmatchedEl) unmatchedEl.textContent = summary.unmatched_rows || 0;
+    if (dupEl) dupEl.textContent = summary.duplicate_in_file_rows || 0;
+    if (invalidEl) invalidEl.textContent = summary.invalid_rows || 0;
+    if (reviewEl) reviewEl.textContent = summary.requires_review_rows || 0;
+  }
+
+  function renderPreviewRows() {
+    if (!currentAnalysisData || !Array.isArray(currentAnalysisData.rowsPreview)) return;
+
+    const tbody = document.getElementById('import-preview-tbody');
+    const filterCountEl = document.getElementById('preview-filter-count');
+    const pageLabel = document.getElementById('preview-current-page-label');
+    const paginationInfo = document.getElementById('preview-pagination-info');
+    const btnPrev = document.getElementById('btn-prev-preview-page');
+    const btnNext = document.getElementById('btn-next-preview-page');
+
+    if (!tbody) return;
+
+    let filtered = currentAnalysisData.rowsPreview.filter(row => {
+      // Status filter
+      if (previewFilterState.status !== 'all') {
+        if (previewFilterState.status === 'matched' && row.status !== 'matched') return false;
+        if (previewFilterState.status === 'unmatched' && row.status !== 'unmatched') return false;
+        if (previewFilterState.status === 'duplicate_in_file' && row.status !== 'duplicate_in_file') return false;
+        if (previewFilterState.status === 'invalid' && !['invalid_row', 'missing_sku', 'invalid_price', 'unsupported_currency'].includes(row.status)) return false;
+        if (previewFilterState.status === 'review' && row.status !== 'requires_manual_review') return false;
+      }
+      // Search filter
+      if (previewFilterState.search) {
+        const q = previewFilterState.search.toLowerCase();
+        const sku = String(row.raw_sku || '').toLowerCase();
+        const name = String(row.raw_name || '').toLowerCase();
+        const matched = String(row.matched_product_name || '').toLowerCase();
+        if (!sku.includes(q) && !name.includes(q) && !matched.includes(q)) return false;
+      }
+      return true;
+    });
+
+    const totalFiltered = filtered.length;
+    const limit = previewFilterState.limit;
+    const totalPages = Math.ceil(totalFiltered / limit) || 1;
+    previewFilterState.page = Math.min(Math.max(1, previewFilterState.page), totalPages);
+
+    const startIndex = (previewFilterState.page - 1) * limit;
+    const endIndex = Math.min(startIndex + limit, totalFiltered);
+    const pageRows = filtered.slice(startIndex, endIndex);
+
+    if (filterCountEl) filterCountEl.textContent = `Showing ${pageRows.length} of ${totalFiltered} rows (${currentAnalysisData.rowsPreview.length} total)`;
+    if (pageLabel) pageLabel.textContent = `Page ${previewFilterState.page} of ${totalPages}`;
+    if (paginationInfo) paginationInfo.textContent = `Showing ${totalFiltered === 0 ? 0 : startIndex + 1}–${endIndex} of ${totalFiltered} filtered rows`;
+    if (btnPrev) btnPrev.disabled = previewFilterState.page <= 1;
+    if (btnNext) btnNext.disabled = previewFilterState.page >= totalPages;
+
+    if (pageRows.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">No supplier rows match the current filter criteria.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = pageRows.map(row => {
+      let statusBadgeClass = 'badge-unmatched';
+      let statusLabel = row.status.toUpperCase().replace(/_/g, ' ');
+
+      if (row.status === 'matched') {
+        statusBadgeClass = 'badge-matched';
+      } else if (row.status === 'duplicate_in_file') {
+        statusBadgeClass = 'badge-duplicate';
+        statusLabel = 'FILE DUPLICATE';
+      } else if (['invalid_row', 'missing_sku', 'invalid_price', 'unsupported_currency'].includes(row.status)) {
+        statusBadgeClass = 'badge-invalid';
+      } else if (row.status === 'requires_manual_review') {
+        statusBadgeClass = 'badge-review';
+        statusLabel = 'MANUAL REVIEW';
+      }
+
+      const issues = (row.validation_errors || []).concat(row.warnings || []);
+      const issuesHtml = issues.length > 0
+        ? issues.map(iss => `<div style="font-size:0.73rem; color:#FCA5A5; margin-top:2px;">• ${escapeHtml(iss)}</div>`).join('')
+        : '<span style="color:#34D399; font-size:0.75rem;">✓ Valid</span>';
+
+      const matchedDesc = row.matched_product_name
+        ? `<div style="font-weight:700; color:#FFFFFF; font-size:0.82rem;">${escapeHtml(row.matched_product_name)}</div>
+           <div style="font-size:0.72rem; color:var(--color-d-text-muted);">SKU: ${escapeHtml(row.matched_product_sku)} • Cat ID: #${row.matched_product_id}</div>`
+        : '<span style="color:var(--color-d-text-subtle); font-size:0.78rem;">— No active catalog match —</span>';
+
+      return `
+        <tr>
+          <td style="color:var(--color-d-text-muted); font-size:0.75rem;">${row.row_number}</td>
+          <td>
+            <strong style="color:var(--color-brand-yellow); font-family:monospace; font-size:0.82rem;">${escapeHtml(row.raw_sku || '—')}</strong>
+          </td>
+          <td>
+            <div style="font-weight:600; color:#FFFFFF; font-size:0.84rem;">${escapeHtml(row.raw_name || '—')}</div>
+            <div style="font-size:0.72rem; color:var(--color-d-text-muted);">${escapeHtml(row.raw_brand || '')} ${escapeHtml(row.raw_category ? '• ' + row.raw_category : '')}</div>
+          </td>
+          <td>
+            <strong style="color:#FFFFFF; font-size:0.84rem;">${row.normalized_cost_ngn ? formatNaira(row.normalized_cost_ngn) : '—'}</strong>
+            <div style="font-size:0.7rem; color:var(--color-d-text-muted);">${escapeHtml(row.currency || 'NGN')} (Raw: ${escapeHtml(String(row.raw_cost || '—'))})</div>
+          </td>
+          <td>${matchedDesc}</td>
+          <td style="font-size:0.75rem; color:var(--color-d-text-muted);">${escapeHtml(row.matching_method || '—')}</td>
+          <td>
+            <span class="badge-status ${statusBadgeClass}">${statusLabel}</span>
+          </td>
+          <td>${issuesHtml}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function saveImportAnalysisRecord() {
+    if (!currentAnalysisData) return;
+
+    const confirmMsg = 'Confirm saving this supplier price analysis record?\n\n' +
+      '• Filename: ' + currentAnalysisData.filename + '\n' +
+      '• Total Rows: ' + currentAnalysisData.summary.total_rows + '\n' +
+      '• Matched SKUs: ' + currentAnalysisData.summary.matched_rows + '\n\n' +
+      'CRITICAL NOTICE: Stage 5 analyses and records import data only. NO live product prices, costs, or inventory stock will be changed.';
+
+    if (!confirm(confirmMsg)) return;
+
+    const btn = document.getElementById('btn-save-import-record');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving Record...';
+    }
+
+    try {
+      const payload = {
+        filename: currentAnalysisData.filename,
+        supplier_name: currentAnalysisData.supplierName,
+        file_format: currentAnalysisData.format,
+        mapping_config: currentAnalysisData.mappingConfig,
+        summary: currentAnalysisData.summary,
+        rows_preview: currentAnalysisData.rowsPreview,
+        notes: `Analysed via admin console on ${new Date().toISOString()}`
+      };
+
+      const res = await apiFetch('/api/admin/price-imports', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to save import analysis record');
+      }
+
+      alert('Import analysed successfully. No live product prices or supplier costs have been changed.\n\nAnalysis record saved to MongoDB Atlas history.');
+      resetPriceImportWorkflow();
+      loadRecentImportsSummary();
+    } catch (err) {
+      alert('Error saving import record: ' + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Save Import Analysis';
+      }
+    }
+  }
+
+  async function loadSupplierImportsModule() {
+    loadRecentImportsSummary();
+  }
+
+  async function loadRecentImportsSummary() {
+    const tbody = document.getElementById('recent-imports-tbody');
+    if (!tbody) return;
+
+    try {
+      const res = await apiFetch('/api/admin/price-imports?limit=5');
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error);
+
+      const imports = data.imports || [];
+      if (imports.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">No supplier price imports recorded yet. Upload a file above to begin analysis.</td></tr>';
+        return;
+      }
+
+      function getImportActionHtml(item) {
+        const id = item._id || item.id;
+        const st = item.status || 'analysed';
+        if (st === 'analysed' || st === 'awaiting_approval') {
+          return `<button type="button" class="btn-table-action" onclick="window.adminOpenReview('${id}')">Review &amp; Approve</button>`;
+        }
+        if (st === 'approved_for_application') {
+          return `<button type="button" class="btn-table-action btn-apply-action" onclick="window.adminOpenReview('${id}')">Apply Prices</button>`;
+        }
+        if (st === 'partially_applied') {
+          return `<button type="button" class="btn-table-action" style="border-color:#FB923C; color:#FB923C;" onclick="window.adminOpenReview('${id}')">Review &amp; Retry</button>`;
+        }
+        return `<button type="button" class="btn-table-action" onclick="window.adminOpenReview('${id}')">View Details</button>`;
+      }
+
+      tbody.innerHTML = imports.map(item => `
+        <tr>
+          <td style="font-family:monospace; font-weight:700; color:var(--color-brand-yellow);">#IMP-${item.id || item._id.slice(-6)}</td>
+          <td style="font-weight:700; color:#FFFFFF;">${escapeHtml(item.filename)}</td>
+          <td><span class="status-pill" style="font-size:0.7rem;">${escapeHtml((item.file_format || '').toUpperCase())}</span></td>
+          <td style="color:var(--color-d-text-muted);">${escapeHtml(item.supplier_name || 'Generic')}</td>
+          <td style="font-size:0.78rem;">${escapeHtml(item.uploaded_by_email || 'staff@devicepro.ng')}</td>
+          <td style="font-size:0.78rem; color:var(--color-d-text-muted);">${formatDate(item.created_at)}</td>
+          <td>
+            <div style="font-size:0.78rem; font-weight:600; color:#FFFFFF;">${item.summary ? item.summary.total_rows : 0} rows</div>
+            <div style="font-size:0.7rem; color:#34D399;">${item.summary ? item.summary.matched_rows : 0} matched active SKUs</div>
+          </td>
+          <td>
+            <span class="badge-status badge-${item.status || 'analysed'}" title="Status: ${item.status}">${(item.status || 'analysed').replace(/_/g, ' ').toUpperCase()}</span>
+          </td>
+          <td>
+            ${getImportActionHtml(item)}
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="9" class="empty-cell text-rose">Error loading recent imports: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  async function loadImportHistoryModule(page = 1) {
+    importHistoryState.page = page;
+    const tbody = document.getElementById('history-table-tbody');
+    const paginationInfo = document.getElementById('history-pagination-info');
+    const pageNumbersEl = document.getElementById('history-page-numbers');
+    const btnPrev = document.getElementById('btn-history-prev');
+    const btnNext = document.getElementById('btn-history-next');
+
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">Loading import records from MongoDB Atlas...</td></tr>';
+
+    try {
+      const q = new URLSearchParams({
+        page: importHistoryState.page,
+        limit: importHistoryState.limit,
+        search: importHistoryState.search,
+        format: importHistoryState.format,
+        status: importHistoryState.status
+      });
+
+      const res = await apiFetch(`/api/admin/price-imports?${q.toString()}`);
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error);
+
+      const imports = data.imports || [];
+      const total = data.total || 0;
+      const totalPages = data.totalPages || 1;
+      importHistoryState.totalPages = totalPages;
+
+      if (paginationInfo) {
+        const start = total === 0 ? 0 : (importHistoryState.page - 1) * importHistoryState.limit + 1;
+        const end = Math.min(start + imports.length - 1, total);
+        paginationInfo.textContent = `Showing ${start}–${end} of ${total} imports`;
+      }
+
+      if (btnPrev) btnPrev.disabled = importHistoryState.page <= 1;
+      if (btnNext) btnNext.disabled = importHistoryState.page >= totalPages;
+
+      if (pageNumbersEl) {
+        pageNumbersEl.innerHTML = Array.from({ length: totalPages }, (_, i) => i + 1)
+          .slice(0, 5)
+          .map(p => `
+            <button type="button" class="pagination-btn ${p === importHistoryState.page ? 'active' : ''}" onclick="window.adminGoHistoryPage(${p})">${p}</button>
+          `).join('');
+      }
+
+      if (imports.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-cell">No supplier price imports found.</td></tr>';
+        return;
+      }
+
+      function getHistoryActionHtml(item) {
+        const id = item._id || item.id;
+        const st = item.status || 'analysed';
+        if (st === 'analysed' || st === 'awaiting_approval') {
+          return `<button type="button" class="btn-table-action" onclick="window.adminOpenReview('${id}')">Review &amp; Approve</button>`;
+        }
+        if (st === 'approved_for_application') {
+          return `<button type="button" class="btn-table-action btn-apply-action" onclick="window.adminOpenReview('${id}')">Apply Prices</button>`;
+        }
+        if (st === 'partially_applied') {
+          return `<button type="button" class="btn-table-action" style="border-color:#FB923C; color:#FB923C;" onclick="window.adminOpenReview('${id}')">Review &amp; Retry</button>`;
+        }
+        return `<button type="button" class="btn-table-action" onclick="window.adminOpenReview('${id}')">View Details</button>`;
+      }
+
+      tbody.innerHTML = imports.map(item => `
+        <tr>
+          <td style="font-family:monospace; font-weight:700; color:var(--color-brand-yellow);">#IMP-${item.id || item._id.slice(-6)}</td>
+          <td style="font-weight:700; color:#FFFFFF;">${escapeHtml(item.filename)}</td>
+          <td><span class="status-pill" style="font-size:0.7rem;">${escapeHtml((item.file_format || '').toUpperCase())}</span></td>
+          <td style="color:var(--color-d-text-muted);">${escapeHtml(item.supplier_name || 'Generic')}</td>
+          <td style="font-size:0.78rem;">${escapeHtml(item.uploaded_by_email || 'staff@devicepro.ng')}</td>
+          <td style="font-size:0.78rem; color:var(--color-d-text-muted);">${formatDate(item.created_at)}</td>
+          <td>
+            <div style="font-size:0.78rem; font-weight:600; color:#FFFFFF;">${item.summary ? item.summary.total_rows : 0} rows</div>
+            <div style="font-size:0.7rem; color:#34D399;">${item.summary ? item.summary.matched_rows : 0} matched active SKUs</div>
+          </td>
+          <td>
+            <span class="badge-status badge-${item.status || 'analysed'}" title="Status: ${item.status}">${(item.status || 'analysed').replace(/_/g, ' ').toUpperCase()}</span>
+          </td>
+          <td>
+            ${getHistoryActionHtml(item)}
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      tbody.innerHTML = `<tr><td colspan="9" class="empty-cell text-rose">Error loading import history: ${escapeHtml(err.message)}</td></tr>`;
+    }
+  }
+
+  // =========================================================================
+  // STAGE 6: SUPPLIER PRICE REVIEW, APPROVAL & CONTROLLED APPLICATION UI
+  // =========================================================================
+
+  let activeReviewState = {
+    importId: null,
+    importDoc: null,
+    selectedRowNumbers: new Set(),
+    currentFilter: 'all',
+    acknowledgeHighVariance: false
+  };
+
+  async function openImportReviewModal(importId) {
+    const modal = document.getElementById('price-import-review-modal');
+    const bodyEl = document.getElementById('review-import-body');
+    const titleEl = document.getElementById('review-import-title');
+    const subEl = document.getElementById('review-import-subtitle');
+    const statusBadge = document.getElementById('review-import-status-badge');
+
+    if (!modal || !bodyEl) return;
+
+    activeReviewState.importId = importId;
+    activeReviewState.selectedRowNumbers.clear();
+    activeReviewState.acknowledgeHighVariance = false;
+    activeReviewState.currentFilter = 'all';
+
+    bodyEl.innerHTML = '<div style="padding:3rem 1rem; text-align:center;"><div class="loading-spinner" style="margin:0 auto 1rem;"></div><div style="color:#FFF; font-weight:700;">Opening price review console...</div><p style="font-size:0.8rem; color:var(--color-d-text-muted); margin-top:0.35rem;">Computing live catalog cost diffs, variance thresholds, and row eligibility.</p></div>';
+    modal.showModal();
+
+    try {
+      const res = await apiFetch(`/api/admin/price-imports/${importId}/review`);
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error);
+
+      const item = data.importRecord;
+      activeReviewState.importDoc = item;
+
+      if (titleEl) titleEl.textContent = `Supplier Price Review: ${item.filename}`;
+      if (subEl) subEl.textContent = `Supplier: ${item.supplier_name || 'Generic'} • Uploaded by ${item.uploaded_by_email} on ${formatDate(item.created_at)}`;
+      if (statusBadge) {
+        statusBadge.className = `badge-status badge-${item.status}`;
+        statusBadge.textContent = (item.status || 'analysed').replace(/_/g, ' ').toUpperCase();
+      }
+
+      // Pre-select rows: if already approved, select approved rows; if awaiting/analysed, select all eligible rows
+      const rows = item.rows_preview || [];
+      const eligibleRows = rows.filter(r => r.is_eligible_for_approval);
+      const approvedPendingRows = rows.filter(r => r.approval_status === 'approved' && r.application_status !== 'applied');
+
+      if (approvedPendingRows.length > 0) {
+        approvedPendingRows.forEach(r => activeReviewState.selectedRowNumbers.add(r.row_number));
+      } else {
+        eligibleRows.forEach(r => activeReviewState.selectedRowNumbers.add(r.row_number));
+      }
+
+      renderReviewModalView();
+    } catch (err) {
+      bodyEl.innerHTML = `<div class="auth-error-box" style="margin:1.5rem 0;">Failed to load import review: ${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  function renderReviewModalView() {
+    const bodyEl = document.getElementById('review-import-body');
+    const item = activeReviewState.importDoc;
+    if (!bodyEl || !item) return;
+
+    const rows = item.rows_preview || [];
+    const sum = item.summary || {};
+
+    const totalRows = rows.length;
+    const eligibleCount = rows.filter(r => r.is_eligible_for_approval).length;
+    const approvedCount = rows.filter(r => r.approval_status === 'approved').length;
+    const appliedCount = rows.filter(r => r.application_status === 'applied').length;
+    const highVarianceCount = rows.filter(r => r.variance_warning && r.variance_warning !== 'NONE').length;
+    const ineligibleCount = rows.filter(r => !r.is_eligible_for_approval).length;
+
+    // Filter rows according to active filter
+    let displayedRows = rows;
+    if (activeReviewState.currentFilter === 'eligible') {
+      displayedRows = rows.filter(r => r.is_eligible_for_approval);
+    } else if (activeReviewState.currentFilter === 'approved') {
+      displayedRows = rows.filter(r => r.approval_status === 'approved');
+    } else if (activeReviewState.currentFilter === 'high-variance') {
+      displayedRows = rows.filter(r => r.variance_warning && r.variance_warning !== 'NONE');
+    } else if (activeReviewState.currentFilter === 'ineligible') {
+      displayedRows = rows.filter(r => !r.is_eligible_for_approval);
+    }
+
+    // Calculate net cost difference across selected rows with valid comparison
+    let selectedCostSumDiff = 0;
+    let selectedValidComparisonCount = 0;
+    rows.forEach(r => {
+      if (activeReviewState.selectedRowNumbers.has(r.row_number) && r.normalized_cost_ngn && r.matched_current_cost_ngn) {
+        selectedCostSumDiff += (r.normalized_cost_ngn - r.matched_current_cost_ngn);
+        selectedValidComparisonCount++;
+      }
+    });
+
+    const isTerminal = item.status === 'successfully_applied' || item.status === 'cancelled';
+    const isApplying = item.status === 'applying';
+
+    bodyEl.innerHTML = `
+      <!-- KPI Ribbon -->
+      <div class="import-kpi-strip" style="border-radius:8px; border:1px solid rgba(255,255,255,0.08); margin-bottom:1rem;">
+        <div class="kpi-mini-card"><span class="kpi-mini-label">TOTAL ROWS</span><span class="kpi-mini-val">${totalRows}</span></div>
+        <div class="kpi-mini-card"><span class="kpi-mini-label">ELIGIBLE</span><span class="kpi-mini-val text-emerald">${eligibleCount}</span></div>
+        <div class="kpi-mini-card"><span class="kpi-mini-label">SELECTED</span><span class="kpi-mini-val text-amber" id="kpi-val-selected">${activeReviewState.selectedRowNumbers.size}</span></div>
+        <div class="kpi-mini-card"><span class="kpi-mini-label">APPROVED</span><span class="kpi-mini-val text-emerald">${approvedCount}</span></div>
+        <div class="kpi-mini-card"><span class="kpi-mini-label">APPLIED</span><span class="kpi-mini-val text-emerald">${appliedCount}</span></div>
+        <div class="kpi-mini-card"><span class="kpi-mini-label">HIGH VARIANCE</span><span class="kpi-mini-val ${highVarianceCount > 0 ? 'text-amber' : 'text-slate'}">${highVarianceCount}</span></div>
+        <div class="kpi-mini-card"><span class="kpi-mini-label">INELIGIBLE</span><span class="kpi-mini-val text-rose">${ineligibleCount}</span></div>
+      </div>
+
+      <!-- Governance Assurance Banner -->
+      <div class="import-gov-notice" style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.3); border-radius: 8px; padding: 0.85rem 1.15rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div>
+          <strong style="color: #38BDF8; font-size: 0.82rem; display: block; margin-bottom: 0.15rem;">
+            STAGE 6 GOVERNANCE: CANONICAL SUPPLIER COST (cost_price_ngn) APPLICATION ONLY
+          </strong>
+          <span style="font-size: 0.76rem; color: rgba(238, 241, 248, 0.85); line-height: 1.4;">
+            Approval and application update purchasing costs ONLY. Retail selling prices (<code>price_ngn</code>), active inventory, and archived products are 100% protected and remain unchanged.
+          </span>
+        </div>
+        <div style="text-align: right; font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 0.4rem 0.85rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 0.65rem; color: var(--color-d-text-subtle); text-transform: uppercase; font-weight: 700;">Est. Selected Net Cost Shift</div>
+          <strong style="color: ${selectedCostSumDiff >= 0 ? '#F87171' : '#34D399'}; font-family: monospace; font-size: 0.95rem;">
+            ${selectedCostSumDiff >= 0 ? '+' : ''}${formatNaira(selectedCostSumDiff)}
+          </strong>
+        </div>
+      </div>
+
+      <!-- Action & Filter Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button type="button" id="btn-select-all-eligible" class="btn-table-action" style="padding: 0.4rem 0.75rem; font-size: 0.76rem;" ${isTerminal || isApplying ? 'disabled' : ''}>
+            Select All Eligible (${eligibleCount})
+          </button>
+          <button type="button" id="btn-deselect-all" class="btn-table-action" style="padding: 0.4rem 0.75rem; font-size: 0.76rem;" ${isTerminal || isApplying ? 'disabled' : ''}>
+            Deselect All
+          </button>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <label for="select-review-filter" style="font-size: 0.76rem; color: var(--color-d-text-muted);">Filter View:</label>
+          <select id="select-review-filter" class="form-input" style="padding: 0.35rem 0.75rem; font-size: 0.76rem; width: auto; background:#0B1324;">
+            <option value="all" ${activeReviewState.currentFilter === 'all' ? 'selected' : ''}>All Rows (${totalRows})</option>
+            <option value="eligible" ${activeReviewState.currentFilter === 'eligible' ? 'selected' : ''}>Eligible for Approval (${eligibleCount})</option>
+            <option value="approved" ${activeReviewState.currentFilter === 'approved' ? 'selected' : ''}>Approved Rows (${approvedCount})</option>
+            <option value="high-variance" ${activeReviewState.currentFilter === 'high-variance' ? 'selected' : ''}>High Variance &gt;30% (${highVarianceCount})</option>
+            <option value="ineligible" ${activeReviewState.currentFilter === 'ineligible' ? 'selected' : ''}>Ineligible / Inactive (${ineligibleCount})</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Review Rows Table -->
+      <div class="table-responsive" style="max-height: 400px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+        <table class="data-table" style="font-size: 0.8rem;">
+          <thead>
+            <tr>
+              <th style="width: 38px; text-align: center;">
+                <input type="checkbox" id="header-select-all-check" class="review-checkbox" title="Toggle all eligible rows" ${isTerminal || isApplying ? 'disabled' : ''}>
+              </th>
+              <th style="width: 40px;">#</th>
+              <th>Product &amp; SKU Match</th>
+              <th>Current Cost</th>
+              <th>Proposed Cost</th>
+              <th>Absolute Diff</th>
+              <th>% Diff</th>
+              <th>Retail Selling Price</th>
+              <th>Approval</th>
+              <th>Application</th>
+            </tr>
+          </thead>
+          <tbody id="review-rows-tbody">
+            ${displayedRows.map(r => {
+              const isChecked = activeReviewState.selectedRowNumbers.has(r.row_number);
+              const isEligible = r.is_eligible_for_approval;
+              const isApplied = r.application_status === 'applied';
+              const hasHighVariance = r.variance_warning && r.variance_warning !== 'NONE';
+
+              let rowClass = '';
+              if (!isEligible) rowClass = 'tr-ineligible';
+              else if (isApplied) rowClass = 'tr-applied';
+              else if (r.approval_status === 'approved') rowClass = 'tr-approved';
+              else if (hasHighVariance) rowClass = 'tr-high-variance';
+
+              let diffPill = '<span class="diff-pill diff-neutral">₦0</span>';
+              if (r.cost_diff_ngn !== null && r.cost_diff_ngn !== undefined) {
+                if (r.cost_diff_ngn > 0) {
+                  diffPill = `<span class="diff-pill diff-increase">+${formatNaira(r.cost_diff_ngn)}</span>`;
+                } else if (r.cost_diff_ngn < 0) {
+                  diffPill = `<span class="diff-pill diff-decrease">-${formatNaira(Math.abs(r.cost_diff_ngn))}</span>`;
+                }
+              }
+
+              let percentPill = '<span class="diff-pill diff-neutral">0%</span>';
+              if (r.cost_diff_percent !== null && r.cost_diff_percent !== undefined) {
+                const pSign = r.cost_diff_percent > 0 ? '+' : '';
+                percentPill = `<span class="diff-pill ${r.cost_diff_percent > 0 ? 'diff-increase' : (r.cost_diff_percent < 0 ? 'diff-decrease' : 'diff-neutral')}">${pSign}${r.cost_diff_percent}%</span>`;
+              }
+
+              return `
+                <tr class="${rowClass}">
+                  <td style="text-align: center;">
+                    <input type="checkbox" class="review-checkbox row-select-checkbox" data-row-number="${r.row_number}" ${isChecked ? 'checked' : ''} ${!isEligible || isApplied || isTerminal || isApplying ? 'disabled' : ''}>
+                  </td>
+                  <td style="color: var(--color-d-text-muted); font-size: 0.75rem;">${r.row_number}</td>
+                  <td>
+                    <div style="font-weight: 700; color: #FFFFFF; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.matched_product_name || r.raw_name || '—')}">
+                      ${escapeHtml(r.matched_product_name || r.raw_name || '—')}
+                    </div>
+                    <div style="display: flex; gap: 0.4rem; font-size: 0.72rem; align-items: center; margin-top: 0.15rem;">
+                      ${r.matched_product_sku ? `<span style="color: #34D399; font-family: monospace; font-weight: 600;">SKU: ${escapeHtml(r.matched_product_sku)}</span>` : '<span style="color: #F87171;">Unmatched</span>'}
+                      <span style="color: var(--color-d-text-subtle);">• In File: ${escapeHtml(r.raw_sku || '—')}</span>
+                    </div>
+                  </td>
+                  <td style="color: var(--color-d-text-muted); font-family: monospace;">
+                    ${r.matched_current_cost_ngn ? formatNaira(r.matched_current_cost_ngn) : '—'}
+                  </td>
+                  <td style="font-weight: 800; color: #FFFFFF; font-family: monospace;">
+                    ${r.normalized_cost_ngn ? formatNaira(r.normalized_cost_ngn) : '—'}
+                  </td>
+                  <td>${diffPill}</td>
+                  <td>
+                    <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                      ${percentPill}
+                      ${hasHighVariance ? `<span class="badge-variance-warning">⚠ ${escapeHtml(r.variance_warning)}</span>` : ''}
+                    </div>
+                  </td>
+                  <td>
+                    <div style="font-family: monospace; color: #FFFFFF; font-size: 0.78rem;">
+                      ${r.matched_selling_price_ngn ? formatNaira(r.matched_selling_price_ngn) : '—'}
+                    </div>
+                    <span style="font-size: 0.65rem; color: #38BDF8;">Unchanged</span>
+                  </td>
+                  <td>
+                    <span class="badge-status badge-${r.approval_status || 'unapproved'}">
+                      ${(r.approval_status || 'unapproved').toUpperCase()}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge-status badge-${r.application_status || 'pending'}">
+                      ${(r.application_status || 'pending').toUpperCase()}
+                    </span>
+                    ${r.application_error ? `<div style="font-size:0.68rem; color:#F87171; margin-top:0.2rem; max-width:180px;">${escapeHtml(r.application_error)}</div>` : ''}
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- High Variance Acknowledgment Container -->
+      <div id="review-variance-ack-container" class="variance-ack-box" style="display: none;">
+        <input type="checkbox" id="check-ack-high-variance" class="review-checkbox" style="margin-top: 0.15rem;">
+        <div>
+          <strong style="color: #FBBF24; font-size: 0.85rem; display: block; margin-bottom: 0.2rem;">
+            Elevated Variance Acknowledgment Required (&gt; 30% Cost Change)
+          </strong>
+          <span style="font-size: 0.78rem; color: rgba(238, 241, 248, 0.88); line-height: 1.45;">
+            One or more selected rows involve significant supplier cost shifts exceeding 30%. I confirm that I have verified distributor wholesale pricing and explicitly authorize approval of these high-variance items.
+          </span>
+        </div>
+      </div>
+    `;
+
+    // Hook filter dropdown
+    const filterSelect = document.getElementById('select-review-filter');
+    if (filterSelect) {
+      filterSelect.addEventListener('change', (e) => {
+        activeReviewState.currentFilter = e.target.value;
+        renderReviewModalView();
+      });
+    }
+
+    // Hook Select All / Deselect All buttons
+    const btnSelectAll = document.getElementById('btn-select-all-eligible');
+    if (btnSelectAll) {
+      btnSelectAll.addEventListener('click', () => {
+        rows.filter(r => r.is_eligible_for_approval && r.application_status !== 'applied').forEach(r => activeReviewState.selectedRowNumbers.add(r.row_number));
+        renderReviewModalView();
+      });
+    }
+
+    const btnDeselectAll = document.getElementById('btn-deselect-all');
+    if (btnDeselectAll) {
+      btnDeselectAll.addEventListener('click', () => {
+        activeReviewState.selectedRowNumbers.clear();
+        renderReviewModalView();
+      });
+    }
+
+    // Hook Header Checkbox
+    const headerCheck = document.getElementById('header-select-all-check');
+    if (headerCheck) {
+      const eligiblePending = rows.filter(r => r.is_eligible_for_approval && r.application_status !== 'applied');
+      headerCheck.checked = eligiblePending.length > 0 && eligiblePending.every(r => activeReviewState.selectedRowNumbers.has(r.row_number));
+      headerCheck.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          eligiblePending.forEach(r => activeReviewState.selectedRowNumbers.add(r.row_number));
+        } else {
+          activeReviewState.selectedRowNumbers.clear();
+        }
+        renderReviewModalView();
+      });
+    }
+
+    // Hook Individual Row Checkboxes
+    const rowCheckboxes = bodyEl.querySelectorAll('.row-select-checkbox');
+    rowCheckboxes.forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const rowNum = Number(e.target.dataset.rowNumber);
+        if (e.target.checked) {
+          activeReviewState.selectedRowNumbers.add(rowNum);
+        } else {
+          activeReviewState.selectedRowNumbers.delete(rowNum);
+        }
+        updateReviewFooterUI();
+      });
+    });
+
+    updateReviewFooterUI();
+  }
+
+  function updateReviewFooterUI() {
+    const item = activeReviewState.importDoc;
+    if (!item) return;
+
+    const rows = item.rows_preview || [];
+    const eligibleCount = rows.filter(r => r.is_eligible_for_approval).length;
+    const selectedCount = activeReviewState.selectedRowNumbers.size;
+
+    // Update KPI & Summary text
+    const kpiVal = document.getElementById('kpi-val-selected');
+    if (kpiVal) kpiVal.textContent = selectedCount;
+
+    const sumEl = document.getElementById('review-selection-summary');
+    if (sumEl) sumEl.textContent = `${selectedCount} of ${eligibleCount} eligible rows selected`;
+
+    // Check for high variance in currently selected rows
+    let selectedHasHighVariance = false;
+    rows.forEach(r => {
+      if (activeReviewState.selectedRowNumbers.has(r.row_number) && r.variance_warning && r.variance_warning !== 'NONE') {
+        selectedHasHighVariance = true;
+      }
+    });
+
+    const ackContainer = document.getElementById('review-variance-ack-container');
+    if (ackContainer) {
+      ackContainer.style.display = selectedHasHighVariance ? 'flex' : 'none';
+    }
+
+    const isTerminal = item.status === 'successfully_applied' || item.status === 'cancelled';
+    const isApplying = item.status === 'applying';
+
+    // Button: Approve Selected Rows
+    const btnApprove = document.getElementById('btn-review-approve-selected');
+    if (btnApprove) {
+      btnApprove.disabled = selectedCount === 0 || isTerminal || isApplying;
+      btnApprove.onclick = handleReviewApproveAction;
+    }
+
+    // Button: Apply Approved Prices
+    const btnApply = document.getElementById('btn-review-apply-approved');
+    const approvedPendingCount = rows.filter(r => r.approval_status === 'approved' && r.application_status !== 'applied').length;
+    if (btnApply) {
+      btnApply.disabled = approvedPendingCount === 0 || isTerminal || isApplying;
+      btnApply.onclick = () => openApplyConfirmModal(approvedPendingCount);
+    }
+
+    // Button: Cancel Import
+    const btnCancel = document.getElementById('btn-review-cancel-import');
+    if (btnCancel) {
+      btnCancel.disabled = isTerminal || isApplying;
+      btnCancel.onclick = handleReviewCancelAction;
+    }
+  }
+
+  async function handleReviewApproveAction() {
+    const item = activeReviewState.importDoc;
+    if (!item) return;
+
+    const btnApprove = document.getElementById('btn-review-approve-selected');
+    const selectedArray = Array.from(activeReviewState.selectedRowNumbers);
+
+    if (selectedArray.length === 0) {
+      alert('Please select at least one eligible row to approve.');
+      return;
+    }
+
+    // Check variance acknowledgement
+    const rows = item.rows_preview || [];
+    const hasHighVariance = rows.some(r => activeReviewState.selectedRowNumbers.has(r.row_number) && r.variance_warning && r.variance_warning !== 'NONE');
+    const ackCheckbox = document.getElementById('check-ack-high-variance');
+    const acknowledged = ackCheckbox ? ackCheckbox.checked : false;
+
+    if (hasHighVariance && !acknowledged) {
+      alert('High variance (>30%) detected on selected rows. Please review and check the elevated variance acknowledgment box before approving.');
+      if (ackCheckbox) ackCheckbox.focus();
+      return;
+    }
+
+    if (btnApprove) {
+      btnApprove.disabled = true;
+      btnApprove.innerHTML = '<div class="loading-spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:0.4rem;"></div> Approving...';
+    }
+
+    try {
+      const res = await apiFetch(`/api/admin/price-imports/${item._id || item.id}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          approvedRowNumbers: selectedArray,
+          acknowledgeHighVariance: acknowledged,
+          notes: `Explicit administrator approval for ${selectedArray.length} items.`
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to approve rows');
+      }
+
+      // Re-load review state to refresh fresh row statuses
+      await openImportReviewModal(item._id || item.id);
+      loadRecentImportsSummary();
+      loadImportHistoryModule(importHistoryState.page);
+    } catch (err) {
+      alert(`Approval error: ${err.message}`);
+      if (btnApprove) {
+        btnApprove.disabled = false;
+        btnApprove.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> <span>Approve Selected Rows</span>';
+      }
+    }
+  }
+
+  function openApplyConfirmModal(approvedCount) {
+    const confirmModal = document.getElementById('price-import-apply-confirm-modal');
+    const countEl = document.getElementById('apply-confirm-count');
+    const btnExecute = document.getElementById('btn-execute-apply-confirmed');
+
+    if (!confirmModal) return;
+    if (countEl) countEl.textContent = `${approvedCount} product(s)`;
+
+    if (btnExecute) {
+      btnExecute.disabled = false;
+      btnExecute.textContent = 'Execute Application →';
+      btnExecute.onclick = () => executeApplication();
+    }
+
+    confirmModal.showModal();
+  }
+
+  async function executeApplication() {
+    const item = activeReviewState.importDoc;
+    const confirmModal = document.getElementById('price-import-apply-confirm-modal');
+    const btnExecute = document.getElementById('btn-execute-apply-confirmed');
+
+    if (!item) return;
+
+    if (btnExecute) {
+      btnExecute.disabled = true;
+      btnExecute.innerHTML = '<div class="loading-spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:0.4rem;"></div> Applying supplier costs...';
+    }
+
+    try {
+      const res = await apiFetch(`/api/admin/price-imports/${item._id || item.id}/apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({})
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to apply supplier prices');
+      }
+
+      if (confirmModal) confirmModal.close();
+
+      // Refresh view with updated state
+      await openImportReviewModal(item._id || item.id);
+      loadRecentImportsSummary();
+      loadImportHistoryModule(importHistoryState.page);
+
+      alert(`Application Complete!\nSuccessfully applied: ${data.appliedCount} product(s).\nFailed: ${data.failedCount} product(s).\n\nRetail selling prices and inventory stock remain strictly unchanged.`);
+    } catch (err) {
+      alert(`Application error: ${err.message}`);
+      if (btnExecute) {
+        btnExecute.disabled = false;
+        btnExecute.textContent = 'Execute Application →';
+      }
+    }
+  }
+
+  async function handleReviewCancelAction() {
+    const item = activeReviewState.importDoc;
+    if (!item) return;
+
+    const reason = prompt(`Cancel supplier price import "${item.filename}"?\nPlease enter a cancellation reason:`, 'Administrative decision / superseded price list');
+    if (reason === null) return; // User cancelled prompt
+
+    try {
+      const res = await apiFetch(`/api/admin/price-imports/${item._id || item.id}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: reason || 'Cancelled by administrator' })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to cancel import');
+      }
+
+      await openImportReviewModal(item._id || item.id);
+      loadRecentImportsSummary();
+      loadImportHistoryModule(importHistoryState.page);
+    } catch (err) {
+      alert(`Cancellation error: ${err.message}`);
+    }
+  }
+
+  // Global hooks for inline event handlers
+  window.adminOpenReview = openImportReviewModal;
+  window.adminInspectImport = openImportReviewModal;
+  window.adminGoHistoryPage = (p) => loadImportHistoryModule(p);
 
   // Utilities
   function debounce(func, wait) {

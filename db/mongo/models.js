@@ -259,6 +259,115 @@ const passwordResetSchema = new mongoose.Schema({
 // Background cleanup TTL index on created_at (1 hour)
 passwordResetSchema.index({ created_at: 1 }, { expireAfterSeconds: 3600 });
 
+// 14. PriceImport Schema (Stage 5 & Stage 6 Supplier Price Review, Approval & Controlled Application)
+const priceImportSchema = new mongoose.Schema({
+  id: { type: Number, index: true },
+  import_id: { type: String, index: true },
+  filename: { type: String, default: 'supplier_prices.xlsx' },
+  original_filename: { type: String, default: 'supplier_prices.xlsx' },
+  file_format: { type: String, default: 'xlsx', enum: ['xlsx', 'xls', 'csv'], index: true },
+  file_size_bytes: { type: Number, default: 0 },
+  supplier_name: { type: String, default: 'Generic Supplier' },
+  uploaded_by: { type: mongoose.Schema.Types.Mixed, default: null },
+  uploaded_by_email: { type: String, default: '' },
+  uploaded_by_name: { type: String, default: 'Administrator' },
+  uploaded_by_role: { type: String, default: 'admin' },
+  status: {
+    type: String,
+    default: 'analysed',
+    enum: [
+      'analysed',
+      'awaiting_approval',
+      'approved_for_application',
+      'applying',
+      'successfully_applied',
+      'partially_applied',
+      'failed',
+      'cancelled'
+    ],
+    index: true
+  },
+  mapping_config: { type: mongoose.Schema.Types.Mixed, default: {} },
+  summary: {
+    total_rows: { type: Number, default: 0 },
+    valid_rows: { type: Number, default: 0 },
+    matched_rows: { type: Number, default: 0 },
+    unmatched_rows: { type: Number, default: 0 },
+    duplicate_in_file_rows: { type: Number, default: 0 },
+    duplicate_in_catalog_rows: { type: Number, default: 0 },
+    invalid_rows: { type: Number, default: 0 },
+    requires_review_rows: { type: Number, default: 0 },
+    // Stage 6 metrics
+    eligible_for_approval_rows: { type: Number, default: 0 },
+    approved_rows: { type: Number, default: 0 },
+    applied_rows: { type: Number, default: 0 },
+    failed_rows: { type: Number, default: 0 },
+    skipped_rows: { type: Number, default: 0 },
+    high_variance_rows: { type: Number, default: 0 }
+  },
+  // Review metadata
+  reviewed_by: { type: mongoose.Schema.Types.Mixed, default: null },
+  reviewed_by_email: { type: String, default: '' },
+  reviewed_at: { type: Date, default: null },
+  // Approval metadata
+  approved_by: { type: mongoose.Schema.Types.Mixed, default: null },
+  approved_by_email: { type: String, default: '' },
+  approved_by_role: { type: String, default: '' },
+  approved_at: { type: Date, default: null },
+  approved_row_count: { type: Number, default: 0 },
+  approval_notes: { type: String, default: '' },
+  // Application metadata
+  applied_by: { type: mongoose.Schema.Types.Mixed, default: null },
+  applied_by_email: { type: String, default: '' },
+  applied_by_role: { type: String, default: '' },
+  applied_at: { type: Date, default: null },
+  applied_row_count: { type: Number, default: 0 },
+  failed_row_count: { type: Number, default: 0 },
+  skipped_row_count: { type: Number, default: 0 },
+  application_notes: { type: String, default: '' },
+  // Cancellation metadata
+  cancelled_by: { type: mongoose.Schema.Types.Mixed, default: null },
+  cancelled_by_email: { type: String, default: '' },
+  cancelled_at: { type: Date, default: null },
+  cancellation_reason: { type: String, default: '' },
+  rows_preview: [{
+    row_number: Number,
+    raw_sku: String,
+    normalized_sku: String,
+    raw_name: String,
+    raw_brand: String,
+    raw_category: String,
+    raw_cost: mongoose.Schema.Types.Mixed,
+    normalized_cost_ngn: Number,
+    currency: String,
+    stock_info: String,
+    supplier_ref: String,
+    matched_product_id: mongoose.Schema.Types.Mixed,
+    matched_product_name: String,
+    matched_product_sku: String,
+    matched_current_price_ngn: Number,
+    matched_current_cost_ngn: Number,
+    matching_method: String,
+    status: String,
+    validation_errors: [String],
+    warnings: [String],
+    // Stage 6 review & approval fields
+    cost_diff_ngn: { type: Number, default: 0 },
+    cost_diff_percent: { type: Number, default: 0 },
+    is_eligible_for_approval: { type: Boolean, default: false },
+    variance_warning: { type: String, default: 'NONE' },
+    approval_status: { type: String, default: 'unapproved', enum: ['unapproved', 'approved', 'rejected', 'ineligible'] },
+    approved_cost_ngn: { type: Number, default: null },
+    approved_at: { type: Date, default: null },
+    approved_by_email: { type: String, default: '' },
+    application_status: { type: String, default: 'pending', enum: ['pending', 'applied', 'failed', 'skipped'] },
+    application_error: { type: String, default: '' },
+    applied_at: { type: Date, default: null },
+    applied_previous_cost_ngn: { type: Number, default: null }
+  }],
+  notes: { type: String, default: '' }
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+
 module.exports = {
   Category: mongoose.models.Category || mongoose.model('Category', categorySchema),
   Product: mongoose.models.Product || mongoose.model('Product', productSchema),
@@ -272,5 +381,6 @@ module.exports = {
   User: mongoose.models.User || mongoose.model('User', userSchema),
   Session: mongoose.models.Session || mongoose.model('Session', sessionSchema),
   AuditLog: mongoose.models.AuditLog || mongoose.model('AuditLog', auditLogSchema),
-  PasswordReset: mongoose.models.PasswordReset || mongoose.model('PasswordReset', passwordResetSchema)
+  PasswordReset: mongoose.models.PasswordReset || mongoose.model('PasswordReset', passwordResetSchema),
+  PriceImport: mongoose.models.PriceImport || mongoose.model('PriceImport', priceImportSchema)
 };
