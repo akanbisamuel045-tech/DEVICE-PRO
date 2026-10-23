@@ -93,9 +93,21 @@ async function disconnectMongo() {
   }
 }
 
+/**
+ * Safety guard: Asserts that test execution is isolated and refuses to run
+ * destructive or test operations against a live production environment.
+ */
+function assertTestEnvironmentIsolated() {
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+    throw new Error('[SAFETY GUARD] Destructive test execution blocked: Refusing to run tests against a production environment (NODE_ENV or VERCEL_ENV is production).');
+  }
+}
+
 module.exports = {
   connectMongo,
   isMongoConnected,
   disconnectMongo,
+  assertTestEnvironmentIsolated,
   mongoose
 };
+

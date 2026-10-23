@@ -1798,9 +1798,11 @@ async function revokeSession(token) {
 }
 
 // --- AUDIT LOGGING ---
-async function logAudit({ userId = null, action, entityType, entityId = '', details = '', ipAddress = '' }) {
+async function logAudit({ userId = null, action, entityType, entityId = '', details = '', ipAddress = '', metadata = {}, session = null, throwOnError = false }) {
   try {
-    const maxDoc = await AuditLog.findOne().sort({ id: -1 }).select('id').lean();
+    const query = AuditLog.findOne().sort({ id: -1 }).select('id').lean();
+    if (session) query.session(session);
+    const maxDoc = await query;
     const id = maxDoc && maxDoc.id ? maxDoc.id + 1 : 1;
     const log = new AuditLog({
       id,
@@ -1809,11 +1811,16 @@ async function logAudit({ userId = null, action, entityType, entityId = '', deta
       entity_type: entityType,
       entity_id: entityId,
       details,
-      ip_address: ipAddress
+      ip_address: ipAddress,
+      metadata: metadata || {}
     });
-    await log.save();
+    await log.save(session ? { session } : {});
+    return log;
   } catch (e) {
-    console.error('[AUDIT LOG MONGO ERROR]:', e);
+    console.error('[AUDIT LOG MONGO ERROR]:', e.message);
+    if (throwOnError || session) {
+      throw e;
+    }
   }
 }
 
@@ -2065,6 +2072,7 @@ async function approvePriceImportRows(id, { approvedRowNumbers = [], acknowledge
     if (isSelected && row.is_eligible_for_approval) {
       row.approval_status = 'approved';
       row.approved_cost_ngn = row.normalized_cost_ngn;
+      row.approved_previous_cost_ngn = row.matched_current_cost_ngn;
       row.approved_at = new Date();
       row.approved_by_email = user.email || '';
       approvedCount++;
@@ -2073,6 +2081,7 @@ async function approvePriceImportRows(id, { approvedRowNumbers = [], acknowledge
         // Unselecting a previously approved row
         row.approval_status = row.is_eligible_for_approval ? 'unapproved' : 'ineligible';
         row.approved_cost_ngn = null;
+        row.approved_previous_cost_ngn = null;
       }
     }
   });
@@ -2093,8 +2102,17 @@ async function approvePriceImportRows(id, { approvedRowNumbers = [], acknowledge
     action: 'APPROVE_PRICE_IMPORT',
     entityType: 'price_import',
     entityId: String(importDoc.id || importDoc._id),
-    details: `Approved ${approvedCount} supplier price rows for "${importDoc.filename}". No live product prices or costs were modified during approval.`,
-    ipAddress: user.ip || ''
+    details: `Approved ${approvedCount} supplier price rows for "${importDoc.filename}". Actor: ${user.email || 'admin'} (${user.role || 'admin'}). No live product prices or costs were modified during approval.`,
+    ipAddress: user.ip || '',
+    metadata: {
+      import_id: String(importDoc.id || importDoc._id),
+      filename: importDoc.filename,
+      approved_count: approvedCount,
+      actor_id: user.id || null,
+      actor_email: user.email || '',
+      actor_role: user.role || 'admin',
+      acknowledged_high_variance: Boolean(acknowledgeHighVariance)
+    }
   });
 
   return importDoc.toObject();
@@ -2116,13 +2134,30 @@ async function applyPriceImport(id, user = {}, options = {}) {
     throw err;
   }
 
+  // Support recovering interrupted or dead application lock (> 5 mins inactivity or explicit recoverInterrupted)
+  const isExplicitRecovery = options && options.recoverInterrupted === true;
+  const staleLockThreshold = new Date(Date.now() - 5 * 60 * 1000);
+
+  const allowedStatuses = ['approved_for_application', 'partially_applied', 'failed'];
+  const statusConditions = [{ status: { $in: allowedStatuses } }];
+  if (isExplicitRecovery) {
+    statusConditions.push({ status: 'applying' });
+  } else {
+    statusConditions.push({ status: 'applying', updated_at: { $lt: staleLockThreshold } });
+  }
+
+  // Preserve query identifier (which has $or for _id / numeric id) using $and
+  const lockQuery = {
+    $and: [
+      query,
+      { $or: statusConditions }
+    ]
+  };
+
   // Atomic state transition to prevent concurrent application runs
   const importDoc = await PriceImport.findOneAndUpdate(
-    {
-      ...query,
-      status: { $in: ['approved_for_application', 'partially_applied'] }
-    },
-    { $set: { status: 'applying' } },
+    lockQuery,
+    { $set: { status: 'applying', updated_at: new Date() } },
     { returnDocument: 'after' }
   );
 
@@ -2153,6 +2188,27 @@ async function applyPriceImport(id, user = {}, options = {}) {
     throw err;
   }
 
+  // Validate all user-supplied row identifiers before processing
+  if (options && Array.isArray(options.rowIds) && options.rowIds.length > 0) {
+    for (const rid of options.rowIds) {
+      const r = importDoc.rows_preview.find(x => String(x.row_number) === String(rid) || (x._id && String(x._id) === String(rid)));
+      if (!r) {
+        importDoc.status = 'approved_for_application';
+        await importDoc.save();
+        const err = new Error(`Row #${rid} does not belong to this price import.`);
+        err.statusCode = 400;
+        throw err;
+      }
+      if (r.approval_status !== 'approved') {
+        importDoc.status = 'approved_for_application';
+        await importDoc.save();
+        const err = new Error(`Row #${rid} has not been approved and cannot be applied.`);
+        err.statusCode = 400;
+        throw err;
+      }
+    }
+  }
+
   let pendingRows = importDoc.rows_preview.filter(r => r.approval_status === 'approved' && r.application_status !== 'applied');
   if (options && Array.isArray(options.rowIds) && options.rowIds.length > 0) {
     const filterIds = options.rowIds.map(String);
@@ -2160,6 +2216,15 @@ async function applyPriceImport(id, user = {}, options = {}) {
   }
 
   if (pendingRows.length === 0) {
+    const totalApproved = importDoc.rows_preview.filter(r => r.approval_status === 'approved').length;
+    const totalApplied = importDoc.rows_preview.filter(r => r.application_status === 'applied').length;
+    if (totalApplied === totalApproved && totalApproved > 0) {
+      importDoc.status = 'successfully_applied';
+      await importDoc.save();
+      const err = new Error('All approved rows for this import have already been applied.');
+      err.statusCode = 400;
+      throw err;
+    }
     importDoc.status = 'approved_for_application';
     await importDoc.save();
     const err = new Error('No pending approved rows found to apply.');
@@ -2175,7 +2240,35 @@ async function applyPriceImport(id, user = {}, options = {}) {
 
   for (const row of pendingRows) {
     try {
-      // Find product in catalog
+      // 1. Validate approved monetary amount
+      const newCost = Math.round(Number(row.approved_cost_ngn));
+      if (isNaN(newCost) || newCost <= 0 || !Number.isSafeInteger(newCost)) {
+        row.application_status = 'failed';
+        row.application_error = `Invalid approved price value "${row.approved_cost_ngn}". Price must be a positive finite integer.`;
+        failedCount++;
+        failedRowsList.push({ rowNumber: row.row_number, error: row.application_error });
+        continue;
+      }
+
+      // 2. Tampering safeguard: Ensure approved value matches proposed value
+      if (row.approved_cost_ngn !== row.normalized_cost_ngn) {
+        row.application_status = 'failed';
+        row.application_error = 'Approved price does not match proposed price in file (possible tampering).';
+        failedCount++;
+        failedRowsList.push({ rowNumber: row.row_number, error: row.application_error });
+        continue;
+      }
+
+      // 3. Currency validation
+      if ((row.currency || 'NGN').toUpperCase() !== 'NGN') {
+        row.application_status = 'failed';
+        row.application_error = `Unsupported currency "${row.currency}". Only NGN is supported.`;
+        failedCount++;
+        failedRowsList.push({ rowNumber: row.row_number, error: row.application_error });
+        continue;
+      }
+
+      // 4. Find product in catalog
       const prodQuery = (mongoose.Types.ObjectId.isValid(row.matched_product_id) && String(new mongoose.Types.ObjectId(row.matched_product_id)) === String(row.matched_product_id))
         ? { $or: [{ _id: row.matched_product_id }, { id: isNaN(row.matched_product_id) ? -1 : Number(row.matched_product_id) }] }
         : { id: Number(row.matched_product_id) };
@@ -2190,7 +2283,7 @@ async function applyPriceImport(id, user = {}, options = {}) {
         continue;
       }
 
-      // Safeguard: archived products must NEVER be modified
+      // 5. Safeguard: archived products must NEVER be modified
       if (prod.published !== 1) {
         row.application_status = 'failed';
         row.application_error = `Product "${prod.name}" (SKU: ${prod.sku}) is archived. Archived products cannot be modified.`;
@@ -2199,7 +2292,7 @@ async function applyPriceImport(id, user = {}, options = {}) {
         continue;
       }
 
-      // Safeguard: SKU match verification
+      // 6. Safeguard: SKU match verification
       if (normalizeSku(prod.sku) !== normalizeSku(row.matched_product_sku)) {
         row.application_status = 'failed';
         row.application_error = `Product SKU in catalog ("${prod.sku}") no longer matches approved SKU ("${row.matched_product_sku}").`;
@@ -2208,44 +2301,120 @@ async function applyPriceImport(id, user = {}, options = {}) {
         continue;
       }
 
+      // 7. Safeguard: Catalog baseline cost conflict detection
       const previousCost = prod.cost_price_ngn !== undefined ? prod.cost_price_ngn : (prod.supplier_cost_ngn || 0);
-      const newCost = Math.round(Number(row.approved_cost_ngn));
+      const baselineCost = row.approved_previous_cost_ngn !== null && row.approved_previous_cost_ngn !== undefined
+        ? row.approved_previous_cost_ngn
+        : row.matched_current_cost_ngn;
 
-      if (isNaN(newCost) || newCost < 0) {
+      if (baselineCost !== null && baselineCost !== undefined && previousCost !== baselineCost) {
         row.application_status = 'failed';
-        row.application_error = `Invalid approved price value "${row.approved_cost_ngn}".`;
+        row.application_error = `Catalog supplier cost has changed since approval (approval baseline was ₦${baselineCost.toLocaleString()}, current is ₦${previousCost.toLocaleString()}). Approval is stale.`;
         failedCount++;
         failedRowsList.push({ rowNumber: row.row_number, error: row.application_error });
         continue;
       }
 
-      // CRITICAL STAGE 6 BOUNDARY:
-      // Update ONLY cost_price_ngn!
-      // price_ngn (selling price), stock_quantity, published, specs, warranty are 100% UNTOUCHED!
-      await Product.updateOne(
-        { _id: prod._id },
-        {
-          $set: {
-            cost_price_ngn: newCost,
-            updated_at: new Date()
-          }
+      // 8. Execute transactional update: product update + audit record + row status persistence
+      let session = null;
+      try {
+        session = await mongoose.startSession();
+        session.startTransaction();
+      } catch (sessErr) {
+        session = null;
+      }
+
+      try {
+        const opts = session ? { session } : {};
+
+        // CRITICAL STAGE 6 BOUNDARY:
+        // Update ONLY cost_price_ngn!
+        // price_ngn (selling price), stock_quantity, published, specs, warranty are 100% UNTOUCHED!
+        await Product.updateOne(
+          { _id: prod._id },
+          {
+            $set: {
+              cost_price_ngn: newCost,
+              updated_at: new Date()
+            }
+          },
+          opts
+        );
+
+        // Required Audit record: If audit fails, transaction rolls back product update!
+        await logAudit({
+          userId: user.id || null,
+          action: 'PRICE_IMPORT_APPLIED_ROW',
+          entityType: 'product',
+          entityId: String(prod.id || prod._id),
+          details: `Updated supplier cost for SKU "${prod.sku}" from ₦${previousCost.toLocaleString()} to ₦${newCost.toLocaleString()} (Import: ${importDoc.filename || importDoc.import_id}, Row #${row.row_number}). Currency: NGN. Outcome: applied. Actor: ${user.email || 'admin'} (${user.role || 'admin'}). Retail selling price (₦${prod.price_ngn.toLocaleString()}) strictly unchanged.`,
+          ipAddress: user.ip || '',
+          metadata: {
+            import_id: String(importDoc.id || importDoc._id),
+            row_id: row.row_number,
+            product_id: String(prod.id || prod._id),
+            sku: prod.sku,
+            previous_cost_ngn: previousCost,
+            new_cost_ngn: newCost,
+            currency: 'NGN',
+            outcome: 'applied',
+            actor_id: user.id || null,
+            actor_role: user.role || 'admin',
+            timestamp: new Date().toISOString()
+          },
+          session,
+          throwOnError: true
+        });
+
+        // Persist row application status in PriceImport collection within the same transaction
+        await PriceImport.updateOne(
+          { _id: importDoc._id, 'rows_preview.row_number': row.row_number },
+          {
+            $set: {
+              'rows_preview.$.application_status': 'applied',
+              'rows_preview.$.applied_at': new Date(),
+              'rows_preview.$.applied_previous_cost_ngn': previousCost,
+              'rows_preview.$.application_error': ''
+            }
+          },
+          opts
+        );
+
+        if (session) {
+          await session.commitTransaction();
         }
-      );
 
-      row.application_status = 'applied';
-      row.applied_at = new Date();
-      row.applied_previous_cost_ngn = previousCost;
-      appliedCount++;
-      appliedRowsList.push({ rowNumber: row.row_number, sku: prod.sku, previousCost, newCost });
+        row.application_status = 'applied';
+        row.applied_at = new Date();
+        row.applied_previous_cost_ngn = previousCost;
+        row.application_error = '';
+        appliedCount++;
+        appliedRowsList.push({ rowNumber: row.row_number, sku: prod.sku, previousCost, newCost });
+      } catch (applyErr) {
+        if (session) {
+          await session.abortTransaction();
+        }
+        row.application_status = 'failed';
+        row.application_error = applyErr.message;
+        failedCount++;
+        failedRowsList.push({ rowNumber: row.row_number, error: applyErr.message });
 
-      await logAudit({
-        userId: user.id || null,
-        action: 'PRICE_IMPORT_APPLIED_ROW',
-        entityType: 'product',
-        entityId: String(prod.id || prod._id),
-        details: `Updated supplier cost for SKU "${prod.sku}" from ₦${previousCost.toLocaleString()} to ₦${newCost.toLocaleString()} (Import: ${importDoc.filename}, Row #${row.row_number}). Retail selling price (₦${prod.price_ngn.toLocaleString()}) strictly unchanged.`,
-        ipAddress: user.ip || ''
-      });
+        try {
+          await PriceImport.updateOne(
+            { _id: importDoc._id, 'rows_preview.row_number': row.row_number },
+            {
+              $set: {
+                'rows_preview.$.application_status': 'failed',
+                'rows_preview.$.application_error': applyErr.message
+              }
+            }
+          );
+        } catch (e) {}
+      } finally {
+        if (session) {
+          await session.endSession();
+        }
+      }
     } catch (rowErr) {
       row.application_status = 'failed';
       row.application_error = rowErr.message;
@@ -2283,7 +2452,17 @@ async function applyPriceImport(id, user = {}, options = {}) {
     entityType: 'price_import',
     entityId: String(importDoc.id || importDoc._id),
     details: `Applied supplier costs for import "${importDoc.filename}". Applied: ${appliedCount}, Failed: ${failedCount}. Status: ${importDoc.status}. Retail selling prices strictly untouched.`,
-    ipAddress: user.ip || ''
+    ipAddress: user.ip || '',
+    metadata: {
+      import_id: String(importDoc.id || importDoc._id),
+      filename: importDoc.filename,
+      applied_count: appliedCount,
+      failed_count: failedCount,
+      total_applied: totalApplied,
+      status: importDoc.status,
+      actor_id: user.id || null,
+      actor_role: user.role || 'admin'
+    }
   });
 
   return {
@@ -2326,6 +2505,16 @@ async function cancelPriceImport(id, user = {}, reason = '') {
     err.statusCode = 400;
     throw err;
   }
+  if (importDoc.status === 'applying') {
+    const err = new Error('Cannot cancel an import that is currently being applied.');
+    err.statusCode = 409;
+    throw err;
+  }
+  if (importDoc.status === 'cancelled') {
+    const err = new Error('Price import is already cancelled.');
+    err.statusCode = 400;
+    throw err;
+  }
 
   importDoc.status = 'cancelled';
   importDoc.cancelled_by = user.id || null;
@@ -2341,11 +2530,19 @@ async function cancelPriceImport(id, user = {}, reason = '') {
     entityType: 'price_import',
     entityId: String(importDoc.id || importDoc._id),
     details: `Cancelled supplier price import "${importDoc.filename}". Reason: ${importDoc.cancellation_reason}`,
-    ipAddress: user.ip || ''
+    ipAddress: user.ip || '',
+    metadata: {
+      import_id: String(importDoc.id || importDoc._id),
+      filename: importDoc.filename,
+      reason: importDoc.cancellation_reason,
+      actor_id: user.id || null,
+      actor_role: user.role || 'admin'
+    }
   });
 
   return { success: true, message: 'Price import cancelled successfully.' };
 }
+
 
 async function getDatabaseStats() {
   const [products, orders, quotes, enquiries, warranties, tickets, categories, caseStudies, users, sessions, auditLogs, payments] = await Promise.all([

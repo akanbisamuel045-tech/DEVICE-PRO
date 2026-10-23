@@ -238,7 +238,8 @@ const auditLogSchema = new mongoose.Schema({
   entity_type: { type: String, index: true },
   entity_id: { type: String, index: true },
   details: { type: String },
-  ip_address: { type: String }
+  ip_address: { type: String },
+  metadata: { type: mongoose.Schema.Types.Mixed, default: {} }
 }, { timestamps: { createdAt: 'created_at' } });
 
 // 13. PasswordReset Schema (Stage 20 Verification Code System)
@@ -358,6 +359,7 @@ const priceImportSchema = new mongoose.Schema({
     variance_warning: { type: String, default: 'NONE' },
     approval_status: { type: String, default: 'unapproved', enum: ['unapproved', 'approved', 'rejected', 'ineligible'] },
     approved_cost_ngn: { type: Number, default: null },
+    approved_previous_cost_ngn: { type: Number, default: null },
     approved_at: { type: Date, default: null },
     approved_by_email: { type: String, default: '' },
     application_status: { type: String, default: 'pending', enum: ['pending', 'applied', 'failed', 'skipped'] },

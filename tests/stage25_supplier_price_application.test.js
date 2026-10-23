@@ -51,9 +51,12 @@
  */
 
 const assert = require('assert');
-const { connectMongo } = require('../db/mongo/connection');
+const { connectMongo, assertTestEnvironmentIsolated } = require('../db/mongo/connection');
 const { Product, Order, AuditLog, User, Session, PriceImport } = require('../db/mongo/models');
 const mongoose = require('mongoose');
+
+// SAFETY FIRST: Enforce database isolation guard
+assertTestEnvironmentIsolated();
 
 const BASE_URL = 'http://localhost:3000';
 

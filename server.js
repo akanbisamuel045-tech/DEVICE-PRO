@@ -2879,8 +2879,11 @@ app.post('/api/admin/price-imports/:id/approve', requireAuth, requireRole('super
 // Apply approved supplier price changes to live catalog (strictly updates cost_price_ngn only)
 app.post('/api/admin/price-imports/:id/apply', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
   try {
-    const { rowIds, approvedRowNumbers } = req.body || {};
-    const result = await applyPriceImport(req.params.id, req.user, { rowIds: rowIds || approvedRowNumbers });
+    const { rowIds, approvedRowNumbers, recoverInterrupted } = req.body || {};
+    const result = await applyPriceImport(req.params.id, req.user, {
+      rowIds: rowIds || approvedRowNumbers,
+      recoverInterrupted: Boolean(recoverInterrupted)
+    });
     res.json(result);
   } catch (error) {
     const status = error.statusCode || (error.message.includes('not found') ? 404 : 400);

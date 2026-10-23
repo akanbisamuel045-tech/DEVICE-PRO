@@ -873,21 +873,24 @@
   - `scripts/production-smoke-test.js`: Updated to smoke-test all 4 auth page routes; 27/27 tests pass cleanly.
 
 ### Stage 25 (Admin Stage 6): Supplier Price Review, Approval and Controlled Application
-- **Status:** Complete ✅ — Awaiting Owner Approval
+- **Status:** Complete & Independently Verified ✅ — Awaiting Owner Approval
 - **Started:** October 2026
 - **Completed:** October 2026
-- **Summary:** Built and verified a complete, auditable, and secure workflow allowing authorized administrators (`superadmin`, `admin`) to review supplier cost changes with absolute and percentage diffs, explicitly approve selected rows with high-variance acknowledgement (>30%), apply approved prices exclusively to the canonical supplier cost field (`cost_price_ngn`), and safely recover from partial failures while strictly protecting customer retail selling prices (`price_ngn`) and active inventory.
-- **Key Deliverables:**
+- **Summary:** Built, independently audited, and verified a complete, auditable, and secure workflow allowing authorized administrators (`superadmin`, `admin`) to review supplier cost changes with absolute and percentage diffs, explicitly approve selected rows with high-variance acknowledgement (>30%), apply approved prices exclusively to the canonical supplier cost field (`cost_price_ngn`), and safely recover from partial failures while strictly protecting customer retail selling prices (`price_ngn`) and active inventory.
+- **Key Deliverables & Verification Artifacts:**
   - `reports/DEVICE_PRO_ADMIN_STAGE_6_BASELINE.md`: Verified baseline of 117 products (48 active, 69 archived benchmark items) and MongoDB Atlas replica set transaction capabilities.
-  - `db/mongo/models.js`: Extended `priceImportSchema` status enums, review metadata, row diffs, variance warning flags, and row approval/application lifecycle fields.
-  - `lib/price-import-engine.js`: Implemented `preparePriceImportForReview()`, real-time diff and variance calculators, and ineligible row protection.
-  - `db/mongo/repository.js` & `db/database.js`: Built `reviewPriceImport()`, `approvePriceImportRows()`, `applyPriceImport()`, and `cancelPriceImport()` with atomic concurrency locks (`findOneAndUpdate`), idempotency safeguards, and row-level audit event logging.
+  - `db/mongo/connection.js`: Added `assertTestEnvironmentIsolated()` safety guard preventing tests from executing on production without leaking credentials.
+  - `db/mongo/models.js`: Extended `priceImportSchema` status enums, review metadata, row diffs, variance warning flags, `approved_previous_cost_ngn` baseline tracking, and `AuditLog.metadata`.
+  - `lib/price-import-engine.js`: Implemented `preparePriceImportForReview()`, real-time diff and variance calculators, zero/negative/infinite price bounds, and ineligible row protection.
+  - `db/mongo/repository.js` & `db/database.js`: Built `reviewPriceImport()`, `approvePriceImportRows()`, `applyPriceImport()`, and `cancelPriceImport()` with atomic concurrency locks (`findOneAndUpdate`), idempotency safeguards, multi-document session transactions for row updates and audits, baseline cost conflict detection, and row-level audit event logging.
   - `server.js`: Mounted authenticated REST endpoints (`GET /api/admin/price-imports/:id/review`, `POST /api/admin/price-imports/:id/approve`, `POST /api/admin/price-imports/:id/apply`, `POST /api/admin/price-imports/:id/cancel`).
   - `public/admin.html`, `public/css/admin.css`, `public/js/admin.js`: Integrated the Stage 6 Review & Approval Console (`#price-import-review-modal`), KPI summary ribbon, net cost shift preview, row filters, high-variance acknowledgment checkbox, and application confirmation modal (`#price-import-apply-confirm-modal`).
   - `tests/stage25_supplier_price_application.test.js`: 40/40 tests passing 100% covering review diffs, RBAC authorization, high-variance gating, atomic concurrency, idempotency, partial failure recovery, and cost/price separation.
-  - Regressions Verified: 161 total automated assertions passing cleanly with 0 failures across Stages 20–25.
+  - `tests/stage25_security_verification.test.js`: 21/21 deep security verification tests passing 100% covering production guards, concurrency lock collisions (409), stale baseline conflict detection, tampering rejection, foreign row blocking, and cancellation state checks.
+  - Regressions Verified: **182 total automated assertions passing cleanly with 0 failures across 7 test suites** (Stages 20, 21, 22, 23, 24, 25-App, 25-Sec).
   - `DECISIONS.md`: Appended ADR-014 formally establishing `cost_price_ngn` as the canonical supplier cost field.
   - `reports/DEVICE_PRO_ADMIN_STAGE_6_PRICE_APPLICATION.md`: Comprehensive engineering report.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_6_FINAL_VERIFICATION.md`: Independent security audit, safety review, and gate approval report.
 
 **Next Permitted Stage:** STOPPED. Awaiting project owner explicit approval before proceeding to Stage 7.
 
