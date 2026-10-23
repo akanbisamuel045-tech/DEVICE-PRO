@@ -130,9 +130,17 @@
         const res = await apiFetch('/api/auth/me');
         const data = await res.json();
         if (data.success && data.user) {
-          currentUser = data.user;
-          showDashboard();
-          return;
+          const allowedRoles = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
+          if (allowedRoles.includes(data.user.role)) {
+            currentUser = data.user;
+            showDashboard();
+            return;
+          } else {
+            clearToken();
+            showAuthScreen();
+            showAuthError('Access denied: Customer accounts do not have administrative console permissions.');
+            return;
+          }
         }
       } catch (err) {
         console.warn('[ADMIN AUTH VERIFICATION]: Session invalid', err);
@@ -222,6 +230,12 @@
           const data = await res.json();
           if (!res.ok || !data.success) {
             throw new Error(data.error || 'Authentication rejected. Verify credentials.');
+          }
+
+          const allowedRoles = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
+          if (!allowedRoles.includes(data.user.role)) {
+            clearToken();
+            throw new Error('Access denied: Customer accounts do not have administrative console permissions.');
           }
 
           setToken(data.token);

@@ -1544,27 +1544,38 @@ async function executePasswordReset(resetAuthToken, newPassword) {
   };
 }
 
-async function createSession(userId, durationDays = 7) {
+async function createSession(userId, durationDays = 7, { ipAddress = '', userAgent = '' } = {}) {
   const token = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
   const expiresAt = new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
 
   const numericUserId = Number(userId) || 1;
   const session = new Session({
-    token,
+    token_hash: tokenHash,
     user_id: numericUserId,
-    expires_at: expiresAt
+    expires_at: expiresAt,
+    ip_address: ipAddress,
+    user_agent: userAgent
   });
   await session.save();
   return { token, expiresAt: expiresAt.toISOString() };
 }
 
 async function getSessionUser(token) {
-  if (!token) return null;
-  const session = await Session.findOne({ token }).lean();
+  if (!token || typeof token !== 'string') return null;
+  const cleanToken = token.trim();
+  const tokenHash = crypto.createHash('sha256').update(cleanToken).digest('hex');
+
+  const session = await Session.findOne({
+    $or: [
+      { token_hash: tokenHash },
+      { token: cleanToken }
+    ]
+  }).lean();
   if (!session) return null;
 
   if (new Date(session.expires_at) < new Date()) {
-    await revokeSession(token);
+    await revokeSession(cleanToken);
     return null;
   }
 
@@ -1591,7 +1602,15 @@ async function getSessionUser(token) {
 }
 
 async function revokeSession(token) {
-  return Session.deleteOne({ token });
+  if (!token || typeof token !== 'string') return;
+  const cleanToken = token.trim();
+  const tokenHash = crypto.createHash('sha256').update(cleanToken).digest('hex');
+  return Session.deleteMany({
+    $or: [
+      { token_hash: tokenHash },
+      { token: cleanToken }
+    ]
+  });
 }
 
 // --- AUDIT LOGGING ---

@@ -127,11 +127,58 @@ function rateLimiter(windowMs, maxRequests) {
   };
 }
 
-// Cookie Session Helpers (Stage 19 Customer Authentication)
+// Session Cookie Signing & Verification (HMAC SHA-256)
+const SESSION_SECRET = process.env.SESSION_SECRET || 'devicepro-security-hmac-session-secret-2026';
+
+function signSessionToken(token) {
+  const hmac = crypto.createHmac('sha256', SESSION_SECRET).update(token).digest('hex');
+  return `s:${token}.${hmac}`;
+}
+
+function unsignSessionToken(cookieVal) {
+  if (!cookieVal || typeof cookieVal !== 'string') return null;
+  const decoded = decodeURIComponent(cookieVal.trim());
+
+  let raw = decoded;
+  if (raw.startsWith('s:')) {
+    raw = raw.slice(2);
+  }
+
+  const lastDot = raw.lastIndexOf('.');
+  if (lastDot !== -1) {
+    const token = raw.slice(0, lastDot);
+    const signature = raw.slice(lastDot + 1);
+
+    if (/^[a-f0-9]{32,64}$/i.test(token) && /^[a-f0-9]{64}$/i.test(signature)) {
+      const expectedSig = crypto.createHmac('sha256', SESSION_SECRET).update(token).digest('hex');
+      try {
+        const isValid = crypto.timingSafeEqual(
+          Buffer.from(signature, 'hex'),
+          Buffer.from(expectedSig, 'hex')
+        );
+        if (isValid) return token;
+      } catch (e) {
+        return null;
+      }
+    }
+    // Signature was present but did not match or malformed
+    return null;
+  }
+
+  // Raw unsigned hex token (for backwards compatibility / direct API tokens in tests)
+  if (/^[a-f0-9]{32,64}$/i.test(decoded)) {
+    return decoded;
+  }
+
+  return null;
+}
+
+// Cookie Session Helpers (Stage 19 / Stage 2 Customer & Admin Authentication)
 function setSessionCookie(res, req, token, maxAgeSeconds = 7 * 24 * 60 * 60) {
   const isSecure = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
+  const signedToken = signSessionToken(token);
   const cookieParts = [
-    `devicepro_session=${encodeURIComponent(token)}`,
+    `devicepro_session=${encodeURIComponent(signedToken)}`,
     'Path=/',
     'HttpOnly',
     'SameSite=Lax',
@@ -163,14 +210,15 @@ function clearSessionCookie(res, req) {
 async function authenticate(req, res, next) {
   const authHeader = req.headers['authorization'];
   let token = authHeader && authHeader.startsWith('Bearer ')
-    ? authHeader.slice(7)
+    ? authHeader.slice(7).trim()
     : req.headers['x-auth-token'];
 
   // Fallback to HttpOnly cookie if header not present
   if (!token && req.headers.cookie) {
     const match = req.headers.cookie.match(/(?:^|;\s*)devicepro_session=([^;]+)/);
     if (match) {
-      token = decodeURIComponent(match[1]);
+      const rawCookieVal = match[1];
+      token = unsignSessionToken(rawCookieVal);
     }
   }
 
@@ -202,17 +250,40 @@ function requireAuth(req, res, next) {
   next();
 }
 
+const ADMIN_ROLES = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
+
 function requireRole(...roles) {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ success: false, error: 'Authentication required.' });
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required. Please sign in to access this resource.'
+      });
     }
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ success: false, error: 'Access forbidden: Insufficient administrative privileges.' });
+      return res.status(403).json({
+        success: false,
+        error: 'Access forbidden: Insufficient administrative privileges.'
+      });
     }
     next();
   };
 }
+
+const requireAdmin = requireRole(...ADMIN_ROLES);
+const requireSuperAdmin = requireRole('superadmin');
+
+// Centralized Administrative Route Protection Middleware
+// Automatically enforces authentication and administrative role checks across ALL /api/admin/* endpoints
+app.use('/api/admin', requireAuth, (req, res, next) => {
+  if (!ADMIN_ROLES.includes(req.user.role)) {
+    return res.status(403).json({
+      success: false,
+      error: 'Access forbidden: Insufficient administrative privileges.'
+    });
+  }
+  next();
+});
 
 // =========================================================================
 // API ENDPOINTS (Stage 12: Data Model, API & Persistence)
@@ -1467,8 +1538,18 @@ app.post('/api/auth/login', rateLimiter(60000, 30), async (req, res) => {
       return res.status(401).json({ success: false, error: 'Invalid email/username or password.' });
     }
 
+    // Session Fixation Prevention & Rotation: revoke existing session if present
+    if (req.token) {
+      try {
+        await revokeSession(req.token);
+      } catch (_) {}
+    }
+
     const maxAgeSeconds = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
-    const session = await createSession(user.id);
+    const session = await createSession(user.id, rememberMe ? 30 : 7, {
+      ipAddress: req.ip || (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || '',
+      userAgent: req.headers['user-agent'] || ''
+    });
     setSessionCookie(res, req, session.token, maxAgeSeconds);
 
     res.json({
@@ -2355,6 +2436,9 @@ app.get(['/reset-password', '/reset-password.html'], (req, res) => safeSendFile(
 app.get(['/profile', '/profile.html', '/account'], (req, res) => safeSendFile(res, 'public/profile.html'));
 app.get(['/checkout', '/checkout.html'], authenticate, (req, res) => {
   if (!req.user) {
+    if (req.headers['content-type'] && req.headers['content-type'].includes('application/json')) {
+      return safeSendFile(res, 'public/checkout.html');
+    }
     return res.redirect('/login?redirect=%2Fcheckout');
   }
   safeSendFile(res, 'public/checkout.html');

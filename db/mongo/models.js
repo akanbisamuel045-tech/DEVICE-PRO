@@ -215,12 +215,18 @@ const userSchema = new mongoose.Schema({
   reset_token_expires: { type: Date }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
-// 11. Session Schema
+// 11. Session Schema (Stage 2 Persistent Sessions with Hashed Tokens & TTL Expiry)
 const sessionSchema = new mongoose.Schema({
-  token: { type: String, required: true, unique: true, index: true },
+  token: { type: String, sparse: true, index: true },
+  token_hash: { type: String, required: true, unique: true, index: true },
   user_id: { type: Number, required: true, index: true },
-  expires_at: { type: Date, required: true }
+  expires_at: { type: Date, required: true, index: true },
+  ip_address: { type: String },
+  user_agent: { type: String }
 }, { timestamps: { createdAt: 'created_at' } });
+
+// Background cleanup TTL index on expires_at (MongoDB automatically purges expired sessions)
+sessionSchema.index({ expires_at: 1 }, { expireAfterSeconds: 0 });
 
 // 12. AuditLog Schema
 const auditLogSchema = new mongoose.Schema({

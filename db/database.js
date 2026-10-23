@@ -3290,6 +3290,9 @@ function dispatch(mongoFn, sqliteFn) {
     if (isMongoConnected()) {
       let syncRes = null;
       const skipSqlite = [
+        mongoRepo.createSession,
+        mongoRepo.getSessionUser,
+        mongoRepo.revokeSession,
         mongoRepo.createPasswordResetToken,
         mongoRepo.resetPasswordWithToken,
         mongoRepo.createVerificationCode,
@@ -3315,7 +3318,9 @@ function dispatch(mongoFn, sqliteFn) {
           // Auth operations in MongoDB Atlas are authoritative; do not fall back to SQLite if Mongo returns null/rejected
           const isAuthFn = [
             mongoRepo.verifyUserLogin,
+            mongoRepo.createSession,
             mongoRepo.getSessionUser,
+            mongoRepo.revokeSession,
             mongoRepo.getUserByEmail,
             mongoRepo.getUserByGoogleSubject,
             mongoRepo.createPasswordResetToken,
