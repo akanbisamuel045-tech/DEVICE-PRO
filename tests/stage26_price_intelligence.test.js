@@ -456,6 +456,14 @@ async function runPriceIntelligenceTests() {
       });
       assert.strictEqual(resEng.status, 403);
 
+      // Regular Admin attempt -> 403 (restricted to superadmin only)
+      const resAdmin = await request('/api/admin/price-intelligence/settings', {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${adminToken}` },
+        body: { target_margin_percent: 25.0 }
+      });
+      assert.strictEqual(resAdmin.status, 403);
+
       // Customer attempt -> 403
       const resCust = await request('/api/admin/price-intelligence/settings', {
         method: 'PATCH',

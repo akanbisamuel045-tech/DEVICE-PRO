@@ -216,7 +216,7 @@ async function getProducts({
   const calculatedOffset = offset ? parseInt(offset, 10) : ((Math.max(1, parseInt(page, 10) || 1) - 1) * safeLimit);
   const safeOffset = Math.max(0, calculatedOffset);
 
-  const projection = includeSupplierCost ? {} : { cost_price_ngn: 0 };
+  const projection = includeSupplierCost ? {} : { cost_price_ngn: 0, supplier_cost_ngn: 0 };
 
   const products = await Product.find(filter, projection)
     .sort(sortOption)
@@ -229,7 +229,7 @@ async function getProducts({
 }
 
 async function getProductBySlug(slug) {
-  return Product.findOne({ slug, published: 1 }, { cost_price_ngn: 0 }).lean();
+  return Product.findOne({ slug, published: 1 }, { cost_price_ngn: 0, supplier_cost_ngn: 0 }).lean();
 }
 
 function buildProductFilter(id) {
@@ -247,7 +247,7 @@ function buildProductFilter(id) {
 async function getProductById(id, { includeSupplierCost = false } = {}) {
   const filter = buildProductFilter(id);
   if (!filter) return null;
-  const projection = includeSupplierCost ? {} : { cost_price_ngn: 0 };
+  const projection = includeSupplierCost ? {} : { cost_price_ngn: 0, supplier_cost_ngn: 0 };
   return Product.findOne(filter, projection).lean();
 }
 
@@ -2664,7 +2664,7 @@ async function updatePriceIntelligenceSettings(updates = {}, user = null) {
 
   if (target_margin_percent !== undefined) {
     const val = Number(target_margin_percent);
-    if (isNaN(val) || val <= 0 || val >= 100) {
+    if (isNaN(val) || !Number.isFinite(val) || val <= 0 || val >= 100) {
       const err = new Error('Target gross margin percentage must be a number strictly between 0% and 100%.');
       err.statusCode = 400;
       throw err;
@@ -2674,7 +2674,7 @@ async function updatePriceIntelligenceSettings(updates = {}, user = null) {
 
   if (warning_low_margin_threshold !== undefined) {
     const val = Number(warning_low_margin_threshold);
-    if (isNaN(val) || val <= 0 || val >= 100) {
+    if (isNaN(val) || !Number.isFinite(val) || val <= 0 || val >= 100) {
       const err = new Error('Warning low margin threshold must be a number strictly between 0% and 100%.');
       err.statusCode = 400;
       throw err;
@@ -2684,7 +2684,7 @@ async function updatePriceIntelligenceSettings(updates = {}, user = null) {
 
   if (significant_cost_increase_percent !== undefined) {
     const val = Number(significant_cost_increase_percent);
-    if (isNaN(val) || val <= 0 || val > 500) {
+    if (isNaN(val) || !Number.isFinite(val) || val <= 0 || val > 500) {
       const err = new Error('Significant cost increase threshold must be a positive number up to 500%.');
       err.statusCode = 400;
       throw err;

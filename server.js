@@ -3038,8 +3038,8 @@ app.get('/api/admin/price-intelligence/settings', requireAuth, requireRole('supe
   }
 });
 
-// Update price intelligence target margin and thresholds
-app.patch('/api/admin/price-intelligence/settings', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+// Update price intelligence target margin and thresholds (superadmin only)
+app.patch('/api/admin/price-intelligence/settings', requireAuth, requireRole('superadmin'), async (req, res) => {
   try {
     const updated = await updatePriceIntelligenceSettings(req.body, req.user);
     if (typeof logAudit === 'function') {
