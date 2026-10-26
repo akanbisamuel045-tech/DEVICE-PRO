@@ -2539,12 +2539,147 @@ app.delete('/api/admin/products/:id', requireAuth, requireRole('superadmin', 'ad
 });
 
 // =========================================================================
+// PRODUCT IMAGE UPLOAD & MEDIA ASSET MANAGEMENT
+// Allows authorized staff (superadmin, admin, engineer) to upload product photos
+// and manage media assets stored in public/images/products.
+// =========================================================================
+
+const multer = require('multer');
+
+const productImageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, 'public', 'images', 'products');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const safeBase = path.basename(file.originalname, ext)
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '-')
+      .replace(/-+/g, '-')
+      .substring(0, 30);
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e6)}`;
+    cb(null, `prod-${safeBase || 'item'}-${uniqueSuffix}${ext}`);
+  }
+});
+
+const productImageUpload = multer({
+  storage: productImageStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5 MB maximum
+    files: 1
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
+    const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif'];
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    if (allowedMimes.includes(file.mimetype) && allowedExts.includes(ext)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid image format. Allowed formats: JPG, PNG, WEBP, SVG, GIF.'));
+    }
+  }
+});
+
+function handleProductImageUpload(req, res, next) {
+  productImageUpload.single('image')(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({
+          success: false,
+          error: 'File size exceeds maximum permitted limit of 5MB.'
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        error: err.message || 'Image upload failed.'
+      });
+    }
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'No image file was uploaded. Please select an image.'
+      });
+    }
+    next();
+  });
+}
+
+// Upload product image (superadmin, admin, engineer)
+app.post('/api/admin/uploads/product-image', requireAuth, requireRole('superadmin', 'admin', 'engineer'), handleProductImageUpload, async (req, res) => {
+  try {
+    const relativeUrl = `/images/products/${req.file.filename}`;
+
+    await logAudit({
+      userId: req.user.id,
+      action: 'UPLOAD_PRODUCT_IMAGE',
+      entityType: 'product_image',
+      details: `Uploaded product photo: ${req.file.filename} (${req.file.originalname}, ${(req.file.size / 1024).toFixed(1)} KB)`
+    });
+
+    res.json({
+      success: true,
+      imageUrl: relativeUrl,
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      size: req.file.size,
+      mimetype: req.file.mimetype
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// List all media images available for products
+app.get('/api/admin/uploads/images', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'sales'), async (req, res) => {
+  try {
+    const productsDir = path.join(__dirname, 'public', 'images', 'products');
+    if (!fs.existsSync(productsDir)) {
+      fs.mkdirSync(productsDir, { recursive: true });
+    }
+
+    const files = fs.readdirSync(productsDir);
+    const images = [];
+
+    for (const file of files) {
+      const ext = path.extname(file).toLowerCase();
+      if (['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif'].includes(ext)) {
+        try {
+          const stats = fs.statSync(path.join(productsDir, file));
+          images.push({
+            filename: file,
+            url: `/images/products/${file}`,
+            size: stats.size,
+            modifiedAt: stats.mtime
+          });
+        } catch (e) {
+          // Skip if unreadable
+        }
+      }
+    }
+
+    // Sort newest first
+    images.sort((a, b) => new Date(b.modifiedAt) - new Date(a.modifiedAt));
+
+    res.json({
+      success: true,
+      images,
+      totalCount: images.length
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// =========================================================================
 // STAGE 5: SUPPLIER PRICE IMPORT INFRASTRUCTURE
 // Security Notice: Analysed supplier price data NEVER updates live prices or supplier costs.
 // Access is strictly restricted to roles with commercial pricing authority: ['superadmin', 'admin']
 // =========================================================================
-
-const multer = require('multer');
 const {
   processSupplierPriceFile,
   generateImportTemplate,

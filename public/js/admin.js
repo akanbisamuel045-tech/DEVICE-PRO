@@ -677,6 +677,11 @@
         document.querySelectorAll('#add-product-modal .form-input').forEach(el => el.classList.remove('input-error'));
         const preview = document.getElementById('add-prod-img-preview');
         if (preview) preview.src = '/images/logo-mark.svg';
+        const addStatus = document.getElementById('add-prod-upload-status');
+        if (addStatus) {
+          addStatus.textContent = 'PNG, JPG, WEBP, SVG up to 5MB';
+          addStatus.className = 'upload-status-text';
+        }
         const marginEl = document.getElementById('add-prod-margin-preview');
         if (marginEl) marginEl.textContent = '—';
         addProductModal.showModal();
@@ -830,6 +835,10 @@
 
     // Stage 8.4: Solar Package BOM Listeners
     setupBomEventListeners();
+
+    // Product Image Uploaders & Media Library Listeners
+    setupProductImageUploaders();
+    setupMediaLibraryListeners();
   }
 
   // Handle popstate for browser back/forward buttons
@@ -939,6 +948,10 @@
         break;
       case 'import-history':
         loadImportHistoryModule();
+        break;
+      case 'images':
+      case 'image-manager':
+        loadImageManagerModule();
         break;
       case 'audit-logs':
       case 'audit':
@@ -2249,6 +2262,11 @@
     if (preview) {
       const img = prod.image_url || '/images/logo-mark.svg';
       preview.src = (img.startsWith('http') || img.startsWith('/')) ? img : `/${img}`;
+    }
+    const editStatus = document.getElementById('edit-prod-upload-status');
+    if (editStatus) {
+      editStatus.textContent = 'PNG, JPG, WEBP, SVG up to 5MB';
+      editStatus.className = 'upload-status-text';
     }
 
     // Role-based Price Permissions
@@ -5388,6 +5406,352 @@
     }).join('');
 
     modal.showModal();
+  }
+
+  // ==========================================================================
+  // PRODUCT IMAGE UPLOADERS & MEDIA ASSET MANAGEMENT
+  // ==========================================================================
+
+  function setupProductImageUploaders() {
+    function bindUploader({ btnId, fileInputId, textInputId, previewImgId, statusId, containerId }) {
+      const btn = document.getElementById(btnId);
+      const fileInput = document.getElementById(fileInputId);
+      const textInput = document.getElementById(textInputId);
+      const previewImg = document.getElementById(previewImgId);
+      const statusEl = document.getElementById(statusId);
+      const container = document.getElementById(containerId);
+
+      if (!btn || !fileInput) return;
+
+      btn.addEventListener('click', () => {
+        fileInput.click();
+      });
+
+      async function uploadFile(file) {
+        if (!file) return;
+
+        // Client-side file type check
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml', 'image/gif'];
+        if (!validTypes.includes(file.type) && !/\.(jpe?g|png|webp|svg|gif)$/i.test(file.name)) {
+          if (statusEl) {
+            statusEl.textContent = '❌ Invalid format. Please choose JPG, PNG, WEBP, SVG, or GIF.';
+            statusEl.className = 'upload-status-text error';
+          }
+          return;
+        }
+
+        // 5MB limit
+        if (file.size > 5 * 1024 * 1024) {
+          if (statusEl) {
+            statusEl.textContent = '❌ File exceeds 5MB limit.';
+            statusEl.className = 'upload-status-text error';
+          }
+          return;
+        }
+
+        // Instant preview
+        if (previewImg) {
+          previewImg.src = URL.createObjectURL(file);
+        }
+
+        if (statusEl) {
+          statusEl.textContent = `⏳ Uploading "${file.name}"...`;
+          statusEl.className = 'upload-status-text uploading';
+        }
+        btn.disabled = true;
+
+        try {
+          const formData = new FormData();
+          formData.append('image', file);
+
+          const res = await fetch('/api/admin/uploads/product-image', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error(data.error || 'Upload failed.');
+          }
+
+          if (textInput) {
+            textInput.value = data.imageUrl;
+          }
+          if (previewImg) {
+            previewImg.src = data.imageUrl;
+          }
+          if (statusEl) {
+            statusEl.textContent = `✓ Uploaded: ${data.filename}`;
+            statusEl.className = 'upload-status-text success';
+          }
+        } catch (err) {
+          if (statusEl) {
+            statusEl.textContent = `❌ ${err.message}`;
+            statusEl.className = 'upload-status-text error';
+          }
+        } finally {
+          btn.disabled = false;
+          fileInput.value = '';
+        }
+      }
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) uploadFile(file);
+      });
+
+      // Drag and drop onto container
+      if (container) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+          container.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            container.style.borderColor = 'var(--color-brand-yellow, #FFB90C)';
+            container.style.background = 'rgba(255, 185, 12, 0.08)';
+          }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+          container.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            container.style.borderColor = '';
+            container.style.background = '';
+          }, false);
+        });
+
+        container.addEventListener('drop', (e) => {
+          const dt = e.dataTransfer;
+          const file = dt && dt.files && dt.files[0];
+          if (file) uploadFile(file);
+        });
+      }
+
+      // Sync preview when typing or pasting URL
+      if (textInput && previewImg) {
+        textInput.addEventListener('input', () => {
+          const val = textInput.value.trim();
+          if (val) {
+            previewImg.src = (val.startsWith('http') || val.startsWith('/')) ? val : `/${val}`;
+          } else {
+            previewImg.src = '/images/logo-mark.svg';
+          }
+        });
+      }
+    }
+
+    // Bind Edit Modal
+    bindUploader({
+      btnId: 'btn-edit-prod-choose-file',
+      fileInputId: 'edit-prod-file-input',
+      textInputId: 'edit-prod-image',
+      previewImgId: 'edit-prod-img-preview',
+      statusId: 'edit-prod-upload-status',
+      containerId: 'edit-prod-preview-container'
+    });
+
+    // Bind Add Modal
+    bindUploader({
+      btnId: 'btn-add-prod-choose-file',
+      fileInputId: 'add-prod-file-input',
+      textInputId: 'add-prod-image',
+      previewImgId: 'add-prod-img-preview',
+      statusId: 'add-prod-upload-status',
+      containerId: 'add-prod-preview-container'
+    });
+  }
+
+  let cachedMediaImages = [];
+
+  async function loadImageManagerModule() {
+    const grid = document.getElementById('media-gallery-grid');
+    const badge = document.getElementById('media-total-badge');
+    if (!grid) return;
+
+    grid.innerHTML = '<div class="media-loading-placeholder">Loading image gallery from server...</div>';
+
+    try {
+      const res = await fetch('/api/admin/uploads/images');
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to load media files.');
+      }
+
+      cachedMediaImages = data.images || [];
+
+      if (badge) {
+        const totalMb = (cachedMediaImages.reduce((sum, img) => sum + (img.size || 0), 0) / (1024 * 1024)).toFixed(2);
+        badge.textContent = `${cachedMediaImages.length} images (${totalMb} MB)`;
+      }
+
+      renderMediaGallery(cachedMediaImages);
+    } catch (err) {
+      grid.innerHTML = `<div class="media-loading-placeholder" style="color: #F87171;">Failed to load images: ${err.message}</div>`;
+    }
+  }
+
+  function renderMediaGallery(imagesToRender) {
+    const grid = document.getElementById('media-gallery-grid');
+    if (!grid) return;
+
+    if (!imagesToRender || imagesToRender.length === 0) {
+      grid.innerHTML = '<div class="media-loading-placeholder">No images found. Upload your first product picture above!</div>';
+      return;
+    }
+
+    grid.innerHTML = imagesToRender.map(img => {
+      const sizeKb = img.size ? (img.size / 1024).toFixed(1) + ' KB' : '';
+      const dateStr = img.modifiedAt ? formatDate(img.modifiedAt) : '';
+
+      return `
+        <div class="media-card" data-url="${escapeHtml(img.url)}" data-filename="${escapeHtml(img.filename)}">
+          <div class="media-card-thumb">
+            <img src="${escapeHtml(img.url)}" alt="${escapeHtml(img.filename)}" loading="lazy" onerror="this.src='/images/logo-mark.svg'">
+          </div>
+          <div class="media-card-info">
+            <div>
+              <div class="media-card-name" title="${escapeHtml(img.filename)}">${escapeHtml(img.filename)}</div>
+              <div class="media-card-meta">${sizeKb} ${dateStr ? '• ' + dateStr : ''}</div>
+            </div>
+            <div class="media-card-actions">
+              <button type="button" class="btn-media-copy" data-copy-url="${escapeHtml(img.url)}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy Path</span>
+              </button>
+              <a href="${escapeHtml(img.url)}" target="_blank" rel="noopener" class="btn-media-copy" style="text-decoration:none;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                <span>View</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    // Attach copy listeners
+    grid.querySelectorAll('[data-copy-url]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const url = btn.getAttribute('data-copy-url');
+        if (url) {
+          try {
+            await navigator.clipboard.writeText(url);
+            const origHtml = btn.innerHTML;
+            btn.innerHTML = '<span>✓ Copied!</span>';
+            setTimeout(() => { btn.innerHTML = origHtml; }, 2000);
+          } catch (e) {
+            prompt('Copy image URL:', url);
+          }
+        }
+      });
+    });
+  }
+
+  function setupMediaLibraryListeners() {
+    const uploadBtn = document.getElementById('btn-media-library-upload');
+    const fileInput = document.getElementById('media-library-file-input');
+    const dropzone = document.getElementById('media-dropzone');
+    const dropzoneStatus = document.getElementById('media-dropzone-status');
+    const searchInput = document.getElementById('media-search-input');
+    const refreshBtn = document.getElementById('btn-refresh-media');
+
+    if (uploadBtn && fileInput) {
+      uploadBtn.addEventListener('click', () => fileInput.click());
+    }
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener('click', () => fileInput.click());
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('drag-over');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('drag-over');
+        });
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const file = dt && dt.files && dt.files[0];
+        if (file) handleDirectMediaUpload(file);
+      });
+    }
+
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) handleDirectMediaUpload(file);
+      });
+    }
+
+    async function handleDirectMediaUpload(file) {
+      if (!dropzoneStatus) return;
+      dropzoneStatus.style.display = 'block';
+
+      if (file.size > 5 * 1024 * 1024) {
+        dropzoneStatus.textContent = '❌ File size exceeds 5MB limit.';
+        dropzoneStatus.className = 'upload-status-text error';
+        return;
+      }
+
+      dropzoneStatus.textContent = `⏳ Uploading "${file.name}" to media storage...`;
+      dropzoneStatus.className = 'upload-status-text uploading';
+
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const res = await fetch('/api/admin/uploads/product-image', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Upload failed.');
+        }
+
+        dropzoneStatus.textContent = `✓ Uploaded: ${data.filename}`;
+        dropzoneStatus.className = 'upload-status-text success';
+
+        await loadImageManagerModule();
+
+        setTimeout(() => {
+          if (dropzoneStatus) dropzoneStatus.style.display = 'none';
+        }, 4000);
+      } catch (err) {
+        dropzoneStatus.textContent = `❌ ${err.message}`;
+        dropzoneStatus.className = 'upload-status-text error';
+      } finally {
+        if (fileInput) fileInput.value = '';
+      }
+    }
+
+    if (searchInput) {
+      searchInput.addEventListener('input', debounce(() => {
+        const query = searchInput.value.trim().toLowerCase();
+        if (!query) {
+          renderMediaGallery(cachedMediaImages);
+        } else {
+          const filtered = cachedMediaImages.filter(img =>
+            img.filename.toLowerCase().includes(query) || img.url.toLowerCase().includes(query)
+          );
+          renderMediaGallery(filtered);
+        }
+      }, 250));
+    }
+
+    if (refreshBtn) {
+      refreshBtn.addEventListener('click', loadImageManagerModule);
+    }
   }
 
   // Utilities

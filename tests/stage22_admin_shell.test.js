@@ -126,6 +126,8 @@ async function runTests() {
   assert.strictEqual(custRes.status, 201, 'Customer registration should succeed');
   const customerToken = custRes.body.token;
 
+  try {
+
   // ---------------------------------------------------------------------------
   // 1. UNAUTHENTICATED VISITOR ACCESS RESTRICTIONS
   // ---------------------------------------------------------------------------
@@ -422,6 +424,11 @@ async function runTests() {
     assert.ok(cssContent.includes('.user-account-dropdown'));
     assert.ok(cssContent.includes('.placeholder-panel-card'));
   });
+  } finally {
+    if (testCustomerEmail) {
+      await User.deleteOne({ email: testCustomerEmail }).catch(() => {});
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // FINAL SUMMARY
