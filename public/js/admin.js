@@ -827,6 +827,9 @@
 
     // Stage 5: Supplier Price Import Listeners
     setupPriceImportListeners();
+
+    // Stage 8.4: Solar Package BOM Listeners
+    setupBomEventListeners();
   }
 
   // Handle popstate for browser back/forward buttons
@@ -930,6 +933,9 @@
       case 'price-intelligence':
       case 'margin-analysis':
         loadPriceIntelligenceModule();
+        break;
+      case 'solar-packages':
+        loadSolarPackagesModule();
         break;
       case 'import-history':
         loadImportHistoryModule();
@@ -4445,6 +4451,943 @@
         contentArea.innerHTML = `<div style="padding: 2rem; text-align: center; color: #EF4444;">Error retrieving cost movements: ${escapeHtml(err.message)}</div>`;
       }
     }
+  }
+
+  // ==========================================================================
+  // STAGE 8.4: SOLAR PACKAGE BILL OF MATERIALS (BOM)
+  // ==========================================================================
+  let activeBomPackageId = null;
+  let activeBomEligibleProducts = [];
+  let activeBomPackagePrice = 0;
+  let activeBomData = null;
+
+  function setupBomEventListeners() {
+    const btnRefreshPkgs = document.getElementById('btn-refresh-solar-packages');
+    if (btnRefreshPkgs) btnRefreshPkgs.addEventListener('click', loadSolarPackagesModule);
+
+    const btnAddBomComp = document.getElementById('btn-add-bom-component');
+    if (btnAddBomComp) btnAddBomComp.addEventListener('click', () => addBomComponentRow());
+
+    const btnAddBomNp = document.getElementById('btn-add-bom-non-product');
+    if (btnAddBomNp) btnAddBomNp.addEventListener('click', () => addBomNonProductRow());
+
+    const btnSaveBom = document.getElementById('btn-save-bom');
+    if (btnSaveBom) btnSaveBom.addEventListener('click', saveCurrentBomRevision);
+
+    const btnReviewBom = document.getElementById('btn-review-bom');
+    if (btnReviewBom) btnReviewBom.addEventListener('click', submitFinanceReviewCurrentBom);
+
+    const btnApproveBom = document.getElementById('btn-approve-bom');
+    if (btnApproveBom) btnApproveBom.addEventListener('click', approveCurrentBom);
+
+    const btnViewBomRevs = document.getElementById('btn-view-bom-revisions');
+    if (btnViewBomRevs) btnViewBomRevs.addEventListener('click', openBomRevisionsModal);
+  }
+
+  async function loadSolarPackagesModule() {
+    const tbody = document.getElementById('solar-packages-tbody');
+    if (!tbody) return;
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" style="text-align: center; padding: 2rem; color: var(--color-d-text-muted);">
+          Loading solar package catalog &amp; BOM statuses...
+        </td>
+      </tr>
+    `;
+
+    try {
+      const res = await apiFetch('/api/admin/solar-packages');
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to retrieve solar packages');
+      }
+
+      const packages = data.packages || [];
+
+      // Update KPI cards
+      const pkgCountEl = document.getElementById('kpi-bom-packages-count');
+      const configuredEl = document.getElementById('kpi-bom-configured-count');
+      const completeEl = document.getElementById('kpi-bom-complete-count');
+      const incompleteEl = document.getElementById('kpi-bom-incomplete-count');
+
+      let configuredCount = 0;
+      let completeCount = 0;
+
+      for (const p of packages) {
+        if (p.has_bom) {
+          configuredCount++;
+          if (p.bom_summary && p.bom_summary.is_costing_complete) {
+            completeCount++;
+          }
+        }
+      }
+
+      if (pkgCountEl) pkgCountEl.textContent = packages.length;
+      if (configuredEl) configuredEl.textContent = configuredCount;
+      if (completeEl) completeEl.textContent = completeCount;
+      if (incompleteEl) incompleteEl.textContent = packages.length - completeCount;
+
+      renderSolarPackagesTable(packages);
+    } catch (err) {
+      console.error('[LOAD SOLAR PACKAGES ERROR]:', err);
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 2rem; color: #EF4444;">
+            Error loading packages: ${escapeHtml(err.message)}
+          </td>
+        </tr>
+      `;
+    }
+  }
+
+  function renderSolarPackagesTable(packages) {
+    const tbody = document.getElementById('solar-packages-tbody');
+    if (!tbody) return;
+
+    if (!packages || packages.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" style="text-align: center; padding: 2rem; color: var(--color-d-text-muted);">
+            No solar packages found in database.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = packages.map(pkg => {
+      const bom = pkg.bom_summary;
+      let statusBadge = '<span class="badge-status badge-unapproved">No BOM</span>';
+      let completenessBadge = '<span class="badge-status badge-unapproved">Not Configured</span>';
+      let financeBadge = '<span class="badge-status badge-unapproved">Pending</span>';
+      let approvalBadge = '<span class="badge-status badge-unapproved">Pending</span>';
+      let costDisplay = '—';
+      let marginDisplay = '—';
+
+      if (bom) {
+        if (bom.status === 'approved') {
+          statusBadge = '<span class="badge-status badge-approved">Approved</span>';
+        } else if (bom.status === 'ready_for_review') {
+          statusBadge = '<span class="badge-status badge-review">Ready for Review</span>';
+        } else if (bom.status === 'incomplete') {
+          statusBadge = '<span class="badge-status badge-invalid">Incomplete</span>';
+        } else {
+          statusBadge = '<span class="badge-status badge-unapproved">Draft (Rev ' + bom.revision + ')</span>';
+        }
+
+        if (bom.is_costing_complete) {
+          completenessBadge = `<span class="badge-status badge-approved">100% Complete (${bom.total_lines_count} lines)</span>`;
+          costDisplay = `<strong>₦${Number(bom.total_estimated_cost_ngn).toLocaleString()}</strong>`;
+          const profit = pkg.price_ngn - bom.total_estimated_cost_ngn;
+          const marginPct = (profit / pkg.price_ngn) * 100;
+          const marginColor = marginPct >= 15 ? '#10B981' : (marginPct >= 10 ? '#F59E0B' : '#EF4444');
+          marginDisplay = `<span style="color: ${marginColor}; font-weight: 700;">${marginPct.toFixed(1)}%</span>`;
+        } else {
+          completenessBadge = `<span class="badge-status badge-invalid">${bom.missing_cost_lines_count} Missing Cost${bom.missing_cost_lines_count === 1 ? '' : 's'}</span>`;
+          costDisplay = '<span style="color: var(--color-d-text-muted); font-size: 0.78rem;">Incomplete Costing</span>';
+          marginDisplay = '<span style="color: var(--color-d-text-muted); font-size: 0.78rem;">— (Incomplete)</span>';
+        }
+
+        if (bom.finance_review_status === 'reviewed') {
+          financeBadge = `<span class="badge-status badge-approved" title="Reviewed by ${escapeHtml(bom.finance_reviewed_by_email || 'Finance')} on ${bom.finance_reviewed_at ? new Date(bom.finance_reviewed_at).toLocaleDateString() : ''}">✓ Reviewed</span>`;
+        } else if (bom.finance_review_status === 'rejected') {
+          financeBadge = '<span class="badge-status badge-invalid">Rejected</span>';
+        } else if (bom.finance_review_status === 'invalidated') {
+          financeBadge = '<span class="badge-status badge-review">Invalidated</span>';
+        } else {
+          financeBadge = '<span class="badge-status badge-unapproved">Pending</span>';
+        }
+
+        if (bom.status === 'approved') {
+          approvalBadge = `<span class="badge-status badge-approved" title="Approved by ${escapeHtml(bom.approved_by_email || 'Superadmin')} on ${bom.approved_at ? new Date(bom.approved_at).toLocaleDateString() : ''}">✓ Approved</span>`;
+        } else {
+          approvalBadge = '<span class="badge-status badge-unapproved">Pending</span>';
+        }
+      }
+
+      return `
+        <tr>
+          <td>
+            <div style="font-weight: 700; color: #FFFFFF;">${escapeHtml(pkg.name)}</div>
+            <a href="/packages/${encodeURIComponent(pkg.slug)}" target="_blank" style="font-size: 0.74rem; color: #38BDF8; text-decoration: none;">
+              /${escapeHtml(pkg.slug)} ↗
+            </a>
+          </td>
+          <td>
+            <div style="font-family: monospace; font-size: 0.8rem; color: #94A3B8;">${escapeHtml(pkg.sku)}</div>
+            <div style="font-size: 0.74rem; color: var(--color-d-text-muted);">${escapeHtml(pkg.power_rating || '—')}</div>
+          </td>
+          <td style="text-align: right; font-weight: 700; color: #FFFFFF;">
+            ₦${Number(pkg.price_ngn).toLocaleString()}
+            ${pkg.previous_price_ngn ? `<div style="font-size: 0.72rem; color: var(--color-d-text-muted); text-decoration: line-through;">₦${Number(pkg.previous_price_ngn).toLocaleString()}</div>` : ''}
+          </td>
+          <td style="text-align: center;">${statusBadge}</td>
+          <td style="text-align: center;">${completenessBadge}</td>
+          <td style="text-align: center;">${financeBadge}</td>
+          <td style="text-align: center;">${approvalBadge}</td>
+          <td style="text-align: right;">${costDisplay}</td>
+          <td style="text-align: right;">${marginDisplay}</td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-secondary btn-action-bom" data-package-id="${pkg.id}" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
+              Configure BOM
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.querySelectorAll('.btn-action-bom').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pkgId = btn.getAttribute('data-package-id');
+        openBomEditor(pkgId);
+      });
+    });
+  }
+
+  async function openBomEditor(packageId) {
+    const modal = document.getElementById('modal-bom-editor');
+    if (!modal) return;
+
+    activeBomPackageId = packageId;
+    activeBomEligibleProducts = [];
+    activeBomData = null;
+
+    const compTbody = document.getElementById('bom-components-tbody');
+    const npTbody = document.getElementById('bom-non-product-tbody');
+    if (compTbody) compTbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 1rem;">Loading BOM data...</td></tr>';
+    if (npTbody) npTbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 1rem;">Loading services data...</td></tr>';
+
+    try {
+      const res = await apiFetch(`/api/admin/solar-packages/${packageId}/bom`);
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to retrieve package BOM');
+      }
+
+      activeBomData = data.bom;
+      activeBomEligibleProducts = data.eligible_products || [];
+      activeBomPackagePrice = data.package.price_ngn;
+
+      const titleEl = document.getElementById('bom-modal-title');
+      const skuBadge = document.getElementById('bom-modal-sku-badge');
+      const revBadge = document.getElementById('bom-modal-revision-badge');
+      const statusPill = document.getElementById('bom-modal-status-pill');
+      const retailPriceEl = document.getElementById('bom-modal-retail-price');
+      const powerRatingEl = document.getElementById('bom-modal-power-rating');
+      const pkgIdInput = document.getElementById('bom-package-id');
+      const baseRevInput = document.getElementById('bom-base-revision');
+      const statusSelect = document.getElementById('bom-status-select');
+      const notesInput = document.getElementById('bom-revision-notes');
+      const approvedNotice = document.getElementById('bom-approved-notice');
+
+      if (titleEl) titleEl.textContent = `${data.package.name} — BOM`;
+      if (skuBadge) skuBadge.textContent = `SKU: ${data.package.sku}`;
+      if (retailPriceEl) retailPriceEl.textContent = `₦${Number(data.package.price_ngn).toLocaleString()}`;
+      if (powerRatingEl) powerRatingEl.textContent = data.package.power_rating || '—';
+      if (pkgIdInput) pkgIdInput.value = data.package.id;
+
+      if (data.bom) {
+        if (revBadge) revBadge.textContent = `Rev ${data.bom.revision}`;
+        if (statusPill) {
+          statusPill.textContent = data.bom.status.toUpperCase();
+          statusPill.className = `badge-status badge-${data.bom.status === 'approved' ? 'approved' : (data.bom.status === 'ready_for_review' ? 'review' : 'unapproved')}`;
+        }
+        if (baseRevInput) baseRevInput.value = data.bom.revision;
+        if (statusSelect) statusSelect.value = data.bom.status === 'approved' ? 'ready_for_review' : data.bom.status;
+        if (notesInput) notesInput.value = data.bom.notes || '';
+        if (approvedNotice) approvedNotice.style.display = data.bom.status === 'approved' ? 'block' : 'none';
+      } else {
+        if (revBadge) revBadge.textContent = 'Rev 1 (Draft)';
+        if (statusPill) {
+          statusPill.textContent = 'NEW DRAFT';
+          statusPill.className = 'badge-status badge-unapproved';
+        }
+        if (baseRevInput) baseRevInput.value = '0';
+        if (statusSelect) statusSelect.value = 'draft';
+        if (notesInput) notesInput.value = '';
+        if (approvedNotice) approvedNotice.style.display = 'none';
+      }
+
+      // Populate Dual-Authorization Governance Card (Stage 8.4.1)
+      const overallBadge = document.getElementById('bom-dual-auth-overall-badge');
+      const finPill = document.getElementById('bom-finance-review-pill');
+      const finInfo = document.getElementById('bom-finance-reviewer-info');
+      const finNotesWrap = document.getElementById('bom-finance-review-notes-wrap');
+      const finNotesText = document.getElementById('bom-finance-review-notes');
+      const appPill = document.getElementById('bom-superadmin-approval-pill');
+      const appInfo = document.getElementById('bom-superadmin-approver-info');
+      const twoPersonWarning = document.getElementById('bom-dual-auth-violation-warning');
+
+      const finRev = data.bom ? data.bom.finance_review : null;
+      const isApproved = data.bom && data.bom.status === 'approved';
+      const isReviewed = finRev && finRev.status === 'reviewed';
+
+      if (finPill) {
+        if (isReviewed) {
+          finPill.textContent = '✓ Reviewed';
+          finPill.className = 'badge-status badge-approved';
+        } else if (finRev && finRev.status === 'rejected') {
+          finPill.textContent = 'Rejected';
+          finPill.className = 'badge-status badge-invalid';
+        } else if (finRev && finRev.status === 'invalidated') {
+          finPill.textContent = 'Invalidated';
+          finPill.className = 'badge-status badge-review';
+        } else {
+          finPill.textContent = 'Pending';
+          finPill.className = 'badge-status badge-unapproved';
+        }
+      }
+
+      if (finInfo) {
+        if (isReviewed) {
+          finInfo.innerHTML = `Reviewed by <strong>${escapeHtml(finRev.reviewed_by_email || 'Finance')}</strong> on ${finRev.reviewed_at ? new Date(finRev.reviewed_at).toLocaleString() : '—'}`;
+        } else if (finRev && finRev.status === 'rejected') {
+          finInfo.innerHTML = `Rejected by <strong>${escapeHtml(finRev.reviewed_by_email || 'Finance')}</strong> on ${finRev.reviewed_at ? new Date(finRev.reviewed_at).toLocaleString() : '—'}`;
+        } else if (finRev && finRev.status === 'invalidated') {
+          finInfo.textContent = `Previous review on Rev ${finRev.revision_reviewed || 'prior'} was invalidated when BOM was modified. A new finance review is required.`;
+        } else {
+          finInfo.textContent = 'No formal review submitted yet. Requires 100% complete verified costing.';
+        }
+      }
+
+      if (finNotesWrap && finNotesText) {
+        if (finRev && finRev.notes) {
+          finNotesWrap.style.display = 'block';
+          finNotesText.textContent = finRev.notes;
+        } else {
+          finNotesWrap.style.display = 'none';
+          finNotesText.textContent = '';
+        }
+      }
+
+      if (appPill) {
+        if (isApproved) {
+          appPill.textContent = '✓ Approved';
+          appPill.className = 'badge-status badge-approved';
+        } else {
+          appPill.textContent = 'Pending';
+          appPill.className = 'badge-status badge-unapproved';
+        }
+      }
+
+      if (appInfo) {
+        if (isApproved) {
+          appInfo.innerHTML = `Approved by <strong>${escapeHtml(data.bom.approved_by_email || 'Superadmin')}</strong> on ${data.bom.approved_at ? new Date(data.bom.approved_at).toLocaleString() : '—'}`;
+        } else if (isReviewed) {
+          appInfo.textContent = 'Step 1 complete. Ready for Superadmin final sign-off (Two-Person rule enforced).';
+        } else {
+          appInfo.textContent = 'Requires Step 1 positive review by a distinct user prior to final sign-off.';
+        }
+      }
+
+      if (overallBadge) {
+        if (isApproved) {
+          overallBadge.textContent = '✓ Approved for Commercial Production';
+          overallBadge.className = 'badge-status badge-approved';
+        } else if (isReviewed) {
+          overallBadge.textContent = 'Step 2: Superadmin Final Approval Ready';
+          overallBadge.className = 'badge-status badge-review';
+        } else if (finRev && finRev.status === 'rejected') {
+          overallBadge.textContent = 'Step 1: Finance Review Rejected';
+          overallBadge.className = 'badge-status badge-invalid';
+        } else if (finRev && finRev.status === 'invalidated') {
+          overallBadge.textContent = 'Review Invalidated — New Review Required';
+          overallBadge.className = 'badge-status badge-review';
+        } else {
+          overallBadge.textContent = 'Step 1: Finance Review Pending';
+          overallBadge.className = 'badge-status badge-unapproved';
+        }
+      }
+
+      if (twoPersonWarning) {
+        const isSameUser = currentUser && finRev && finRev.reviewed_by_id && String(currentUser.id) === String(finRev.reviewed_by_id);
+        if (!isApproved && isReviewed && isSameUser) {
+          twoPersonWarning.style.display = 'block';
+        } else {
+          twoPersonWarning.style.display = 'none';
+        }
+      }
+
+      if (compTbody) compTbody.innerHTML = '';
+      const existingComponents = (data.bom && Array.isArray(data.bom.components)) ? data.bom.components : [];
+      if (existingComponents.length === 0) {
+        addBomComponentRow();
+      } else {
+        existingComponents.forEach(comp => addBomComponentRow(comp));
+      }
+
+      if (npTbody) npTbody.innerHTML = '';
+      const existingNonProduct = (data.bom && Array.isArray(data.bom.non_product_costs)) ? data.bom.non_product_costs : [];
+      if (existingNonProduct.length > 0) {
+        existingNonProduct.forEach(line => addBomNonProductRow(line));
+      }
+
+      recalculateLiveBom();
+      modal.showModal();
+    } catch (err) {
+      console.error('[OPEN BOM EDITOR ERROR]:', err);
+      alert(`Error loading BOM: ${err.message}`);
+    }
+  }
+
+  function addBomComponentRow(comp = {}) {
+    const tbody = document.getElementById('bom-components-tbody');
+    if (!tbody) return;
+
+    const row = document.createElement('tr');
+    row.className = 'bom-comp-row';
+
+    const selectedType = comp.component_type || 'solar-panels';
+    const selectedUnit = comp.unit || 'pcs';
+    const selectedProductId = comp.product_id ? String(comp.product_id) : '';
+    const selectedCostSource = comp.cost_source || 'unknown';
+
+    const productOptions = activeBomEligibleProducts.map(p => {
+      const isSel = String(p.id) === selectedProductId ? 'selected' : '';
+      const costInfo = p.cost_price_ngn > 0 ? ` (₦${Number(p.cost_price_ngn).toLocaleString()})` : ' (No Cost)';
+      return `<option value="${p.id}" data-category="${p.category}" data-sku="${escapeHtml(p.sku)}" data-name="${escapeHtml(p.name)}" data-cost="${p.cost_price_ngn || ''}" ${isSel}>${escapeHtml(p.name)} [${escapeHtml(p.sku)}]${costInfo}</option>`;
+    }).join('');
+
+    row.innerHTML = `
+      <td>
+        <select class="form-select bom-comp-type" style="font-size: 0.76rem; padding: 0.25rem 0.4rem;">
+          <option value="solar-panels" ${selectedType === 'solar-panels' ? 'selected' : ''}>Solar Panels</option>
+          <option value="hybrid-inverter" ${selectedType === 'hybrid-inverter' ? 'selected' : ''}>Hybrid Inverter</option>
+          <option value="battery" ${selectedType === 'battery' ? 'selected' : ''}>Battery Storage</option>
+          <option value="mounting-structure" ${selectedType === 'mounting-structure' ? 'selected' : ''}>Mounting Structure</option>
+          <option value="dc-ac-protection" ${selectedType === 'dc-ac-protection' ? 'selected' : ''}>Protection &amp; Switchgear</option>
+          <option value="cables-connectors" ${selectedType === 'cables-connectors' ? 'selected' : ''}>Cables &amp; Connectors</option>
+          <option value="installation-materials" ${selectedType === 'installation-materials' ? 'selected' : ''}>Installation Materials</option>
+          <option value="accessories" ${selectedType === 'accessories' ? 'selected' : ''}>Accessories &amp; BOS</option>
+          <option value="other" ${selectedType === 'other' ? 'selected' : ''}>Other Component</option>
+        </select>
+      </td>
+      <td>
+        <div style="margin-bottom: 0.25rem;">
+          <select class="form-select bom-comp-prod-select" style="font-size: 0.74rem; padding: 0.25rem 0.4rem; width: 100%;">
+            <option value="">-- Select Active Catalog Product --</option>
+            ${productOptions}
+          </select>
+        </div>
+        <input type="text" class="form-input bom-comp-name" placeholder="Component display title..." value="${escapeHtml(comp.product_name || '')}" style="font-size: 0.76rem; padding: 0.25rem 0.4rem; width: 100%;">
+        <input type="hidden" class="bom-comp-sku" value="${escapeHtml(comp.product_sku || '')}">
+      </td>
+      <td>
+        <input type="number" class="form-input bom-comp-qty" min="0.001" step="any" value="${comp.quantity !== undefined ? comp.quantity : 1}" style="font-size: 0.76rem; padding: 0.25rem 0.4rem; width: 100%;">
+      </td>
+      <td>
+        <select class="form-select bom-comp-unit" style="font-size: 0.76rem; padding: 0.25rem 0.4rem; width: 100%;">
+          <option value="pcs" ${selectedUnit === 'pcs' ? 'selected' : ''}>pcs</option>
+          <option value="meters" ${selectedUnit === 'meters' ? 'selected' : ''}>meters</option>
+          <option value="sets" ${selectedUnit === 'sets' ? 'selected' : ''}>sets</option>
+          <option value="roll" ${selectedUnit === 'roll' ? 'selected' : ''}>roll</option>
+          <option value="lot" ${selectedUnit === 'lot' ? 'selected' : ''}>lot</option>
+          <option value="hours" ${selectedUnit === 'hours' ? 'selected' : ''}>hours</option>
+          <option value="units" ${selectedUnit === 'units' ? 'selected' : ''}>units</option>
+        </select>
+      </td>
+      <td>
+        <input type="number" class="form-input bom-comp-waste" min="0" max="100" step="1" value="${comp.waste_allowance_pct !== undefined ? comp.waste_allowance_pct : 0}" style="font-size: 0.76rem; padding: 0.25rem 0.4rem; width: 100%;">
+      </td>
+      <td>
+        <input type="number" class="form-input bom-comp-cost" min="0" step="0.01" placeholder="Missing" value="${comp.unit_cost_ngn !== null && comp.unit_cost_ngn !== undefined ? comp.unit_cost_ngn : ''}" style="font-size: 0.76rem; padding: 0.25rem 0.4rem; width: 100%; text-align: right;">
+      </td>
+      <td style="text-align: right; font-weight: 700;">
+        <span class="bom-comp-subtotal-display" style="font-size: 0.78rem;">—</span>
+      </td>
+      <td>
+        <select class="form-select bom-comp-source" style="font-size: 0.74rem; padding: 0.25rem 0.35rem; width: 100%;">
+          <option value="unknown" ${selectedCostSource === 'unknown' ? 'selected' : ''}>Unknown / Missing</option>
+          <option value="catalog_documented_cost" ${selectedCostSource === 'catalog_documented_cost' ? 'selected' : ''}>Catalog Cost</option>
+          <option value="verified_supplier_quote" ${selectedCostSource === 'verified_supplier_quote' ? 'selected' : ''}>Supplier Quote</option>
+          <option value="manual_sourced_cost" ${selectedCostSource === 'manual_sourced_cost' ? 'selected' : ''}>Manual Verified</option>
+        </select>
+      </td>
+      <td>
+        <input type="text" class="form-input bom-comp-prov" placeholder="Invoice # or Quote Ref..." value="${escapeHtml(comp.cost_provenance_ref || '')}" style="font-size: 0.74rem; padding: 0.25rem 0.4rem; width: 100%;">
+      </td>
+      <td style="text-align: center;">
+        <button type="button" class="btn-delete-bom-row" style="background: none; border: none; color: #EF4444; cursor: pointer; padding: 0.2rem;" title="Remove Line">
+          ✕
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+
+    const prodSelect = row.querySelector('.bom-comp-prod-select');
+    const nameInput = row.querySelector('.bom-comp-name');
+    const skuInput = row.querySelector('.bom-comp-sku');
+    const costInput = row.querySelector('.bom-comp-cost');
+    const sourceSelect = row.querySelector('.bom-comp-source');
+    const typeSelect = row.querySelector('.bom-comp-type');
+    const deleteBtn = row.querySelector('.btn-delete-bom-row');
+
+    prodSelect.addEventListener('change', () => {
+      const selectedOpt = prodSelect.options[prodSelect.selectedIndex];
+      if (selectedOpt && selectedOpt.value) {
+        const pName = selectedOpt.getAttribute('data-name');
+        const pSku = selectedOpt.getAttribute('data-sku');
+        const pCost = selectedOpt.getAttribute('data-cost');
+        const pCat = selectedOpt.getAttribute('data-category');
+
+        if (nameInput) nameInput.value = pName;
+        if (skuInput) skuInput.value = pSku;
+        if (pCost && Number(pCost) > 0) {
+          if (costInput) costInput.value = pCost;
+          if (sourceSelect) sourceSelect.value = 'catalog_documented_cost';
+        }
+        if (pCat === 'solar-panels' && typeSelect) typeSelect.value = 'solar-panels';
+        if (pCat === 'inverters' && typeSelect) typeSelect.value = 'hybrid-inverter';
+        if (pCat === 'batteries' && typeSelect) typeSelect.value = 'battery';
+        if (pCat === 'accessories' && typeSelect) typeSelect.value = 'accessories';
+      }
+      recalculateLiveBom();
+    });
+
+    row.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', recalculateLiveBom);
+      el.addEventListener('change', recalculateLiveBom);
+    });
+
+    deleteBtn.addEventListener('click', () => {
+      row.remove();
+      recalculateLiveBom();
+    });
+  }
+
+  function addBomNonProductRow(line = {}) {
+    const tbody = document.getElementById('bom-non-product-tbody');
+    if (!tbody) return;
+
+    const row = document.createElement('tr');
+    row.className = 'bom-np-row';
+
+    const selectedType = line.cost_type || 'labour_installation';
+
+    row.innerHTML = `
+      <td>
+        <select class="form-select bom-np-type" style="font-size: 0.76rem; padding: 0.25rem 0.4rem;">
+          <option value="labour_installation" ${selectedType === 'labour_installation' ? 'selected' : ''}>Labour &amp; Installation</option>
+          <option value="logistics_transport" ${selectedType === 'logistics_transport' ? 'selected' : ''}>Logistics &amp; Transport</option>
+          <option value="electrical_switchgear_bos" ${selectedType === 'electrical_switchgear_bos' ? 'selected' : ''}>Electrical &amp; Switchgear BOS</option>
+          <option value="contingency_commissioning" ${selectedType === 'contingency_commissioning' ? 'selected' : ''}>Commissioning &amp; Testing</option>
+          <option value="other" ${selectedType === 'other' ? 'selected' : ''}>Other Service Cost</option>
+        </select>
+      </td>
+      <td>
+        <input type="text" class="form-input bom-np-name" placeholder="Service description..." value="${escapeHtml(line.name || '')}" style="font-size: 0.76rem; padding: 0.25rem 0.4rem; width: 100%;">
+      </td>
+      <td>
+        <input type="number" class="form-input bom-np-cost" min="0" step="0.01" placeholder="Missing" value="${line.cost_ngn !== null && line.cost_ngn !== undefined ? line.cost_ngn : ''}" style="font-size: 0.76rem; padding: 0.25rem 0.4rem; width: 100%; text-align: right;">
+      </td>
+      <td>
+        <input type="text" class="form-input bom-np-prov" placeholder="Subcontractor / Quote Ref..." value="${escapeHtml(line.provenance_ref || '')}" style="font-size: 0.74rem; padding: 0.25rem 0.4rem; width: 100%;">
+      </td>
+      <td style="text-align: center;">
+        <button type="button" class="btn-delete-bom-row" style="background: none; border: none; color: #EF4444; cursor: pointer; padding: 0.2rem;" title="Remove Line">
+          ✕
+        </button>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+
+    row.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', recalculateLiveBom);
+      el.addEventListener('change', recalculateLiveBom);
+    });
+
+    row.querySelector('.btn-delete-bom-row').addEventListener('click', () => {
+      row.remove();
+      recalculateLiveBom();
+    });
+  }
+
+  function recalculateLiveBom() {
+    let compSubtotal = 0;
+    let npSubtotal = 0;
+    let missingCount = 0;
+    let totalLines = 0;
+
+    document.querySelectorAll('.bom-comp-row').forEach(row => {
+      totalLines++;
+      const qty = parseFloat(row.querySelector('.bom-comp-qty')?.value) || 0;
+      const wastePct = parseFloat(row.querySelector('.bom-comp-waste')?.value) || 0;
+      const costVal = row.querySelector('.bom-comp-cost')?.value;
+      const source = row.querySelector('.bom-comp-source')?.value;
+      const subtotalEl = row.querySelector('.bom-comp-subtotal-display');
+
+      const effectiveQty = qty * (1 + wastePct / 100);
+
+      if (costVal === '' || costVal === null || costVal === undefined || isNaN(parseFloat(costVal)) || source === 'unknown') {
+        missingCount++;
+        if (subtotalEl) {
+          subtotalEl.textContent = 'Missing';
+          subtotalEl.style.color = '#EF4444';
+        }
+      } else {
+        const unitCost = parseFloat(costVal);
+        const lineTotal = effectiveQty * unitCost;
+        compSubtotal += lineTotal;
+        if (subtotalEl) {
+          subtotalEl.textContent = `₦${Math.round(lineTotal).toLocaleString()}`;
+          subtotalEl.style.color = '#10B981';
+        }
+      }
+    });
+
+    document.querySelectorAll('.bom-np-row').forEach(row => {
+      totalLines++;
+      const costVal = row.querySelector('.bom-np-cost')?.value;
+      if (costVal === '' || costVal === null || costVal === undefined || isNaN(parseFloat(costVal))) {
+        missingCount++;
+      } else {
+        npSubtotal += parseFloat(costVal);
+      }
+    });
+
+    const isComplete = totalLines > 0 && missingCount === 0;
+    const completenessPct = totalLines > 0 ? Math.round(((totalLines - missingCount) / totalLines) * 100) : 0;
+
+    const compSubtotalEl = document.getElementById('summary-components-subtotal');
+    const npSubtotalEl = document.getElementById('summary-non-product-subtotal');
+    const totalCostEl = document.getElementById('summary-total-cost');
+    const completenessPill = document.getElementById('summary-completeness-pill');
+    const grossMarginEl = document.getElementById('summary-gross-margin');
+    const grossProfitEl = document.getElementById('summary-gross-profit');
+    const btnApprove = document.getElementById('btn-approve-bom');
+
+    if (compSubtotalEl) compSubtotalEl.textContent = `₦${Math.round(compSubtotal).toLocaleString()}`;
+    if (npSubtotalEl) npSubtotalEl.textContent = `₦${Math.round(npSubtotal).toLocaleString()}`;
+
+    if (isComplete) {
+      const totalCost = compSubtotal + npSubtotal;
+      if (totalCostEl) {
+        totalCostEl.textContent = `₦${Math.round(totalCost).toLocaleString()}`;
+        totalCostEl.style.color = '#FFFFFF';
+      }
+      if (completenessPill) {
+        completenessPill.textContent = '100% Costed (Complete)';
+        completenessPill.className = 'badge-status badge-approved';
+      }
+
+      if (activeBomPackagePrice > 0) {
+        const profit = activeBomPackagePrice - totalCost;
+        const marginPct = (profit / activeBomPackagePrice) * 100;
+        const marginColor = marginPct >= 15 ? '#10B981' : (marginPct >= 10 ? '#F59E0B' : '#EF4444');
+        if (grossMarginEl) {
+          grossMarginEl.textContent = `${marginPct.toFixed(1)}%`;
+          grossMarginEl.style.color = marginColor;
+        }
+        if (grossProfitEl) grossProfitEl.textContent = `Est. Profit: ₦${Math.round(profit).toLocaleString()}`;
+      }
+    } else {
+      if (totalCostEl) {
+        totalCostEl.textContent = `₦${Math.round(compSubtotal + npSubtotal).toLocaleString()} (Incomplete)`;
+        totalCostEl.style.color = '#F59E0B';
+      }
+      if (completenessPill) {
+        completenessPill.textContent = `${completenessPct}% Costed (${missingCount} missing)`;
+        completenessPill.className = 'badge-status badge-invalid';
+      }
+      if (grossMarginEl) {
+        grossMarginEl.textContent = '— (Incomplete)';
+        grossMarginEl.style.color = 'var(--color-d-text-muted)';
+      }
+      if (grossProfitEl) grossProfitEl.textContent = 'Requires 100% verified costs';
+    }
+
+    // Dual-Authorization Button State Controls (Stage 8.4.1)
+    const btnReview = document.getElementById('btn-review-bom');
+    const isFinanceOrSuperadmin = currentUser && (currentUser.role === 'finance' || currentUser.role === 'superadmin');
+    const isSuperadmin = currentUser && currentUser.role === 'superadmin';
+
+    // Step 1: Finance Review button control
+    if (btnReview) {
+      if (isFinanceOrSuperadmin) {
+        btnReview.style.display = 'inline-block';
+        if (isComplete) {
+          btnReview.removeAttribute('disabled');
+          btnReview.title = 'Submit formal Finance Review for this BOM revision';
+        } else {
+          btnReview.setAttribute('disabled', 'true');
+          btnReview.title = 'Finance Review requires 100% complete verified costing (no missing costs)';
+        }
+      } else {
+        btnReview.style.display = 'none';
+      }
+    }
+
+    // Step 2: Superadmin Final Approval button control
+    if (btnApprove) {
+      if (isSuperadmin) {
+        btnApprove.style.display = 'inline-block';
+        const finRev = activeBomData ? activeBomData.finance_review : null;
+        const hasPositiveReview = finRev && finRev.status === 'reviewed';
+        const isSameUser = finRev && finRev.reviewed_by_id && currentUser && String(currentUser.id) === String(finRev.reviewed_by_id);
+
+        if (!isComplete) {
+          btnApprove.setAttribute('disabled', 'true');
+          btnApprove.title = 'Approval requires 100% complete costing';
+        } else if (!hasPositiveReview) {
+          btnApprove.setAttribute('disabled', 'true');
+          btnApprove.title = 'Approval requires Step 1 Finance Review before final sign-off';
+        } else if (isSameUser) {
+          btnApprove.setAttribute('disabled', 'true');
+          btnApprove.title = 'Two-Person Rule: You cannot approve a BOM revision that you reviewed';
+        } else {
+          btnApprove.removeAttribute('disabled');
+          btnApprove.title = 'Formally approve this BOM for commercial production';
+        }
+      } else {
+        btnApprove.style.display = 'none';
+      }
+    }
+  }
+
+  async function saveCurrentBomRevision() {
+    if (!activeBomPackageId) return;
+
+    const baseRev = document.getElementById('bom-base-revision')?.value;
+    const status = document.getElementById('bom-status-select')?.value || 'draft';
+    const notes = document.getElementById('bom-revision-notes')?.value || '';
+
+    const components = [];
+    let hasValidationError = false;
+
+    document.querySelectorAll('.bom-comp-row').forEach((row, idx) => {
+      const type = row.querySelector('.bom-comp-type')?.value;
+      const prodId = row.querySelector('.bom-comp-prod-select')?.value;
+      const name = row.querySelector('.bom-comp-name')?.value?.trim();
+      const sku = row.querySelector('.bom-comp-sku')?.value?.trim();
+      const qty = parseFloat(row.querySelector('.bom-comp-qty')?.value);
+      const unit = row.querySelector('.bom-comp-unit')?.value;
+      const waste = parseFloat(row.querySelector('.bom-comp-waste')?.value) || 0;
+      const costVal = row.querySelector('.bom-comp-cost')?.value?.trim();
+      const source = row.querySelector('.bom-comp-source')?.value;
+      const prov = row.querySelector('.bom-comp-prov')?.value?.trim();
+
+      if (!name) {
+        alert(`Hardware Line ${idx + 1}: Component name is required.`);
+        hasValidationError = true;
+        return;
+      }
+      if (!qty || qty <= 0) {
+        alert(`Hardware Line ${idx + 1}: Quantity must be greater than 0.`);
+        hasValidationError = true;
+        return;
+      }
+
+      components.push({
+        component_type: type,
+        product_id: prodId ? Number(prodId) : null,
+        product_name: name,
+        product_sku: sku || '',
+        quantity: qty,
+        unit: unit,
+        waste_allowance_pct: waste,
+        unit_cost_ngn: costVal !== '' && !isNaN(parseFloat(costVal)) ? parseFloat(costVal) : null,
+        cost_source: source,
+        cost_provenance_ref: prov || ''
+      });
+    });
+
+    if (hasValidationError) return;
+
+    const nonProduct = [];
+    document.querySelectorAll('.bom-np-row').forEach((row, idx) => {
+      const type = row.querySelector('.bom-np-type')?.value;
+      const name = row.querySelector('.bom-np-name')?.value?.trim();
+      const costVal = row.querySelector('.bom-np-cost')?.value?.trim();
+      const prov = row.querySelector('.bom-np-prov')?.value?.trim();
+
+      if (!name) {
+        alert(`Service Line ${idx + 1}: Description is required.`);
+        hasValidationError = true;
+        return;
+      }
+
+      nonProduct.push({
+        cost_type: type,
+        name: name,
+        cost_ngn: costVal !== '' && !isNaN(parseFloat(costVal)) ? parseFloat(costVal) : null,
+        provenance_ref: prov || ''
+      });
+    });
+
+    if (hasValidationError) return;
+
+    const saveBtn = document.getElementById('btn-save-bom');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving Revision...';
+    }
+
+    try {
+      const res = await apiFetch(`/api/admin/solar-packages/${activeBomPackageId}/bom`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          base_revision: Number(baseRev),
+          status,
+          revision_notes: notes,
+          components,
+          non_product_costs: nonProduct
+        })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to save BOM revision');
+      }
+
+      alert(`BOM revision ${data.bom.revision} saved successfully!`);
+      const modal = document.getElementById('modal-bom-editor');
+      if (modal) modal.close();
+      loadSolarPackagesModule();
+    } catch (err) {
+      console.error('[SAVE BOM ERROR]:', err);
+      alert(`Save Error: ${err.message}`);
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save BOM Revision';
+      }
+    }
+  }
+
+  async function submitFinanceReviewCurrentBom() {
+    if (!activeBomPackageId) return;
+
+    const baseRev = document.getElementById('bom-base-revision')?.value;
+    const isApproved = confirm('Click OK to submit an APPROVED Finance Review (Cost Verified),\nor CANCEL to return/reject for costing correction.');
+    const decisionChoice = isApproved ? 'reviewed' : 'rejected';
+
+    const notes = prompt(`Enter ${decisionChoice === 'reviewed' ? 'Finance Review' : 'Rejection'} notes for Rev ${baseRev}:`) || '';
+
+    try {
+      const res = await apiFetch(`/api/admin/solar-packages/${activeBomPackageId}/bom/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          base_revision: Number(baseRev),
+          decision: decisionChoice,
+          notes: notes
+        })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to submit finance review');
+      }
+
+      alert(`Finance review (${decisionChoice.toUpperCase()}) submitted successfully for Revision ${data.bom.revision}!`);
+      const modal = document.getElementById('modal-bom-editor');
+      if (modal) modal.close();
+      loadSolarPackagesModule();
+    } catch (err) {
+      console.error('[FINANCE REVIEW ERROR]:', err);
+      alert(`Finance Review Error: ${err.message}`);
+    }
+  }
+
+  async function approveCurrentBom() {
+    if (!activeBomPackageId) return;
+
+    if (!confirm('Are you sure you want to formally APPROVE this Bill of Materials? This action requires 100% verified component and service costs and prior Finance Review.')) {
+      return;
+    }
+
+    const notes = prompt('Enter optional approval sign-off notes (e.g. Approved for commercial production):') || '';
+
+    try {
+      const res = await apiFetch(`/api/admin/solar-packages/${activeBomPackageId}/bom/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approval_notes: notes })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to approve BOM');
+      }
+
+      alert(`BOM revision ${data.bom.revision} approved successfully by superadmin!`);
+      const modal = document.getElementById('modal-bom-editor');
+      if (modal) modal.close();
+      loadSolarPackagesModule();
+    } catch (err) {
+      console.error('[APPROVE BOM ERROR]:', err);
+      alert(`Approval Error: ${err.message}`);
+    }
+  }
+
+  function openBomRevisionsModal() {
+    const modal = document.getElementById('modal-bom-revisions');
+    const tbody = document.getElementById('bom-revisions-tbody');
+    if (!modal || !tbody) return;
+
+    if (!activeBomData) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 1.5rem;">No revision history available.</td></tr>';
+      modal.showModal();
+      return;
+    }
+
+    const history = Array.isArray(activeBomData.history) ? activeBomData.history : [];
+    const allRevs = [
+      ...history,
+      {
+        revision: activeBomData.revision,
+        saved_at: activeBomData.updated_at || new Date(),
+        saved_by_email: activeBomData.updated_by_email || activeBomData.created_by_email,
+        status: activeBomData.status,
+        cost_summary: activeBomData.cost_summary,
+        finance_review_snapshot: activeBomData.finance_review,
+        approved_by_email: activeBomData.approved_by_email,
+        approved_at: activeBomData.approved_at,
+        revision_notes: activeBomData.notes || 'Current active revision'
+      }
+    ];
+
+    allRevs.sort((a, b) => b.revision - a.revision);
+
+    tbody.innerHTML = allRevs.map(rev => {
+      const costStr = rev.cost_summary && rev.cost_summary.is_costing_complete
+        ? `₦${Number(rev.cost_summary.total_estimated_cost_ngn).toLocaleString()}`
+        : 'Incomplete';
+      const linesCount = rev.cost_summary ? rev.cost_summary.total_lines_count : '—';
+      const dateStr = rev.saved_at ? new Date(rev.saved_at).toLocaleString() : '—';
+
+      const finRev = rev.finance_review_snapshot;
+      let dualAuthDetails = '';
+      if (finRev && finRev.status === 'reviewed') {
+        dualAuthDetails += `<div style="font-size: 0.7rem; color: #10B981; margin-top: 0.2rem;">Fin: ✓ ${escapeHtml(finRev.reviewed_by_email || 'Finance')}</div>`;
+      } else if (finRev && finRev.status === 'invalidated') {
+        dualAuthDetails += `<div style="font-size: 0.7rem; color: #F59E0B; margin-top: 0.2rem;">Fin: ⚠️ Invalidated</div>`;
+      }
+      if (rev.approved_by_email) {
+        dualAuthDetails += `<div style="font-size: 0.7rem; color: #38BDF8; margin-top: 0.1rem;">App: ✓ ${escapeHtml(rev.approved_by_email)}</div>`;
+      }
+
+      return `
+        <tr>
+          <td><strong style="color: #FFFFFF;">Rev ${rev.revision}</strong></td>
+          <td style="font-size: 0.76rem; color: var(--color-d-text-muted);">${dateStr}</td>
+          <td style="font-size: 0.76rem;">${escapeHtml(rev.saved_by_email || '—')}</td>
+          <td style="text-align: center;">
+            <span class="badge-status badge-${rev.status === 'approved' ? 'approved' : (rev.status === 'ready_for_review' ? 'review' : 'unapproved')}">${escapeHtml(rev.status || 'draft')}</span>
+            ${dualAuthDetails}
+          </td>
+          <td style="text-align: center;">${linesCount}</td>
+          <td style="text-align: right; font-weight: 700;">${costStr}</td>
+          <td style="font-size: 0.74rem; color: var(--color-d-text-muted);">${escapeHtml(rev.revision_notes || '—')}</td>
+        </tr>
+      `;
+    }).join('');
+
+    modal.showModal();
   }
 
   // Utilities

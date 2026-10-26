@@ -269,6 +269,23 @@ const priceImportSchema = new mongoose.Schema({
   file_format: { type: String, default: 'xlsx', enum: ['xlsx', 'xls', 'csv'], index: true },
   file_size_bytes: { type: Number, default: 0 },
   supplier_name: { type: String, default: 'Generic Supplier' },
+  // Stage 8.2: Supplier Quotation Traceability & Pre-Validation Metadata
+  supplier_quote_ref: { type: String, default: '' },
+  quote_date: { type: Date, default: null },
+  quote_expiry_date: { type: Date, default: null },
+  import_source: {
+    type: String,
+    default: 'manual_upload'
+  },
+  submitted_at: { type: Date, default: Date.now },
+  currency: { type: String, default: 'NGN' },
+  freshness_status: {
+    type: String,
+    default: 'date_missing',
+    enum: ['fresh', 'stale', 'future_date', 'expired', 'date_missing', 'date_ambiguous'],
+    index: true
+  },
+  validation_warnings: [{ type: String }],
   uploaded_by: { type: mongoose.Schema.Types.Mixed, default: null },
   uploaded_by_email: { type: String, default: '' },
   uploaded_by_name: { type: String, default: 'Administrator' },
@@ -352,6 +369,13 @@ const priceImportSchema = new mongoose.Schema({
     status: String,
     validation_errors: [String],
     warnings: [String],
+    // Stage 8.2 row-level quotation metadata
+    quote_date: { type: Date, default: null },
+    quote_expiry_date: { type: Date, default: null },
+    availability: { type: String, default: '' },
+    warranty_terms: { type: String, default: '' },
+    quote_ref: { type: String, default: '' },
+    freshness_status: { type: String, default: 'date_missing' },
     // Stage 6 review & approval fields
     cost_diff_ngn: { type: Number, default: 0 },
     cost_diff_percent: { type: Number, default: 0 },
@@ -380,6 +404,131 @@ const priceIntelligenceSettingsSchema = new mongoose.Schema({
   updated_by_role: { type: String, default: '' }
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
+// 16. PackageBom Schema (Stage 8.4 Solar Package Bill of Materials)
+const packageBomSchema = new mongoose.Schema({
+  bom_id: { type: String, required: true, unique: true, index: true },
+  package_id: { type: Number, required: true, index: true },
+  package_sku: { type: String, required: true, index: true },
+  package_name: { type: String, required: true },
+  package_slug: { type: String, required: true },
+  revision: { type: Number, default: 1 },
+  status: {
+    type: String,
+    enum: ['draft', 'incomplete', 'ready_for_review', 'approved'],
+    default: 'draft',
+    index: true
+  },
+  currency: { type: String, default: 'NGN' },
+  components: [{
+    line_id: { type: String, required: true },
+    component_type: {
+      type: String,
+      enum: [
+        'solar-panels',
+        'hybrid-inverter',
+        'battery',
+        'mounting-structure',
+        'dc-ac-protection',
+        'cables-connectors',
+        'installation-materials',
+        'accessories',
+        'other'
+      ],
+      required: true
+    },
+    product_id: { type: Number, default: null },
+    product_sku: { type: String, default: '' },
+    product_name: { type: String, required: true },
+    quantity: { type: Number, required: true, min: 0.001 },
+    unit: {
+      type: String,
+      enum: ['pcs', 'meters', 'sets', 'roll', 'lot', 'hours', 'units'],
+      default: 'pcs'
+    },
+    waste_allowance_pct: { type: Number, default: 0, min: 0, max: 100 },
+    cost_source: {
+      type: String,
+      enum: ['verified_supplier_quote', 'catalog_documented_cost', 'manual_sourced_cost', 'unknown'],
+      default: 'unknown'
+    },
+    unit_cost_ngn: { type: Number, default: null },
+    line_cost_ngn: { type: Number, default: null },
+    cost_provenance_ref: { type: String, default: '' },
+    notes: { type: String, default: '' },
+    validation_status: {
+      type: String,
+      enum: ['valid', 'warning', 'missing_cost'],
+      default: 'missing_cost'
+    }
+  }],
+  non_product_costs: [{
+    line_id: { type: String, required: true },
+    cost_type: {
+      type: String,
+      enum: [
+        'labour_installation',
+        'logistics_transport',
+        'electrical_switchgear_bos',
+        'contingency_commissioning',
+        'other'
+      ],
+      required: true
+    },
+    name: { type: String, required: true },
+    cost_ngn: { type: Number, default: null },
+    provenance_ref: { type: String, default: '' },
+    notes: { type: String, default: '' }
+  }],
+  cost_summary: {
+    components_subtotal_ngn: { type: Number, default: 0 },
+    non_product_subtotal_ngn: { type: Number, default: 0 },
+    total_estimated_cost_ngn: { type: Number, default: null },
+    missing_cost_lines_count: { type: Number, default: 0 },
+    total_lines_count: { type: Number, default: 0 },
+    is_costing_complete: { type: Boolean, default: false },
+    costing_completeness_pct: { type: Number, default: 0 }
+  },
+  notes: { type: String, default: '' },
+  created_by_email: { type: String, default: '' },
+  updated_by_email: { type: String, default: '' },
+  finance_review: {
+    status: {
+      type: String,
+      enum: ['pending', 'reviewed', 'rejected', 'invalidated'],
+      default: 'pending',
+      index: true
+    },
+    reviewed_by_id: { type: Number, default: null },
+    reviewed_by_email: { type: String, default: null },
+    reviewed_at: { type: Date, default: null },
+    decision: {
+      type: String,
+      enum: ['approved', 'rejected', 'reviewed', null],
+      default: null
+    },
+    notes: { type: String, default: '' },
+    revision_reviewed: { type: Number, default: null },
+    invalidated_at: { type: Date, default: null }
+  },
+  approved_by_id: { type: Number, default: null },
+  approved_by_email: { type: String, default: null },
+  approved_at: { type: Date, default: null },
+  history: [{
+    revision: Number,
+    saved_at: Date,
+    saved_by_email: String,
+    status: String,
+    cost_summary: mongoose.Schema.Types.Mixed,
+    components_snapshot: [mongoose.Schema.Types.Mixed],
+    non_product_costs_snapshot: [mongoose.Schema.Types.Mixed],
+    revision_notes: String,
+    finance_review_snapshot: mongoose.Schema.Types.Mixed,
+    approved_by_id: Number,
+    approved_by_email: String,
+    approved_at: Date
+  }]
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+
 module.exports = {
   Category: mongoose.models.Category || mongoose.model('Category', categorySchema),
   Product: mongoose.models.Product || mongoose.model('Product', productSchema),
@@ -395,6 +544,8 @@ module.exports = {
   AuditLog: mongoose.models.AuditLog || mongoose.model('AuditLog', auditLogSchema),
   PasswordReset: mongoose.models.PasswordReset || mongoose.model('PasswordReset', passwordResetSchema),
   PriceImport: mongoose.models.PriceImport || mongoose.model('PriceImport', priceImportSchema),
-  PriceIntelligenceSettings: mongoose.models.PriceIntelligenceSettings || mongoose.model('PriceIntelligenceSettings', priceIntelligenceSettingsSchema)
+  PriceIntelligenceSettings: mongoose.models.PriceIntelligenceSettings || mongoose.model('PriceIntelligenceSettings', priceIntelligenceSettingsSchema),
+  PackageBom: mongoose.models.PackageBom || mongoose.model('PackageBom', packageBomSchema)
 };
+
 

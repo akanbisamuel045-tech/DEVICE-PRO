@@ -509,6 +509,27 @@ async function runTests() {
     assert.ok(actions.includes('DELETE_PRODUCT'), 'Missing DELETE_PRODUCT audit action');
   });
 
+  // Teardown: Safely cleanup records created by this specific test execution
+  try {
+    const { connectMongo } = require('../db/mongo/connection');
+    const { Product, Order, Quote, Enquiry } = require('../db/mongo/models');
+    await connectMongo();
+    if (createdProductId) {
+      await Product.deleteOne({ id: createdProductId });
+    }
+    if (testOrderId) {
+      await Order.deleteOne({ id: testOrderId });
+    }
+    if (testQuoteId) {
+      await Quote.deleteOne({ id: testQuoteId });
+    }
+    if (testEnquiryId) {
+      await Enquiry.deleteOne({ id: testEnquiryId });
+    }
+  } catch (cleanErr) {
+    console.warn('Test teardown notice:', cleanErr.message);
+  }
+
   // Summary
   console.log('\n===============================================================');
   console.log(`STAGE 13 TEST RESULTS: ${passed} PASSED, ${failed} FAILED`);

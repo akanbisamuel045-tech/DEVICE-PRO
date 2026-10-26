@@ -18,7 +18,7 @@ const crypto = require('crypto');
 const { connectMongo } = require('../db/mongo/connection');
 const { User, AuditLog } = require('../db/mongo/models');
 
-const ALLOWED_ADMIN_ROLES = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
+const ALLOWED_ADMIN_ROLES = ['admin', 'superadmin', 'engineer', 'sales', 'staff', 'finance'];
 
 function printUsage() {
   console.log(`

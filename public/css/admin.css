@@ -2463,6 +2463,37 @@ dialog.admin-modal::backdrop {
   color: var(--color-brand-yellow);
 }
 
+/* ==========================================================================
+   Stage 8.4: Solar Package Bill of Materials (BOM) Styles
+   ========================================================================== */
+.bom-comp-row:hover,
+.bom-np-row:hover {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+.btn-delete-bom-row {
+  opacity: 0.7;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.btn-delete-bom-row:hover {
+  opacity: 1;
+  transform: scale(1.15);
+}
+
+.badge-ready_for_review {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.badge-incomplete {
+  background: rgba(239, 68, 68, 0.15);
+  color: #EF4444;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+
 
 
 

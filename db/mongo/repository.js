@@ -3,8 +3,14 @@ const mongoose = require('mongoose');
 const {
   Product, Category, CaseStudy, Enquiry, Quote,
   Order, Payment, Warranty, SupportTicket, User, Session, AuditLog, PasswordReset,
-  PriceImport, PriceIntelligenceSettings
+  PriceImport, PriceIntelligenceSettings, PackageBom
 } = require('./models');
+const {
+  calculateBom,
+  validateCatalogProductForBom,
+  createProductSnapshot,
+  COST_SOURCES
+} = require('../../lib/bom-engine');
 
 // Password verification helper (consistent with SQLite implementation)
 function verifyPassword(password, hash, salt) {
@@ -2953,6 +2959,616 @@ async function getProductCostHistory(productId) {
   };
 }
 
+// --- STAGE 8.4: SOLAR PACKAGE BILL OF MATERIALS (BOM) ---
+
+async function getAdminSolarPackages() {
+  const packages = await Product.find({ category: 'solar-packages' })
+    .sort({ price_ngn: 1 })
+    .lean();
+
+  const packageIds = packages.map(p => p.id);
+  const boms = await PackageBom.find({ package_id: { $in: packageIds } }).lean();
+  const bomMap = new Map();
+  for (const b of boms) {
+    bomMap.set(b.package_id, b);
+  }
+
+  return packages.map(pkg => {
+    const bom = bomMap.get(pkg.id) || null;
+    return {
+      id: pkg.id,
+      sku: pkg.sku,
+      name: pkg.name,
+      slug: pkg.slug,
+      price_ngn: pkg.price_ngn,
+      previous_price_ngn: pkg.previous_price_ngn,
+      power_rating: pkg.power_rating,
+      stock_status: pkg.stock_status,
+      published: pkg.published,
+      has_bom: !!bom,
+      bom_summary: bom ? {
+        bom_id: bom.bom_id,
+        revision: bom.revision,
+        status: bom.status,
+        components_count: (bom.components || []).length,
+        non_product_count: (bom.non_product_costs || []).length,
+        total_lines_count: bom.cost_summary ? bom.cost_summary.total_lines_count : 0,
+        missing_cost_lines_count: bom.cost_summary ? bom.cost_summary.missing_cost_lines_count : 0,
+        is_costing_complete: bom.cost_summary ? bom.cost_summary.is_costing_complete : false,
+        costing_completeness_pct: bom.cost_summary ? bom.cost_summary.costing_completeness_pct : 0,
+        total_estimated_cost_ngn: bom.cost_summary ? bom.cost_summary.total_estimated_cost_ngn : null,
+        finance_review_status: bom.finance_review ? bom.finance_review.status : 'pending',
+        finance_reviewed_by_id: bom.finance_review ? bom.finance_review.reviewed_by_id : null,
+        finance_reviewed_by_email: bom.finance_review ? bom.finance_review.reviewed_by_email : null,
+        finance_reviewed_at: bom.finance_review ? bom.finance_review.reviewed_at : null,
+        finance_review_decision: bom.finance_review ? bom.finance_review.decision : null,
+        approved_by_id: bom.approved_by_id || null,
+        approved_by_email: bom.approved_by_email || null,
+        approved_at: bom.approved_at || null,
+        updated_at: bom.updated_at
+      } : null
+    };
+  });
+}
+
+async function getPackageBom(packageId) {
+  const pkgId = Number(packageId);
+  if (!Number.isFinite(pkgId)) {
+    const err = new Error('Invalid package identifier.');
+    err.status = 400;
+    throw err;
+  }
+
+  const pkg = await Product.findOne({ id: pkgId, category: 'solar-packages' }).lean();
+  if (!pkg) {
+    const err = new Error(`Solar package with ID ${pkgId} not found.`);
+    err.status = 404;
+    throw err;
+  }
+
+  const bom = await PackageBom.findOne({ package_id: pkgId }).lean();
+
+  // Active commercial products eligible for linking in BOM
+  const eligibleProducts = await Product.find({
+    published: 1,
+    category: { $ne: 'solar-packages' }
+  }).select('id sku name category brand price_ngn cost_price_ngn stock_status').sort({ category: 1, name: 1 }).lean();
+
+  // If BOM exists, compute live margin analysis (strictly internal calculation)
+  let marginAnalysis = null;
+  if (bom && bom.cost_summary && bom.cost_summary.is_costing_complete) {
+    const calc = calculateBom({
+      components: bom.components || [],
+      non_product_costs: bom.non_product_costs || [],
+      packagePriceNgn: pkg.price_ngn
+    });
+    marginAnalysis = calc.margin_analysis;
+  }
+
+  return {
+    package: {
+      id: pkg.id,
+      sku: pkg.sku,
+      name: pkg.name,
+      slug: pkg.slug,
+      price_ngn: pkg.price_ngn,
+      previous_price_ngn: pkg.previous_price_ngn,
+      power_rating: pkg.power_rating
+    },
+    bom: bom ? {
+      ...bom,
+      margin_analysis: marginAnalysis
+    } : null,
+    eligible_products: eligibleProducts
+  };
+}
+
+async function savePackageBomRevision(packageId, bomPayload, userContext = {}, reqMeta = {}) {
+  const pkgId = Number(packageId);
+  if (!Number.isFinite(pkgId)) {
+    const err = new Error('Invalid package identifier.');
+    err.status = 400;
+    throw err;
+  }
+
+  const pkg = await Product.findOne({ id: pkgId, category: 'solar-packages' }).lean();
+  if (!pkg) {
+    const err = new Error(`Solar package with ID ${pkgId} not found.`);
+    err.status = 404;
+    throw err;
+  }
+
+  // Find existing BOM if present
+  let existingBom = await PackageBom.findOne({ package_id: pkgId });
+
+  // Optimistic concurrency check
+  if (existingBom && bomPayload.base_revision !== undefined && bomPayload.base_revision !== null) {
+    const baseRev = Number(bomPayload.base_revision);
+    if (existingBom.revision !== baseRev) {
+      const err = new Error(`Concurrent edit conflict: This BOM has been updated to revision ${existingBom.revision} by ${existingBom.updated_by_email || 'another administrator'}. Please reload the latest revision before saving changes.`);
+      err.status = 409;
+      throw err;
+    }
+  }
+
+  // Enrich components with product snapshots if linked to catalog
+  const rawComponents = Array.isArray(bomPayload.components) ? bomPayload.components : [];
+  const processedComponents = [];
+
+  for (const raw of rawComponents) {
+    let comp = { ...raw };
+    if (comp.product_id) {
+      const linkedProduct = await Product.findOne({ id: Number(comp.product_id) }).lean();
+      if (!linkedProduct) {
+        const err = new Error(`Linked product ID ${comp.product_id} not found in catalog.`);
+        err.status = 400;
+        throw err;
+      }
+      // Rejects archived products and circular package references
+      validateCatalogProductForBom(linkedProduct);
+      comp.product_sku = comp.product_sku || linkedProduct.sku;
+      comp.product_name = comp.product_name || linkedProduct.name;
+      if ((comp.unit_cost_ngn === undefined || comp.unit_cost_ngn === null) && linkedProduct.cost_price_ngn > 0) {
+        comp.unit_cost_ngn = linkedProduct.cost_price_ngn;
+        comp.cost_source = COST_SOURCES.CATALOG_DOCUMENTED_COST;
+        comp.cost_provenance_ref = comp.cost_provenance_ref || `Catalog SKU ${linkedProduct.sku}`;
+      }
+    }
+    processedComponents.push(comp);
+  }
+
+  const rawNonProduct = Array.isArray(bomPayload.non_product_costs) ? bomPayload.non_product_costs : [];
+
+  // Calculate full BOM using calculation engine (handles validation, precision, subtotal, completeness)
+  const calc = calculateBom({
+    components: processedComponents,
+    non_product_costs: rawNonProduct,
+    packagePriceNgn: pkg.price_ngn
+  });
+
+  // Determine valid status
+  let targetStatus = bomPayload.status || (existingBom ? existingBom.status : 'draft');
+  if (!['draft', 'incomplete', 'ready_for_review'].includes(targetStatus)) {
+    targetStatus = 'draft';
+  }
+  // If costing is incomplete, cannot set to ready_for_review
+  if (targetStatus === 'ready_for_review' && !calc.cost_summary.is_costing_complete) {
+    targetStatus = 'incomplete';
+  }
+
+  const userEmail = (userContext && userContext.email) ? userContext.email : 'system@devicepro.local';
+  const revisionNotes = String(bomPayload.revision_notes || bomPayload.notes || '').trim();
+
+  let savedBom;
+  let actionName;
+
+  if (existingBom) {
+    actionName = 'UPDATE_BOM_REVISION';
+    const wasReviewed = existingBom.finance_review && existingBom.finance_review.status === 'reviewed';
+
+    // Archive current revision snapshot in history
+    const historyEntry = {
+      revision: existingBom.revision,
+      saved_at: existingBom.updated_at || new Date(),
+      saved_by_email: existingBom.updated_by_email || existingBom.created_by_email || userEmail,
+      status: existingBom.status,
+      cost_summary: existingBom.cost_summary,
+      components_snapshot: existingBom.components,
+      non_product_costs_snapshot: existingBom.non_product_costs,
+      revision_notes: existingBom.notes || '',
+      finance_review_snapshot: existingBom.finance_review ? JSON.parse(JSON.stringify(existingBom.finance_review)) : null,
+      approved_by_id: existingBom.approved_by_id || null,
+      approved_by_email: existingBom.approved_by_email || null,
+      approved_at: existingBom.approved_at || null
+    };
+
+    existingBom.history.push(historyEntry);
+    existingBom.revision = existingBom.revision + 1;
+    existingBom.status = targetStatus;
+    existingBom.components = calc.components;
+    existingBom.non_product_costs = calc.non_product_costs;
+    existingBom.cost_summary = calc.cost_summary;
+    existingBom.notes = revisionNotes;
+    existingBom.updated_by_email = userEmail;
+
+    // Dual authorization invariant: modifying a BOM revision invalidates prior finance review
+    existingBom.finance_review = {
+      status: wasReviewed ? 'invalidated' : 'pending',
+      reviewed_by_id: null,
+      reviewed_by_email: null,
+      reviewed_at: null,
+      decision: null,
+      notes: wasReviewed ? `Prior review on revision ${historyEntry.revision} invalidated due to revision modification.` : '',
+      revision_reviewed: null,
+      invalidated_at: wasReviewed ? new Date() : null
+    };
+
+    savedBom = await existingBom.save();
+
+    if (wasReviewed) {
+      await logAudit({
+        userId: userContext ? userContext.id : null,
+        action: 'INVALIDATE_BOM_REVIEW',
+        entityType: 'PACKAGE_BOM',
+        entityId: savedBom.bom_id,
+        details: `INVALIDATE_BOM_REVIEW: Finance review on revision ${historyEntry.revision} invalidated by revision update to revision ${savedBom.revision} by ${userEmail}.`,
+        ipAddress: reqMeta.ip || '',
+        metadata: {
+          package_id: pkg.id,
+          bom_id: savedBom.bom_id,
+          previous_revision: historyEntry.revision,
+          new_revision: savedBom.revision
+        }
+      });
+    }
+  } else {
+    actionName = 'CREATE_BOM';
+    const bomId = `BOM-PKG-${pkg.sku}`;
+    savedBom = await PackageBom.create({
+      bom_id: bomId,
+      package_id: pkg.id,
+      package_sku: pkg.sku,
+      package_name: pkg.name,
+      package_slug: pkg.slug,
+      revision: 1,
+      status: targetStatus,
+      currency: 'NGN',
+      components: calc.components,
+      non_product_costs: calc.non_product_costs,
+      cost_summary: calc.cost_summary,
+      notes: revisionNotes,
+      created_by_email: userEmail,
+      updated_by_email: userEmail,
+      finance_review: {
+        status: 'pending',
+        reviewed_by_id: null,
+        reviewed_by_email: null,
+        reviewed_at: null,
+        decision: null,
+        notes: '',
+        revision_reviewed: null
+      },
+      approved_by_id: null,
+      approved_by_email: null,
+      approved_at: null,
+      history: []
+    });
+  }
+
+  // Structured Audit Log
+  await logAudit({
+    userId: userContext ? userContext.id : null,
+    action: actionName,
+    entityType: 'PACKAGE_BOM',
+    entityId: savedBom.bom_id,
+    details: `${actionName}: Revision ${savedBom.revision} saved for package "${pkg.name}" (${pkg.sku}) by ${userEmail}. Status: ${savedBom.status}. Lines: ${savedBom.cost_summary.total_lines_count}, Missing Cost: ${savedBom.cost_summary.missing_cost_lines_count}.`,
+    ipAddress: reqMeta.ip || '',
+    metadata: {
+      package_id: pkg.id,
+      package_sku: pkg.sku,
+      bom_id: savedBom.bom_id,
+      revision: savedBom.revision,
+      status: savedBom.status,
+      total_lines_count: savedBom.cost_summary.total_lines_count,
+      missing_cost_lines_count: savedBom.cost_summary.missing_cost_lines_count,
+      is_costing_complete: savedBom.cost_summary.is_costing_complete,
+      total_estimated_cost_ngn: savedBom.cost_summary.total_estimated_cost_ngn,
+      actor_email: userEmail
+    }
+  });
+
+  return savedBom;
+}
+
+async function reviewPackageBom(packageId, userContext = {}, reviewPayload = {}, reqMeta = {}) {
+  const pkgId = Number(packageId);
+  if (!Number.isFinite(pkgId)) {
+    const err = new Error('Invalid package identifier.');
+    err.status = 400;
+    throw err;
+  }
+
+  const pkg = await Product.findOne({ id: pkgId, category: 'solar-packages' }).lean();
+  if (!pkg) {
+    const err = new Error(`Solar package with ID ${pkgId} not found.`);
+    err.status = 404;
+    throw err;
+  }
+
+  const bom = await PackageBom.findOne({ package_id: pkgId });
+  if (!bom) {
+    const err = new Error(`No BOM found for package "${pkg.name}".`);
+    err.status = 404;
+    throw err;
+  }
+
+  // Optimistic revision checking: Prevent reviewing stale revision
+  if (reviewPayload.base_revision !== undefined && reviewPayload.base_revision !== null) {
+    const baseRev = Number(reviewPayload.base_revision);
+    if (baseRev !== bom.revision) {
+      const err = new Error(`Concurrent edit conflict: Review was submitted for revision ${baseRev}, but target BOM is currently at revision ${bom.revision}. Please reload before reviewing.`);
+      err.status = 409;
+      throw err;
+    }
+  }
+
+  const rawDecision = String(reviewPayload.decision || 'reviewed').toLowerCase().trim();
+  const decision = ['approved', 'reviewed'].includes(rawDecision) ? 'reviewed' : rawDecision;
+  if (!['reviewed', 'rejected'].includes(decision)) {
+    const err = new Error(`Invalid review decision: "${rawDecision}". Permitted values are "reviewed" (or "approved") and "rejected".`);
+    err.status = 400;
+    throw err;
+  }
+
+  const reviewNotes = String(reviewPayload.notes || '').trim();
+
+  // Incomplete costing strictly blocks positive finance review
+  if (decision === 'reviewed') {
+    if (!bom.cost_summary || !bom.cost_summary.is_costing_complete) {
+      const missing = bom.cost_summary ? bom.cost_summary.missing_cost_lines_count : 'unknown';
+      const err = new Error(`Cannot approve finance review: Costing is incomplete (${missing} lines missing verified costs). All components and non-product costs must have verified provenance before finance approval.`);
+      err.status = 400;
+      throw err;
+    }
+  }
+
+  const userId = userContext && userContext.id ? Number(userContext.id) : null;
+  const userEmail = (userContext && userContext.email) ? userContext.email : 'finance@devicepro.local';
+  const now = new Date();
+
+  // Transaction support / Compensating revert for safe audit logging
+  let session = null;
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+  } catch (sessErr) {
+    session = null;
+  }
+
+  const prevReviewState = bom.finance_review ? JSON.parse(JSON.stringify(bom.finance_review)) : null;
+  const prevStatus = bom.status;
+  const prevUpdatedBy = bom.updated_by_email;
+
+  try {
+    const opts = session ? { session } : {};
+
+    bom.finance_review = {
+      status: decision === 'reviewed' ? 'reviewed' : 'rejected',
+      reviewed_by_id: userId,
+      reviewed_by_email: userEmail,
+      reviewed_at: now,
+      decision: decision,
+      notes: reviewNotes,
+      revision_reviewed: bom.revision
+    };
+
+    if (decision === 'reviewed') {
+      bom.status = 'ready_for_review';
+    } else {
+      bom.status = 'incomplete';
+    }
+    bom.updated_by_email = userEmail;
+
+    await bom.save(opts);
+
+    const action = decision === 'reviewed' ? 'REVIEW_BOM' : 'REJECT_BOM_REVIEW';
+    const auditDetails = decision === 'reviewed'
+      ? `REVIEW_BOM: Finance review APPROVED for package "${pkg.name}" (${pkg.sku}) revision ${bom.revision} by ${userEmail} (User ID: ${userId}). Total verified cost: ₦${bom.cost_summary.total_estimated_cost_ngn ? bom.cost_summary.total_estimated_cost_ngn.toLocaleString() : 'N/A'}. Notes: ${reviewNotes || 'None'}.`
+      : `REJECT_BOM_REVIEW: Finance review REJECTED for package "${pkg.name}" (${pkg.sku}) revision ${bom.revision} by ${userEmail} (User ID: ${userId}). Notes: ${reviewNotes || 'None'}.`;
+
+    // Critical: throwOnError must be true so state transition rolls back if audit fails!
+    await logAudit({
+      userId: userId,
+      action: action,
+      entityType: 'PACKAGE_BOM',
+      entityId: bom.bom_id,
+      details: auditDetails,
+      ipAddress: reqMeta.ip || '',
+      session: session,
+      throwOnError: true,
+      metadata: {
+        package_id: pkg.id,
+        package_sku: pkg.sku,
+        bom_id: bom.bom_id,
+        revision: bom.revision,
+        decision: decision,
+        reviewed_by_id: userId,
+        reviewed_by_email: userEmail,
+        reviewed_at: now,
+        notes: reviewNotes,
+        total_estimated_cost_ngn: bom.cost_summary ? bom.cost_summary.total_estimated_cost_ngn : null
+      }
+    });
+
+    if (session) {
+      await session.commitTransaction();
+      await session.endSession();
+    }
+
+    return bom;
+  } catch (err) {
+    if (session) {
+      await session.abortTransaction();
+      await session.endSession();
+    } else {
+      // Revert in-memory document state
+      bom.finance_review = prevReviewState;
+      bom.status = prevStatus;
+      bom.updated_by_email = prevUpdatedBy;
+      try { await bom.save(); } catch (revertErr) {}
+    }
+    throw err;
+  }
+}
+
+async function approvePackageBom(packageId, userContext = {}, approvalNotes = '', reqMeta = {}) {
+  const pkgId = Number(packageId);
+  if (!Number.isFinite(pkgId)) {
+    const err = new Error('Invalid package identifier.');
+    err.status = 400;
+    throw err;
+  }
+
+  const pkg = await Product.findOne({ id: pkgId, category: 'solar-packages' }).lean();
+  if (!pkg) {
+    const err = new Error(`Solar package with ID ${pkgId} not found.`);
+    err.status = 404;
+    throw err;
+  }
+
+  const bom = await PackageBom.findOne({ package_id: pkgId });
+  if (!bom) {
+    const err = new Error(`No BOM found for package "${pkg.name}".`);
+    err.status = 404;
+    throw err;
+  }
+
+  // 1. Strict completeness verification: Cannot approve incomplete costing
+  if (!bom.cost_summary || !bom.cost_summary.is_costing_complete) {
+    const missing = bom.cost_summary ? bom.cost_summary.missing_cost_lines_count : 'unknown';
+    const err = new Error(`Cannot approve BOM: Costing is incomplete (${missing} lines missing verified costs). All components and non-product costs must have verified provenance before approval.`);
+    err.status = 400;
+    throw err;
+  }
+
+  // 2. Dual Authorization: Finance Review Verification
+  if (!bom.finance_review || bom.finance_review.status !== 'reviewed' || !['approved', 'reviewed'].includes(bom.finance_review.decision)) {
+    const currentReviewStatus = bom.finance_review ? bom.finance_review.status : 'pending';
+    const err = new Error(`Cannot approve BOM: Requires a valid Finance review prior to final Superadmin approval. Current finance review status: ${currentReviewStatus}.`);
+    err.status = 400;
+    throw err;
+  }
+
+  // 3. Exact Revision Match: Finance review must match exact current revision
+  if (bom.finance_review.revision_reviewed !== bom.revision) {
+    const err = new Error(`Cannot approve BOM: Finance review was conducted on revision ${bom.finance_review.revision_reviewed}, but current revision is ${bom.revision}. The BOM was modified after review and requires a renewed Finance review.`);
+    err.status = 400;
+    throw err;
+  }
+
+  // 4. Two-Person Rule: Distinct Approver Verification
+  const approverId = userContext && userContext.id ? Number(userContext.id) : null;
+  const reviewerId = bom.finance_review && bom.finance_review.reviewed_by_id ? Number(bom.finance_review.reviewed_by_id) : null;
+  const approverEmail = (userContext && userContext.email ? userContext.email : '').toLowerCase().trim();
+  const reviewerEmail = (bom.finance_review && bom.finance_review.reviewed_by_email ? bom.finance_review.reviewed_by_email : '').toLowerCase().trim();
+
+  const isSameUser = (approverId && reviewerId && approverId === reviewerId) ||
+                     (approverEmail && reviewerEmail && approverEmail === reviewerEmail);
+
+  if (isSameUser) {
+    // Log security audit event for denied approval attempt
+    await logAudit({
+      userId: approverId,
+      action: 'DENY_BOM_APPROVAL',
+      entityType: 'PACKAGE_BOM',
+      entityId: bom.bom_id,
+      details: `DENY_BOM_APPROVAL: Dual authorization violation. Approver (ID: ${approverId}, Email: ${approverEmail}) cannot be the same user as Finance reviewer (ID: ${reviewerId}, Email: ${reviewerEmail}).`,
+      ipAddress: reqMeta.ip || '',
+      metadata: {
+        package_id: pkg.id,
+        bom_id: bom.bom_id,
+        revision: bom.revision,
+        approver_id: approverId,
+        reviewer_id: reviewerId,
+        reason: 'dual_authorization_same_user'
+      }
+    });
+
+    const err = new Error('Two-person rule violation: The finance reviewer and final superadmin approver must be distinct individuals. A user cannot approve a BOM revision they reviewed.');
+    err.status = 403;
+    throw err;
+  }
+
+  const userEmail = approverEmail || 'superadmin@devicepro.local';
+
+  // Transaction support / Compensating revert for safe audit logging
+  let session = null;
+  try {
+    session = await mongoose.startSession();
+    session.startTransaction();
+  } catch (sessErr) {
+    session = null;
+  }
+
+  const prevBomState = JSON.parse(JSON.stringify(bom.toObject ? bom.toObject() : bom));
+
+  try {
+    const opts = session ? { session } : {};
+
+    // Snapshot previous state in history
+    bom.history.push({
+      revision: bom.revision,
+      saved_at: bom.updated_at || new Date(),
+      saved_by_email: bom.updated_by_email || userEmail,
+      status: bom.status,
+      cost_summary: bom.cost_summary,
+      components_snapshot: bom.components,
+      non_product_costs_snapshot: bom.non_product_costs,
+      revision_notes: `Pre-approval snapshot. Notes: ${approvalNotes}`,
+      finance_review_snapshot: bom.finance_review ? JSON.parse(JSON.stringify(bom.finance_review)) : null,
+      approved_by_id: approverId,
+      approved_by_email: userEmail,
+      approved_at: new Date()
+    });
+
+    bom.revision = bom.revision + 1;
+    bom.status = 'approved';
+    bom.approved_by_id = approverId;
+    bom.approved_by_email = userEmail;
+    bom.approved_at = new Date();
+    bom.updated_by_email = userEmail;
+    if (approvalNotes) {
+      bom.notes = bom.notes ? `${bom.notes} | Approved: ${approvalNotes}` : `Approved: ${approvalNotes}`;
+    }
+
+    await bom.save(opts);
+
+    // Audit Log with throwOnError: true so state transition aborts if audit fails
+    await logAudit({
+      userId: approverId,
+      action: 'APPROVE_BOM',
+      entityType: 'PACKAGE_BOM',
+      entityId: bom.bom_id,
+      details: `APPROVE_BOM: BOM revision ${bom.revision} approved for package "${pkg.name}" (${pkg.sku}) by superadmin ${userEmail} (ID: ${approverId}). Verified Total Cost: ₦${bom.cost_summary.total_estimated_cost_ngn ? bom.cost_summary.total_estimated_cost_ngn.toLocaleString() : 'N/A'}. Finance Reviewer: ${reviewerEmail} (ID: ${reviewerId}).`,
+      ipAddress: reqMeta.ip || '',
+      session: session,
+      throwOnError: true,
+      metadata: {
+        package_id: pkg.id,
+        package_sku: pkg.sku,
+        bom_id: bom.bom_id,
+        revision: bom.revision,
+        status: 'approved',
+        approved_by_id: approverId,
+        approved_by_email: userEmail,
+        approved_at: bom.approved_at,
+        finance_reviewer_id: reviewerId,
+        finance_reviewed_by_id: reviewerId,
+        finance_reviewer_email: reviewerEmail,
+        total_estimated_cost_ngn: bom.cost_summary.total_estimated_cost_ngn
+      }
+    });
+
+    if (session) {
+      await session.commitTransaction();
+      await session.endSession();
+    }
+
+    return bom;
+  } catch (err) {
+    if (session) {
+      await session.abortTransaction();
+      await session.endSession();
+    } else {
+      // Compensating revert
+      try {
+        await PackageBom.replaceOne({ _id: bom._id }, prevBomState);
+      } catch (revErr) {}
+    }
+    throw err;
+  }
+}
+
 module.exports = {
   getProducts, getProductBySlug, getProductById, getProductFacets, getRelatedProducts,
   createProduct, updateProduct, deleteProduct, archiveProduct,
@@ -2979,6 +3595,13 @@ module.exports = {
   updatePriceIntelligenceSettings,
   getPriceIntelligenceProducts,
   getPriceIntelligenceSummary,
-  getProductCostHistory
+  getProductCostHistory,
+  // Stage 8.4: Solar Package BOM
+  getAdminSolarPackages,
+  getPackageBom,
+  savePackageBomRevision,
+  reviewPackageBom,
+  approvePackageBom
 };
+
 

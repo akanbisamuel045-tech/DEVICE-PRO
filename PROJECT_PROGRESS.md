@@ -1,30 +1,48 @@
 # DEVICE PRO — Project Progress
 
 ## Current Stage
-**Administrator Stage 7: Supplier Price Intelligence, Margin Analysis and Controlled Pricing Recommendations**
-**Status:** ✅ COMPLETE & INDEPENDENTLY VERIFIED — AWAITING FORMAL OWNER REVIEW & APPROVAL
+**Administrator Stage 8.5.1: Supplier Cost Activation Readiness and Evidence Audit**
+**Status:** 🛑 AUDIT COMPLETE — CLASSIFIED: BLOCKED BY MISSING EVIDENCE (2026-10-26) — STOPPED FOR OWNER REVIEW
 
-### Latest Milestone: Supplier Price Intelligence & Margin Analysis Console Delivered
-- **Profitability & Margin Engine (`lib/price-intelligence-engine.js`)**:
-  - Implemented mathematical and analytical formulations for unit gross profit, gross margin %, cost markup %, target margin pricing simulation, and advisory recommendations.
-  - Safe guards against division by zero and honest handling of missing supplier costs without metric fabrication.
-- **Admin Console Integration (`public/admin.html`, `public/css/admin.css`, `public/js/admin.js`)**:
-  - Added "Price Intelligence & Margins" section, aggregate KPI summary cards, faceted filters, and responsive data table with visual margin health bars.
-  - Interactive Target Margin Simulator modal (`#modal-indicative-price`), Configurable Business Rules modal (`#modal-price-intelligence-settings`), and Verified Supplier Cost History timeline (`#modal-cost-history`).
-- **Data Invariance & Zero Automated Repricing**:
-  - Strictly analytical: no automatic changes to customer retail selling prices (`price_ngn`), supplier costs (`cost_price_ngn`), promotional prices, or inventory stock quantities.
-  - Active commercial products (`published: 1`) isolated from benchmark stress-test records.
-- **Verification & Platform Regressions**:
-  - 30/30 Stage 26 tests passed (100%).
-  - 212/212 total tests passing with 0 failures across all 8 suites (Stages 20, 21, 22, 23, 24, 25-App, 25-Sec, 26).
-  - Isolated development and testing on MongoDB Atlas replica set (`devicepro`). No production deployment to Vercel.
+### Latest Milestone: Readiness Audit, Evidence Inventory & Control Verification Complete
+- **Readiness Classification**:
+  - **`BLOCKED BY MISSING EVIDENCE`**: Technical readiness and validation safeguards are 100% verified; however, exactly zero genuine distributor quotation files exist in the repository or database. All 48 active commercial products lack verified wholesale acquisition costs (`cost_price_ngn: null/0`). Live cost activation remains strictly prohibited.
+- **Current Baseline Facts Established (MongoDB Atlas `devicepro`)**:
+  - Total product documents: 118 (48 active commercial items IDs 1–48; 70 soft-archived benchmark records IDs 49–118).
+  - Active commercial products with verified supplier costs: 0 of 48 (100% unpopulated / `MISSING_COST`).
+  - Active commercial products with missing or duplicate SKUs: 0 (all 48 SKUs unique and normalized).
+  - Turnkey solar packages: 6 packages (IDs 27, 23, 24, 48, 25, 26).
+  - Solar package BOM status: Packages 24 (Rev 4) and 25 (Rev 5) contain BOM revisions created during automated dual-authorization test suites; Packages 27, 23, 48, and 26 have `NO_BOM`. All 6 packages remain incomplete for commercial cost activation because constituent catalog components lack verified supplier acquisition costs.
+  - Price import records: 2 in `analysed` status (from automated test suites; 0 applied).
+  - Customer orders: 412 (410 baseline + 2 test fixtures).
+  - Customer accounts: 310 (308 baseline + 2 test fixtures).
+  - Sizing quotes: 182; Customer enquiries: 147.
+- **Evidence Verification (Task B)**:
+  - Quotation templates verified: `templates/DEVICE_PRO_ACTIVE_CATALOG_QUOTATION_TEMPLATE.xlsx` and `.csv` present, cell-protected, blank supplier prices, strictly excluding the 70 benchmark records.
+  - Received genuine quotation files: Exactly 0. Zero vendor price sheets submitted.
+  - Zero fabricated prices or synthetic vendor identities.
+- **Technical Control Verification (Task C)**:
+  - All 14 mandatory validation, security, and governance controls VERIFIED in source code across route handlers, DAL, and session transaction logic.
+  - Supported by 149 passing automated regression test assertions across 6 test suites.
+- **Database Invariance Confirmed (Task D)**:
+  - Zero supplier costs activated. Zero retail prices or stock quantities changed.
+  - Zero customer/order/quote/enquiry records modified. Zero benchmark records altered.
+  - Zero external communications sent. Zero production deployments. Stages 8.5.2, 8.5.3, and 8.5.4 unstarted.
+- **Key Reports & Deliverables**:
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_5_1_READINESS_AUDIT.md` (Main readiness audit report)
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_5_1_PRODUCT_COST_COVERAGE.csv` (48 active commercial products audit)
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_5_1_BOM_READINESS.csv` (6 solar packages BOM readiness audit)
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_5_1_CONTROL_VERIFICATION.md` (14-control source code verification matrix)
+  - `DECISIONS.md`: Recorded ADR-022.
+- **Mandatory Stop Condition**:
+  - Live cost activation is halted. System stopped awaiting owner review and authorization of procurement outreach (OD-8.4.2.1.1, OD-8.4.2.1.2).
 
 ## Project Overview
 - **Project:** DEVICE PRO Solar Energy Website & Commerce Platform
 - **Market:** Nigeria
 - **Stack:** HTML5 + CSS3 + Vanilla JS + Node.js/Express + MongoDB Atlas / SQLite Fallback
 - **Runtime:** Node.js v26.4.0, npm 11.17.0, Git 2.47.1
-- **Last Updated:** 2026-10-23
+- **Last Updated:** 2026-10-24
 
 ---
 
@@ -897,7 +915,7 @@
 - **Approval:** Explicitly approved by Project Owner on October 23, 2026.
 
 ### Stage 26 (Admin Stage 7): Supplier Price Intelligence, Margin Analysis and Controlled Pricing Recommendations
-- **Status:** Complete & Independently Verified ✅ — Awaiting Owner Approval
+- **Status:** Complete, Independently Verified & Owner-Approved ✅
 - **Started:** October 2026
 - **Completed:** October 2026
 - **Summary:** Built a complete, read-only Supplier Price Intelligence and Profit Margin Analysis dashboard in the administrative console allowing authorized administrators (`superadmin`, `admin`) to monitor product gross margins and markups, track verified historical supplier cost movements, evaluate advisory pricing recommendations, and simulate target margin pricing without modifying catalog selling prices or exposing internal supplier costs.
@@ -912,8 +930,151 @@
   - Full Platform Regression: **212 total tests passing with 0 failures across 8 suites** (Stages 20, 21, 22, 23, 24, 25-App, 25-Sec, 26).
   - `DECISIONS.md`: Appended ADR-015 documenting Stage 7 architecture, advisory pricing rules, and cost confidentiality.
   - `reports/DEVICE_PRO_ADMIN_STAGE_7_PRICE_INTELLIGENCE.md`: Comprehensive engineering, calculation, and verification report.
+- **Approval:** Explicitly approved by Project Owner on October 24, 2026.
 
-**Next Permitted Stage:** STOPPED. Awaiting project owner review and explicit approval of Stage 7 before proceeding to Stage 8.
+### Stage 27 (Admin Stage 8.1–8.3): Supplier Cost Baseline Preparation, Catalog Specification Matrix & Batch Reconciliation
+- **Status:** Complete, Independently Verified & Owner-Approved ✅ (Approved 2026-10-24 with Documented Limitations)
+- **Started:** October 2026
+- **Completed:** October 2026
+- **Approval Date:** 2026-10-24
+- **Summary:** Delivered the complete infrastructure for active commercial catalog specification matrix generation, supplier quotation intake with pre-validation, date ambiguity and calendar rollover safeguards, multi-supplier quotation comparison, and database invariance verification.
+- **Key Deliverables & Verification Artifacts:**
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_BASELINE_AND_PLAN.md`: Initial audit detailing product schema, 48 active commercial items, 69 archived benchmark items, cost availability, and implementation plan.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_IMPLEMENTATION.md`: Engineering report for Stage 8.1, 8.2, and 8.3 implementation.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_FINAL_VERIFICATION.md`: Independent multi-role verification report covering code audit, security, date parsing, test results, and post-test database invariance.
+  - `templates/DEVICE_PRO_ACTIVE_CATALOG_QUOTATION_TEMPLATE.xlsx`: Dual-sheet Excel quotation template containing all 48 active commercial catalog products with reference columns A–F locked and supplier completion columns G–O unlocked.
+  - `templates/DEVICE_PRO_ACTIVE_CATALOG_QUOTATION_TEMPLATE.csv`: RFC 4180 compliant CSV matrix containing all 48 active commercial products across 15 standard columns.
+  - `templates/README.md`: Supplier instructions, date formatting policy, ambiguity resolution guidelines, and security disclaimers.
+  - `scripts/generate-catalog-template.js`: Standalone template generator script for administrative operations.
+  - `lib/price-import-engine.js`: Implemented `generateMasterCatalogTemplate()`, calendar-validated date parser (`parseDate`), ambiguous date rejection (`date_ambiguous`), 30-calendar-day freshness window (`evaluateQuotationFreshness`), exact normalized SKU matching, duplicate file SKU detection, competing quotation comparison (`compareSupplierQuotations`), formula injection sanitization, and review-time freshness re-validation (`preparePriceImportForReview`).
+  - `db/mongo/models.js` & `server.js`: Enhanced `priceImportSchema` with quotation traceability fields, added `'date_ambiguous'` to `freshness_status` schema enum and server validation whitelist.
+  - `tests/stage27_supplier_baseline_reconciliation.test.js`: 31/31 automated tests passing covering matrix generation, intake, date parsing, leap years, ambiguity rejection, matching, formula sanitization, and database invariance.
+  - `tests/stage13_cart_admin.test.js`: Added safe teardown cleanup resolving test product leakage.
+  - Full Platform Regression: **268 total tests passing with 0 failures across 10 suites** (Stages 13, 20, 21, 22, 23, 24, 25-App, 25-Sec, 26, 27).
+  - Database Invariance: All 48 active commercial products retain 100% identical retail prices, stock, and 0 supplier costs applied. 410 orders, 308 customers, 182 quotes, and 147 enquiries preserved.
+- **Approved Owner Decisions:**
+  - **OD-8.1**: Retain all 70 soft-archived Sungrow benchmark documents (`sku: 'SG-10K-HYBRID-NG'`, `published: 0`, IDs 49–118) in MongoDB Atlas untouched pending a separate data-retention decision. Active commercial catalog contains exactly 48 products and currently has no verified supplier acquisition cost baseline.
+  - **OD-8.2**: Adopt the documented administrative supplier quotation intake workflow using the approved Excel and CSV templates.
+  - **OD-8.3**: Keep supplier cost activation deferred until genuine supplier quotations have been collected, validated, reviewed, and explicitly approved.
+- **Documented Limitations:**
+  - Active commercial catalog contains 48 products and currently has no verified supplier acquisition cost baseline (`cost_price_ngn: null/0`).
+  - Ambiguous dates (`04/05/2026`) require an explicit format parameter (`options.dateFormat`) or remain flagged as `date_ambiguous` requiring human review.
+  - Excel sheet protection is an administrative convenience for UI, not an access control boundary.
+- **Next Permitted Stage:** Advanced to Stage 8.4 (Solar Package Bill of Materials).
+
+### Stage 28 (Admin Stage 8.4): Solar Package Bill of Materials (BOM)
+- **Status:** Complete, Independently Verified & Owner-Approved ✅ (Approved 2026-10-24 with Documented Limitations)
+- **Started:** October 2026
+- **Completed:** October 2026
+- **Approval Date:** 2026-10-24
+- **Summary:** Designed and implemented an administrator-controlled Bill of Materials (BOM) subsystem for DEVICE PRO's turnkey solar packages. Developed deterministic calculation rules, honest missing cost tracking, catalog component linking, revision history, approval governance, and a responsive administrative UI console while strictly preserving retail prices, commercial inventory, and deferred supplier acquisition costs.
+- **Key Deliverables & Verification Artifacts:**
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_BASELINE.md`: Comprehensive initial audit of 6 turnkey packages, pricing fields, catalog linkages, technical risks, and architectural roadmap.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_BOM.md`: Authoritative engineering, calculation, testing, and security verification report.
+  - `DECISIONS.md`: Recorded ADR-017 (BOM Architecture) and ADR-018 (Owner Approval & Governance Decisions OD-8.4.1 to OD-8.4.4).
+  - `db/mongo/models.js`: Implemented `packageBomSchema` and `PackageBom` model with embedded line items, snapshot tracing, integer arithmetic, and revision snapshots.
+  - `lib/bom-engine.js`: Pure functional engine handling unit/quantity validation, waste percentages (0–100%), honest missing-cost handling (`null`), subtotal & grand total calculations, completeness evaluation (`is_costing_complete`), and catalog product eligibility verification.
+  - `db/mongo/repository.js` & `db/database.js`: DAL methods `getAdminSolarPackages()`, `getPackageBom()`, `savePackageBomRevision()`, and `approvePackageBom()` with concurrency revision checking and audit events (`CREATE_BOM`, `UPDATE_BOM_REVISION`, `APPROVE_BOM`).
+  - `server.js`: Administrator BOM endpoints (`/api/admin/solar-packages`, `/api/admin/solar-packages/:id/bom`, `/api/admin/solar-packages/:id/bom/approve`) secured by RBAC middleware. Public endpoints (`/api/packages`, `/api/packages/:slug`) strictly audited and verified to never leak internal BOM data.
+  - `public/admin.html`, `public/js/admin.js`, `public/css/admin.css`: Upgraded Solar Packages console with KPI overview, status indicators, BOM modal editor, live client-side calculations, and revision history viewer.
+  - `tests/stage28_solar_package_bom.test.js`: Comprehensive 32-test automated suite covering all 18 requirements from Section 11. **Result: 32/32 tests PASSED**.
+  - Regression Suites Verified: **137 tests passing cleanly with 0 failures** across Stages 23, 25, 26, 27, and 28.
+  - Database Invariance: All 6 turnkey solar packages and 48 active commercial catalog products retain 100% identical retail prices, stock counts, and 0 active supplier costs. All 70 archived benchmarks, 410 orders, 308 customers, 182 quotes, and 147 enquiries preserved intact.
+- **Approved Owner Decisions:**
+  - **OD-8.4.1 (Stage 8.4 Approval)**: Approved Stage 8.4 with documented limitations, referencing implementation report `reports/DEVICE_PRO_ADMIN_STAGE_8_4_BOM.md`.
+  - **OD-8.4.2 (Missing Supplier Costs Policy)**: Linked hardware components remain in `missing_cost` validation status and the BOM remains `incomplete` until genuine supplier acquisition costs are obtained, ingested, validated, and reviewed via Stage 8.2/8.3 intake matrices. Retail prices (`price_ngn`) must never be substituted for supplier acquisition costs. Missing costs must never silently become zero.
+  - **OD-8.4.3 (BOM Approval Authority & Dual Authorization Policy)**: Dual authorization adopted as the formal target policy (Step 1: Finance reviews BOM and cost sources; Step 2: Distinct Superadmin provides final approval; both recorded with timestamps and audit events; incomplete costing strictly prevents approval; one user cannot satisfy both). Code inspection confirms current implementation enforces single-step Superadmin approval (`requireRole('superadmin')`) with completeness validation; dual authorization is **PENDING IMPLEMENTATION AND OWNER VERIFICATION** and not yet enforced in code.
+  - **OD-8.4.4 (Service & Logistics Tariffs Deferral)**: Standardized flat rates and regional tariffs for installation labour, balance of system (BOS) materials, and freight across Lagos, Abuja, Port Harcourt, and nationwide zones are explicitly deferred. No rates may be invented. Affected lines remain identified as estimates or missing costs, and cannot cause an incomplete BOM to appear complete.
+- **Documented Limitations:**
+  - Dual authorization workflow is pending implementation (current system enforces single-step Superadmin approval).
+  - Active commercial catalog contains no verified supplier costs; BOMs linked to commercial catalog products report `unit_cost_ngn: null` and `missing_cost_lines_count > 0` until supplier quotes are approved.
+  - Standardized regional service tariffs deferred.
+  - Incomplete costing strictly disables gross margin calculations.
+- **Next Permitted Stage:** Advanced to Stage 8.4.1 (Dual Authorization) and Stage 8.4.2 (Supplier Cost Baseline).
+
+### Stage 29 (Admin Stage 8.4.1): Dual-Authorization Implementation for Solar Package BOM Approval
+- **Status:** Complete, Independently Verified & Implemented ✅ (2026-10-26)
+- **Started:** October 2026
+- **Completed:** October 2026
+- **Summary:** Replaced the single-step Superadmin approval model with an authoritative, server-enforced dual-authorization and two-person governance workflow conforming to Owner Decision OD-8.4.3 (ADR-018) and ADR-019. Established formal Finance Review (`finance`, `superadmin`), distinct Superadmin Final Approval (`superadmin`), and server-side identity segregation guaranteeing that reviewer and approver user IDs and emails must differ. Implemented automatic invalidation upon subsequent BOM revision edits.
+- **Key Deliverables & Verification Artifacts:**
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_1_BASELINE.md`: Initial audit of BOM approval endpoints, schema fields, and roles.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_1_DUAL_AUTHORIZATION.md`: Authoritative implementation and verification report.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_1_INVARIANCE_CLARIFICATION.md`: Forensic audit of order/customer counts clarifying 2 historical test fixture records.
+  - `DECISIONS.md`: Recorded ADR-019 (Dual-Authorization for Solar Package BOM Approval).
+  - `db/mongo/models.js`: Extended `packageBomSchema` with `finance_review` subdocument, invalidation flags, and snapshots.
+  - `server.js`: Implemented dual-authorization endpoints (`/api/admin/solar-packages/:id/bom/review` and `/api/admin/solar-packages/:id/bom/approve`) with transactional rollbacks on audit failure.
+  - `public/admin.html`, `public/js/admin.js`: Dynamic dual-authorization review/approval controls and status indicators in Admin Console.
+  - `tests/stage29_bom_dual_authorization.test.js`: 28/28 tests passing.
+  - Full Platform Regression: 142/142 tests passing across 5 suites.
+- **Documented Limitations:**
+  - Active commercial catalog contains no verified supplier costs; linked BOM hardware components report `missing_cost`.
+  - Orders (412) and Customers (310) reflect 410 legitimate orders + 2 Stage 23 test fixtures, and 308 legitimate accounts + 2 Stage 23 test fixtures.
+
+### Stage 30 (Admin Stage 8.4.2): Supplier Cost Baseline Establishment
+- **Status:** Completed Readiness & Baseline Reconciliation / Blocked on Genuine Quotation Evidence ⚠️ (2026-10-26)
+- **Started:** October 2026
+- **Completed:** October 2026
+- **Summary:** Established quotation collection readiness and audited the active commercial product catalog against genuine supplier quotation availability. Verified that zero distributor quotation spreadsheets currently exist in the workspace, and strictly adhered to mandatory scope boundaries prohibiting synthetic quotation fabrication. Reconciled all 48 active commercial products as `MISSING_COST`, confirmed 0 supplier costs activated, verified intake gateway security and validation rules, confirmed BOM costing safeguards, and established 14 automated verification tests and database invariance.
+- **Key Deliverables & Verification Artifacts:**
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_2_BASELINE.md`: Initial state audit, gateway verification, and quotation inventory.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_2_SUPPLIER_COST_BASELINE.md`: Comprehensive baseline reconciliation report with 48-product catalog table, missing evidence gap analysis, owner decisions, and recommendations.
+  - `DECISIONS.md`: Recorded ADR-020 (Supplier Cost Baseline Readiness & Evidence Governance).
+  - `server.js`: Aliased and secured quotation intake route `POST /api/admin/price-imports/intake` to `POST /api/admin/price-imports/upload`.
+  - `tests/stage30_supplier_cost_baseline.test.js`: 22/22 tests passing across all 14 Stage 8.4.2 requirement areas.
+  - Regression Test Suites: 134/134 tests passing across 5 test suites (Stages 25, 27, 28, 29, 30).
+  - Database Invariance: All 118 product documents (48 active commercial, 70 archived benchmark items) and 6 turnkey solar packages verified 100% invariant with zero supplier costs applied and zero retail price changes.
+- **Pending Owner Decisions:**
+  - **OD-8.4.2.1**: Acknowledge genuine distributor quotation gap (0 valid quotations received; 48 active products awaiting quotations) and authorize distributor outreach.
+  - **OD-8.4.2.2**: Confirm quotation intake and multi-supplier reconciliation parameters (30-day freshness, exact SKU matching, NGN currency only).
+  - **OD-8.4.2.3**: Maintain strict deferral of Stage 8.5 (Supplier Cost Baseline Activation) until genuine quotations are submitted, validated, and approved.
+- **Documented Limitations:**
+  - Zero genuine distributor quotations received.
+  - Active commercial catalog supplier acquisition costs remain missing (`cost_price_ngn: null/0`).
+  - Stage 8.5 remains unstarted and prohibited.
+- **Next Permitted Stage:** Advanced to Stage 8.4.2.1 (Procurement Outreach Preparation) upon approval of OD-8.4.2.1.
+
+### Stage 31 (Admin Stage 8.4.2.1): Procurement Outreach Preparation
+- **Status:** Complete, Independently Verified & Awaiting Owner Outreach Approval 📋 (2026-10-26)
+- **Started:** October 2026
+- **Completed:** October 2026
+- **Summary:** Prepared the comprehensive procurement outreach package to solicit authentic wholesale equipment quotations from certified Nigerian solar equipment distributors under Owner Decision OD-8.4.2.1. Re-verified active catalog quotation templates (Excel & CSV), conducted empirical research to establish a 14-candidate distributor shortlist (8 VERIFIED, 4 PARTIALLY_VERIFIED, 1 UNVERIFIED, 1 EXCLUDE), authored a formal quotation request email draft (marked DRAFT FOR OWNER REVIEW ONLY — DO NOT SEND), and formulated a multi-dimensional quotation review checklist enforcing human-only decision-making and Two-Person Rule governance.
+- **Key Deliverables & Verification Artifacts:**
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_2_1_PROCUREMENT_OUTREACH_PREPARATION.md`: Comprehensive preparation report documenting scope, candidate research methodology, verification results, risk analysis, and owner decisions.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_2_1_DISTRIBUTOR_SHORTLIST.csv`: Structured 14-candidate matrix with verified websites, physical locations, product categories, public sales contacts, source URLs, and verification statuses.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_2_1_OUTREACH_EMAIL_DRAFT.md`: Formal quotation request email draft prominently marked as DRAFT FOR OWNER REVIEW ONLY.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_4_2_1_QUOTATION_REVIEW_CHECKLIST.md`: Multi-point evaluation checklist prohibiting automated lowest-bid selection and enforcing dual authorization.
+  - `DECISIONS.md`: Recorded ADR-021 (Procurement Outreach Preparation and Distributor Shortlist Protocol).
+  - `tests/stage30_1_procurement_outreach.test.js`: 15/15 automated tests passing covering template protection, shortlist validity, email governance, review checklist rules, and database invariance.
+  - Database Invariance: All 118 product documents (48 active commercial, 70 archived benchmark items) and 6 turnkey solar packages verified 100% invariant with zero supplier costs applied and zero retail price changes.
+- **Pending Owner Decisions:**
+  - **OD-8.4.2.1.1 (Shortlist Approval)**: Approve the 8 `VERIFIED` and 4 `PARTIALLY_VERIFIED` candidates for formal procurement outreach.
+  - **OD-8.4.2.1.2 (Outreach Dispatch Authorization)**: Explicit owner authorization required prior to dispatching any external email or spreadsheet.
+- **Documented Limitations:**
+  - Zero external communications sent.
+  - Outreach dispatch halted pending owner review.
+  - Active commercial catalog supplier acquisition costs remain missing (`cost_price_ngn: null/0`).
+  - Stage 8.5 remains unstarted and prohibited.
+- **Next Permitted Stage:** STOPPED. Awaiting owner review and authorization of the outreach package.
+
+### Stage 32 (Admin Stage 8.5.1): Supplier Cost Activation Readiness and Evidence Audit
+- **Status:** Complete, Factually Verified & Halted 🛑 (2026-10-26)
+- **Started:** October 2026
+- **Completed:** October 2026
+- **Summary:** Conducted a comprehensive, strictly read-only audit of the MongoDB Atlas database (`devicepro`), filesystem, intake route handlers, BOM calculation engine, and quotation evidence artifacts. Established verified baseline counts across all collections (118 products: 48 active commercial items, 70 benchmark records; 6 solar packages; 412 orders; 310 customers; 182 quotes; 147 enquiries). Determined readiness classification as **`BLOCKED BY MISSING EVIDENCE`** because zero genuine distributor quotation files exist in the repository or database (0 of 48 active commercial products have verified supplier costs). Formally inspected and verified all 14 mandatory validation, security, BOM dual-authorization, and concurrency controls in source code. Verified complete database invariance with zero price or data modifications.
+- **Key Deliverables & Verification Artifacts:**
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_5_1_READINESS_AUDIT.md`: Authoritative audit report documenting scope, timestamp, baseline counts, evidence inventory, 14-control verification matrix, discrepancy analysis, readiness classification (`BLOCKED BY MISSING EVIDENCE`), blockers, and recommended next actions.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_5_1_PRODUCT_COST_COVERAGE.csv`: Detailed 48-row CSV cataloging every active commercial product with current cost status (`MISSING_COST`), quotation date, freshness status (`NO_QUOTATION_RECEIVED`), and outstanding validation blockers.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_5_1_BOM_READINESS.csv`: Detailed 6-row CSV auditing every solar package BOM revision, completeness status, missing cost lines, Finance review status, reviewer identity, and approval status.
+  - `reports/DEVICE_PRO_ADMIN_STAGE_8_5_1_CONTROL_VERIFICATION.md`: Line-by-line source code inspection matrix validating all 14 controls with exact file paths, line references, and supporting test citations.
+  - `DECISIONS.md`: Recorded ADR-022 (Supplier Cost Activation Readiness and Evidence Audit Outcome).
+  - Database Invariance: Confirmed 100% invariance across products (118), benchmark records (70), solar packages (6), orders (412), customers (310), quotes (182), enquiries (147), retail prices (`price_ngn`), promotional prices (`previous_price_ngn`), and inventory quantities.
+- **Blockers to Live Cost Activation:**
+  - Zero genuine distributor quotations received.
+  - Procurement outreach pending owner approval of candidate shortlist (OD-8.4.2.1.1) and dispatch authorization (OD-8.4.2.1.2).
+  - Solar package BOMs incomplete pending constituent catalog component supplier costs.
+- **Mandatory Stop Condition:**
+  - Work stopped at Stage 8.5.1. Live cost activation, production deployments, and Stages 8.5.2, 8.5.3, and 8.5.4 remain strictly prohibited until owner explicitly authorizes procurement outreach and authentic quotations are reviewed and approved.
 
 ---
 

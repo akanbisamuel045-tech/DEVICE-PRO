@@ -3471,6 +3471,13 @@ module.exports = {
   updatePriceIntelligenceSettings: dispatch(mongoRepo.updatePriceIntelligenceSettings, null),
   getPriceIntelligenceProducts: dispatch(mongoRepo.getPriceIntelligenceProducts, null),
   getPriceIntelligenceSummary: dispatch(mongoRepo.getPriceIntelligenceSummary, null),
-  getProductCostHistory: dispatch(mongoRepo.getProductCostHistory, null)
+  getProductCostHistory: dispatch(mongoRepo.getProductCostHistory, null),
+  // Stage 8.4: Solar Package BOM
+  getAdminSolarPackages: dispatch(mongoRepo.getAdminSolarPackages, null),
+  getPackageBom: dispatch(mongoRepo.getPackageBom, null),
+  savePackageBomRevision: dispatch(mongoRepo.savePackageBomRevision, null),
+  reviewPackageBom: dispatch(mongoRepo.reviewPackageBom, null),
+  approvePackageBom: dispatch(mongoRepo.approvePackageBom, null)
 };
+
 

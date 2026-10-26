@@ -25,7 +25,8 @@ const {
   createPriceImport, getPriceImports, getPriceImportById, deletePriceImport,
   reviewPriceImport, approvePriceImportRows, applyPriceImport, cancelPriceImport,
   getPriceIntelligenceSettings, updatePriceIntelligenceSettings,
-  getPriceIntelligenceProducts, getPriceIntelligenceSummary, getProductCostHistory
+  getPriceIntelligenceProducts, getPriceIntelligenceSummary, getProductCostHistory,
+  getAdminSolarPackages, getPackageBom, savePackageBomRevision, reviewPackageBom, approvePackageBom
 } = require('./db/database');
 const { evaluateProductProfitability } = require('./lib/price-intelligence-engine');
 const {
@@ -216,17 +217,17 @@ async function authenticate(req, res, next) {
   }
 }
 
-const ADMIN_ROLES = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
+const ADMIN_ROLES = ['admin', 'superadmin', 'engineer', 'sales', 'staff', 'finance'];
 
 // Stage 3: Section permissions matrix for all 16 administration modules
 const ADMIN_SECTION_PERMISSIONS = {
-  'overview': ['superadmin', 'admin', 'engineer', 'sales', 'staff'],
+  'overview': ['superadmin', 'admin', 'engineer', 'sales', 'staff', 'finance'],
   'products': ['superadmin', 'admin', 'engineer'],
   'supplier-imports': ['superadmin', 'admin'],
   'supplier-price-imports': ['superadmin', 'admin'],
   'categories': ['superadmin', 'admin', 'engineer'],
   'brands': ['superadmin', 'admin', 'engineer'],
-  'solar-packages': ['superadmin', 'admin', 'engineer'],
+  'solar-packages': ['superadmin', 'admin', 'engineer', 'finance'],
   'content': ['superadmin', 'admin'],
   'website-content': ['superadmin', 'admin'],
   'images': ['superadmin', 'admin'],
@@ -2547,6 +2548,7 @@ const multer = require('multer');
 const {
   processSupplierPriceFile,
   generateImportTemplate,
+  generateMasterCatalogTemplate,
   MAX_FILE_SIZE_BYTES,
   MAX_ROW_COUNT
 } = require('./lib/price-import-engine');
@@ -2597,8 +2599,33 @@ app.get('/api/admin/price-imports/template/:format', requireAuth, requireRole('s
   }
 });
 
+// Stage 8.1: Download standardized master catalog quotation template populated with active commercial products
+app.get('/api/admin/price-imports/catalog-template/:format', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const format = (req.params.format || '').toLowerCase();
+    if (!['xlsx', 'csv'].includes(format)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid template format "${req.params.format}". Supported formats: xlsx, csv.`
+      });
+    }
+
+    // Query active catalog products (exclude archived benchmark products)
+    const catalogData = await getProducts({ status: 'active', limit: 1000 });
+    const allProducts = Array.isArray(catalogData) ? catalogData : (catalogData.products || []);
+    const activeCommercial = allProducts.filter(p => p.published === 1 && p.sku !== 'SG-10K-HYBRID-NG' && p.brand !== 'Sungrow Benchmark');
+
+    const { buffer, contentType, filename } = await generateMasterCatalogTemplate(format, activeCommercial);
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Upload and analyze supplier price list without updating live database
-app.post('/api/admin/price-imports/upload', requireAuth, requireRole('superadmin', 'admin'), handlePriceUpload, async (req, res) => {
+app.post(['/api/admin/price-imports/upload', '/api/admin/price-imports/intake'], requireAuth, requireRole('superadmin', 'admin'), handlePriceUpload, async (req, res) => {
   try {
     let fileBuffer = null;
     let originalFilename = '';
@@ -2633,6 +2660,11 @@ app.post('/api/admin/price-imports/upload', requireAuth, requireRole('superadmin
     }
 
     const supplierName = (req.body && req.body.supplierName) ? String(req.body.supplierName).trim() : 'Solar Equipment Supplier';
+    const supplierQuoteRef = (req.body && (req.body.supplierQuoteRef || req.body.supplier_quote_ref)) ? String(req.body.supplierQuoteRef || req.body.supplier_quote_ref).trim() : '';
+    const quoteDate = req.body ? (req.body.quoteDate || req.body.quote_date) : null;
+    const quoteExpiryDate = req.body ? (req.body.quoteExpiryDate || req.body.quote_expiry_date) : null;
+    const importSource = (req.body && (req.body.importSource || req.body.import_source)) ? String(req.body.importSource || req.body.import_source).trim() : 'Manual Upload';
+    const currency = (req.body && req.body.currency) ? String(req.body.currency).trim().toUpperCase() : 'NGN';
 
     // Retrieve active catalog products for conservative matching
     const catalogData = await getProducts({ status: 'all', limit: 1000, includeSupplierCost: true });
@@ -2643,7 +2675,12 @@ app.post('/api/admin/price-imports/upload', requireAuth, requireRole('superadmin
       filename: originalFilename,
       activeProducts: allProducts,
       customMapping,
-      supplierName
+      supplierName,
+      supplierQuoteRef,
+      quoteDate,
+      quoteExpiryDate,
+      importSource,
+      currency
     });
 
     res.json({
@@ -2682,7 +2719,10 @@ app.post('/api/admin/price-imports/upload', requireAuth, requireRole('superadmin
 // Save persistent import analysis record (Strictly 'analysed', never applied)
 app.post('/api/admin/price-imports', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
   try {
-    const { filename, supplier_name, file_format, mapping_config, summary, rows_preview, notes } = req.body || {};
+    const {
+      filename, supplier_name, file_format, mapping_config, summary, rows_preview, notes,
+      supplier_quote_ref, quote_date, quote_expiry_date, import_source, currency, freshness_status, validation_warnings
+    } = req.body || {};
 
     if (!filename || !file_format || !summary) {
       return res.status(400).json({
@@ -2697,6 +2737,13 @@ app.post('/api/admin/price-imports', requireAuth, requireRole('superadmin', 'adm
     const importRecord = await createPriceImport({
       filename: String(filename).trim().slice(0, 255),
       supplier_name: String(supplier_name || 'Generic Supplier').trim().slice(0, 150),
+      supplier_quote_ref: supplier_quote_ref ? String(supplier_quote_ref).trim().slice(0, 100) : '',
+      quote_date: quote_date ? new Date(quote_date) : null,
+      quote_expiry_date: quote_expiry_date ? new Date(quote_expiry_date) : null,
+      import_source: import_source ? String(import_source).trim().slice(0, 100) : 'manual_upload',
+      currency: currency ? String(currency).trim().toUpperCase().slice(0, 10) : 'NGN',
+      freshness_status: (freshness_status && ['fresh', 'stale', 'future_date', 'expired', 'date_missing', 'date_ambiguous'].includes(freshness_status)) ? freshness_status : 'date_missing',
+      validation_warnings: Array.isArray(validation_warnings) ? validation_warnings : [],
       file_format: String(file_format).toLowerCase(),
       uploaded_by: req.user.id,
       uploaded_by_email: req.user.email,
@@ -3064,6 +3111,104 @@ app.patch('/api/admin/price-intelligence/settings', requireAuth, requireRole('su
     });
   } catch (error) {
     const status = error.statusCode || 400;
+    res.status(status).json({ success: false, error: error.message });
+  }
+});
+
+// =========================================================================
+// STAGE 8.4: SOLAR PACKAGE BILL OF MATERIALS (BOM) ADMIN ROUTES
+// =========================================================================
+
+// 1. List Turnkey Solar Packages with BOM Status Summary
+app.get('/api/admin/solar-packages', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'finance'), async (req, res) => {
+  try {
+    const packages = await getAdminSolarPackages();
+    res.json({
+      success: true,
+      count: packages.length,
+      packages
+    });
+  } catch (error) {
+    console.error('[ADMIN SOLAR PACKAGES ERROR]:', error);
+    res.status(500).json({ success: false, error: 'Failed to retrieve solar packages with BOM summary' });
+  }
+});
+
+// 2. Get BOM Details, Components, Revisions, and Eligible Catalog Products for a Package
+app.get('/api/admin/solar-packages/:id/bom', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'finance'), async (req, res) => {
+  try {
+    const result = await getPackageBom(req.params.id);
+    res.json({
+      success: true,
+      ...result
+    });
+  } catch (error) {
+    const status = error.status || error.statusCode || 500;
+    res.status(status).json({ success: false, error: error.message });
+  }
+});
+
+// 3. Save / Update BOM Revision (Superadmin, Admin, Engineer)
+app.post('/api/admin/solar-packages/:id/bom', requireAuth, requireRole('superadmin', 'admin', 'engineer'), async (req, res) => {
+  try {
+    const bom = await savePackageBomRevision(
+      req.params.id,
+      req.body,
+      req.user,
+      { ip: req.ip || req.headers['x-forwarded-for'] || '' }
+    );
+    res.json({
+      success: true,
+      message: `BOM revision ${bom.revision} saved successfully.`,
+      bom
+    });
+  } catch (error) {
+    const status = error.status || error.statusCode || 400;
+    res.status(status).json({ success: false, error: error.message });
+  }
+});
+
+// 4. Formally Review BOM Revision (Finance & Superadmin)
+app.post('/api/admin/solar-packages/:id/bom/review', requireAuth, requireRole('finance', 'superadmin'), async (req, res) => {
+  try {
+    const bom = await reviewPackageBom(
+      req.params.id,
+      req.user,
+      {
+        decision: req.body.decision,
+        notes: req.body.notes || req.body.review_notes || '',
+        base_revision: req.body.base_revision
+      },
+      { ip: req.ip || req.headers['x-forwarded-for'] || '' }
+    );
+    res.json({
+      success: true,
+      message: `BOM revision ${bom.revision} finance review submitted successfully (${bom.finance_review.decision}).`,
+      bom
+    });
+  } catch (error) {
+    const status = error.status || error.statusCode || 400;
+    res.status(status).json({ success: false, error: error.message });
+  }
+});
+
+// 5. Formally Approve BOM Revision (Superadmin Only - Dual Authorization Enforced)
+app.post('/api/admin/solar-packages/:id/bom/approve', requireAuth, requireRole('superadmin'), async (req, res) => {
+  try {
+    const approvalNotes = req.body.approval_notes || req.body.notes || '';
+    const bom = await approvePackageBom(
+      req.params.id,
+      req.user,
+      approvalNotes,
+      { ip: req.ip || req.headers['x-forwarded-for'] || '' }
+    );
+    res.json({
+      success: true,
+      message: `BOM revision ${bom.revision} approved successfully by superadmin.`,
+      bom
+    });
+  } catch (error) {
+    const status = error.status || error.statusCode || 400;
     res.status(status).json({ success: false, error: error.message });
   }
 });
