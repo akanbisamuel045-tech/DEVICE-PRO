@@ -2419,6 +2419,212 @@ app.get('/api/admin/backup', requireAuth, requireRole('superadmin'), async (req,
   }
 });
 
+// Admin Customers Directory & CRM
+app.get('/api/admin/customers', requireAuth, requireRole('superadmin', 'admin', 'sales'), async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit, 10) || 20));
+    const search = req.query.search ? String(req.query.search).trim() : '';
+    const state = req.query.state ? String(req.query.state).trim() : '';
+    const offset = (page - 1) * limit;
+
+    let customers = [];
+    let total = 0;
+
+    if (isMongoConnected()) {
+      const { User: MongoUser, Order: MongoOrder } = require('./db/mongo/models');
+      const filter = { role: 'customer' };
+      if (search) {
+        filter.$or = [
+          { full_name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { phone: { $regex: search, $options: 'i' } }
+        ];
+      }
+      total = await MongoUser.countDocuments(filter);
+      const docs = await MongoUser.find(filter)
+        .sort({ created_at: -1, id: -1 })
+        .skip(offset)
+        .limit(limit)
+        .lean();
+
+      // Retrieve order aggregates for these customers
+      const emails = docs.map(d => d.email).filter(Boolean);
+      const orders = await MongoOrder.find({ customer_email: { $in: emails } }).lean();
+
+      customers = docs.map(d => {
+        const userOrders = orders.filter(o => o.customer_email === d.email);
+        const totalSpent = userOrders.reduce((sum, o) => sum + (o.total_ngn || 0), 0);
+        return {
+          id: d.id,
+          name: d.full_name,
+          email: d.email,
+          phone: d.phone || '—',
+          state: d.state || 'Lagos',
+          ordersCount: userOrders.length,
+          totalSpentNgn: totalSpent,
+          emailVerified: d.email_verified,
+          created_at: d.created_at
+        };
+      });
+    } else {
+      let query = "SELECT id, full_name as name, email, phone, 'Lagos' as state, email_verified as emailVerified, created_at FROM users WHERE role = 'customer'";
+      const params = [];
+      if (search) {
+        query += " AND (full_name LIKE ? OR email LIKE ? OR phone LIKE ?)";
+        params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+      }
+      const countStmt = db.prepare(`SELECT COUNT(*) as count FROM (${query})`);
+      total = countStmt.get(...params)?.count || 0;
+
+      query += " ORDER BY id DESC LIMIT ? OFFSET ?";
+      params.push(limit, offset);
+      customers = db.prepare(query).all(...params).map(c => ({
+        ...c,
+        ordersCount: 0,
+        totalSpentNgn: 0
+      }));
+    }
+
+    res.json({
+      success: true,
+      customers,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Admin Brands Directory
+app.get('/api/admin/brands', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'sales', 'staff'), async (req, res) => {
+  try {
+    const facets = await getProductFacets();
+    const knownBrands = [
+      { name: 'Deye', country: 'China / Global', category: 'Hybrid Inverters & HV Batteries', warranty: '5 - 10 Years', tier1: true, website: 'https://deyeinverter.com', description: 'Industry-leading high voltage hybrid converters and lithium energy storage.' },
+      { name: 'Felicity Solar', country: 'China / Nigeria', category: 'LiFePO4 Batteries & Inverters', warranty: '5 - 10 Years', tier1: true, website: 'https://felicitysolar.com', description: 'High-reliability low-voltage wall and rack-mount battery storage units.' },
+      { name: 'Growatt', country: 'China / Global', category: 'Smart Converters & String Inverters', warranty: '5 Years', tier1: true, website: 'https://growatt.com', description: 'Award-winning residential and commercial smart solar inverters.' },
+      { name: 'Jinko Solar', country: 'China / Global', category: 'Tier-1 Monocrystalline PV Modules', warranty: '12 - 25 Years', tier1: true, website: 'https://jinkosolar.com', description: 'World-record N-Type TOPCon solar panels with high temperature tolerance.' },
+      { name: 'Canadian Solar', country: 'Canada / Global', category: 'Tier-1 Mono PERC & Bifacial Modules', warranty: '12 - 25 Years', tier1: true, website: 'https://canadiansolar.com', description: 'Global Tier-1 solar manufacturer renowned for heavy duty yield in high-heat zones.' },
+      { name: 'Victron Energy', country: 'Netherlands / Europe', category: 'Industrial Inverter-Chargers & MPPTs', warranty: '5 Years', tier1: true, website: 'https://victronenergy.com', description: 'Heavy duty off-grid power conversion and marine-grade power systems.' },
+      { name: 'Must Energy', country: 'China / Nigeria', category: 'Cost-Effective Hybrid Inverters', warranty: '2 - 3 Years', tier1: true, website: 'https://mustpower.com', description: 'Affordable pure sine wave backup and hybrid inverters for homes.' }
+    ];
+
+    const catalogBrands = (facets && facets.brands) || [];
+    const brandsWithCounts = knownBrands.map(b => {
+      const match = catalogBrands.find(cb => cb.name.toLowerCase() === b.name.toLowerCase());
+      return {
+        ...b,
+        productsCount: match ? match.count : 0
+      };
+    });
+
+    res.json({ success: true, count: brandsWithCounts.length, brands: brandsWithCounts });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Admin Projects / Case Studies
+app.get('/api/admin/projects', requireAuth, requireRole('superadmin', 'admin', 'engineer'), async (req, res) => {
+  try {
+    const projects = await getCaseStudies();
+    res.json({ success: true, count: (projects || []).length, projects: projects || [] });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Admin Staff Users Directory (Superadmin Only)
+app.get('/api/admin/users', requireAuth, requireRole('superadmin'), async (req, res) => {
+  try {
+    let users = [];
+    if (isMongoConnected()) {
+      const { User: MongoUser } = require('./db/mongo/models');
+      users = await MongoUser.find({ role: { $ne: 'customer' } })
+        .select('id username email full_name role created_at updated_at')
+        .sort({ id: 1 })
+        .lean();
+    } else {
+      users = db.prepare("SELECT id, username, email, full_name, role, created_at FROM users WHERE role != 'customer' ORDER BY id ASC").all();
+    }
+    res.json({ success: true, count: users.length, users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Admin Platform Settings
+app.get('/api/admin/settings', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      settings: {
+        platform: {
+          brand: 'DEVICE PRO Nigeria',
+          environment: process.env.NODE_ENV || 'production',
+          region: 'Nigeria (36 States + FCT Abuja)',
+          currency: 'NGN (₦)',
+          vatRatePercent: 7.5
+        },
+        regionalPsh: REGIONAL_PSH,
+        generatorBenchmarks: GENERATOR_BENCHMARKS,
+        batteryChemistries: BATTERY_CHEMISTRIES,
+        paymentGateway: {
+          gateway: 'Paystack',
+          mode: IS_SANDBOX ? 'Sandbox / Test Mode' : 'Live Production Mode',
+          supportedChannels: ['Card (Mastercard / Visa / Verve)', 'Bank Transfer', 'USSD', 'Apple Pay'],
+          currency: 'NGN'
+        },
+        database: {
+          status: isMongoConnected() ? 'connected' : 'sqlite_active',
+          cluster: 'MongoDB Atlas (Replica Set Sharded Cluster)',
+          database: 'devicepro'
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Admin Website Content
+app.get('/api/admin/content', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      content: {
+        hero: {
+          title: 'Reliable Solar Power Engineered for Nigerian Homes & Businesses',
+          subtitle: 'Tier-1 Inverters, Lithium Storage & Turnkey Solar Systems Designed to Permanently Replace Expensive Fuel Generators.',
+          ctaPrimary: 'Calculate Your System Sizing',
+          ctaSecondary: 'Book Free Engineering Consultation'
+        },
+        trustStrip: [
+          { title: '100% Genuine OEM Hardware', desc: 'Direct from Deye, Felicity, Jinko & Growatt authorized distributors' },
+          { title: '5-10 Year Battery Warranties', desc: 'Verified LiFePO4 6000+ cycle warranties with rapid swap SLA' },
+          { title: 'Nationwide Delivery across 36 States', desc: 'Insured logistics via GIG, Red Star & dedicated logistics fleet' },
+          { title: 'COREN Accredited Engineers', desc: 'NEMSA compliant commissioning and electrical safety verification' }
+        ],
+        faqSummary: {
+          totalArticles: 14,
+          categories: ['Solar Inverters', 'LiFePO4 Storage', 'Installation & Sizing', 'Warranties & Support']
+        },
+        policies: [
+          { name: 'Warranty Registration & RMA Rapid Swap Policy', path: '/warranty' },
+          { name: 'Shipping, Delivery & Heavy Logistics Policy', path: '/shipping-policy' },
+          { name: 'Returns, Cancellation & Refund Policy', path: '/terms' },
+          { name: 'Data Privacy & Customer Security Policy', path: '/privacy-policy' }
+        ]
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Product Catalogue Administration (Stage 4)
 // List products with server-side pagination, search, category, stockStatus, status filters, and role-based supplier cost protection
 app.get('/api/admin/products', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'sales', 'staff'), async (req, res) => {
