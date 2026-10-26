@@ -41,6 +41,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
 const { connectMongo } = require('../db/mongo/connection');
 const { User, Session } = require('../db/mongo/models');
 
@@ -94,7 +95,12 @@ async function runTests() {
   }
 
   // Pre-test setup: Connect Mongo and obtain tokens
-  await connectMongo();
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const conn = await connectMongo();
+      if (conn && mongoose.connection.readyState === 1) break;
+    } catch (e) {}
+  }
 
   // 1. Authenticate Superadmin
   const saRes = await request('/api/auth/login', {
@@ -426,7 +432,14 @@ async function runTests() {
   });
   } finally {
     if (testCustomerEmail) {
-      await User.deleteOne({ email: testCustomerEmail }).catch(() => {});
+      try {
+        if (!mongoose.connection || mongoose.connection.readyState !== 1) {
+          await connectMongo();
+        }
+        await User.deleteOne({ email: testCustomerEmail });
+      } catch (e) {
+        console.error('Failed to teardown test customer:', e.message);
+      }
     }
   }
 
