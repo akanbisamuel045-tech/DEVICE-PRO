@@ -6768,15 +6768,30 @@
       }
 
       // Sync preview when typing or pasting URL
+      function updateUrlPreview() {
+        if (!textInput || !previewImg) return;
+        const val = textInput.value.trim();
+        if (val) {
+          previewImg.src = (val.startsWith('http') || val.startsWith('/')) ? val : `/${val}`;
+        } else {
+          previewImg.src = '/images/logo-mark.svg';
+        }
+      }
+
       if (textInput && previewImg) {
-        textInput.addEventListener('input', () => {
-          const val = textInput.value.trim();
-          if (val) {
-            previewImg.src = (val.startsWith('http') || val.startsWith('/')) ? val : `/${val}`;
-          } else {
-            previewImg.src = '/images/logo-mark.svg';
-          }
-        });
+        textInput.addEventListener('input', updateUrlPreview);
+        textInput.addEventListener('change', updateUrlPreview);
+        textInput.addEventListener('paste', () => setTimeout(updateUrlPreview, 50));
+      }
+
+      if (cfg.previewBtnId) {
+        const previewBtn = document.getElementById(cfg.previewBtnId);
+        if (previewBtn) {
+          previewBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            updateUrlPreview();
+          });
+        }
       }
     }
 
@@ -6787,7 +6802,8 @@
       textInputId: 'edit-prod-image',
       previewImgId: 'edit-prod-img-preview',
       statusId: 'edit-prod-upload-status',
-      containerId: 'edit-prod-preview-container'
+      containerId: 'edit-prod-preview-container',
+      previewBtnId: 'btn-edit-prod-preview-link'
     });
 
     // Bind Add Modal
@@ -6797,7 +6813,8 @@
       textInputId: 'add-prod-image',
       previewImgId: 'add-prod-img-preview',
       statusId: 'add-prod-upload-status',
-      containerId: 'add-prod-preview-container'
+      containerId: 'add-prod-preview-container',
+      previewBtnId: 'btn-add-prod-preview-link'
     });
   }
 
