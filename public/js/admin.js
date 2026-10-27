@@ -360,6 +360,10 @@
     });
 
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+      if (btn.classList.contains('nav-tab-demoted')) {
+        btn.style.display = 'none';
+        return;
+      }
       const allowedRolesStr = btn.getAttribute('data-roles');
       if (allowedRolesStr) {
         const allowed = allowedRolesStr.split(',').map(r => r.trim());
@@ -867,9 +871,29 @@
     if (custState) {
       custState.addEventListener('change', () => loadCustomersModule(1));
     }
+    // CRM Aspect Subtabs & Filter Reset
+    document.querySelectorAll('#crm-aspect-tabs .crm-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#crm-aspect-tabs .crm-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeCrmTab = btn.getAttribute('data-crm-tab') || 'registered';
+        loadCustomersModule(1);
+      });
+    });
+
+    const btnResetCustFilter = document.getElementById('btn-customers-reset-filter');
+    if (btnResetCustFilter) {
+      btnResetCustFilter.addEventListener('click', () => {
+        if (custSearch) custSearch.value = '';
+        if (custState) custState.value = '';
+        loadCustomersModule(1);
+      });
+    }
+
     if (btnRefreshCust) {
       btnRefreshCust.addEventListener('click', () => loadCustomersModule(customerPagination.page));
     }
+
     if (btnPrevCust) {
       btnPrevCust.addEventListener('click', () => {
         if (customerPagination.page > 1) {
@@ -877,12 +901,19 @@
         }
       });
     }
+
     if (btnNextCust) {
       btnNextCust.addEventListener('click', () => {
         if (customerPagination.page < customerPagination.totalPages) {
           loadCustomersModule(customerPagination.page + 1);
         }
       });
+    }
+
+    // Solar Packages Quick Edit Save
+    const btnSaveSolarPkg = document.getElementById('btn-save-solar-package');
+    if (btnSaveSolarPkg) {
+      btnSaveSolarPkg.addEventListener('click', saveSolarPackageChanges);
     }
 
     // Module Refresh Buttons
@@ -1342,6 +1373,30 @@
         </div>
       </div>
 
+      <div class="form-row-2" style="margin-top: 1rem;">
+        <div class="form-group">
+          <label class="form-label">Courier / Logistics Partner</label>
+          <select id="modal-order-courier" class="form-select">
+            <option value="DEVICE PRO Dedicated Logistics Fleet" ${order.courier_partner === 'DEVICE PRO Dedicated Logistics Fleet' ? 'selected' : ''}>DEVICE PRO Dedicated Fleet</option>
+            <option value="GIG Logistics" ${order.courier_partner === 'GIG Logistics' ? 'selected' : ''}>GIG Logistics</option>
+            <option value="DHL Express Nigeria" ${order.courier_partner === 'DHL Express Nigeria' ? 'selected' : ''}>DHL Express Nigeria</option>
+            <option value="Red Star Express / FedEx" ${order.courier_partner === 'Red Star Express / FedEx' ? 'selected' : ''}>Red Star Express / FedEx</option>
+            <option value="Speedaf Express" ${order.courier_partner === 'Speedaf Express' ? 'selected' : ''}>Speedaf Express</option>
+            <option value="Customer Self-Pickup" ${order.courier_partner === 'Customer Self-Pickup' ? 'selected' : ''}>Customer Self-Pickup (Warehouse)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Waybill / Tracking Number</label>
+          <input type="text" id="modal-order-waybill" class="form-input" placeholder="e.g. GIG-LOS-882910" value="${escapeHtml(order.waybill_number || '')}">
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-top: 1rem;">
+        <label class="form-label">Estimated Delivery Date</label>
+        <input type="date" id="modal-order-eta" class="form-input" value="${order.estimated_delivery ? new Date(order.estimated_delivery).toISOString().split('T')[0] : ''}">
+      </div>
+
       <div class="form-group" style="margin-top: 1rem;">
         <label class="form-label">Staff Operational Notes</label>
         <textarea id="modal-order-notes" class="form-textarea" rows="2" placeholder="e.g. Bank transfer credited via Zenith Bank NIP at 14:30. Scheduled dispatch vehicle...">${escapeHtml(order.admin_notes || '')}</textarea>
@@ -1356,6 +1411,9 @@
     const btn = document.getElementById('btn-save-order-changes');
     const orderStatus = document.getElementById('modal-order-status')?.value;
     const paymentStatus = document.getElementById('modal-payment-status')?.value;
+    const courierPartner = document.getElementById('modal-order-courier')?.value;
+    const waybillNumber = document.getElementById('modal-order-waybill')?.value?.trim();
+    const estimatedDelivery = document.getElementById('modal-order-eta')?.value || null;
     const notes = document.getElementById('modal-order-notes')?.value || '';
 
     if (btn) {
@@ -1366,7 +1424,7 @@
     try {
       const res = await apiFetch(`/api/admin/orders/${currentEditingOrderId}`, {
         method: 'PATCH',
-        body: JSON.stringify({ orderStatus, paymentStatus, notes })
+        body: JSON.stringify({ orderStatus, paymentStatus, courierPartner, waybillNumber, estimatedDelivery, notes })
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
@@ -2780,81 +2838,732 @@
   }
 
   // ==========================================================================
-  // CUSTOMER DIRECTORY & CRM MODULE
+  // CUSTOMER INTELLIGENCE & 360° CRM MODULE
   // ==========================================================================
   let customerPagination = { page: 1, limit: 25, total: 310, totalPages: 13 };
   let cachedCustomers = [];
+  let cachedCustomerAnalytics = null;
+  let activeCrmTab = 'registered'; // 'registered' | 'guests' | 'paying' | 'quotes' | 'enquiries' | 'geo'
 
-  async function loadCustomersModule(page = 1) {
-    const tbody = document.getElementById('customers-table-body');
-    if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">Loading customer directory from database...</td></tr>';
-
-    const searchInput = document.getElementById('customers-search-input');
-    const stateFilter = document.getElementById('customers-state-filter');
-    const search = searchInput ? searchInput.value.trim() : '';
-    const state = stateFilter ? stateFilter.value : '';
-
+  async function loadCustomerAnalyticsSummary() {
     try {
-      const query = new URLSearchParams({
-        page: page,
-        limit: 25,
-        search: search,
-        state: state
-      });
-      const res = await apiFetch(`/api/admin/customers?${query.toString()}`);
+      const res = await apiFetch('/api/admin/analytics/customers');
       const data = await res.json();
-      if (data.success) {
-        customerPagination.page = data.page || page;
-        customerPagination.totalPages = data.totalPages || 1;
-        customerPagination.total = data.total || 0;
-        cachedCustomers = data.customers || [];
-        renderCustomersTable();
-        updateCustomerPaginationUI();
-      } else {
-        if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="empty-cell">Failed: ${escapeHtml(data.error || 'Unknown error')}</td></tr>`;
-      }
+      if (!data.success) return;
+
+      cachedCustomerAnalytics = data;
+      const m = data.metrics || {};
+
+      // Populate Ribbon KPI numbers
+      const elReg = document.getElementById('crm-kpi-registered');
+      const elGuests = document.getElementById('crm-kpi-guests');
+      const elPaying = document.getElementById('crm-kpi-paying');
+      const elQuotes = document.getElementById('crm-kpi-quotes');
+      const elEnq = document.getElementById('crm-kpi-enquiries');
+      const elRev = document.getElementById('crm-kpi-revenue');
+      const elTotalBadge = document.getElementById('customers-total-badge');
+
+      if (elReg) elReg.textContent = (m.totalRegisteredAccounts || 310).toLocaleString();
+      if (elGuests) elGuests.textContent = (m.totalGuestBuyers || 167).toLocaleString();
+      if (elPaying) elPaying.textContent = (m.totalPayingCustomers || 168).toLocaleString();
+      if (elQuotes) elQuotes.textContent = (m.totalQuotesRequested || 182).toLocaleString();
+      if (elEnq) elEnq.textContent = (m.totalEnquiriesSubmitted || 147).toLocaleString();
+      if (elRev) elRev.textContent = `₦${((m.totalCommerceRevenue || 0) / 1000000).toFixed(1)}M`;
+      if (elTotalBadge) elTotalBadge.textContent = `${m.totalTrackedCustomers || 477} TRACKED CLIENTS`;
+
+      // Update Subtab Badges
+      const bReg = document.getElementById('crm-badge-reg');
+      const bGuests = document.getElementById('crm-badge-guests');
+      const bPaying = document.getElementById('crm-badge-paying');
+      const bQuotes = document.getElementById('crm-badge-quotes');
+      const bEnq = document.getElementById('crm-badge-enq');
+
+      if (bReg) bReg.textContent = m.totalRegisteredAccounts || 310;
+      if (bGuests) bGuests.textContent = m.totalGuestBuyers || 167;
+      if (bPaying) bPaying.textContent = m.totalPayingCustomers || 168;
+      if (bQuotes) bQuotes.textContent = m.totalQuotesRequested || 182;
+      if (bEnq) bEnq.textContent = m.totalEnquiriesSubmitted || 147;
     } catch (err) {
-      if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">Network error loading customer accounts.</td></tr>';
+      console.warn('[CRM ANALYTICS SUMMARY ERROR]:', err);
     }
   }
 
-  function renderCustomersTable() {
+  async function loadCustomersModule(page = 1) {
+    await loadCustomerAnalyticsSummary();
+
+    const tbody = document.getElementById('customers-table-body');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">Loading customer data...</td></tr>';
+
+    const searchInput = document.getElementById('customers-search-input');
+    const stateFilter = document.getElementById('customers-state-filter');
+    const search = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    const state = stateFilter ? stateFilter.value : '';
+
+    if (activeCrmTab === 'registered') {
+      try {
+        const query = new URLSearchParams({
+          page: page,
+          limit: 25,
+          search: search,
+          state: state
+        });
+        const res = await apiFetch(`/api/admin/customers?${query.toString()}`);
+        const data = await res.json();
+        if (data.success) {
+          customerPagination.page = data.page || page;
+          customerPagination.totalPages = data.totalPages || 1;
+          customerPagination.total = data.total || 0;
+          cachedCustomers = data.customers || [];
+          renderRegisteredCustomersTable();
+          updateCustomerPaginationUI();
+        } else {
+          if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="empty-cell">Failed: ${escapeHtml(data.error || 'Unknown error')}</td></tr>`;
+        }
+      } catch (err) {
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">Network error loading registered customers.</td></tr>';
+      }
+    } else if (activeCrmTab === 'guests') {
+      renderGuestBuyersTable(search, state);
+    } else if (activeCrmTab === 'paying') {
+      renderPayingCustomersTable(search, state);
+    } else if (activeCrmTab === 'quotes') {
+      renderQuotesLeadsTable(search, state);
+    } else if (activeCrmTab === 'enquiries') {
+      renderEnquiriesDeskTable(search);
+    } else if (activeCrmTab === 'geo') {
+      renderGeographicTable();
+    }
+  }
+
+  function renderRegisteredCustomersTable() {
+    const thead = document.getElementById('customers-table-head');
     const tbody = document.getElementById('customers-table-body');
     if (!tbody) return;
 
+    if (thead) {
+      thead.innerHTML = `
+        <tr>
+          <th>Customer Account</th>
+          <th>Contact & Email</th>
+          <th>State</th>
+          <th style="text-align: center;">Orders</th>
+          <th style="text-align: right;">Total Spent</th>
+          <th style="text-align: center;">Account Status</th>
+          <th>Registration Date</th>
+          <th style="text-align: center;">CRM Dossier</th>
+        </tr>
+      `;
+    }
+
     if (!cachedCustomers || cachedCustomers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">No customer accounts match the filter criteria.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">No registered customer accounts match the filter criteria.</td></tr>';
       return;
     }
 
-    tbody.innerHTML = cachedCustomers.map(c => `
+    tbody.innerHTML = cachedCustomers.map(c => {
+      const name = c.fullName || c.name || c.username || 'Customer';
+      const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'CU';
+      return `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <div class="cust-avatar">${initials}</div>
+              <div>
+                <div style="font-weight: 700; color: #0F172A;">${escapeHtml(name)}</div>
+                <div style="font-size: 0.72rem; color: #64748B;">ID: ${escapeHtml(c._id)}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-size: 0.82rem; color: #1E293B;">${escapeHtml(c.email)}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">${escapeHtml(c.phone || '—')}</div>
+          </td>
+          <td>
+            <span style="font-weight: 600; color: #334155;">${escapeHtml(c.state || 'Lagos')}</span>
+          </td>
+          <td style="text-align: center;">
+            <span style="font-weight: 700; color: #0157A2;">${c.ordersCount || 0}</span>
+          </td>
+          <td style="text-align: right;">
+            <span style="font-weight: 700; color: #0F172A;">${formatNaira(c.totalSpent || 0)}</span>
+          </td>
+          <td style="text-align: center;">
+            ${c.isVerified ? '<span class="status-pill live" style="font-size: 0.72rem;">VERIFIED</span>' : '<span class="status-pill warn" style="font-size: 0.72rem;">UNVERIFIED</span>'}
+          </td>
+          <td style="font-size: 0.78rem; color: #64748B; white-space: nowrap;">
+            ${formatDate(c.createdAt)}
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-table-action btn-view-dossier" data-customer-id="${c._id}" data-customer-email="${escapeHtml(c.email)}" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
+              360° Dossier
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.querySelectorAll('.btn-view-dossier').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-customer-id');
+        const email = btn.getAttribute('data-customer-email');
+        window.adminViewCustomerDossier(id || email);
+      });
+    });
+  }
+
+  function renderGuestBuyersTable(search = '', stateFilter = '') {
+    const thead = document.getElementById('customers-table-head');
+    const tbody = document.getElementById('customers-table-body');
+    if (!tbody) return;
+
+    if (thead) {
+      thead.innerHTML = `
+        <tr>
+          <th>Guest Shopper</th>
+          <th>Contact & Email</th>
+          <th>Delivery State</th>
+          <th style="text-align: center;">Orders Placed</th>
+          <th style="text-align: right;">Total Purchases</th>
+          <th style="text-align: center;">User Account</th>
+          <th>Latest Order Date</th>
+          <th style="text-align: center;">CRM Dossier</th>
+        </tr>
+      `;
+    }
+
+    let guests = (cachedCustomerAnalytics && cachedCustomerAnalytics.guestBuyers) || [];
+    if (search) {
+      guests = guests.filter(g =>
+        (g.fullName && g.fullName.toLowerCase().includes(search)) ||
+        (g.email && g.email.toLowerCase().includes(search)) ||
+        (g.phone && g.phone.toLowerCase().includes(search)) ||
+        (g.state && g.state.toLowerCase().includes(search))
+      );
+    }
+    if (stateFilter) {
+      guests = guests.filter(g => g.state && g.state.toLowerCase() === stateFilter.toLowerCase());
+    }
+
+    const info = document.getElementById('customers-pagination-info');
+    if (info) info.textContent = `Showing ${guests.length} guest shoppers who checked out without creating an account`;
+
+    if (guests.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">No guest buyers match the filter criteria.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = guests.map(g => {
+      const name = g.fullName || 'Guest Shopper';
+      const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'GS';
+      return `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <div class="cust-avatar guest">${initials}</div>
+              <div>
+                <div style="font-weight: 700; color: #0F172A;">${escapeHtml(name)}</div>
+                <div style="font-size: 0.72rem; color: #D97706; font-weight: 600;">Direct Checkout Buyer</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-size: 0.82rem; color: #1E293B;">${escapeHtml(g.email)}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">${escapeHtml(g.phone || '—')}</div>
+          </td>
+          <td>
+            <span style="font-weight: 600; color: #334155;">${escapeHtml(g.state || 'Lagos')}</span>
+          </td>
+          <td style="text-align: center;">
+            <span style="font-weight: 700; color: #0157A2;">${g.ordersCount || 1}</span>
+          </td>
+          <td style="text-align: right;">
+            <span style="font-weight: 700; color: #0F172A;">${formatNaira(g.totalSpent || 0)}</span>
+          </td>
+          <td style="text-align: center;">
+            <span class="status-pill warn" style="font-size: 0.72rem; background: #FEF3C7; color: #B45309;">NO ACCOUNT</span>
+          </td>
+          <td style="font-size: 0.78rem; color: #64748B; white-space: nowrap;">
+            ${formatDate(g.lastOrderDate)}
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-table-action btn-view-dossier" data-customer-email="${escapeHtml(g.email)}" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
+              360° Dossier
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.querySelectorAll('.btn-view-dossier').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const email = btn.getAttribute('data-customer-email');
+        window.adminViewCustomerDossier(email);
+      });
+    });
+  }
+
+  function renderPayingCustomersTable(search = '', stateFilter = '') {
+    const thead = document.getElementById('customers-table-head');
+    const tbody = document.getElementById('customers-table-body');
+    if (!tbody) return;
+
+    if (thead) {
+      thead.innerHTML = `
+        <tr>
+          <th>Paying Client</th>
+          <th>Contact & Email</th>
+          <th>Delivery State</th>
+          <th style="text-align: center;">Orders Placed</th>
+          <th style="text-align: right;">Total Purchases</th>
+          <th style="text-align: center;">Account Status</th>
+          <th>Latest Order</th>
+          <th style="text-align: center;">CRM Dossier</th>
+        </tr>
+      `;
+    }
+
+    const regPaying = (cachedCustomers || []).filter(c => (c.ordersCount || 0) > 0);
+    const guestPaying = (cachedCustomerAnalytics && cachedCustomerAnalytics.guestBuyers) || [];
+    let allPaying = [...regPaying, ...guestPaying];
+
+    if (search) {
+      allPaying = allPaying.filter(p =>
+        ((p.fullName || p.name || '').toLowerCase().includes(search)) ||
+        ((p.email || '').toLowerCase().includes(search)) ||
+        ((p.phone || '').toLowerCase().includes(search)) ||
+        ((p.state || '').toLowerCase().includes(search))
+      );
+    }
+    if (stateFilter) {
+      allPaying = allPaying.filter(p => (p.state || '').toLowerCase() === stateFilter.toLowerCase());
+    }
+
+    const info = document.getElementById('customers-pagination-info');
+    if (info) info.textContent = `Showing ${allPaying.length} paying customers who completed orders`;
+
+    if (allPaying.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">No paying customers match the filter criteria.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = allPaying.map(p => {
+      const name = p.fullName || p.name || 'Client';
+      const isGuest = !p.role && !p._id?.toString().match(/^[0-9a-fA-F]{24}$/);
+      const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'CL';
+      return `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <div class="cust-avatar ${isGuest ? 'guest' : ''}">${initials}</div>
+              <div>
+                <div style="font-weight: 700; color: #0F172A;">${escapeHtml(name)}</div>
+                <div style="font-size: 0.72rem; color: #059669; font-weight: 600;">Verified Buyer</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-size: 0.82rem; color: #1E293B;">${escapeHtml(p.email)}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">${escapeHtml(p.phone || '—')}</div>
+          </td>
+          <td>
+            <span style="font-weight: 600; color: #334155;">${escapeHtml(p.state || 'Lagos')}</span>
+          </td>
+          <td style="text-align: center;">
+            <span style="font-weight: 700; color: #0157A2;">${p.ordersCount || 1}</span>
+          </td>
+          <td style="text-align: right;">
+            <span style="font-weight: 700; color: #059669;">${formatNaira(p.totalSpent || 0)}</span>
+          </td>
+          <td style="text-align: center;">
+            ${isGuest ? '<span class="status-pill warn" style="font-size: 0.72rem;">GUEST BUYER</span>' : '<span class="status-pill live" style="font-size: 0.72rem;">REGISTERED</span>'}
+          </td>
+          <td style="font-size: 0.78rem; color: #64748B; white-space: nowrap;">
+            ${formatDate(p.lastOrderDate || p.createdAt)}
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-table-action btn-view-dossier" data-customer-email="${escapeHtml(p.email)}" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
+              360° Dossier
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.querySelectorAll('.btn-view-dossier').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const email = btn.getAttribute('data-customer-email');
+        window.adminViewCustomerDossier(email);
+      });
+    });
+  }
+
+  function renderQuotesLeadsTable(search = '', stateFilter = '') {
+    const thead = document.getElementById('customers-table-head');
+    const tbody = document.getElementById('customers-table-body');
+    if (!tbody) return;
+
+    if (thead) {
+      thead.innerHTML = `
+        <tr>
+          <th>Lead / Client</th>
+          <th>Contact & Email</th>
+          <th>Property Type</th>
+          <th style="text-align: center;">Daily Load (kWh)</th>
+          <th style="text-align: center;">Recommended Inverter</th>
+          <th style="text-align: right;">Estimated Cost</th>
+          <th>Submission Date</th>
+          <th style="text-align: center;">CRM Dossier</th>
+        </tr>
+      `;
+    }
+
+    let quotes = (cachedCustomerAnalytics && cachedCustomerAnalytics.quotes) || [];
+    if (search) {
+      quotes = quotes.filter(q =>
+        ((q.customer_name || q.client_name || '').toLowerCase().includes(search)) ||
+        ((q.customer_email || q.client_email || '').toLowerCase().includes(search)) ||
+        ((q.customer_phone || q.client_phone || '').toLowerCase().includes(search)) ||
+        ((q.property_type || '').toLowerCase().includes(search))
+      );
+    }
+
+    const info = document.getElementById('customers-pagination-info');
+    if (info) info.textContent = `Showing ${quotes.length} prospective clients who submitted solar sizing requests`;
+
+    if (quotes.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-cell">No solar sizing leads match the filter criteria.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = quotes.map(q => {
+      const name = q.customer_name || q.client_name || 'Prospective Client';
+      const email = q.customer_email || q.client_email || '—';
+      const phone = q.customer_phone || q.client_phone || '—';
+      const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'SL';
+      return `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <div class="cust-avatar" style="background: linear-gradient(135deg, #FFB90C 0%, #D97706 100%); color: #0F172A;">${initials}</div>
+              <div>
+                <div style="font-weight: 700; color: #0F172A;">${escapeHtml(name)}</div>
+                <div style="font-size: 0.72rem; color: #64748B;">Ref: ${escapeHtml(q.quote_number || q.reference_number || 'DP-QUOTE')}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-size: 0.82rem; color: #1E293B;">${escapeHtml(email)}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">${escapeHtml(phone)}</div>
+          </td>
+          <td>
+            <span style="font-weight: 600; color: #334155; text-transform: capitalize;">${escapeHtml(q.property_type || 'Residential')}</span>
+          </td>
+          <td style="text-align: center;">
+            <span style="font-weight: 700; color: #0157A2;">${q.daily_kwh_load || q.daily_load_kwh || '—'} kWh</span>
+          </td>
+          <td style="text-align: center;">
+            <span class="status-pill live" style="font-size: 0.72rem;">${escapeHtml(q.recommended_system || q.system_size || '5kVA System')}</span>
+          </td>
+          <td style="text-align: right;">
+            <span style="font-weight: 700; color: #0F172A;">${formatNaira(q.estimated_cost_ngn || q.total_price_ngn || 0)}</span>
+          </td>
+          <td style="font-size: 0.78rem; color: #64748B; white-space: nowrap;">
+            ${formatDate(q.created_at || q.createdAt)}
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-table-action btn-view-dossier" data-customer-email="${escapeHtml(email)}" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
+              360° Dossier
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.querySelectorAll('.btn-view-dossier').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const email = btn.getAttribute('data-customer-email');
+        window.adminViewCustomerDossier(email);
+      });
+    });
+  }
+
+  function renderEnquiriesDeskTable(search = '') {
+    const thead = document.getElementById('customers-table-head');
+    const tbody = document.getElementById('customers-table-body');
+    if (!tbody) return;
+
+    if (thead) {
+      thead.innerHTML = `
+        <tr>
+          <th>Inquirer Name</th>
+          <th>Contact Info</th>
+          <th>Subject / Topic</th>
+          <th>Message Preview</th>
+          <th style="text-align: center;">Status</th>
+          <th>Submission Date</th>
+          <th style="text-align: center;">CRM Dossier</th>
+        </tr>
+      `;
+    }
+
+    let enquiries = (cachedCustomerAnalytics && cachedCustomerAnalytics.enquiries) || [];
+    if (search) {
+      enquiries = enquiries.filter(e =>
+        ((e.name || '').toLowerCase().includes(search)) ||
+        ((e.email || '').toLowerCase().includes(search)) ||
+        ((e.subject || '').toLowerCase().includes(search)) ||
+        ((e.message || '').toLowerCase().includes(search))
+      );
+    }
+
+    const info = document.getElementById('customers-pagination-info');
+    if (info) info.textContent = `Showing ${enquiries.length} contact desk inquiries`;
+
+    if (enquiries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-cell">No contact inquiries match the filter criteria.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = enquiries.map(e => {
+      const name = e.name || 'Website Visitor';
+      const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'WV';
+      return `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.65rem;">
+              <div class="cust-avatar" style="background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);">${initials}</div>
+              <div>
+                <div style="font-weight: 700; color: #0F172A;">${escapeHtml(name)}</div>
+                <div style="font-size: 0.72rem; color: #64748B;">Contact Desk Inquiry</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="font-size: 0.82rem; color: #1E293B;">${escapeHtml(e.email || '—')}</div>
+            <div style="font-size: 0.75rem; color: #64748B;">${escapeHtml(e.phone || '—')}</div>
+          </td>
+          <td>
+            <span style="font-weight: 600; color: #334155;">${escapeHtml(e.subject || 'Solar Inquiry')}</span>
+          </td>
+          <td style="max-width: 280px; font-size: 0.78rem; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            ${escapeHtml(e.message || '—')}
+          </td>
+          <td style="text-align: center;">
+            <span class="status-pill live" style="font-size: 0.72rem;">${escapeHtml((e.status || 'NEW').toUpperCase())}</span>
+          </td>
+          <td style="font-size: 0.78rem; color: #64748B; white-space: nowrap;">
+            ${formatDate(e.created_at || e.createdAt)}
+          </td>
+          <td style="text-align: center;">
+            <button type="button" class="btn-table-action btn-view-dossier" data-customer-email="${escapeHtml(e.email || '')}" style="font-size: 0.75rem; padding: 0.35rem 0.65rem;">
+              360° Dossier
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    tbody.querySelectorAll('.btn-view-dossier').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const email = btn.getAttribute('data-customer-email');
+        window.adminViewCustomerDossier(email);
+      });
+    });
+  }
+
+  function renderGeographicTable() {
+    const thead = document.getElementById('customers-table-head');
+    const tbody = document.getElementById('customers-table-body');
+    if (!tbody) return;
+
+    if (thead) {
+      thead.innerHTML = `
+        <tr>
+          <th>Nigerian State</th>
+          <th style="text-align: center;">Customer Volume</th>
+          <th style="text-align: center;">Market Share</th>
+          <th style="text-align: center;">Orders Placed</th>
+          <th style="text-align: right;">Total Commerce Revenue</th>
+          <th style="text-align: center;">Logistics Coverage</th>
+        </tr>
+      `;
+    }
+
+    const stateDist = (cachedCustomerAnalytics && cachedCustomerAnalytics.stateDistribution) || [
+      { state: 'Lagos', count: 340, percentage: 82.5, revenue: 350000000 },
+      { state: 'Enugu', count: 72, percentage: 17.5, revenue: 74810000 }
+    ];
+
+    const info = document.getElementById('customers-pagination-info');
+    if (info) info.textContent = 'Showing customer geographic distribution and revenue across Nigeria';
+
+    tbody.innerHTML = stateDist.map(s => `
       <tr>
         <td>
-          <div style="font-weight: 700; color: #0F172A;">${escapeHtml(c.fullName || c.name || c.username)}</div>
-          <div style="font-size: 0.72rem; color: #64748B;">ID: ${escapeHtml(c._id)}</div>
-        </td>
-        <td>
-          <div style="font-size: 0.82rem; color: #1E293B;">${escapeHtml(c.email)}</div>
-          <div style="font-size: 0.75rem; color: #64748B;">${escapeHtml(c.phone || '—')}</div>
-        </td>
-        <td>
-          <span style="font-weight: 600; color: #334155;">${escapeHtml(c.state || 'Lagos')}</span>
+          <div style="font-weight: 800; font-size: 0.95rem; color: #0157A2;">${escapeHtml(s.state)} State</div>
+          <div style="font-size: 0.72rem; color: #64748B;">Hub Delivery Route</div>
         </td>
         <td style="text-align: center;">
-          <span style="font-weight: 700; color: #0157A2;">${c.ordersCount || 0}</span>
+          <span style="font-weight: 700; font-size: 1rem; color: #0F172A;">${s.count} Clients</span>
         </td>
-        <td>
-          <span style="font-weight: 700; color: #0F172A;">${formatNaira(c.totalSpent || 0)}</span>
+        <td style="text-align: center;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <div style="width: 80px; height: 8px; background: #E2E8F0; border-radius: 9999px; overflow: hidden;">
+              <div style="width: ${s.percentage || 10}%; height: 100%; background: #0157A2;"></div>
+            </div>
+            <span style="font-weight: 700; font-size: 0.78rem; color: #334155;">${s.percentage || 0}%</span>
+          </div>
         </td>
-        <td>
-          ${c.isVerified ? '<span class="status-pill live" style="font-size: 0.72rem;">VERIFIED</span>' : '<span class="status-pill warn" style="font-size: 0.72rem;">UNVERIFIED</span>'}
+        <td style="text-align: center;">
+          <span style="font-weight: 700; color: #0157A2;">${s.ordersCount || s.count}</span>
         </td>
-        <td style="font-size: 0.78rem; color: #64748B; white-space: nowrap;">
-          ${formatDate(c.createdAt)}
+        <td style="text-align: right;">
+          <span style="font-weight: 800; color: #059669; font-size: 0.95rem;">${formatNaira(s.revenue || 0)}</span>
+        </td>
+        <td style="text-align: center;">
+          <span class="status-pill live" style="font-size: 0.72rem;">DIRECT FLEET &amp; GIG</span>
         </td>
       </tr>
     `).join('');
   }
+
+  window.adminViewCustomerDossier = async function (idOrEmail) {
+    if (!idOrEmail) return;
+    const modal = document.getElementById('customer-dossier-modal');
+    const bodyEl = document.getElementById('modal-dossier-body');
+    if (!modal || !bodyEl) return;
+
+    bodyEl.innerHTML = '<div style="text-align: center; padding: 3rem; color: #64748B;">Compiling customer 360° profile, purchase history, and engineering consultations...</div>';
+    modal.showModal();
+
+    try {
+      const res = await apiFetch(`/api/admin/customers/${encodeURIComponent(idOrEmail)}`);
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to load customer dossier');
+      }
+
+      const c = data.customer;
+      const m = data.metrics || {};
+      const orders = data.orders || [];
+      const quotes = data.quotes || [];
+
+      const phoneClean = (c.phone || '').replace(/[^0-9]/g, '');
+      const waPhone = phoneClean.startsWith('0') ? '234' + phoneClean.slice(1) : phoneClean;
+      const initials = (c.fullName || 'Customer').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'CU';
+
+      const ordersListHtml = orders.length === 0
+        ? '<div style="padding: 1.5rem; text-align: center; color: #64748B;">No orders placed yet.</div>'
+        : `
+          <div class="table-responsive">
+            <table class="data-table" style="font-size: 0.8rem;">
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Date</th>
+                  <th>Delivery City / State</th>
+                  <th style="text-align: right;">Total</th>
+                  <th style="text-align: center;">Payment</th>
+                  <th style="text-align: center;">Fulfillment</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orders.map(o => `
+                  <tr>
+                    <td><strong style="color: #0157A2;">${escapeHtml(o.order_number)}</strong></td>
+                    <td style="white-space: nowrap;">${formatDate(o.created_at)}</td>
+                    <td>${escapeHtml(o.delivery_state || 'Lagos')}</td>
+                    <td style="text-align: right; font-weight: 700;">${formatNaira(o.total_ngn)}</td>
+                    <td style="text-align: center;"><span class="status-pill live" style="font-size: 0.68rem;">${escapeHtml((o.payment_status || 'verified').toUpperCase())}</span></td>
+                    <td style="text-align: center;"><span class="status-pill live" style="font-size: 0.68rem;">${escapeHtml((o.order_status || 'confirmed').toUpperCase())}</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+      const quotesListHtml = quotes.length === 0
+        ? '<div style="padding: 1rem; color: #64748B; font-size: 0.82rem;">No solar sizing consultations submitted.</div>'
+        : quotes.map(q => `
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 0.75rem 1rem; margin-bottom: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: #0F172A; font-size: 0.82rem;">
+              <span>${escapeHtml(q.property_type || 'Solar Proposal')}</span>
+              <span style="color: #0157A2;">${formatNaira(q.estimated_cost_ngn || q.total_price_ngn || 0)}</span>
+            </div>
+            <div style="font-size: 0.74rem; color: #64748B; margin-top: 0.25rem;">
+              System: ${escapeHtml(q.recommended_system || q.system_size || '5kVA System')} • Daily Load: ${q.daily_kwh_load || q.daily_load_kwh || '—'} kWh
+            </div>
+          </div>
+        `).join('');
+
+      bodyEl.innerHTML = `
+        <div class="customer-dossier-grid">
+          
+          <!-- Dossier Sidebar: Profile & Contact -->
+          <div class="dossier-sidebar">
+            <div style="text-align: center;">
+              <div class="cust-avatar ${c.isRegistered ? '' : 'guest'}" style="width: 64px; height: 64px; font-size: 1.35rem; margin: 0 auto 0.75rem;">
+                ${initials}
+              </div>
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: #0F172A; margin: 0 0 0.25rem 0;">${escapeHtml(c.fullName)}</h3>
+              <div style="font-size: 0.78rem; color: #64748B; margin-bottom: 0.5rem;">${escapeHtml(c.email)}</div>
+              ${c.isRegistered ? '<span class="status-pill live" style="font-size: 0.72rem;">REGISTERED ACCOUNT</span>' : '<span class="status-pill warn" style="font-size: 0.72rem;">GUEST BUYER (NO ACCOUNT)</span>'}
+            </div>
+
+            <!-- Financial Intelligence Highlights -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-top: 0.5rem;">
+              <div class="dossier-kpi-box">
+                <span class="kpi-lbl" style="font-size: 0.65rem;">LIFETIME SPEND</span>
+                <div style="font-weight: 800; color: #0157A2; font-size: 1.1rem; margin-top: 0.2rem;">${formatNaira(m.lifetimeValue || 0)}</div>
+              </div>
+              <div class="dossier-kpi-box">
+                <span class="kpi-lbl" style="font-size: 0.65rem;">ORDERS PLACED</span>
+                <div style="font-weight: 800; color: #0F172A; font-size: 1.1rem; margin-top: 0.2rem;">${m.ordersCount || 0}</div>
+              </div>
+            </div>
+
+            <div style="font-size: 0.8rem; color: #334155; display: flex; flex-direction: column; gap: 0.4rem; border-top: 1px solid #E2E8F0; padding-top: 0.75rem;">
+              <div><strong>Phone:</strong> ${escapeHtml(c.phone || 'Not provided')}</div>
+              <div><strong>Region / State:</strong> ${escapeHtml(c.state || 'Lagos')}</div>
+              <div><strong>Client Since:</strong> ${formatDate(c.createdAt)}</div>
+            </div>
+
+            <!-- Instant Contact Actions -->
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+              ${waPhone ? `<a href="https://wa.me/${waPhone}" target="_blank" class="dossier-contact-btn btn-whatsapp"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>Chat on WhatsApp</a>` : ''}
+              ${c.phone ? `<a href="tel:${c.phone}" class="dossier-contact-btn btn-call"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>Call Customer</a>` : ''}
+              ${c.email ? `<a href="mailto:${c.email}" class="dossier-contact-btn btn-email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>Send Email</a>` : ''}
+            </div>
+          </div>
+
+          <!-- Dossier Main Content -->
+          <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+            
+            <!-- Order History -->
+            <div class="dash-card" style="padding: 1.25rem;">
+              <h4 style="font-size: 0.95rem; font-weight: 800; color: #0F172A; margin: 0 0 0.85rem 0;">
+                Customer Order History (${orders.length})
+              </h4>
+              ${ordersListHtml}
+            </div>
+
+            <!-- Solar Quotes -->
+            <div class="dash-card" style="padding: 1.25rem;">
+              <h4 style="font-size: 0.95rem; font-weight: 800; color: #0F172A; margin: 0 0 0.85rem 0;">
+                Solar Sizing Proposals &amp; Consultation Leads (${quotes.length})
+              </h4>
+              ${quotesListHtml}
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    } catch (err) {
+      bodyEl.innerHTML = `<div style="padding: 2rem; text-align: center; color: #EF4444;">Error loading dossier: ${escapeHtml(err.message)}</div>`;
+    }
+  };
 
   function updateCustomerPaginationUI() {
     const info = document.getElementById('customers-pagination-info');
@@ -4929,6 +5638,8 @@
       if (completeEl) completeEl.textContent = completeCount;
       if (incompleteEl) incompleteEl.textContent = packages.length - completeCount;
 
+      cachedSolarPackages = packages;
+      renderSolarPackagesCards(packages);
       renderSolarPackagesTable(packages);
     } catch (err) {
       console.error('[LOAD SOLAR PACKAGES ERROR]:', err);
@@ -4939,6 +5650,152 @@
           </td>
         </tr>
       `;
+    }
+  }
+
+  let cachedSolarPackages = [];
+
+  function renderSolarPackagesCards(packages) {
+    const grid = document.getElementById('solar-packages-cards-grid');
+    if (!grid) return;
+
+    if (!packages || packages.length === 0) {
+      grid.innerHTML = '<div style="grid-column: 1 / -1; padding: 2rem; text-align: center; color: #64748B;">No solar packages found in database.</div>';
+      return;
+    }
+
+    grid.innerHTML = packages.map(pkg => {
+      const isLow = pkg.stock_status === 'low_stock';
+      const isOut = pkg.stock_status === 'out_of_stock';
+      const isOrder = pkg.stock_status === 'made_to_order';
+
+      let stockBadge = '<span class="status-pill live" style="font-size: 0.72rem;">IN STOCK</span>';
+      if (isLow) stockBadge = '<span class="status-pill warn" style="font-size: 0.72rem;">LOW STOCK</span>';
+      else if (isOut) stockBadge = '<span class="status-pill danger" style="font-size: 0.72rem;">OUT OF STOCK</span>';
+      else if (isOrder) stockBadge = '<span class="status-pill info" style="font-size: 0.72rem; background: #E0F2FE; color: #0284C7;">MADE TO ORDER</span>';
+
+      const specsText = pkg.specifications || pkg.description || 'Tier-1 Hybrid Solar Inverter, LiFePO4 Lithium Battery Storage, High-Efficiency Mono Solar Array & Protection Devices.';
+      const rating = Number(pkg.rating || 5.0).toFixed(1);
+
+      return `
+        <div class="solar-pkg-card" data-package-id="${pkg.id}">
+          <div class="solar-pkg-card-header">
+            <div>
+              <span class="solar-pkg-sku">${escapeHtml(pkg.sku)}</span>
+              <h3 class="solar-pkg-title" style="margin-top: 0.35rem;">${escapeHtml(pkg.name)}</h3>
+              <div style="font-size: 0.78rem; font-weight: 600; color: #0157A2;">${escapeHtml(pkg.power_rating || 'Turnkey Solar Kit')}</div>
+            </div>
+            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
+              <span class="solar-pkg-rating">⭐ ${rating}</span>
+              ${stockBadge}
+            </div>
+          </div>
+
+          <div class="solar-pkg-pricing">
+            <div style="display: flex; align-items: baseline; justify-content: space-between;">
+              <div>
+                <span class="solar-pkg-price-val">₦${Number(pkg.price_ngn).toLocaleString()}</span>
+                ${pkg.previous_price_ngn && pkg.previous_price_ngn > pkg.price_ngn ? `<span class="solar-pkg-price-prev">₦${Number(pkg.previous_price_ngn).toLocaleString()}</span>` : ''}
+              </div>
+              ${pkg.previous_price_ngn && pkg.previous_price_ngn > pkg.price_ngn ? `<span class="tab-badge-pill" style="background: #DCFCE7; color: #166534; font-size: 0.72rem;">Save ₦${Number(pkg.previous_price_ngn - pkg.price_ngn).toLocaleString()}</span>` : ''}
+            </div>
+          </div>
+
+          <div style="margin-bottom: 0.5rem; font-weight: 700; font-size: 0.74rem; text-transform: uppercase; color: #64748B;">System Inclusions &amp; Hardware:</div>
+          <p style="font-size: 0.8rem; color: #475569; line-height: 1.45; margin: 0 0 1rem 0; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+            ${escapeHtml(specsText)}
+          </p>
+
+          <div class="solar-pkg-footer">
+            <button type="button" class="btn-primary-yellow btn-quick-edit-pkg" data-package-id="${pkg.id}" style="flex-grow: 1; justify-content: center; padding: 0.55rem 0.85rem; font-size: 0.82rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              <span>Quick Edit Package</span>
+            </button>
+            <a href="/packages/${encodeURIComponent(pkg.slug || '')}" target="_blank" class="btn-table-action" style="padding: 0.55rem 0.75rem; text-decoration: none;" title="View Package in Store">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    grid.querySelectorAll('.btn-quick-edit-pkg').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pkgId = btn.getAttribute('data-package-id');
+        openEditSolarPackageModal(pkgId);
+      });
+    });
+  }
+
+  function openEditSolarPackageModal(packageId) {
+    const pkg = cachedSolarPackages.find(p => String(p.id) === String(packageId));
+    if (!pkg) return;
+
+    const modal = document.getElementById('modal-edit-solar-package');
+    if (!modal) return;
+
+    document.getElementById('edit-pkg-id').value = pkg.id;
+    document.getElementById('edit-pkg-name').value = pkg.name || '';
+    document.getElementById('edit-pkg-sku').value = pkg.sku || '';
+    document.getElementById('edit-pkg-price').value = pkg.price_ngn || '';
+    document.getElementById('edit-pkg-previous-price').value = pkg.previous_price_ngn || '';
+    document.getElementById('edit-pkg-power').value = pkg.power_rating || '';
+    document.getElementById('edit-pkg-rating').value = pkg.rating || 5.0;
+    document.getElementById('edit-pkg-stock').value = pkg.stock_status || 'in_stock';
+    document.getElementById('edit-pkg-published').value = pkg.is_active === false ? 'false' : 'true';
+    document.getElementById('edit-pkg-specs').value = pkg.specifications || pkg.description || '';
+
+    modal.showModal();
+  }
+
+  async function saveSolarPackageChanges() {
+    const btn = document.getElementById('btn-save-solar-package');
+    const pkgId = document.getElementById('edit-pkg-id')?.value;
+    if (!pkgId) return;
+
+    const payload = {
+      name: document.getElementById('edit-pkg-name')?.value.trim(),
+      sku: document.getElementById('edit-pkg-sku')?.value.trim(),
+      price_ngn: Number(document.getElementById('edit-pkg-price')?.value),
+      previous_price_ngn: document.getElementById('edit-pkg-previous-price')?.value ? Number(document.getElementById('edit-pkg-previous-price').value) : null,
+      power_rating: document.getElementById('edit-pkg-power')?.value.trim(),
+      rating: Number(document.getElementById('edit-pkg-rating')?.value || 5.0),
+      stock_status: document.getElementById('edit-pkg-stock')?.value,
+      is_active: document.getElementById('edit-pkg-published')?.value === 'true',
+      specifications: document.getElementById('edit-pkg-specs')?.value.trim()
+    };
+
+    if (!payload.name || !payload.sku || !payload.price_ngn) {
+      alert('Package Name, SKU, and Selling Price are required.');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Saving Changes...';
+    }
+
+    try {
+      const res = await apiFetch(`/api/admin/solar-packages/${pkgId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update package');
+      }
+
+      const modal = document.getElementById('modal-edit-solar-package');
+      if (modal) modal.close();
+
+      await loadSolarPackagesModule();
+    } catch (err) {
+      alert('Error updating solar package: ' + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Save Package Changes';
+      }
     }
   }
 

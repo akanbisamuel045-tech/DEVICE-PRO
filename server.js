@@ -2291,8 +2291,22 @@ app.get('/api/admin/orders', requireAuth, async (req, res) => {
 
 app.patch('/api/admin/orders/:id', requireAuth, async (req, res) => {
   try {
-    const { orderStatus, paymentStatus, notes } = req.body;
+    const { orderStatus, paymentStatus, notes, waybillNumber, courierPartner, estimatedDelivery } = req.body;
     const order = await updateOrderStatus(req.params.id, orderStatus, paymentStatus, notes, req.user.id);
+    if (waybillNumber !== undefined || courierPartner !== undefined || estimatedDelivery !== undefined) {
+      try {
+        await updateOrderFulfillment(req.params.id, {
+          waybillNumber,
+          courierPartner,
+          estimatedDelivery,
+          orderStatus,
+          adminNotes: notes,
+          adminUserId: req.user.id
+        });
+      } catch (fulErr) {
+        console.warn('[ORDER LOGISTICS SYNC]:', fulErr.message);
+      }
+    }
     res.json({ success: true, order });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -2493,6 +2507,196 @@ app.get('/api/admin/customers', requireAuth, requireRole('superadmin', 'admin', 
       page,
       totalPages: Math.ceil(total / limit)
     });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Comprehensive Customer Analytics & 360° Tracking
+app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin', 'admin', 'sales'), async (req, res) => {
+  try {
+    if (isMongoConnected()) {
+      const { User: MongoUser, Order: MongoOrder, Quote: MongoQuote, Enquiry: MongoEnquiry } = require('./db/mongo/models');
+      
+      const [registeredDocs, orders, quotes, enquiries] = await Promise.all([
+        MongoUser.find({ role: 'customer' }).select('id full_name email phone state email_verified created_at').lean(),
+        MongoOrder.find().select('order_number customer_name customer_email customer_phone delivery_address delivery_state total_ngn order_status payment_status created_at').lean(),
+        MongoQuote.find().select('reference_id name email phone state property_type recommended_package power_kwp battery_kwh status created_at').sort({ created_at: -1 }).lean(),
+        MongoEnquiry.find().select('reference_id name email phone subject message status created_at').sort({ created_at: -1 }).lean()
+      ]);
+
+      const registeredEmailMap = new Map();
+      registeredDocs.forEach(u => {
+        if (u.email) registeredEmailMap.set(u.email.toLowerCase().trim(), u);
+      });
+
+      const ordersByEmail = new Map();
+      let totalRevenue = 0;
+      let paidOrdersCount = 0;
+      const stateStats = new Map();
+
+      orders.forEach(o => {
+        const email = (o.customer_email || 'guest@devicepro.ng').toLowerCase().trim();
+        if (!ordersByEmail.has(email)) ordersByEmail.set(email, []);
+        ordersByEmail.get(email).push(o);
+
+        const amount = Number(o.total_ngn || 0);
+        const isPaid = o.payment_status === 'paid' || o.payment_status === 'verified' || o.order_status === 'completed';
+        if (isPaid) {
+          totalRevenue += amount;
+          paidOrdersCount++;
+        }
+
+        const st = o.delivery_state || 'Lagos';
+        if (!stateStats.has(st)) {
+          stateStats.set(st, { state: st, ordersCount: 0, revenue: 0 });
+        }
+        const stateObj = stateStats.get(st);
+        stateObj.ordersCount++;
+        if (isPaid) stateObj.revenue += amount;
+      });
+
+      let registeredActiveWithOrders = 0;
+      const enhancedRegistered = registeredDocs.map(u => {
+        const userEmail = (u.email || '').toLowerCase().trim();
+        const userOrders = ordersByEmail.get(userEmail) || [];
+        const spent = userOrders.reduce((sum, o) => sum + Number(o.total_ngn || 0), 0);
+        if (userOrders.length > 0) registeredActiveWithOrders++;
+        return {
+          id: u.id,
+          name: u.full_name,
+          email: u.email,
+          phone: u.phone || '—',
+          state: u.state || 'Lagos',
+          emailVerified: !!u.email_verified,
+          ordersCount: userOrders.length,
+          totalSpent: spent,
+          created_at: u.created_at,
+          type: 'registered'
+        };
+      });
+
+      const guestBuyers = [];
+      ordersByEmail.forEach((userOrders, email) => {
+        if (!registeredEmailMap.has(email) && email !== 'guest@devicepro.ng') {
+          const latestOrder = userOrders[userOrders.length - 1];
+          const spent = userOrders.reduce((sum, o) => sum + Number(o.total_ngn || 0), 0);
+          guestBuyers.push({
+            email: email,
+            name: latestOrder.customer_name || 'Guest Customer',
+            phone: latestOrder.customer_phone || '—',
+            state: latestOrder.delivery_state || 'Lagos',
+            address: latestOrder.delivery_address || '—',
+            ordersCount: userOrders.length,
+            totalSpent: spent,
+            latestOrderNumber: latestOrder.order_number,
+            latestOrderDate: latestOrder.created_at,
+            latestStatus: latestOrder.order_status,
+            type: 'guest'
+          });
+        }
+      });
+
+      const repeatBuyersCount = [...ordersByEmail.values()].filter(list => list.length > 1).length;
+
+      return res.json({
+        success: true,
+        summary: {
+          totalRegistered: registeredDocs.length,
+          registeredActiveWithOrders,
+          registeredInactiveNoOrders: registeredDocs.length - registeredActiveWithOrders,
+          guestCustomersCount: guestBuyers.length,
+          totalTrackedCustomers: registeredDocs.length + guestBuyers.length,
+          totalOrders: orders.length,
+          totalQuotes: quotes.length,
+          totalEnquiries: enquiries.length,
+          repeatBuyersCount,
+          totalRevenue,
+          averageOrderValue: paidOrdersCount > 0 ? Math.round(totalRevenue / paidOrdersCount) : 0
+        },
+        guestBuyers: guestBuyers.sort((a,b) => b.totalSpent - a.totalSpent),
+        topRegistered: enhancedRegistered.sort((a,b) => b.totalSpent - a.totalSpent),
+        quoteLeads: quotes,
+        enquiryLeads: enquiries,
+        geographicDistribution: [...stateStats.values()].sort((a,b) => b.ordersCount - a.ordersCount)
+      });
+    }
+
+    res.json({ success: true, summary: { totalRegistered: 0 } });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Admin Customer Full 360° Profile Dossier
+app.get('/api/admin/customers/:id', requireAuth, requireRole('superadmin', 'admin', 'sales'), async (req, res) => {
+  try {
+    const identifier = req.params.id;
+    let customer = null;
+    let orders = [];
+    let quotes = [];
+    let enquiries = [];
+
+    if (isMongoConnected()) {
+      const { User: MongoUser, Order: MongoOrder, Quote: MongoQuote, Enquiry: MongoEnquiry } = require('./db/mongo/models');
+      const mongoose = require('mongoose');
+
+      if (identifier.includes('@')) {
+        customer = await MongoUser.findOne({ email: identifier.toLowerCase().trim() }).lean();
+      } else if (mongoose.Types.ObjectId.isValid(identifier)) {
+        customer = await MongoUser.findById(identifier).lean();
+      } else if (!isNaN(identifier)) {
+        customer = await MongoUser.findOne({ id: Number(identifier) }).lean();
+      }
+
+      const email = customer ? customer.email : (identifier.includes('@') ? identifier.toLowerCase().trim() : null);
+
+      if (email) {
+        [orders, quotes, enquiries] = await Promise.all([
+          MongoOrder.find({ customer_email: { $regex: `^${email}$`, $options: 'i' } }).sort({ created_at: -1 }).lean(),
+          MongoQuote.find({ email: { $regex: `^${email}$`, $options: 'i' } }).sort({ created_at: -1 }).lean(),
+          MongoEnquiry.find({ email: { $regex: `^${email}$`, $options: 'i' } }).sort({ created_at: -1 }).lean()
+        ]);
+      }
+    }
+
+    if (!customer && orders.length === 0) {
+      return res.status(404).json({ success: false, error: 'Customer record not found' });
+    }
+
+    const totalSpent = orders.reduce((sum, o) => sum + Number(o.total_ngn || 0), 0);
+
+    res.json({
+      success: true,
+      customer: {
+        id: customer ? customer.id : null,
+        name: customer ? customer.full_name : (orders[0]?.customer_name || 'Guest Customer'),
+        email: customer ? customer.email : (orders[0]?.customer_email || identifier),
+        phone: customer ? (customer.phone || '—') : (orders[0]?.customer_phone || '—'),
+        state: customer ? (customer.state || 'Lagos') : (orders[0]?.delivery_state || 'Lagos'),
+        address: orders[0]?.delivery_address || '—',
+        isRegistered: !!customer,
+        emailVerified: customer ? !!customer.email_verified : false,
+        created_at: customer ? customer.created_at : orders[0]?.created_at,
+        totalOrders: orders.length,
+        totalSpentNgn: totalSpent,
+        averageOrderValue: orders.length > 0 ? Math.round(totalSpent / orders.length) : 0,
+        orders,
+        quotes,
+        enquiries
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Admin Solar Package Quick Edit
+app.patch('/api/admin/solar-packages/:id', requireAuth, requireRole('superadmin', 'admin', 'engineer'), async (req, res) => {
+  try {
+    const canEditPrice = ['superadmin', 'admin'].includes(req.user.role);
+    const updated = await updateProduct(req.params.id, req.body, req.user.id, { canEditPrice });
+    res.json({ success: true, package: updated, message: 'Solar package updated successfully' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

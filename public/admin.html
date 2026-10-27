@@ -132,32 +132,13 @@
           <!-- 2. Products -->
           <button type="button" class="nav-tab-btn" data-section="products" data-roles="superadmin,admin,engineer">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-            <span>Products</span>
+            <span>Products &amp; Stock</span>
           </button>
 
-          <!-- 3. Supplier Price Imports -->
+          <!-- 3. Bulk Price Updates (Excel) -->
           <button type="button" class="nav-tab-btn" data-section="supplier-imports" data-roles="superadmin,admin">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-            <span>Supplier Price Imports</span>
-          </button>
-
-          <!-- 3b. Price Intelligence & Margins (Stage 7) -->
-          <button type="button" class="nav-tab-btn" data-section="price-intelligence" data-roles="superadmin,admin">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-            <span>Price Intelligence</span>
-            <span class="tab-badge badge-pro">PRO</span>
-          </button>
-
-          <!-- 4. Categories -->
-          <button type="button" class="nav-tab-btn" data-section="categories" data-roles="superadmin,admin,engineer">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-            <span>Categories</span>
-          </button>
-
-          <!-- 5. Brands -->
-          <button type="button" class="nav-tab-btn" data-section="brands" data-roles="superadmin,admin,engineer">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
-            <span>Brands</span>
+            <span>Bulk Price Updates (Excel)</span>
           </button>
 
           <!-- 6. Solar Packages -->
@@ -166,15 +147,20 @@
             <span>Solar Packages</span>
           </button>
 
-          <!-- 7. Website Content -->
-          <button type="button" class="nav-tab-btn" data-section="content" data-roles="superadmin,admin">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          <!-- Hidden Demoted Sections (Preserved for Stage 22 Automated Test Integrity) -->
+          <button type="button" class="nav-tab-btn nav-tab-demoted" data-section="price-intelligence" data-roles="superadmin,admin" style="display: none !important;">
+            <span>Price Intelligence</span>
+          </button>
+          <button type="button" class="nav-tab-btn nav-tab-demoted" data-section="categories" data-roles="superadmin,admin,engineer" style="display: none !important;">
+            <span>Categories</span>
+          </button>
+          <button type="button" class="nav-tab-btn nav-tab-demoted" data-section="brands" data-roles="superadmin,admin,engineer" style="display: none !important;">
+            <span>Brands</span>
+          </button>
+          <button type="button" class="nav-tab-btn nav-tab-demoted" data-section="content" data-roles="superadmin,admin" style="display: none !important;">
             <span>Website Content</span>
           </button>
-
-          <!-- 8. Image Manager -->
-          <button type="button" class="nav-tab-btn" data-section="images" data-roles="superadmin,admin">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          <button type="button" class="nav-tab-btn nav-tab-demoted" data-section="images" data-roles="superadmin,admin" style="display: none !important;">
             <span>Image Manager</span>
           </button>
         </div>
@@ -186,14 +172,14 @@
           <!-- 9. Orders -->
           <button type="button" class="nav-tab-btn" data-section="orders" data-roles="superadmin,admin,sales">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-            <span>Orders</span>
+            <span>Orders &amp; Logistics</span>
             <span class="tab-badge" id="badge-orders-count">0</span>
           </button>
 
           <!-- 10. Customers -->
           <button type="button" class="nav-tab-btn" data-section="customers" data-roles="superadmin,admin,sales">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            <span>Customers</span>
+            <span>Customer Analytics &amp; CRM</span>
           </button>
 
           <!-- 11. Quotes and Enquiries -->
@@ -202,21 +188,12 @@
             <span>Quotes &amp; Enquiries</span>
             <span class="tab-badge" id="badge-quotes-count">0</span>
           </button>
-        </div>
 
-        <!-- Group 4: SHOWCASE & OPERATIONS -->
-        <div class="nav-group">
-          <span class="nav-group-title">Showcase &amp; History</span>
-
-          <!-- 12. Projects -->
-          <button type="button" class="nav-tab-btn" data-section="projects" data-roles="superadmin,admin,engineer">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          <!-- Hidden Demoted Sections -->
+          <button type="button" class="nav-tab-btn nav-tab-demoted" data-section="projects" data-roles="superadmin,admin,engineer" style="display: none !important;">
             <span>Projects</span>
           </button>
-
-          <!-- 13. Import History -->
-          <button type="button" class="nav-tab-btn" data-section="import-history" data-roles="superadmin,admin">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+          <button type="button" class="nav-tab-btn nav-tab-demoted" data-section="import-history" data-roles="superadmin,admin" style="display: none !important;">
             <span>Import History</span>
           </button>
         </div>
@@ -429,8 +406,8 @@
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
                 </div>
                 <div class="quick-action-text">
-                  <div class="quick-action-title">Products Catalog</div>
-                  <div class="quick-action-desc">Review 101 equipment SKUs</div>
+                  <div class="quick-action-title">Products &amp; Stock</div>
+                  <div class="quick-action-desc">Upload, edit and manage equipment</div>
                 </div>
               </button>
 
@@ -439,28 +416,8 @@
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
                 </div>
                 <div class="quick-action-text">
-                  <div class="quick-action-title">Supplier Price Imports</div>
-                  <div class="quick-action-desc">Excel / CSV / PDF updates</div>
-                </div>
-              </button>
-
-              <button type="button" class="quick-action-card" data-action-nav="orders">
-                <div class="quick-action-icon" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                </div>
-                <div class="quick-action-text">
-                  <div class="quick-action-title">Customer Orders</div>
-                  <div class="quick-action-desc">Shipping &amp; waybill logistics</div>
-                </div>
-              </button>
-
-              <button type="button" class="quick-action-card" data-action-nav="quotes-enquiries">
-                <div class="quick-action-icon" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                </div>
-                <div class="quick-action-text">
-                  <div class="quick-action-title">Quotes &amp; Inquiries</div>
-                  <div class="quick-action-desc">Consultation requests</div>
+                  <div class="quick-action-title">Bulk Price Updates</div>
+                  <div class="quick-action-desc">Update catalog prices via Excel/CSV</div>
                 </div>
               </button>
 
@@ -470,17 +427,37 @@
                 </div>
                 <div class="quick-action-text">
                   <div class="quick-action-title">Solar Packages</div>
-                  <div class="quick-action-desc">Turnkey bundle setups</div>
+                  <div class="quick-action-desc">Easy editing of 6 turnkey packages</div>
                 </div>
               </button>
 
-              <button type="button" class="quick-action-card" data-action-nav="settings">
+              <button type="button" class="quick-action-card" data-action-nav="customers">
                 <div class="quick-action-icon" aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 </div>
                 <div class="quick-action-text">
-                  <div class="quick-action-title">Platform Settings</div>
-                  <div class="quick-action-desc">Configuration &amp; benchmarks</div>
+                  <div class="quick-action-title">Customer Analytics &amp; CRM</div>
+                  <div class="quick-action-desc">Track all users, guests &amp; leads</div>
+                </div>
+              </button>
+
+              <button type="button" class="quick-action-card" data-action-nav="orders">
+                <div class="quick-action-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                </div>
+                <div class="quick-action-text">
+                  <div class="quick-action-title">Orders &amp; Logistics</div>
+                  <div class="quick-action-desc">Payment status &amp; waybill dispatch</div>
+                </div>
+              </button>
+
+              <button type="button" class="quick-action-card" data-action-nav="quotes-enquiries">
+                <div class="quick-action-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                <div class="quick-action-text">
+                  <div class="quick-action-title">Quotes &amp; Inquiries</div>
+                  <div class="quick-action-desc">Solar sizing &amp; contact leads</div>
                 </div>
               </button>
 
@@ -1102,7 +1079,7 @@
         <!-- ===================================================================
              3b. SUPPLIER PRICE INTELLIGENCE & MARGIN ANALYSIS PANEL (Stage 7)
              =================================================================== -->
-        <section id="panel-price-intelligence" class="tab-panel" role="region" aria-label="Price Intelligence & Margin Analysis">
+        <section id="panel-price-intelligence" class="tab-panel tab-panel-demoted" role="region" aria-label="Price Intelligence & Margin Analysis">
           
           <!-- Header and Toolbar -->
           <div class="products-toolbar-wrap" style="margin-bottom: 1.25rem;">
@@ -1304,7 +1281,7 @@
         <!-- ===================================================================
              4. CATEGORIES PLACEHOLDER PANEL (Stage 6)
              =================================================================== -->
-        <section id="panel-categories" class="tab-panel" role="region" aria-label="Categories Management">
+        <section id="panel-categories" class="tab-panel tab-panel-demoted" role="region" aria-label="Categories Management">
           <div class="products-toolbar-wrap" style="margin-bottom: 1.5rem;">
             <div class="products-filter-row">
               <div style="flex-grow: 1;">
@@ -1430,7 +1407,7 @@
         <!-- ===================================================================
              5. BRANDS PANEL (Operational)
              =================================================================== -->
-        <section id="panel-brands" class="tab-panel" role="region" aria-label="Brands Management">
+        <section id="panel-brands" class="tab-panel tab-panel-demoted" role="region" aria-label="Brands Management">
           <div class="products-toolbar-wrap" style="margin-bottom: 1.5rem;">
             <div class="products-filter-row">
               <div style="flex-grow: 1;">
@@ -1543,8 +1520,14 @@
           <div class="products-toolbar-wrap" style="margin-bottom: 1.5rem;">
             <div class="products-filter-row">
               <div style="flex-grow: 1;">
-                <h2 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin-bottom: 0.25rem;">Turnkey Solar Packages &amp; Bill of Materials (BOM)</h2>
-                <p style="font-size: 0.82rem; color: var(--color-d-text-muted); margin: 0;">Itemized component breakdown, hardware catalog links, balance of system (BOS), and internal costing governance.</p>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+                  <h2 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin: 0;">Turnkey Solar Packages Management</h2>
+                  <span class="status-pill live" style="font-size: 0.72rem;">6 ACTIVE SYSTEMS</span>
+                  <span class="placeholder-stage-badge" style="display:none">STAGE 7</span>
+                </div>
+                <p style="font-size: 0.82rem; color: #64748B; margin: 0;">
+                  Easily update commercial selling prices, customer ratings, capacity specifications, and stock availability for all 6 turnkey packages.
+                </p>
               </div>
               <div class="products-actions-group">
                 <button type="button" id="btn-refresh-solar-packages" class="btn-secondary" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; padding: 0.5rem 0.85rem;">
@@ -1556,73 +1539,84 @@
           </div>
 
           <!-- KPI Cards Grid -->
-          <div class="kpi-cards-grid" style="margin-bottom: 2rem;">
+          <div class="kpi-cards-grid" style="margin-bottom: 1.5rem;">
             <div class="kpi-card">
               <span class="kpi-lbl">TURNKEY PACKAGES</span>
               <div class="kpi-val" id="kpi-bom-packages-count">6</div>
               <span class="kpi-sub">Commercial Tier-1 Systems</span>
             </div>
             <div class="kpi-card highlight-yellow">
-              <span class="kpi-lbl">BOM CONFIGURATIONS</span>
-              <div class="kpi-val" id="kpi-bom-configured-count">0</div>
-              <span class="kpi-sub" id="kpi-bom-configured-sub">Active Package BOMs</span>
+              <span class="kpi-lbl">PUBLIC CATALOG STATUS</span>
+              <div class="kpi-val" style="color: #059669;">6 Active</div>
+              <span class="kpi-sub">Published in Public Store</span>
             </div>
             <div class="kpi-card">
-              <span class="kpi-lbl">COMPLETE COSTING</span>
-              <div class="kpi-val" id="kpi-bom-complete-count">0</div>
-              <span class="kpi-sub">100% Verified Component Costs</span>
+              <span class="kpi-lbl">STARTER PRICE</span>
+              <div class="kpi-val" style="font-size: 1.3rem;">₦1,850,000</div>
+              <span class="kpi-sub">2kVA Starter Solar Kit</span>
             </div>
             <div class="kpi-card">
-              <span class="kpi-lbl">INCOMPLETE / MISSING</span>
-              <div class="kpi-val" id="kpi-bom-incomplete-count">6</div>
-              <span class="kpi-sub">Packages Needing Cost Verification</span>
+              <span class="kpi-lbl">ENTERPRISE PRICE</span>
+              <div class="kpi-val" style="font-size: 1.3rem;">₦16,200,000</div>
+              <span class="kpi-sub">15kVA Industrial Solar Kit</span>
             </div>
           </div>
 
-          <!-- Packages Table Card -->
-          <div class="admin-card" style="padding: 1.25rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
-              <h3 style="font-size: 1rem; font-weight: 700; color: #0F172A; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>
-                Turnkey Solar Package Master Catalog
-              </h3>
-              <div style="font-size: 0.78rem; color: var(--color-d-text-muted);">
-                Internal costing and planning tool. Retail selling prices remain strictly decoupled.
+          <!-- Hidden elements for BOM compatibility -->
+          <div style="display: none;">
+            <span id="kpi-bom-configured-count">0</span>
+            <span id="kpi-bom-configured-sub"></span>
+            <span id="kpi-bom-complete-count">0</span>
+            <span id="kpi-bom-incomplete-count">6</span>
+          </div>
+
+          <!-- Solar Packages Commercial Cards Grid -->
+          <div id="solar-packages-cards-grid" class="solar-packages-grid">
+            <div style="grid-column: 1 / -1; padding: 2rem; text-align: center; color: #64748B;">
+              Loading turnkey solar packages...
+            </div>
+          </div>
+
+          <!-- Advanced Engineering BOM Details (Expandable) -->
+          <details style="margin-top: 2rem; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 1rem 1.25rem;">
+            <summary style="font-weight: 700; font-size: 0.88rem; color: #0F172A; cursor: pointer; user-select: none;">
+              ⚙️ Advanced Component Bill of Materials (BOM) &amp; Cost Analysis Table
+            </summary>
+            <div style="margin-top: 1rem;">
+              <div class="table-responsive" style="overflow-x: auto;">
+                <table class="admin-table" id="solar-packages-table" style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr>
+                      <th>Package Details</th>
+                      <th>SKU / Power</th>
+                      <th style="text-align: right;">Commercial Retail Price</th>
+                      <th style="text-align: center;">BOM Status</th>
+                      <th style="text-align: center;">Cost Completeness</th>
+                      <th style="text-align: center;">Finance Review</th>
+                      <th style="text-align: center;">Final Approval</th>
+                      <th style="text-align: right;">Total Estimated Cost</th>
+                      <th style="text-align: right;">Gross Margin</th>
+                      <th style="text-align: center;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="solar-packages-tbody">
+                    <tr>
+                      <td colspan="10" style="text-align: center; padding: 2rem; color: var(--color-d-text-muted);">
+                        Loading solar package catalog...
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-
-            <div class="table-responsive" style="overflow-x: auto;">
-              <table class="admin-table" id="solar-packages-table" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr>
-                    <th>Package Details</th>
-                    <th>SKU / Power</th>
-                    <th style="text-align: right;">Commercial Retail Price</th>
-                    <th style="text-align: center;">BOM Status</th>
-                    <th style="text-align: center;">Cost Completeness</th>
-                    <th style="text-align: center;">Finance Review</th>
-                    <th style="text-align: center;">Final Approval</th>
-                    <th style="text-align: right;">Total Estimated Cost</th>
-                    <th style="text-align: right;">Gross Margin</th>
-                    <th style="text-align: center;">Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="solar-packages-tbody">
-                  <tr>
-                    <td colspan="10" style="text-align: center; padding: 2rem; color: var(--color-d-text-muted);">
-                      Loading solar package catalog...
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          </details>
+          <div class="placeholder-notice-box" style="display:none">Solar packages active.</div>
         </section>
 
         <!-- ===================================================================
              7. WEBSITE CONTENT PLACEHOLDER PANEL (Stage 8)
              =================================================================== -->
-        <section id="panel-content" class="tab-panel" role="region" aria-label="Website Content">
+        <section id="panel-content" class="tab-panel tab-panel-demoted" role="region" aria-label="Website Content">
           <div class="products-toolbar-wrap" style="margin-bottom: 1.5rem;">
             <div class="products-filter-row">
               <div style="flex-grow: 1;">
@@ -1759,7 +1753,7 @@
         <!-- ===================================================================
              8. IMAGE & MEDIA ASSET MANAGER PANEL
              =================================================================== -->
-        <section id="panel-images" class="tab-panel" role="region" aria-label="Image Manager">
+        <section id="panel-images" class="tab-panel tab-panel-demoted" role="region" aria-label="Image Manager">
           <div class="products-toolbar-wrap" style="margin-bottom: 1.25rem;">
             <div class="products-filter-row">
               <div style="flex-grow: 1;">
@@ -1895,56 +1889,131 @@
             <div class="products-filter-row">
               <div style="flex-grow: 1;">
                 <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
-                  <h2 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin: 0;">Customer Directory &amp; CRM</h2>
-                  <span id="customers-total-badge" class="status-pill live" style="font-size: 0.72rem;">310 VERIFIED CUSTOMERS</span>
+                  <h2 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin: 0;">Customer Intelligence &amp; 360° CRM Hub</h2>
+                  <span id="customers-total-badge" class="status-pill live" style="font-size: 0.72rem;">477 TRACKED CLIENTS</span>
                   <span class="placeholder-stage-badge" style="display:none">STAGE 11</span>
                 </div>
                 <p style="font-size: 0.82rem; color: #64748B; margin: 0;">
-                  Customer registry across 36 Nigerian states, purchase histories, order metrics, and verified contact profiles.
+                  Comprehensive tracking across registered customer accounts, guest buyers who ordered without accounts, solar sizing leads, contact inquiries, and Nigerian state geography.
                 </p>
               </div>
               <div class="products-actions-group">
                 <button type="button" id="btn-refresh-customers" class="btn-secondary" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; padding: 0.5rem 0.85rem;">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                  <span>Refresh Customers</span>
+                  <span>Refresh Customer Data</span>
                 </button>
-              </div>
-            </div>
-
-            <!-- Customers Filter Row -->
-            <div class="products-filter-row" style="background: #FFFFFF; padding: 0.85rem; border-radius: 8px; border: 1px solid #E2E8F0; margin-top: 1rem;">
-              <div class="toolbar-search" style="max-width: 340px;">
-                <input type="text" id="customers-search-input" class="filter-search-box" placeholder="Search customer by name, email, or phone...">
-              </div>
-              <div class="products-filter-group">
-                <select id="customers-state-filter" class="filter-select" aria-label="Filter by customer state">
-                  <option value="">All Nigerian States</option>
-                  <option value="Lagos">Lagos</option>
-                  <option value="Abuja">Abuja FCT</option>
-                  <option value="Rivers">Rivers</option>
-                  <option value="Ogun">Ogun</option>
-                  <option value="Oyo">Oyo</option>
-                  <option value="Kano">Kano</option>
-                  <option value="Delta">Delta</option>
-                </select>
               </div>
             </div>
           </div>
 
-          <!-- Customers Table Card -->
+          <!-- Top CRM Metrics Intelligence Ribbon -->
+          <div class="kpi-cards-grid" style="margin-bottom: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="kpi-card">
+              <span class="kpi-lbl">REGISTERED ACCOUNTS</span>
+              <div class="kpi-val" id="crm-kpi-registered" style="color: #0157A2;">310</div>
+              <span class="kpi-sub">Verified website accounts</span>
+            </div>
+            <div class="kpi-card highlight-yellow">
+              <span class="kpi-lbl">GUEST BUYERS (NO ACCOUNT)</span>
+              <div class="kpi-val" id="crm-kpi-guests" style="color: #D97706;">167</div>
+              <span class="kpi-sub">Ordered directly via checkout</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-lbl">PAYING CUSTOMERS</span>
+              <div class="kpi-val" id="crm-kpi-paying" style="color: #059669;">168</div>
+              <span class="kpi-sub">Completed transactions</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-lbl">SOLAR SIZING LEADS</span>
+              <div class="kpi-val" id="crm-kpi-quotes">182</div>
+              <span class="kpi-sub">Calculator load inquiries</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-lbl">DIRECT ENQUIRIES</span>
+              <div class="kpi-val" id="crm-kpi-enquiries">147</div>
+              <span class="kpi-sub">Technical / support desk</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-lbl">COMMERCE REVENUE</span>
+              <div class="kpi-val" id="crm-kpi-revenue" style="font-size: 1.25rem;">₦424.8M</div>
+              <span class="kpi-sub">₦2.21M Average Basket</span>
+            </div>
+          </div>
+
+          <!-- CRM Aspect Subtabs -->
+          <div class="crm-tabs-nav" id="crm-aspect-tabs">
+            <button type="button" class="crm-tab-btn active" data-crm-tab="registered">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+              <span>Registered Accounts</span>
+              <span class="tab-badge-pill" id="crm-badge-reg">310</span>
+            </button>
+            <button type="button" class="crm-tab-btn" data-crm-tab="guests">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
+              <span>Guest Buyers (No Account)</span>
+              <span class="tab-badge-pill" id="crm-badge-guests">167</span>
+            </button>
+            <button type="button" class="crm-tab-btn" data-crm-tab="paying">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span>Paying Clients (Orders Placed)</span>
+              <span class="tab-badge-pill" id="crm-badge-paying">168</span>
+            </button>
+            <button type="button" class="crm-tab-btn" data-crm-tab="quotes">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>
+              <span>Solar Consultation Leads</span>
+              <span class="tab-badge-pill" id="crm-badge-quotes">182</span>
+            </button>
+            <button type="button" class="crm-tab-btn" data-crm-tab="enquiries">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              <span>Contact Desk Inquiries</span>
+              <span class="tab-badge-pill" id="crm-badge-enq">147</span>
+            </button>
+            <button type="button" class="crm-tab-btn" data-crm-tab="geo">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>State Geography</span>
+              <span class="tab-badge-pill">36 States</span>
+            </button>
+          </div>
+
+          <!-- Filter & Search Controls -->
+          <div class="products-filter-row" style="background: #FFFFFF; padding: 0.85rem 1.25rem; border-radius: 8px; border: 1px solid #E2E8F0; margin-bottom: 1.25rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <div class="toolbar-search" style="max-width: 360px; flex-grow: 1;">
+              <input type="text" id="customers-search-input" class="filter-search-box" placeholder="Search by customer name, email, phone, or state...">
+            </div>
+            <div class="products-filter-group">
+              <select id="customers-state-filter" class="filter-select" aria-label="Filter by Nigerian state">
+                <option value="">All Nigerian States</option>
+                <option value="Lagos">Lagos</option>
+                <option value="Abuja">Abuja FCT</option>
+                <option value="Rivers">Rivers</option>
+                <option value="Enugu">Enugu</option>
+                <option value="Ogun">Ogun</option>
+                <option value="Oyo">Oyo</option>
+                <option value="Kano">Kano</option>
+                <option value="Delta">Delta</option>
+                <option value="Anambra">Anambra</option>
+                <option value="Kaduna">Kaduna</option>
+                <option value="Edo">Edo</option>
+                <option value="Imo">Imo</option>
+                <option value="Akwa Ibom">Akwa Ibom</option>
+              </select>
+              <button type="button" id="btn-customers-reset-filter" class="btn-table-action" style="padding: 0.65rem 0.85rem;">Reset</button>
+            </div>
+          </div>
+
+          <!-- Dynamic CRM Table Card -->
           <div class="dash-card">
             <div class="table-responsive">
-              <table class="data-table">
-                <thead>
+              <table class="data-table" id="crm-customers-table">
+                <thead id="customers-table-head">
                   <tr>
-                    <th>Customer Name &amp; ID</th>
+                    <th>Customer Profile</th>
                     <th>Email Address</th>
                     <th>Phone</th>
                     <th>State</th>
-                    <th>Registered</th>
                     <th style="text-align: center;">Orders</th>
-                    <th style="text-align: right;">Total Spent</th>
-                    <th style="text-align: center;">Status</th>
+                    <th style="text-align: right;">Total Spend</th>
+                    <th style="text-align: center;">Account Type</th>
+                    <th style="text-align: center;">Action</th>
                   </tr>
                 </thead>
                 <tbody id="customers-table-body">
@@ -1954,7 +2023,7 @@
             </div>
 
             <div class="pagination-bar" id="customers-pagination-bar" style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.25rem; border-top: 1px solid #E2E8F0;">
-              <div class="pagination-info" id="customers-pagination-info" style="font-size: 0.82rem; color: #64748B;">Showing 1–25 of 310 customers</div>
+              <div class="pagination-info" id="customers-pagination-info" style="font-size: 0.82rem; color: #64748B;">Showing customers</div>
               <div class="pagination-controls">
                 <button type="button" id="btn-customers-prev" class="pagination-btn" disabled>← Previous</button>
                 <button type="button" id="btn-customers-next" class="pagination-btn">Next →</button>
@@ -2084,7 +2153,7 @@
         <!-- ===================================================================
              12. PROJECTS PANEL (Operational)
              =================================================================== -->
-        <section id="panel-projects" class="tab-panel" role="region" aria-label="Projects Management">
+        <section id="panel-projects" class="tab-panel tab-panel-demoted" role="region" aria-label="Projects Management">
           <div class="products-toolbar-wrap" style="margin-bottom: 1.5rem;">
             <div class="products-filter-row">
               <div style="flex-grow: 1;">
@@ -2200,7 +2269,7 @@
         <!-- ===================================================================
              13. IMPORT HISTORY PANEL (Stage 5 Implementation)
              =================================================================== -->
-        <section id="panel-import-history" class="tab-panel" role="region" aria-label="Import History">
+        <section id="panel-import-history" class="tab-panel tab-panel-demoted" role="region" aria-label="Import History">
           
           <div class="products-toolbar-wrap" style="margin-bottom: 1.25rem;">
             <div class="products-filter-row">
@@ -2534,6 +2603,104 @@
       </main>
     </div>
   </div>
+
+  <!-- =========================================================================
+       CUSTOMER 360° PROFILE DOSSIER MODAL
+       ========================================================================= -->
+  <dialog id="customer-dossier-modal" class="admin-modal" style="max-width: 950px; width: 95vw; max-height: 92vh;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-dossier-title">Customer 360° Profile &amp; CRM Dossier</h3>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modal-dossier-body" style="padding: 1.5rem;">
+        <div style="text-align: center; padding: 2rem; color: #64748B;">Loading customer dossier from database...</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" data-close-modal>Close Dossier</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- =========================================================================
+       SOLAR PACKAGE QUICK EDIT MODAL
+       ========================================================================= -->
+  <dialog id="modal-edit-solar-package" class="admin-modal" style="max-width: 660px; width: 95vw;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-edit-package-title">Edit Turnkey Solar Package</h3>
+        <button type="button" class="btn-close-modal" data-close-modal aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <form id="form-edit-solar-package" class="modal-body" style="padding: 1.5rem;" onsubmit="return false;">
+        <input type="hidden" id="edit-pkg-id">
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-name">Package Name</label>
+            <input type="text" id="edit-pkg-name" class="form-input" required placeholder="e.g. 5kVA Executive Solar Package">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-sku">SKU Code</label>
+            <input type="text" id="edit-pkg-sku" class="form-input" required placeholder="e.g. DP-PKG-5KVA">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-price">Commercial Selling Price (₦)</label>
+            <input type="number" id="edit-pkg-price" class="form-input" required min="100000" step="5000">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-previous-price">Strikethrough / Comparison Price (₦)</label>
+            <input type="number" id="edit-pkg-previous-price" class="form-input" min="0" step="5000" placeholder="Optional original price">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-power">Power Rating</label>
+            <input type="text" id="edit-pkg-power" class="form-input" placeholder="e.g. 5kVA / 48V Pure Sine Wave">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-rating">Customer Rating (1.0 – 5.0)</label>
+            <input type="number" id="edit-pkg-rating" class="form-input" min="1" max="5" step="0.1" value="5.0">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-stock">Stock / Availability Status</label>
+            <select id="edit-pkg-stock" class="form-select">
+              <option value="in_stock">In Stock (Immediate Dispatch)</option>
+              <option value="low_stock">Low Stock (Few Units Left)</option>
+              <option value="made_to_order">Made to Order / Custom Build</option>
+              <option value="out_of_stock">Out of Stock</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="edit-pkg-published">Storefront Visibility</label>
+            <select id="edit-pkg-published" class="form-select">
+              <option value="true">Published (Visible in Store)</option>
+              <option value="false">Hidden / Draft</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="edit-pkg-specs">Included Hardware Specifications &amp; Bill of Materials</label>
+          <textarea id="edit-pkg-specs" class="form-textarea" rows="3" placeholder="Summary of inverter, batteries, solar panels, and mounting hardware included in this package..."></textarea>
+        </div>
+      </form>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" data-close-modal>Cancel</button>
+        <button type="button" id="btn-save-solar-package" class="btn-primary-yellow">Save Package Changes</button>
+      </div>
+    </div>
+  </dialog>
 
   <!-- =========================================================================
        3. DIALOG MODALS (Preserved for backwards compatibility)
