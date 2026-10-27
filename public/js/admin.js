@@ -4513,10 +4513,11 @@
       const payload = {
         filename: currentAnalysisData.filename,
         supplier_name: currentAnalysisData.supplierName,
-        file_format: currentAnalysisData.format,
-        mapping_config: currentAnalysisData.mappingConfig,
+        file_format: currentAnalysisData.format || currentAnalysisData.file_format || 'xlsx',
+        format: currentAnalysisData.format || currentAnalysisData.file_format || 'xlsx',
+        mapping_config: currentAnalysisData.mappingConfig || currentAnalysisData.active_mapping || {},
         summary: currentAnalysisData.summary,
-        rows_preview: currentAnalysisData.rowsPreview,
+        rows_preview: currentAnalysisData.rowsPreview || currentAnalysisData.rows,
         notes: `Analysed via admin console on ${new Date().toISOString()}`
       };
 

@@ -218,7 +218,7 @@ async function getProducts({
   else if (sort === 'newest') sortOption = { created_at: -1, id: -1 };
   else if (sort === 'featured') sortOption = { featured: -1, price_ngn: 1 };
 
-  const safeLimit = Math.max(1, Math.min(parseInt(limit, 10) || 50, 100));
+  const safeLimit = Math.max(1, Math.min(parseInt(limit, 10) || 50, 1000));
   const calculatedOffset = offset ? parseInt(offset, 10) : ((Math.max(1, parseInt(page, 10) || 1) - 1) * safeLimit);
   const safeOffset = Math.max(0, calculatedOffset);
 

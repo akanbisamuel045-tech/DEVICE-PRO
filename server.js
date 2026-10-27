@@ -3265,11 +3265,13 @@ app.post(['/api/admin/price-imports/upload', '/api/admin/price-imports/intake'],
 app.post('/api/admin/price-imports', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
   try {
     const {
-      filename, supplier_name, file_format, mapping_config, summary, rows_preview, notes,
+      filename, supplier_name, file_format, format, fileFormat, mapping_config, summary, rows_preview, notes,
       supplier_quote_ref, quote_date, quote_expiry_date, import_source, currency, freshness_status, validation_warnings
     } = req.body || {};
 
-    if (!filename || !file_format || !summary) {
+    const effectiveFormat = file_format || format || fileFormat;
+
+    if (!filename || !effectiveFormat || !summary) {
       return res.status(400).json({
         success: false,
         error: 'Missing required import analysis payload (filename, file_format, and summary are required).'
@@ -3289,7 +3291,7 @@ app.post('/api/admin/price-imports', requireAuth, requireRole('superadmin', 'adm
       currency: currency ? String(currency).trim().toUpperCase().slice(0, 10) : 'NGN',
       freshness_status: (freshness_status && ['fresh', 'stale', 'future_date', 'expired', 'date_missing', 'date_ambiguous'].includes(freshness_status)) ? freshness_status : 'date_missing',
       validation_warnings: Array.isArray(validation_warnings) ? validation_warnings : [],
-      file_format: String(file_format).toLowerCase(),
+      file_format: String(effectiveFormat).toLowerCase(),
       uploaded_by: req.user.id,
       uploaded_by_email: req.user.email,
       uploaded_by_role: req.user.role,

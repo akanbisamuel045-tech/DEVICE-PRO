@@ -1,0 +1,49 @@
+Product ID,Supplier SKU,Product Name,Brand,Category,Current Price (NGN),Price (NGN),Price Increase (+10%),Currency,Stock Status,Supplier Reference
+1,JKM-550M-72HL4,Monocrystalline Solar Panel,Jinko Solar,Solar Panels,245000,269500,24500,NGN,in_stock,DP-PLUS10-JKM-550M-72HL4
+2,GW-SPH5000-TL-BL-UP,Hybrid Inverter,Growatt,Inverters,1250000,1375000,125000,NGN,in_stock,DP-PLUS10-GW-SPH5000-TL-BL-UP
+3,PYL-US3000C-48V,Lithium Battery,Pylontech,Batteries,1850000,2035000,185000,NGN,in_stock,DP-PLUS10-PYL-US3000C-48V
+4,SM-RMS-ALUM-6P,Roof Mounting Structure,Solar Mount,Mounting Accessories,180000,198000,18000,NGN,in_stock,DP-PLUS10-SM-RMS-ALUM-6P
+5,MC4-CBL-4MM-100M,Solar Cable (100m),MC4,Electrical Accessories,95000,104500,9500,NGN,in_stock,DP-PLUS10-MC4-CBL-4MM-100M
+6,EF-DELTA-1000W,Portable Power Station,EcoFlow,Portable Power,650000,715000,65000,NGN,in_stock,DP-PLUS10-EF-DELTA-1000W
+7,CS7N-660MB-AG,Canadian Solar BiHiKu7 Bifacial Panel,Canadian Solar,Solar Panels,295000,324500,29500,NGN,in_stock,DP-PLUS10-CS7N-660MB-AG
+8,JAM72S30-545/MR,JA Solar DeepBlue 3.0 Mono Half-Cell,JA Solar,Solar Panels,238000,261800,23800,NGN,in_stock,DP-PLUS10-JAM72S30-545/MR
+9,LR5-72HTH-580M,Longi Hi-MO 6 Explorer Mono Panel,Longi,Solar Panels,260000,286000,26000,NGN,in_stock,DP-PLUS10-LR5-72HTH-580M
+10,TSM-440NEG9R.28,Trina Solar Vertex S+ N-Type Dual Glass,Trina Solar,Solar Panels,198000,217800,19800,NGN,in_stock,DP-PLUS10-TSM-440NEG9R.28
+11,FL-M-450W,Felicity Solar Monocrystalline Panel,Felicity Solar,Solar Panels,175000,192500,17500,NGN,in_stock,DP-PLUS10-FL-M-450W
+12,SUN-8K-SG01LP1-EU,Deye Sun-8K Hybrid Inverter,Deye,Inverters,1850000,2035000,185000,NGN,in_stock,DP-PLUS10-SUN-8K-SG01LP1-EU
+13,PMP482505010,Victron MultiPlus-II Inverter/Charger,Victron,Inverters,2100000,2310000,210000,NGN,in_stock,DP-PLUS10-PMP482505010
+14,HF4850U80-H,SRNE Smart MPPT Hybrid Inverter,SRNE,Inverters,890000,979000,89000,NGN,in_stock,DP-PLUS10-HF4850U80-H
+15,SG33CX-V114,Sungrow Commercial Three-Phase Inverter,Sungrow,Inverters,4650000,5115000,465000,NGN,in_stock,DP-PLUS10-SG33CX-V114
+16,LUM-CRZ-3500,Luminous Cruze 3.5kVA Pure Sine Wave,Luminous,Inverters,520000,572000,52000,NGN,in_stock,DP-PLUS10-LUM-CRZ-3500
+17,PRAG-2500-24V,PRAG Pure Sine Wave Solar Inverter,Other Brands,Inverters,380000,418000,38000,NGN,in_stock,DP-PLUS10-PRAG-2500-24V
+18,FL-LPBF48200-H,Felicity Solar LiFePO4 Wall Battery,Felicity Solar,Batteries,2850000,3135000,285000,NGN,in_stock,DP-PLUS10-FL-LPBF48200-H
+19,HITH-ESS-15K-300AH,Hithium Commercial ESS Rack Battery,Other Brands,Batteries,4200000,4620000,420000,NGN,in_stock,DP-PLUS10-HITH-ESS-15K-300AH
+20,SE-G5.1PRO-B,Deye Wall-Mount Lithium Battery,Deye,Batteries,1650000,1815000,165000,NGN,in_stock,DP-PLUS10-SE-G5.1PRO-B
+21,LUM-TT-220AH,Luminous 220Ah Tubular Battery,Luminous,Batteries,285000,313500,28500,NGN,in_stock,DP-PLUS10-LUM-TT-220AH
+22,ARK-2.5L-A1,Growatt ARK 2.5L Modular Battery,Growatt,Batteries,920000,1012000,92000,NGN,in_stock,DP-PLUS10-ARK-2.5L-A1
+23,DP-PKG-3.5KVA,3.5kVA Essential Home Solar System,DEVICE PRO,Solar Packages,2450000,2695000,245000,NGN,in_stock,DP-PLUS10-DP-PKG-3.5KVA
+24,DP-PKG-5KVA,5kVA Premium Duplex Solar Package,DEVICE PRO,Solar Packages,4350000,4785000,435000,NGN,in_stock,DP-PLUS10-DP-PKG-5KVA
+25,DP-PKG-10KVA,10kVA Executive Residence Solar System,DEVICE PRO,Solar Packages,8200000,9020000,820000,NGN,in_stock,DP-PLUS10-DP-PKG-10KVA
+26,DP-PKG-15KVA,15kVA Commercial Office Microgrid,DEVICE PRO,Solar Packages,12500000,13750000,1250000,NGN,in_stock,DP-PLUS10-DP-PKG-15KVA
+27,DP-PKG-2KVA,2kVA Starter Solar Backup System,DEVICE PRO,Solar Packages,1150000,1265000,115000,NGN,in_stock,DP-PLUS10-DP-PKG-2KVA
+28,MC4-CONN-10P,MC4 Waterproof Solar Connectors (10 Pairs),MC4,Electrical Accessories,18000,19800,1800,NGN,in_stock,DP-PLUS10-MC4-CONN-10P
+29,SUNT-SPD-1000V,DC Surge Protection Device (SPD 1000V 40kA),Other Brands,Electrical Accessories,42000,46200,4200,NGN,in_stock,DP-PLUS10-SUNT-SPD-1000V
+30,PV-COMB-4IN1,Solar PV Combiner Box (4 Strings In 1 Out),Other Brands,Electrical Accessories,135000,148500,13500,NGN,in_stock,DP-PLUS10-PV-COMB-4IN1
+31,SM-GMR-8P,Ground Mount Galvanized Steel Rack (8 Panels),Solar Mount,Mounting Accessories,320000,352000,32000,NGN,in_stock,DP-PLUS10-SM-GMR-8P
+32,TOMZN-ATS-63A,Automatic Transfer Switch (ATS 63A 4P),Other Brands,Electrical Accessories,68000,74800,6800,NGN,in_stock,DP-PLUS10-TOMZN-ATS-63A
+33,EF-DELTA2-MAX,EcoFlow DELTA 2 Max Power Station,EcoFlow,Portable Power,1450000,1595000,145000,NGN,in_stock,DP-PLUS10-EF-DELTA2-MAX
+34,ITEL-PT-1000W,itel Power Tank 1000W Solar Generator,Other Brands,Portable Power,580000,638000,58000,NGN,in_stock,DP-PLUS10-ITEL-PT-1000W
+35,EF-RIVER2-PRO,EcoFlow RIVER 2 Pro Portable Generator,EcoFlow,Portable Power,480000,528000,48000,NGN,in_stock,DP-PLUS10-EF-RIVER2-PRO
+36,COLA-3600W,ColaSolar Cola 3600 Heavy-Duty Station,Other Brands,Portable Power,2200000,2420000,220000,NGN,in_stock,DP-PLUS10-COLA-3600W
+37,ITEL-PT-300W,itel Power Tank Mini 300W Emergency Pack,Other Brands,Portable Power,165000,181500,16500,NGN,in_stock,DP-PLUS10-ITEL-PT-300W
+38,FL-IV-5KVA,Felicity Solar 5kVA Hybrid Inverter,Felicity Solar,Inverters,980000,1078000,98000,NGN,in_stock,DP-PLUS10-FL-IV-5KVA
+39,LUM-550W-MONO,Luminous Mono Solar Panel 550W,Luminous,Solar Panels,240000,264000,24000,NGN,in_stock,DP-PLUS10-LUM-550W-MONO
+40,ITEL-PT-600W,itel Power Tank 600W Portable Generator,Other Brands,Portable Power,385000,423500,38500,NGN,in_stock,DP-PLUS10-ITEL-PT-600W
+41,SUN-12K-SG04LP3-EU,Deye 12kW Three-Phase Hybrid Inverter,Deye,Inverters,2850000,3135000,285000,NGN,in_stock,DP-PLUS10-SUN-12K-SG04LP3-EU
+42,SRNE-ML48100,SRNE 100A MPPT Solar Charge Controller,SRNE,Electrical Accessories,215000,236500,21500,NGN,in_stock,DP-PLUS10-SRNE-ML48100
+43,SCH-DC-MCB-63A,Schneider DC Miniature Circuit Breaker (63A 1000V),Other Brands,Electrical Accessories,38000,41800,3800,NGN,in_stock,DP-PLUS10-SCH-DC-MCB-63A
+44,HITH-WALL-10K,Hithium 10kWh Wall LiFePO4 Storage Unit,Other Brands,Batteries,2950000,3245000,295000,NGN,in_stock,DP-PLUS10-HITH-WALL-10K
+45,SH10RT-V112,Sungrow 10kW Commercial Hybrid Inverter,Sungrow,Inverters,2450000,2695000,245000,NGN,in_stock,DP-PLUS10-SH10RT-V112
+46,SCC115085211,Victron SmartSolar MPPT 150/85-Tr,Victron,Electrical Accessories,495000,544500,49500,NGN,in_stock,DP-PLUS10-SCC115085211
+47,SUNT-DC-ISO-32A,Solar DC Isolator Switch IP66 (4P 32A),Other Brands,Electrical Accessories,28000,30800,2800,NGN,in_stock,DP-PLUS10-SUNT-DC-ISO-32A
+48,DP-PKG-7.5KVA,7.5kVA Executive Villa Solar Package,DEVICE PRO,Solar Packages,6450000,7095000,645000,NGN,in_stock,DP-PLUS10-DP-PKG-7.5KVA

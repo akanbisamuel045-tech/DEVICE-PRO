@@ -721,6 +721,7 @@ async function runTests() {
   // Post-test cleanup
   await PriceImport.deleteMany({ filename: /^STAGE24-TEST/i });
   await User.deleteOne({ email: testCustomerEmail });
+  await Order.deleteMany({ customer_email: 'integrity@devicepro.test' });
 
   console.log('\n========================================================================');
   console.log(`STAGE 24 SUMMARY: ${passed} Passed, ${failed} Failed`);
