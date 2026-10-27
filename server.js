@@ -80,7 +80,7 @@ app.use((req, res, next) => {
   res.setHeader('Permissions-Policy', 'geolocation=(self), microphone=(), camera=()');
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.paystack.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api.paystack.co; frame-src https://checkout.paystack.com;"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://js.paystack.co https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://api.paystack.co; frame-src https://checkout.paystack.com;"
   );
   next();
 });

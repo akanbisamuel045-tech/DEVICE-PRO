@@ -16,8 +16,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="/css/tokens.css?v=20261026_white">
-  <link rel="stylesheet" href="/css/admin.css?v=20261026_white">
+  <link rel="stylesheet" href="/css/tokens.css?v=20261027_modern_crm">
+  <link rel="stylesheet" href="/css/admin.css?v=20261027_modern_crm">
+
+  <!-- Interactive Analytics Charts (Local Vendor & CDN Fallback) -->
+  <script src="/js/chart.min.js?v=4.4.7"></script>
 </head>
 <body class="admin-body">
 
@@ -1907,71 +1910,262 @@
           </div>
 
           <!-- Top CRM Metrics Intelligence Ribbon -->
-          <div class="kpi-cards-grid" style="margin-bottom: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
-            <div class="kpi-card">
-              <span class="kpi-lbl">REGISTERED ACCOUNTS</span>
-              <div class="kpi-val" id="crm-kpi-registered" style="color: #0157A2;">310</div>
-              <span class="kpi-sub">Verified website accounts</span>
+          <div class="kpi-cards-grid crm-kpi-ribbon" style="margin-bottom: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+            <div class="kpi-card crm-kpi-card" data-switch-tab="registered" style="cursor: pointer;" title="Click to view registered customer accounts">
+              <div class="kpi-card-top-accent" style="background: #0157A2;"></div>
+              <div class="kpi-card-inner">
+                <div class="kpi-lbl-wrap">
+                  <span class="kpi-lbl">REGISTERED ACCOUNTS</span>
+                  <div class="kpi-icon-badge" style="color: #0157A2; background: #EFF6FF;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                  </div>
+                </div>
+                <div class="kpi-val" id="crm-kpi-registered" style="color: #0157A2;">310</div>
+                <span class="kpi-sub">Verified website accounts</span>
+              </div>
             </div>
-            <div class="kpi-card highlight-yellow">
-              <span class="kpi-lbl">GUEST BUYERS (NO ACCOUNT)</span>
-              <div class="kpi-val" id="crm-kpi-guests" style="color: #D97706;">167</div>
-              <span class="kpi-sub">Ordered directly via checkout</span>
+
+            <div class="kpi-card crm-kpi-card highlight-yellow" data-switch-tab="guests" style="cursor: pointer;" title="Click to view guest buyers">
+              <div class="kpi-card-top-accent" style="background: #FFB90C;"></div>
+              <div class="kpi-card-inner">
+                <div class="kpi-lbl-wrap">
+                  <span class="kpi-lbl">GUEST BUYERS (NO ACCOUNT)</span>
+                  <div class="kpi-icon-badge" style="color: #D97706; background: #FFFBEB;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                  </div>
+                </div>
+                <div class="kpi-val" id="crm-kpi-guests" style="color: #D97706;">167</div>
+                <span class="kpi-sub">Ordered directly via checkout</span>
+              </div>
             </div>
-            <div class="kpi-card">
-              <span class="kpi-lbl">PAYING CUSTOMERS</span>
-              <div class="kpi-val" id="crm-kpi-paying" style="color: #059669;">168</div>
-              <span class="kpi-sub">Completed transactions</span>
+
+            <div class="kpi-card crm-kpi-card" data-switch-tab="paying" style="cursor: pointer;" title="Click to view paying customers">
+              <div class="kpi-card-top-accent" style="background: #059669;"></div>
+              <div class="kpi-card-inner">
+                <div class="kpi-lbl-wrap">
+                  <span class="kpi-lbl">PAYING CUSTOMERS</span>
+                  <div class="kpi-icon-badge" style="color: #059669; background: #ECFDF5;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                  </div>
+                </div>
+                <div class="kpi-val" id="crm-kpi-paying" style="color: #059669;">168</div>
+                <span class="kpi-sub">Completed transactions</span>
+              </div>
             </div>
-            <div class="kpi-card">
-              <span class="kpi-lbl">SOLAR SIZING LEADS</span>
-              <div class="kpi-val" id="crm-kpi-quotes">182</div>
-              <span class="kpi-sub">Calculator load inquiries</span>
+
+            <div class="kpi-card crm-kpi-card" data-switch-tab="quotes" style="cursor: pointer;" title="Click to view solar calculator leads">
+              <div class="kpi-card-top-accent" style="background: #0284C7;"></div>
+              <div class="kpi-card-inner">
+                <div class="kpi-lbl-wrap">
+                  <span class="kpi-lbl">SOLAR SIZING LEADS</span>
+                  <div class="kpi-icon-badge" style="color: #0284C7; background: #F0F9FF;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>
+                  </div>
+                </div>
+                <div class="kpi-val" id="crm-kpi-quotes">182</div>
+                <span class="kpi-sub">Calculator load inquiries</span>
+              </div>
             </div>
-            <div class="kpi-card">
-              <span class="kpi-lbl">DIRECT ENQUIRIES</span>
-              <div class="kpi-val" id="crm-kpi-enquiries">147</div>
-              <span class="kpi-sub">Technical / support desk</span>
+
+            <div class="kpi-card crm-kpi-card" data-switch-tab="enquiries" style="cursor: pointer;" title="Click to view contact inquiries">
+              <div class="kpi-card-top-accent" style="background: #6366F1;"></div>
+              <div class="kpi-card-inner">
+                <div class="kpi-lbl-wrap">
+                  <span class="kpi-lbl">DIRECT ENQUIRIES</span>
+                  <div class="kpi-icon-badge" style="color: #6366F1; background: #EEF2FF;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  </div>
+                </div>
+                <div class="kpi-val" id="crm-kpi-enquiries">147</div>
+                <span class="kpi-sub">Technical &amp; support desk</span>
+              </div>
             </div>
-            <div class="kpi-card">
-              <span class="kpi-lbl">COMMERCE REVENUE</span>
-              <div class="kpi-val" id="crm-kpi-revenue" style="font-size: 1.25rem;">₦424.8M</div>
-              <span class="kpi-sub">₦2.21M Average Basket</span>
+
+            <div class="kpi-card crm-kpi-card">
+              <div class="kpi-card-top-accent" style="background: #0157A2;"></div>
+              <div class="kpi-card-inner">
+                <div class="kpi-lbl-wrap">
+                  <span class="kpi-lbl">COMMERCE REVENUE</span>
+                  <div class="kpi-icon-badge" style="color: #0157A2; background: #EFF6FF;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5a3.5 3.5 0 1 0-7 0 3.5 3.5 0 0 0 7 0Z"></path></svg>
+                  </div>
+                </div>
+                <div class="kpi-val" id="crm-kpi-revenue" style="font-size: 1.4rem; color: #0F172A;">₦424.8M</div>
+                <span class="kpi-sub" id="crm-kpi-aov-sub">₦2.21M Average Basket</span>
+              </div>
             </div>
           </div>
 
-          <!-- CRM Aspect Subtabs -->
-          <div class="crm-tabs-nav" id="crm-aspect-tabs">
-            <button type="button" class="crm-tab-btn active" data-crm-tab="registered">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-              <span>Registered Accounts</span>
-              <span class="tab-badge-pill" id="crm-badge-reg">310</span>
-            </button>
-            <button type="button" class="crm-tab-btn" data-crm-tab="guests">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4l3 3"></path></svg>
-              <span>Guest Buyers (No Account)</span>
-              <span class="tab-badge-pill" id="crm-badge-guests">167</span>
-            </button>
-            <button type="button" class="crm-tab-btn" data-crm-tab="paying">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-              <span>Paying Clients (Orders Placed)</span>
-              <span class="tab-badge-pill" id="crm-badge-paying">168</span>
-            </button>
-            <button type="button" class="crm-tab-btn" data-crm-tab="quotes">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line></svg>
-              <span>Solar Consultation Leads</span>
-              <span class="tab-badge-pill" id="crm-badge-quotes">182</span>
-            </button>
-            <button type="button" class="crm-tab-btn" data-crm-tab="enquiries">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-              <span>Contact Desk Inquiries</span>
-              <span class="tab-badge-pill" id="crm-badge-enq">147</span>
-            </button>
-            <button type="button" class="crm-tab-btn" data-crm-tab="geo">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-              <span>State Geography</span>
-              <span class="tab-badge-pill">36 States</span>
-            </button>
+          <!-- =================================================================
+               CRM INTELLIGENCE VISUALIZATION & ANALYTICS CHARTS
+               ================================================================= -->
+          <div class="crm-analytics-grid" id="crm-analytics-section" style="margin-bottom: 1.5rem;">
+            <!-- Chart 1: Customer Segmentation & Audience Composition -->
+            <div class="crm-chart-card">
+              <div class="crm-chart-header">
+                <div>
+                  <h3 class="crm-chart-title">Customer Audience Segmentation</h3>
+                  <p class="crm-chart-desc">Registered accounts vs. direct guest buyers without accounts</p>
+                </div>
+                <span class="status-pill live" id="crm-segment-total-pill">477 Total Clients</span>
+              </div>
+              <div class="crm-chart-body" style="height: 220px; position: relative;">
+                <canvas id="crm-chart-segments"></canvas>
+              </div>
+              <div class="crm-chart-legend">
+                <div class="legend-item">
+                  <span class="legend-color-dot" style="background: #0157A2;"></span>
+                  <span class="legend-label">Registered Accounts:</span>
+                  <strong class="legend-val" id="legend-reg-count">310 (65.0%)</strong>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color-dot" style="background: #FFB90C;"></span>
+                  <span class="legend-label">Guest Buyers:</span>
+                  <strong class="legend-val" id="legend-guest-count">167 (35.0%)</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart 2: Customer Acquisition & Conversion Funnel -->
+            <div class="crm-chart-card">
+              <div class="crm-chart-header">
+                <div>
+                  <h3 class="crm-chart-title">Acquisition &amp; Conversion Pipeline</h3>
+                  <p class="crm-chart-desc">Total tracked reach into high-intent leads and paying customers</p>
+                </div>
+                <span class="status-pill live" style="background: #ECFDF5; color: #065F46; border-color: #A7F3D0;">35.2% Sales Conversion</span>
+              </div>
+              <div class="crm-chart-body" style="height: 220px; position: relative;">
+                <canvas id="crm-chart-funnel"></canvas>
+              </div>
+              <div class="crm-chart-stats-row">
+                <div class="stat-pill-box">
+                  <span class="stat-lbl">Sizing Leads</span>
+                  <strong class="stat-num" id="stat-funnel-quotes">182</strong>
+                </div>
+                <div class="stat-pill-box">
+                  <span class="stat-lbl">Inquiries</span>
+                  <strong class="stat-num" id="stat-funnel-enq">147</strong>
+                </div>
+                <div class="stat-pill-box">
+                  <span class="stat-lbl">Paying Clients</span>
+                  <strong class="stat-num" id="stat-funnel-paying">168</strong>
+                </div>
+                <div class="stat-pill-box">
+                  <span class="stat-lbl">Total Orders</span>
+                  <strong class="stat-num" id="stat-funnel-orders">412</strong>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chart 3: Order Velocity & Commercial Volume -->
+            <div class="crm-chart-card">
+              <div class="crm-chart-header">
+                <div>
+                  <h3 class="crm-chart-title">Orders Velocity &amp; Fulfillment</h3>
+                  <p class="crm-chart-desc">Logistics pipeline across 412 total commercial equipment orders</p>
+                </div>
+                <span class="status-pill live" id="crm-orders-vol-pill">₦424.8M Volume</span>
+              </div>
+              <div class="crm-chart-body" style="height: 220px; position: relative;">
+                <canvas id="crm-chart-orders"></canvas>
+              </div>
+              <div class="crm-chart-legend">
+                <div class="legend-item">
+                  <span class="legend-color-dot" style="background: #059669;"></span>
+                  <span class="legend-label">Completed / Dispatched:</span>
+                  <strong class="legend-val">189 Orders</strong>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color-dot" style="background: #0284C7;"></span>
+                  <span class="legend-label">Processing / Verified:</span>
+                  <strong class="legend-val">103 Orders</strong>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-color-dot" style="background: #F59E0B;"></span>
+                  <span class="legend-label">Pending:</span>
+                  <strong class="legend-val">120 Orders</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Redesigned Customer Engagement Dimension Hub (The 6 Redesigned Buttons) -->
+          <div class="crm-aspect-deck-container">
+            <div class="crm-aspect-deck-header">
+              <div>
+                <span class="crm-deck-title">CUSTOMER ENGAGEMENT DIMENSIONS &amp; DIRECTORY FILTERS</span>
+                <span class="crm-deck-subtitle">Select any dimension below to inspect customer accounts, history, and dossiers</span>
+              </div>
+              <span class="crm-deck-counter" id="crm-deck-active-label">Viewing: <strong>Registered Accounts (310)</strong></span>
+            </div>
+            <div class="crm-tabs-nav" id="crm-aspect-tabs">
+              <button type="button" class="crm-tab-btn active" data-crm-tab="registered" title="Inspect 310 registered accounts">
+                <div class="crm-tab-icon-wrap" style="color: #0157A2; background: rgba(1, 87, 162, 0.08);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <div class="crm-tab-text-wrap">
+                  <span class="crm-tab-title">Registered Accounts</span>
+                  <span class="crm-tab-desc">Verified website users</span>
+                </div>
+                <span class="tab-badge-pill pill-blue" id="crm-badge-reg">310</span>
+              </button>
+
+              <button type="button" class="crm-tab-btn" data-crm-tab="guests" title="Inspect 167 guest checkout buyers">
+                <div class="crm-tab-icon-wrap" style="color: #D97706; background: rgba(217, 119, 6, 0.1);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                </div>
+                <div class="crm-tab-text-wrap">
+                  <span class="crm-tab-title">Guest Buyers</span>
+                  <span class="crm-tab-desc">No account created</span>
+                </div>
+                <span class="tab-badge-pill pill-amber" id="crm-badge-guests">167</span>
+              </button>
+
+              <button type="button" class="crm-tab-btn" data-crm-tab="paying" title="Inspect 168 customers with placed orders">
+                <div class="crm-tab-icon-wrap" style="color: #059669; background: rgba(5, 150, 105, 0.1);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                </div>
+                <div class="crm-tab-text-wrap">
+                  <span class="crm-tab-title">Paying Clients</span>
+                  <span class="crm-tab-desc">Orders placed</span>
+                </div>
+                <span class="tab-badge-pill pill-emerald" id="crm-badge-paying">168</span>
+              </button>
+
+              <button type="button" class="crm-tab-btn" data-crm-tab="quotes" title="Inspect 182 sizing calculator leads">
+                <div class="crm-tab-icon-wrap" style="color: #0284C7; background: rgba(2, 132, 199, 0.1);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line></svg>
+                </div>
+                <div class="crm-tab-text-wrap">
+                  <span class="crm-tab-title">Solar Consultation Leads</span>
+                  <span class="crm-tab-desc">Calculator inquiries</span>
+                </div>
+                <span class="tab-badge-pill pill-cyan" id="crm-badge-quotes">182</span>
+              </button>
+
+              <button type="button" class="crm-tab-btn" data-crm-tab="enquiries" title="Inspect 147 contact desk inquiries">
+                <div class="crm-tab-icon-wrap" style="color: #6366F1; background: rgba(99, 102, 241, 0.1);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                </div>
+                <div class="crm-tab-text-wrap">
+                  <span class="crm-tab-title">Contact Desk Inquiries</span>
+                  <span class="crm-tab-desc">Direct consultations</span>
+                </div>
+                <span class="tab-badge-pill pill-indigo" id="crm-badge-enq">147</span>
+              </button>
+
+              <button type="button" class="crm-tab-btn" data-crm-tab="geo" title="Inspect 36 Nigerian states customer distribution">
+                <div class="crm-tab-icon-wrap" style="color: #475569; background: rgba(71, 85, 105, 0.1);">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                </div>
+                <div class="crm-tab-text-wrap">
+                  <span class="crm-tab-title">State Geography</span>
+                  <span class="crm-tab-desc">36 Nigerian states</span>
+                </div>
+                <span class="tab-badge-pill pill-slate">36 States</span>
+              </button>
+            </div>
           </div>
 
           <!-- Filter & Search Controls -->
@@ -3702,6 +3896,6 @@
   <!-- Client Scripts -->
   <script src="/js/lucide.min.js"></script>
   <script src="/js/lucide-init.js"></script>
-  <script src="/js/admin.js?v=3"></script>
+  <script src="/js/admin.js?v=20261027_charts"></script>
 </body>
 </html>
