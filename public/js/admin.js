@@ -498,18 +498,45 @@
       });
     }
 
-    // Collapsible Sidebar (Desktop)
+    // Collapsible Sidebar (Desktop - Slim 60px Mode)
     const collapseBtn = document.getElementById('btn-collapse-sidebar');
     const sidebar = document.getElementById('admin-sidebar');
+    const appLayout = document.querySelector('.admin-app-layout') || document.body;
     if (collapseBtn && sidebar) {
+      const applySidebarCollapse = (collapsed) => {
+        sidebar.classList.toggle('sidebar-collapsed', collapsed);
+        if (appLayout) appLayout.classList.toggle('sidebar-collapsed', collapsed);
+        collapseBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        collapseBtn.setAttribute('title', collapsed ? 'Expand Sidebar' : 'Collapse Sidebar');
+        localStorage.setItem('dp_admin_sidebar_collapsed', collapsed ? 'true' : 'false');
+      };
+
       const savedState = localStorage.getItem('dp_admin_sidebar_collapsed');
       if (savedState === 'true') {
-        sidebar.classList.add('sidebar-collapsed');
+        applySidebarCollapse(true);
       }
+
       collapseBtn.addEventListener('click', () => {
-        const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
-        localStorage.setItem('dp_admin_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+        const isCurrentlyCollapsed = sidebar.classList.contains('sidebar-collapsed');
+        applySidebarCollapse(!isCurrentlyCollapsed);
       });
+    }
+
+    // Ensure all nav buttons have titles for hover tooltips in slim collapsed rail mode
+    document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+      const labelSpan = btn.querySelector('span');
+      if (labelSpan && labelSpan.textContent && !btn.getAttribute('title')) {
+        btn.setAttribute('title', labelSpan.textContent.trim());
+      }
+    });
+
+    const publicStoreLink = document.querySelector('.sidebar-ext-link');
+    if (publicStoreLink && !publicStoreLink.getAttribute('title')) {
+      publicStoreLink.setAttribute('title', 'View Public Store');
+    }
+    const sidebarLogoutBtn = document.getElementById('btn-admin-logout');
+    if (sidebarLogoutBtn && !sidebarLogoutBtn.getAttribute('title')) {
+      sidebarLogoutBtn.setAttribute('title', 'Sign Out of Operations');
     }
 
     // Mobile Navigation Drawer (Hamburger & Close)
