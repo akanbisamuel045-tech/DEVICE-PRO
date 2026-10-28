@@ -51,12 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const itemsCountBadge = document.getElementById('summary-items-count');
   const subtotalEl = document.getElementById('calc-subtotal');
   const deliveryEl = document.getElementById('calc-delivery');
-  const installRow = document.getElementById('row-install-fee');
-  const installEl = document.getElementById('calc-installation');
   const totalEl = document.getElementById('calc-total');
 
   const stateSelect = document.getElementById('cust-state');
-  const installRadios = document.querySelectorAll('input[name="installationOption"]');
 
   // Load cart items
   const items = window.DeviceProCart ? window.DeviceProCart.getItems() : [];
@@ -106,46 +103,19 @@ document.addEventListener('DOMContentLoaded', () => {
     return 35000; // Default nationwide shipping
   }
 
-  // Calculate installation fee
-  function getInstallationFee(subtotal) {
-    const selectedOption = document.querySelector('input[name="installationOption"]:checked');
-    if (selectedOption && selectedOption.value === 'turnkey_install') {
-      // 10% of subtotal or flat ₦120,000 minimum
-      return Math.max(120000, Math.round(subtotal * 0.08));
-    }
-    return 0;
-  }
-
   // Recalculate totals
   function recalculateTotals() {
     const subtotal = window.DeviceProCart ? window.DeviceProCart.getSubtotal() : 0;
     const delivery = getDeliveryFee();
-    const installation = getInstallationFee(subtotal);
-    const total = subtotal + delivery + installation;
+    const total = subtotal + delivery;
 
     subtotalEl.textContent = formatNaira(subtotal);
     deliveryEl.textContent = delivery === 0 ? 'FREE (Pickup)' : formatNaira(delivery);
-
-    if (installation > 0) {
-      installRow.style.display = 'flex';
-      installEl.textContent = formatNaira(installation);
-    } else {
-      installRow.style.display = 'none';
-      installEl.textContent = '₦0';
-    }
-
     totalEl.textContent = formatNaira(total);
 
     const btnText = submitBtn.querySelector('span:first-child');
     if (btnText) {
-      const selectedMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value;
-      if (selectedMethod === 'paystack') {
-        btnText.textContent = `Proceed to Secure Online Payment (${formatNaira(total)})`;
-      } else if (selectedMethod === 'cod') {
-        btnText.textContent = `Confirm Pay on Delivery (${formatNaira(total)})`;
-      } else {
-        btnText.textContent = `Place Order & Generate Invoice (${formatNaira(total)})`;
-      }
+      btnText.textContent = `Proceed to Secure Online Payment (${formatNaira(total)})`;
     }
   }
 
@@ -153,25 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const errorParam = urlParams.get('error');
   if (errorParam) {
-    errorFeedback.textContent = `Payment update: ${decodeURIComponent(errorParam)}. Please review your details or select bank transfer below.`;
+    errorFeedback.textContent = `Payment update: ${decodeURIComponent(errorParam)}. Please review your details and try again.`;
     errorFeedback.style.display = 'block';
   }
 
   // Event Listeners
   stateSelect.addEventListener('change', recalculateTotals);
-  installRadios.forEach(radio => radio.addEventListener('change', () => {
-    document.querySelectorAll('.install-option-card').forEach(c => c.classList.remove('selected'));
-    radio.closest('.install-option-card').classList.add('selected');
-    recalculateTotals();
-  }));
-
-  document.querySelectorAll('input[name="paymentMethod"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      document.querySelectorAll('.payment-method-card').forEach(c => c.classList.remove('selected'));
-      radio.closest('.payment-method-card').classList.add('selected');
-      recalculateTotals();
-    });
-  });
 
   // Initial Calculation
   renderSummary();
@@ -188,8 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const deliveryAddress = document.getElementById('cust-address').value.trim();
     const deliveryState = stateSelect.value;
     const notes = document.getElementById('cust-notes').value.trim();
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-    const installationOption = document.querySelector('input[name="installationOption"]:checked').value;
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'paystack';
 
     if (!customerName || !customerPhone || !deliveryAddress || !deliveryState) {
       errorFeedback.textContent = 'Please fill out all mandatory customer and delivery destination fields.';
@@ -199,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const subtotal = window.DeviceProCart.getSubtotal();
     const deliveryFee = getDeliveryFee();
-    const installationFee = getInstallationFee(subtotal);
 
     const orderPayload = {
       customerName,
@@ -216,16 +171,14 @@ document.addEventListener('DOMContentLoaded', () => {
         subtotal: i.price * i.quantity
       })),
       paymentMethod,
-      installationOption,
-      installationFeeNgn: installationFee,
+      installationOption: 'supply_only',
+      installationFeeNgn: 0,
       deliveryFeeNgn: deliveryFee,
       notes
     };
 
     submitBtn.disabled = true;
-    submitBtn.querySelector('span:first-child').textContent = paymentMethod === 'paystack'
-      ? 'Connecting to Secure Gateway...'
-      : 'Creating Order & Reserving Hardware...';
+    submitBtn.querySelector('span:first-child').textContent = 'Connecting to Secure Gateway...';
 
     try {
       const response = await fetch('/api/orders', {

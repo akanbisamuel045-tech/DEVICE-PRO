@@ -30,28 +30,49 @@
   <!-- Accessible Skip Link (WCAG 2.2 AA) -->
   <a href="#checkout-main" class="skip-to-content">Skip to checkout form</a>
 
-  <!-- Header (Clean Minimalist Checkout Navbar) -->
+  <!-- Header (Redesigned White Enterprise Checkout Navbar) -->
   <header class="site-header checkout-navbar" role="banner">
     <div class="layout-container checkout-navbar-inner">
-      <a href="/" class="checkout-logo-link" aria-label="DEVICE PRO Homepage">
-        <img src="/images/logo.svg" alt="DEVICE PRO" class="checkout-logo-img" width="145" height="32"
-          style="height: 32px; width: auto; max-width: 160px; object-fit: contain;">
-      </a>
-
-      <div class="checkout-navbar-actions">
-        <a href="tel:+2348033882268" class="btn-book-call" id="btn-book-call-checkout"
-          aria-label="Book a call with a solar engineer">
-          <span class="btn-book-call-icon-wrap" aria-hidden="true">
-            <svg class="phone-call-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <path
-                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-              </path>
-            </svg>
-          </span>
-          <span class="btn-book-call-label">Book a call</span>
-          <span class="btn-book-call-badge">Free</span>
+      <div class="checkout-navbar-left">
+        <a href="/" class="checkout-logo-link" aria-label="DEVICE PRO Homepage">
+          <img src="/images/logo.svg" alt="DEVICE PRO" class="checkout-logo-img" width="155" height="34"
+            style="height: 34px; width: auto; max-width: 165px; object-fit: contain;">
         </a>
+        <div class="checkout-nav-divider" aria-hidden="true"></div>
+        <div class="checkout-security-pill">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <span>256-Bit SSL Encrypted Checkout</span>
+        </div>
+      </div>
+
+      <div class="checkout-navbar-right">
+        <a href="/products" class="checkout-nav-back-link" title="Return to Equipment Catalogue">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Back to Store</span>
+        </a>
+
+        <div class="checkout-nav-hotline">
+          <span class="hotline-label">Need assistance?</span>
+          <a href="tel:+2348033882268" class="hotline-link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            <strong>+234 803 388 2268</strong>
+          </a>
+        </div>
+
+        <button type="button" class="btn-checkout-consult" id="btn-book-call-checkout" aria-label="Book a call with a solar engineer">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Speak with Engineer</span>
+        </button>
       </div>
     </div>
   </header>
@@ -72,8 +93,7 @@
       <div class="checkout-header-row">
         <div>
           <h1 class="checkout-page-title">Complete Your Solar Order</h1>
-          <p class="checkout-page-subtitle">Verify your delivery address, installation requirements, and payment
-            preference.</p>
+          <p class="checkout-page-subtitle">Verify your delivery destination and secure payment details.</p>
         </div>
         <div class="checkout-phone-help">
           <span>Need immediate assistance?</span>
@@ -84,11 +104,13 @@
 
       <!-- Empty Cart State -->
       <div id="checkout-empty-state" class="checkout-empty-card" style="display: none;">
-        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-        </svg>
+        <div class="empty-cart-icon-wrap">
+          <svg class="empty-cart-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0157A2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </div>
         <h2>Your Cart is Currently Empty</h2>
         <p>You have not added any solar equipment or turnkey packages to your cart yet.</p>
         <div class="empty-actions">
@@ -168,100 +190,36 @@
               </div>
             </section>
 
-            <!-- STEP 2: Certified Installation Service -->
+            <!-- STEP 2: Payment Preference -->
             <section class="checkout-step-card" aria-labelledby="step2-title">
               <div class="step-card-header">
                 <span class="step-number">2</span>
                 <div>
-                  <h2 id="step2-title" class="step-card-title">Installation &amp; Engineering Scope</h2>
-                  <p class="step-card-desc">Choose whether you need professional on-site mounting and electrical
-                    commissioning.</p>
-                </div>
-              </div>
-
-              <div class="installation-options-grid">
-                <label class="install-option-card selected">
-                  <input type="radio" name="installationOption" value="turnkey_install" checked>
-                  <div class="install-option-content">
-                    <div class="option-header-row">
-                      <span class="option-title">Certified Turnkey Installation &amp; Commissioning</span>
-                      <span class="option-price-tag">+₦120,000</span>
-                    </div>
-                    <p class="option-desc">
-                      Full electrical installation by COREN-certified solar engineers. Includes rooftop railing, DC/AC
-                      disconnect switches, Class-II surge arresters, copper earthing, and a 12-Month Workmanship
-                      Warranty.
-                    </p>
-                    <span class="option-badge">Recommended for Warranty Protection</span>
-                  </div>
-                </label>
-
-                <label class="install-option-card">
-                  <input type="radio" name="installationOption" value="supply_only">
-                  <div class="install-option-content">
-                    <div class="option-header-row">
-                      <span class="option-title">Hardware Supply Only (DIY / Own Technician)</span>
-                      <span class="option-price-tag">₦0</span>
-                    </div>
-                    <p class="option-desc">
-                      We deliver the verified Tier-1 hardware directly to your site with OEM warranties. Installation is
-                      handled by your internal electrical team or third-party technician.
-                    </p>
-                  </div>
-                </label>
-              </div>
-            </section>
-
-            <!-- STEP 3: Payment Preference -->
-            <section class="checkout-step-card" aria-labelledby="step3-title">
-              <div class="step-card-header">
-                <span class="step-number">3</span>
-                <div>
-                  <h2 id="step3-title" class="step-card-title">Payment Method</h2>
-                  <p class="step-card-desc">All transactions are backed by official Nigerian corporate tax receipts.</p>
+                  <h2 id="step2-title" class="step-card-title">Payment Method</h2>
+                  <p class="step-card-desc">Instant online processing with automated verification and official corporate receipt.</p>
                 </div>
               </div>
 
               <div class="payment-methods-grid">
-                <label class="payment-method-card selected">
-                  <input type="radio" name="paymentMethod" value="transfer" checked>
-                  <div class="payment-method-content">
-                    <div class="method-title-row">
-                      <span class="method-icon"><i data-lucide="landmark"></i></span>
-                      <span class="method-name">Direct Corporate Bank Transfer</span>
-                      <span class="method-tag">Most Popular</span>
-                    </div>
-                    <p class="method-desc">
-                      Generate an official pro-forma invoice with DEVICE PRO corporate bank account details (Zenith Bank
-                      / GTBank). Equipment is reserved immediately upon confirmation.
-                    </p>
-                  </div>
-                </label>
-
-                <label class="payment-method-card">
-                  <input type="radio" name="paymentMethod" value="paystack">
+                <label class="payment-method-card selected" style="cursor: default;">
+                  <input type="radio" name="paymentMethod" value="paystack" checked>
                   <div class="payment-method-content">
                     <div class="method-title-row">
                       <span class="method-icon"><i data-lucide="credit-card"></i></span>
-                      <span class="method-name">Online Card / USSD / Bank Transfer</span>
+                      <div style="flex-grow: 1;">
+                        <span class="method-name">Online Card / USSD / Bank Transfer</span>
+                        <div style="font-size: 0.78rem; color: #16A34A; font-weight: 600; margin-top: 2px;">
+                          ✓ Instant Automated Confirmation &amp; Hardware Reservation
+                        </div>
+                      </div>
+                      <div class="payment-card-badges">
+                        <span class="badge-card-brand">Cards</span>
+                        <span class="badge-card-brand">Bank Transfer</span>
+                        <span class="badge-card-brand">USSD</span>
+                      </div>
                     </div>
                     <p class="method-desc">
-                      Instant, secure card processing supporting Mastercard, Visa, Verve, and Nigerian bank USSD
-                      transfers.
-                    </p>
-                  </div>
-                </label>
-
-                <label class="payment-method-card">
-                  <input type="radio" name="paymentMethod" value="cod">
-                  <div class="payment-method-content">
-                    <div class="method-title-row">
-                      <span class="method-icon"><i data-lucide="banknote"></i></span>
-                      <span class="method-name">Payment on Delivery</span>
-                    </div>
-                    <p class="method-desc">
-                      Available for orders under ₦2,500,000 within Lagos (Ikeja, Mainland, Island, and Lekki). POS
-                      terminal or bank transfer upon equipment inspection.
+                      Instant, 256-bit bank-grade encryption supporting Mastercard, Visa, Verve, Nigerian bank transfer, and bank USSD. Your official VAT invoice and logistics tracking ID are generated immediately upon successful payment.
                     </p>
                   </div>
                 </label>
@@ -281,7 +239,7 @@
               </div>
 
               <button type="submit" id="btn-submit-order" class="btn-place-order">
-                <span>Place Order &amp; Generate Invoice</span>
+                <span>Proceed to Secure Online Payment</span>
                 <span class="btn-arrow">→</span>
               </button>
 
@@ -314,10 +272,6 @@
               <div class="calc-row">
                 <span>Nationwide Logistics / Delivery</span>
                 <span id="calc-delivery">₦15,000</span>
-              </div>
-              <div class="calc-row" id="row-install-fee">
-                <span>Certified Installation Fee</span>
-                <span id="calc-installation">₦120,000</span>
               </div>
               <div class="calc-row-total">
                 <span class="total-label">Total Amount Due</span>

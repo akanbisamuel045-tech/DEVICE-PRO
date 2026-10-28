@@ -7,21 +7,18 @@
    Header & Brand Logo Styling (Clean Minimalist Checkout Navbar)
    ============================================================================= */
 .site-header.checkout-navbar {
-  background: #080E1A;
-  background-color: rgba(8, 14, 26, 0.96);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.35);
-  padding: 16px 0;
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04) !important;
+  padding: 0 !important;
   position: sticky;
   top: 0;
   z-index: 100;
-  transition: all 0.25s ease;
-  height: auto !important;
-  min-height: 72px;
+  height: 72px !important;
+  min-height: 72px !important;
   display: flex !important;
   align-items: center !important;
+  transition: all 0.25s ease;
 }
 
 .checkout-navbar-inner {
@@ -38,6 +35,12 @@
   padding-right: 24px;
 }
 
+.checkout-navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .checkout-logo-link {
   display: inline-flex;
   align-items: center;
@@ -52,92 +55,133 @@
 }
 
 .checkout-logo-link:focus-visible {
-  outline: 2px solid #F9B000;
+  outline: 2px solid #0157A2;
   outline-offset: 4px;
   border-radius: 6px;
 }
 
 .checkout-logo-img {
-  height: 32px !important;
-  max-height: 32px !important;
+  height: 34px !important;
+  max-height: 34px !important;
   width: auto !important;
-  max-width: 160px !important;
+  max-width: 165px !important;
   object-fit: contain;
   display: block;
 }
 
-.checkout-navbar-actions {
+.checkout-nav-divider {
+  width: 1px;
+  height: 24px;
+  background-color: #E2E8F0;
+}
+
+.checkout-security-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  background-color: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 9999px;
+  font-size: 0.78125rem;
+  font-weight: 600;
+  color: #15803D;
+  letter-spacing: -0.01em;
+}
+
+.checkout-navbar-right {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
 }
 
-/* "Book a call" Action Button */
-.btn-book-call {
+.checkout-nav-back-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 22px;
-  background: linear-gradient(135deg, #F9B000 0%, #FFB703 100%);
-  color: #07111D !important;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  gap: 8px;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 7px 12px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.checkout-nav-back-link:hover {
+  color: #0157A2;
+  background-color: #F8FAFC;
+}
+
+.checkout-nav-hotline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+
+.checkout-nav-hotline .hotline-label {
+  font-size: 0.7rem;
+  color: #64748B;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.checkout-nav-hotline .hotline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #082D50;
+  text-decoration: none;
   font-size: 0.875rem;
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  text-decoration: none !important;
-  border-radius: 9999px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 18px rgba(249, 176, 0, 0.32);
-  cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  user-select: none;
-  -webkit-user-select: none;
+  transition: color 0.2s ease;
 }
 
-.btn-book-call:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(249, 176, 0, 0.48);
-  filter: brightness(1.04);
+.checkout-nav-hotline .hotline-link:hover {
+  color: #0157A2;
 }
 
-.btn-book-call:active {
-  transform: translateY(0);
-  filter: brightness(0.96);
-  box-shadow: 0 2px 8px rgba(249, 176, 0, 0.3);
-}
-
-.btn-book-call:focus {
-  outline: none;
-}
-
-.btn-book-call:focus-visible {
-  outline: 2px solid #F9B000;
-  outline-offset: 3px;
-}
-
-.btn-book-call-icon-wrap {
+.btn-checkout-consult {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(7, 17, 29, 0.12);
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.btn-book-call:hover .btn-book-call-icon-wrap {
-  transform: scale(1.1) rotate(-8deg);
-}
-
-.phone-call-svg {
-  display: block;
-}
-
-.btn-book-call-label {
+  gap: 8px;
+  padding: 8px 18px;
+  background-color: #082D50;
+  color: #FFFFFF;
+  border: 1px solid #082D50;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
   font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(8, 45, 80, 0.16);
+}
+
+.btn-checkout-consult:hover {
+  background-color: #0157A2;
+  border-color: #0157A2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(1, 87, 162, 0.22);
+}
+
+.payment-card-badges {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.badge-card-brand {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #0157A2;
+  background: #EBF3FB;
+  border: 1px solid #DCE5EF;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
   white-space: nowrap;
 }
 
@@ -725,28 +769,57 @@
   flex-shrink: 0;
 }
 
-/* Empty State Card */
+/* Empty State Card - Centralized with Corporate Blue Icon */
 .checkout-empty-card {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 16px;
-  padding: 60px 24px;
+  padding: 56px 32px;
   text-align: center;
   max-width: 580px;
-  margin: 40px auto;
+  margin: 48px auto;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+}
+
+.empty-cart-icon-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #EBF3FB;
+  border: 1px solid #DCE5EF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px auto;
+  box-shadow: 0 4px 14px rgba(1, 87, 162, 0.1);
+}
+
+.empty-cart-icon {
+  display: block;
+  margin: 0 auto;
+  stroke: #0157A2 !important; /* Corporate Blue (cblue) */
+  color: #0157A2 !important;
 }
 
 .checkout-empty-card h2 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #061C35;
-  margin: 16px 0 8px;
+  color: #082D50;
+  margin: 8px 0 10px 0;
+  text-align: center;
 }
 
 .checkout-empty-card p {
   color: #64748B;
   font-size: 0.9375rem;
-  margin: 0 0 24px;
+  line-height: 1.55;
+  margin: 0 0 28px 0;
+  max-width: 440px;
+  text-align: center;
 }
 
 .empty-actions {
@@ -784,6 +857,19 @@
   }
 }
 
+@media (max-width: 900px) {
+  .checkout-nav-divider,
+  .checkout-security-pill {
+    display: none !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .checkout-nav-hotline {
+    display: none !important;
+  }
+}
+
 @media (max-width: 640px) {
   .checkout-main-content {
     padding: 24px 0 60px;
@@ -797,23 +883,28 @@
   .checkout-phone-help {
     display: none;
   }
+  .btn-checkout-consult span {
+    display: none;
+  }
+  .btn-checkout-consult {
+    padding: 8px 12px;
+  }
 }
 
 @media (max-width: 480px) {
   .site-header.checkout-navbar {
-    padding: 12px 0;
+    height: 64px !important;
+    min-height: 64px !important;
   }
   .checkout-logo-img {
     height: 28px !important;
     max-height: 28px !important;
   }
-  .btn-book-call {
-    padding: 8px 14px;
-    gap: 7px;
-    font-size: 0.8125rem;
-  }
-  .btn-book-call-badge {
+  .checkout-nav-back-link span {
     display: none;
+  }
+  .checkout-nav-back-link {
+    padding: 6px;
   }
 }
 
