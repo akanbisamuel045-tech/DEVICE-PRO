@@ -1023,23 +1023,56 @@
               </div>
             </div>
 
-            <!-- Final Save Action Bar -->
-            <div style="padding: 1.25rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-              <div style="max-width: 550px;">
-                <div style="font-weight: 700; color: #0F172A; font-size: 0.88rem; margin-bottom: 0.2rem;">
-                  Save Validated Import Analysis Record
-                </div>
-                <div style="font-size: 0.78rem; color: var(--color-d-text-muted); line-height: 1.4;">
-                  Saving records this analysis in persistent MongoDB Atlas import history for audit logging and future catalog review. <strong>No live prices, supplier costs, or stock quantities will be updated.</strong>
+            <!-- Update Application & Save Controls -->
+            <div style="padding: 1.5rem; background: #F8FAFC; border-top: 1px solid #E2E8F0; display: flex; flex-direction: column; gap: 1.25rem;">
+              
+              <!-- Success notification banner (hidden by default) -->
+              <div id="import-apply-success-box" style="display:none; background:#ECFDF5; border:1px solid #10B981; border-radius:8px; padding:1rem 1.25rem; color:#065F46;">
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+                  <div style="display:flex; align-items:center; gap:0.6rem;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <div>
+                      <strong style="font-size:0.95rem; display:block; color:#064E3B;" id="import-apply-success-title">Product Prices Updated Successfully!</strong>
+                      <span style="font-size:0.82rem; color:#047857;" id="import-apply-success-desc">Live products have been updated with new selling prices.</span>
+                    </div>
+                  </div>
+                  <a href="/products" target="_blank" class="btn-primary" style="background:#059669; border-color:#059669; color:#FFF; font-size:0.82rem; padding:0.5rem 1rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+                    <span>View Live Products Page</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
                 </div>
               </div>
-              <div style="display: flex; gap: 0.75rem; align-items: center;">
-                <button type="button" id="btn-reset-import-all" class="btn-secondary">Discard Analysis</button>
-                <button type="button" id="btn-save-import-record" class="btn-primary-yellow" style="padding: 0.65rem 1.35rem;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  <span>Save Import Analysis</span>
-                </button>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                <div style="max-width: 580px;">
+                  <div style="font-weight: 800; color: #0F172A; font-size: 0.95rem; margin-bottom: 0.35rem;">
+                    Choose Update Target &amp; Action
+                  </div>
+                  <div style="display:flex; align-items:center; gap:0.75rem; margin-top:0.4rem;">
+                    <label for="select-price-update-target" style="font-size:0.8rem; font-weight:700; color:#334155; white-space:nowrap;">Price Field:</label>
+                    <select id="select-price-update-target" class="form-input" style="font-size:0.82rem; padding:0.45rem 0.85rem; background:#FFF; border:1px solid #CBD5E1; border-radius:6px; font-weight:600; color:#0F172A; min-width:280px;">
+                      <option value="retail_price" selected>Live Store Selling Price (price_ngn) - Updates Website Catalog</option>
+                      <option value="both">Both Live Selling Price &amp; Supplier Cost</option>
+                      <option value="cost_price">Internal Supplier Wholesale Cost Only (cost_price_ngn)</option>
+                    </select>
+                  </div>
+                  <div style="font-size: 0.76rem; color: #64748B; margin-top: 0.4rem; line-height: 1.4;">
+                    Clicking <strong>Apply Price Updates to Live Products</strong> updates active commercial products in MongoDB Atlas and immediately reflects the new prices on the store catalog.
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                  <button type="button" id="btn-reset-import-all" class="btn-secondary">Discard</button>
+                  <button type="button" id="btn-save-import-record" class="btn-secondary" style="border:1px solid #CBD5E1;">
+                    <span>Save Analysis Only</span>
+                  </button>
+                  <button type="button" id="btn-apply-direct-to-products" class="btn-primary" style="background:#059669; border:1px solid #047857; color:#FFFFFF; font-weight:700; padding:0.65rem 1.4rem; display:inline-flex; align-items:center; gap:0.5rem; box-shadow:0 1px 3px rgba(0,0,0,0.1); cursor:pointer;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span id="btn-apply-direct-text">Apply Price Updates to Live Products</span>
+                  </button>
+                </div>
               </div>
+
             </div>
 
           </div>
@@ -2089,6 +2122,195 @@
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- =================================================================
+               CUSTOMER PRODUCT DEMAND & EQUIPMENT BROWSING INTELLIGENCE (NEW)
+               ================================================================= -->
+          <div class="crm-demand-section" id="crm-demand-intelligence" style="margin-bottom: 2rem;">
+            <!-- Section Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.6rem;">
+                  <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #059669; box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);"></span>
+                  <span style="font-size: 0.78rem; font-weight: 800; color: #0157A2; text-transform: uppercase; letter-spacing: 0.06em;">LIVE WEBSITE DEMAND &amp; EQUIPMENT BROWSING TELEMETRY</span>
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: #0F172A; margin: 0.25rem 0 0.15rem 0; letter-spacing: -0.01em;">
+                  Most Checked Product Categories, Equipment Types &amp; Brands
+                </h3>
+                <p style="font-size: 0.82rem; color: #64748B; margin: 0;">
+                  Real-time analytics of what prospective solar clients and commercial buyers browse, compare, and inquire about on the website.
+                </p>
+              </div>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="status-pill live" id="crm-demand-total-interactions-pill" style="font-size: 0.75rem; padding: 0.4rem 0.85rem;">5,665 Website Touchpoints Tracked</span>
+              </div>
+            </div>
+
+            <!-- Top 3 Champion Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;">
+              
+              <!-- Card 1: Top Category -->
+              <div class="kpi-card crm-demand-hero-card" style="border-top: 4px solid #0157A2;">
+                <div class="kpi-card-inner" style="padding: 1.25rem 1.35rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                    <div>
+                      <span class="kpi-lbl" style="color: #0157A2;">#1 MOST CHECKED CATEGORY</span>
+                      <div class="kpi-val" id="crm-demand-top-category" style="font-size: 1.35rem; margin-top: 0.35rem; color: #0F172A; font-weight: 800;">Solar Inverters</div>
+                    </div>
+                    <div class="kpi-icon-badge" style="color: #0157A2; background: #EFF6FF; width: 38px; height: 38px;">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid #F1F5F9;">
+                    <span class="status-pill live" id="crm-demand-category-share" style="font-size: 0.72rem;">27.7% Demand Share</span>
+                    <span style="font-size: 0.76rem; font-weight: 700; color: #475569;" id="crm-demand-category-count">1,570 Total Checks</span>
+                  </div>
+                  <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.35rem;" id="crm-demand-category-runner">
+                    Runner-up: Lithium Batteries (21.2%)
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 2: Top Product Type -->
+              <div class="kpi-card crm-demand-hero-card" style="border-top: 4px solid #FFB90C;">
+                <div class="kpi-card-inner" style="padding: 1.25rem 1.35rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                    <div>
+                      <span class="kpi-lbl" style="color: #D97706;">#1 MOST CHECKED PRODUCT TYPE</span>
+                      <div class="kpi-val" id="crm-demand-top-type" style="font-size: 1.2rem; margin-top: 0.35rem; color: #0F172A; font-weight: 800; line-height: 1.2;">Hybrid Inverters (5kVA–10kVA)</div>
+                    </div>
+                    <div class="kpi-icon-badge" style="color: #D97706; background: #FFFBEB; width: 38px; height: 38px;">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid #F1F5F9;">
+                    <span class="status-pill live" id="crm-demand-type-share" style="font-size: 0.72rem; background: #FEF3C7; color: #92400E; border-color: #FDE68A;">13.2% Demand Share</span>
+                    <span style="font-size: 0.76rem; font-weight: 700; color: #475569;" id="crm-demand-type-count">750 Total Checks</span>
+                  </div>
+                  <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.35rem;" id="crm-demand-type-runner">
+                    Runner-up: Monocrystalline Panels (10.9%)
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card 3: Top Brand -->
+              <div class="kpi-card crm-demand-hero-card" style="border-top: 4px solid #059669;">
+                <div class="kpi-card-inner" style="padding: 1.25rem 1.35rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                    <div>
+                      <span class="kpi-lbl" style="color: #059669;">#1 MOST CHECKED BRAND</span>
+                      <div class="kpi-val" id="crm-demand-top-brand" style="font-size: 1.35rem; margin-top: 0.35rem; color: #0F172A; font-weight: 800;">DEVICE PRO Packages</div>
+                    </div>
+                    <div class="kpi-icon-badge" style="color: #059669; background: #ECFDF5; width: 38px; height: 38px;">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px solid #F1F5F9;">
+                    <span class="status-pill live" id="crm-demand-brand-share" style="font-size: 0.72rem;">16.6% Brand Affinity</span>
+                    <span style="font-size: 0.76rem; font-weight: 700; color: #475569;" id="crm-demand-brand-count">940 Total Checks</span>
+                  </div>
+                  <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.35rem;" id="crm-demand-brand-runner">
+                    Runner-up: Deye (15.5%) &amp; Felicity Solar (14.7%)
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- 3 Visual Demand Charts Grid -->
+            <div class="crm-analytics-grid" style="margin-bottom: 1.25rem;">
+              
+              <!-- Chart 1: Categories Donut -->
+              <div class="crm-chart-card">
+                <div class="crm-chart-header">
+                  <div>
+                    <h3 class="crm-chart-title">Product Category Demand Share</h3>
+                    <p class="crm-chart-desc">Traffic volume &amp; inquiry share across 8 solar equipment categories</p>
+                  </div>
+                  <span class="status-pill live" id="crm-pill-cat-lead">Inverters Lead</span>
+                </div>
+                <div class="crm-chart-body" style="height: 230px; position: relative;">
+                  <canvas id="crm-chart-demand-categories"></canvas>
+                </div>
+                <div class="crm-chart-legend" id="crm-demand-cat-legend">
+                  <!-- Populated dynamically via JS -->
+                </div>
+              </div>
+
+              <!-- Chart 2: Product Types Horizontal Bar -->
+              <div class="crm-chart-card">
+                <div class="crm-chart-header">
+                  <div>
+                    <h3 class="crm-chart-title">Most Checked Equipment Types</h3>
+                    <p class="crm-chart-desc">Top engineering specifications, power capacities &amp; battery formats</p>
+                  </div>
+                  <span class="status-pill live" style="background: #EFF6FF; color: #0157A2; border-color: #BFDBFE;">Top 8 Tiers</span>
+                </div>
+                <div class="crm-chart-body" style="height: 230px; position: relative;">
+                  <canvas id="crm-chart-demand-types"></canvas>
+                </div>
+                <div style="font-size: 0.74rem; color: #64748B; text-align: center; margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid #F1F5F9;">
+                  Hybrid Inverters 5–10kVA &amp; Monocrystalline Panels capture over 24% of all website equipment lookups.
+                </div>
+              </div>
+
+              <!-- Chart 3: Brand Affinity Bar -->
+              <div class="crm-chart-card">
+                <div class="crm-chart-header">
+                  <div>
+                    <h3 class="crm-chart-title">Customer Brand Loyalty &amp; Affinity</h3>
+                    <p class="crm-chart-desc">Which manufacturer brands customers check &amp; request quotes for most</p>
+                  </div>
+                  <span class="status-pill live" style="background: #ECFDF5; color: #065F46; border-color: #A7F3D0;">Tier-1 Solar Brands</span>
+                </div>
+                <div class="crm-chart-body" style="height: 230px; position: relative;">
+                  <canvas id="crm-chart-demand-brands"></canvas>
+                </div>
+                <div style="font-size: 0.74rem; color: #64748B; text-align: center; margin-top: 0.75rem; padding-top: 0.5rem; border-top: 1px solid #F1F5F9;">
+                  DEVICE PRO Turnkey Packages, Deye, Felicity Solar &amp; GoodWe represent the top 4 brand affinities.
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Leaderboard Table with Dimension Filters -->
+            <div class="crm-chart-card" style="padding: 1.25rem 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid #F1F5F9;">
+                <div>
+                  <h4 style="font-size: 1rem; font-weight: 800; color: #0F172A; margin: 0 0 0.2rem 0;">Product Demand Leaderboard &amp; Customer Interest Ranking</h4>
+                  <p style="font-size: 0.76rem; color: #64748B; margin: 0;">Ranked catalog breakdown across categories, equipment types, and manufacturer brands</p>
+                </div>
+                <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;" id="crm-demand-dim-filters">
+                  <button type="button" class="btn-subtab active" data-demand-dim="all" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">All Dimensions</button>
+                  <button type="button" class="btn-subtab" data-demand-dim="category" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">By Category</button>
+                  <button type="button" class="btn-subtab" data-demand-dim="type" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">By Equipment Type</button>
+                  <button type="button" class="btn-subtab" data-demand-dim="brand" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">By Brand</button>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="data-table" id="crm-demand-leaderboard-table" style="font-size: 0.82rem;">
+                  <thead>
+                    <tr>
+                      <th style="width: 60px; text-align: center;">Rank</th>
+                      <th>Product Dimension / Name</th>
+                      <th>Dimension Type</th>
+                      <th style="text-align: right;">Total Checks</th>
+                      <th style="text-align: center;">Direct Views</th>
+                      <th style="text-align: center;">Cart Adds</th>
+                      <th style="text-align: center;">Quote Inquiries</th>
+                      <th style="text-align: center; width: 140px;">Demand Share</th>
+                      <th style="text-align: center;">Commercial Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="crm-demand-leaderboard-tbody">
+                    <!-- Populated dynamically via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
 
           <!-- Redesigned Customer Engagement Dimension Hub (The 6 Redesigned Buttons) -->
@@ -3412,12 +3634,22 @@
         <p style="font-size: 0.88rem; color: #0F172A; line-height: 1.5; margin-bottom: 1rem;">
           You are about to apply approved supplier costs to <strong id="apply-confirm-count" class="text-emerald">0 product(s)</strong> in the live catalog.
         </p>
+        <div style="margin-bottom: 1rem;">
+          <label for="modal-apply-target-select" style="font-size: 0.82rem; font-weight: 700; color: #0F172A; display: block; margin-bottom: 0.35rem;">
+            Select Target Price Field:
+          </label>
+          <select id="modal-apply-target-select" class="form-input" style="font-size: 0.82rem; padding: 0.5rem 0.85rem; width: 100%; border: 1px solid #CBD5E1; border-radius: 6px;">
+            <option value="retail_price" selected>Live Store Selling Price (price_ngn) - Updates Public Website</option>
+            <option value="both">Both Live Selling Price &amp; Supplier Cost</option>
+            <option value="cost_price">Internal Supplier Wholesale Cost Only (cost_price_ngn)</option>
+          </select>
+        </div>
         <div class="import-gov-notice" style="background: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.35); border-radius: 8px; padding: 0.85rem 1rem; margin-bottom: 1rem;">
-          <strong style="color: #38BDF8; font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">STRICT SEPARATION SAFEGUARD:</strong>
+          <strong style="color: #0369A1; font-size: 0.8rem; display: block; margin-bottom: 0.25rem;">PRICE UPDATE SAFEGUARD:</strong>
           <span style="font-size: 0.76rem; color: #334155; line-height: 1.4; display: block;">
-            • Only the internal supplier cost field (<code>cost_price_ngn</code>) will be updated.<br>
-            • Customer retail selling prices (<code>price_ngn</code>) will <strong>NOT</strong> change.<br>
-            • Product stock levels, descriptions, and active status remain unchanged.
+            • Updates the selected price field for all matched active commercial items.<br>
+            • Changes take effect immediately in MongoDB Atlas and on the public catalog.<br>
+            • Product stock levels, descriptions, and active status remain untouched.
           </span>
         </div>
         <p style="font-size: 0.78rem; color: var(--color-d-text-muted); margin: 0;">

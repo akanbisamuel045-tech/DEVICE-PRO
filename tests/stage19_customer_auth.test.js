@@ -131,7 +131,7 @@ async function runTests() {
       body: JSON.stringify({
         fullName: 'Amina Danjuma',
         email: testEmail,
-        phone: '+2348012345678',
+        phone: '+234 803 388 2268',
         password: testPassword,
         role: 'admin' // Attempt privilege escalation: must be ignored and forced to 'customer'
       })

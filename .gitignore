@@ -27,4 +27,6 @@ Thumbs.db
 # Test artifacts
 .test-mailbox.json
 scratch/
-
+# Temporary & Office lock files
+~$*
+*.tmp

@@ -3625,3 +3625,74 @@ dialog.admin-modal::backdrop {
 .btn-email:hover {
   background: #F1F5F9;
 }
+
+/* 3. CRM Product Demand & Browsing Intelligence Styling */
+.crm-demand-hero-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #FFFFFF;
+  border-radius: 14px;
+}
+
+.crm-demand-hero-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(1, 87, 162, 0.08), 0 8px 10px -6px rgba(1, 87, 162, 0.04);
+}
+
+.btn-subtab {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  color: #475569;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-subtab:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+  border-color: #CBD5E1;
+}
+
+.btn-subtab.active {
+  background: #0157A2;
+  color: #FFFFFF;
+  border-color: #0157A2;
+  box-shadow: 0 2px 6px rgba(1, 87, 162, 0.2);
+}
+
+.rank-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.rank-gold {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+.rank-silver {
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+}
+
+.rank-bronze {
+  background: #FFEDD5;
+  color: #9A3412;
+  border: 1px solid #FED7AA;
+}
+
+.rank-default {
+  background: #F8FAFC;
+  color: #64748B;
+  border: 1px solid #E2E8F0;
+}
+

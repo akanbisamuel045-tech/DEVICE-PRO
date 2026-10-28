@@ -54,6 +54,10 @@ const {
   IS_SANDBOX,
   PAYSTACK_PUBLIC_KEY
 } = require('./lib/payment-gateway');
+const {
+  recordProductInteraction,
+  computeProductDemandAnalytics
+} = require('./lib/product-demand-analytics');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -565,6 +569,17 @@ app.get('/api/products/:slug', async (req, res) => {
 
     const related = await getRelatedProducts(product.category, product.id, 3);
 
+    // Asynchronously record live customer product view event
+    if (typeof recordProductInteraction === 'function') {
+      recordProductInteraction({
+        productId: product.id,
+        slug: product.slug,
+        interactionType: 'view',
+        ipAddress: req.ip || '',
+        userAgent: req.headers['user-agent'] || ''
+      }).catch(() => {});
+    }
+
     res.json({
       success: true,
       product,
@@ -573,6 +588,28 @@ app.get('/api/products/:slug', async (req, res) => {
   } catch (error) {
     console.error('[API PRODUCT DETAIL ERROR]:', error);
     res.status(500).json({ success: false, error: 'Failed to retrieve product' });
+  }
+});
+
+// Public Product Interaction Tracking (views, clicks, cart additions)
+app.post('/api/analytics/track-product-view', rateLimiter(60000, 120), async (req, res) => {
+  try {
+    const { slug, productId, interactionType = 'view' } = req.body || {};
+    if (!slug && !productId) {
+      return res.status(400).json({ success: false, error: 'Product slug or ID is required.' });
+    }
+    const record = await recordProductInteraction({
+      productId,
+      slug,
+      interactionType,
+      customerEmail: (req.user && req.user.email) ? req.user.email : '',
+      userId: (req.user && req.user.id) ? req.user.id : null,
+      ipAddress: req.ip || '',
+      userAgent: req.headers['user-agent'] || ''
+    });
+    res.json({ success: true, recorded: !!record });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
@@ -832,9 +869,9 @@ function buildOrderTrackingPayload(order) {
       title: 'Order Placed & Hardware Reserved',
       status: 'completed',
       badge: 'Reserved',
-      summary: 'Equipment allocated from Victoria Island Central Depot. Pro-forma invoice generated.',
-      details: 'Equipment allocated from Victoria Island Central Depot. Pro-forma invoice generated.',
-      description: 'Equipment allocated from Victoria Island Central Depot. Pro-forma invoice generated.',
+      summary: 'Equipment allocated from Computer Village, Ikeja Depot. Pro-forma invoice generated.',
+      details: 'Equipment allocated from Computer Village, Ikeja Depot. Pro-forma invoice generated.',
+      description: 'Equipment allocated from Computer Village, Ikeja Depot. Pro-forma invoice generated.',
       timestamp: order.created_at
     },
     {
@@ -1122,7 +1159,7 @@ app.get('/api/warranty/verify/:query', rateLimiter(60000, 60), async (req, res) 
       expiryDate: expiryDateStr,
       daysRemaining,
       isExpired,
-      serviceHub: 'DEVICE PRO Technical Service Hub, Victoria Island, Lagos'
+      serviceHub: 'DEVICE PRO Technical Service Hub, No 13 adepele street, computervillage, ikeja, lagos.'
     };
 
     res.json({
@@ -1160,7 +1197,7 @@ app.post('/api/support/tickets', rateLimiter(60000, 20), async (req, res) => {
     });
 
     const slaNotice = ticket.issue_category === 'warranty'
-      ? 'Warranty claim registered. Our engineering support desk reviews claims within 4 hours. Rapid swap replacement units dispatch within 24-48 hours across Lagos, Abuja, and Port Harcourt.'
+      ? 'Warranty claim registered. Our engineering support desk reviews claims within 4 hours. Rapid swap replacement units dispatch within 24-48 hours across Lagos and nationwide.'
       : 'Support request received. A COREN certified solar technician has been assigned and will reach out within 4 business hours.';
 
     res.status(201).json({
@@ -2599,6 +2636,15 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
 
       const repeatBuyersCount = [...ordersByEmail.values()].filter(list => list.length > 1).length;
 
+      let productDemand = null;
+      try {
+        if (typeof computeProductDemandAnalytics === 'function') {
+          productDemand = await computeProductDemandAnalytics();
+        }
+      } catch (err) {
+        console.warn('[CRM PRODUCT DEMAND ERROR]:', err.message);
+      }
+
       return res.json({
         success: true,
         summary: {
@@ -2614,6 +2660,7 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
           totalRevenue,
           averageOrderValue: paidOrdersCount > 0 ? Math.round(totalRevenue / paidOrdersCount) : 0
         },
+        productDemandAnalytics: productDemand,
         guestBuyers: guestBuyers.sort((a,b) => b.totalSpent - a.totalSpent),
         topRegistered: enhancedRegistered.sort((a,b) => b.totalSpent - a.totalSpent),
         quoteLeads: quotes,
@@ -2628,6 +2675,16 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
   }
 });
 
+// Dedicated Product Demand Intelligence API (Category, Type, Brand Champions)
+app.get('/api/admin/analytics/product-demand', requireAuth, requireRole('superadmin', 'admin', 'sales'), async (req, res) => {
+  try {
+    const data = await computeProductDemandAnalytics();
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Admin Customer Full 360° Profile Dossier
 app.get('/api/admin/customers/:id', requireAuth, requireRole('superadmin', 'admin', 'sales'), async (req, res) => {
   try {
@@ -2636,9 +2693,10 @@ app.get('/api/admin/customers/:id', requireAuth, requireRole('superadmin', 'admi
     let orders = [];
     let quotes = [];
     let enquiries = [];
+    let browsingInteractions = [];
 
     if (isMongoConnected()) {
-      const { User: MongoUser, Order: MongoOrder, Quote: MongoQuote, Enquiry: MongoEnquiry } = require('./db/mongo/models');
+      const { User: MongoUser, Order: MongoOrder, Quote: MongoQuote, Enquiry: MongoEnquiry, ProductInteraction: MongoInteraction } = require('./db/mongo/models');
       const mongoose = require('mongoose');
 
       if (identifier.includes('@')) {
@@ -2657,6 +2715,19 @@ app.get('/api/admin/customers/:id', requireAuth, requireRole('superadmin', 'admi
           MongoQuote.find({ email: { $regex: `^${email}$`, $options: 'i' } }).sort({ created_at: -1 }).lean(),
           MongoEnquiry.find({ email: { $regex: `^${email}$`, $options: 'i' } }).sort({ created_at: -1 }).lean()
         ]);
+
+        try {
+          if (MongoInteraction) {
+            browsingInteractions = await MongoInteraction.find({
+              $or: [
+                { customer_email: { $regex: `^${email}$`, $options: 'i' } },
+                ...(customer?.id ? [{ user_id: customer.id }] : [])
+              ]
+            }).sort({ created_at: -1 }).limit(10).lean();
+          }
+        } catch (e) {
+          console.warn('[DOSSIER BROWSING FETCH WARN]:', e.message);
+        }
       }
     }
 
@@ -2683,7 +2754,8 @@ app.get('/api/admin/customers/:id', requireAuth, requireRole('superadmin', 'admi
         averageOrderValue: orders.length > 0 ? Math.round(totalSpent / orders.length) : 0,
         orders,
         quotes,
-        enquiries
+        enquiries,
+        browsingInteractions
       }
     });
   } catch (error) {
@@ -3473,13 +3545,14 @@ app.post('/api/admin/price-imports/:id/approve', requireAuth, requireRole('super
   }
 });
 
-// Apply approved supplier price changes to live catalog (strictly updates cost_price_ngn only)
+// Apply approved price changes to live catalog
 app.post('/api/admin/price-imports/:id/apply', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
   try {
-    const { rowIds, approvedRowNumbers, recoverInterrupted } = req.body || {};
+    const { rowIds, approvedRowNumbers, recoverInterrupted, updateTarget = 'retail_price' } = req.body || {};
     const result = await applyPriceImport(req.params.id, req.user, {
       rowIds: rowIds || approvedRowNumbers,
-      recoverInterrupted: Boolean(recoverInterrupted)
+      recoverInterrupted: Boolean(recoverInterrupted),
+      updateTarget
     });
     res.json(result);
   } catch (error) {
@@ -3488,6 +3561,96 @@ app.post('/api/admin/price-imports/:id/apply', requireAuth, requireRole('superad
       success: false,
       error: error.message
     });
+  }
+});
+
+// Direct Bulk Price Application to Live Product Catalog
+app.post('/api/admin/price-imports/apply-to-products', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const { rows, updateTarget = 'retail_price', filename, supplierName, notes } = req.body || {};
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return res.status(400).json({ success: false, error: 'No product rows provided for price update.' });
+    }
+
+    const { Product, AuditLog } = require('./db/mongo/models');
+    const mongoose = require('mongoose');
+    let updatedCount = 0;
+    const updatedProducts = [];
+    const errors = [];
+
+    for (const row of rows) {
+      const prodId = row.matched_product_id || row.productId || row.id;
+      const rawPrice = row.normalized_cost_ngn || row.price || row.new_price || row.approved_cost_ngn;
+      const newPrice = Math.round(Number(rawPrice));
+
+      if (!newPrice || isNaN(newPrice) || newPrice <= 0) {
+        continue;
+      }
+
+      const prod = await Product.findOne({
+        $or: [
+          ...(prodId ? [{ id: Number(prodId) }, ...(mongoose.Types.ObjectId.isValid(prodId) ? [{ _id: prodId }] : [])] : []),
+          ...(row.matched_product_sku ? [{ sku: row.matched_product_sku }] : []),
+          ...(row.raw_sku ? [{ sku: row.raw_sku }] : [])
+        ],
+        published: 1
+      });
+
+      if (!prod) {
+        errors.push({ sku: row.raw_sku || row.matched_product_sku, error: 'Active product not found in catalog' });
+        continue;
+      }
+
+      const prevSellingPrice = prod.price_ngn;
+      const prevCostPrice = prod.cost_price_ngn || 0;
+
+      const updateDoc = { updated_at: new Date() };
+      if (updateTarget === 'retail_price' || updateTarget === 'selling_price') {
+        updateDoc.price_ngn = newPrice;
+      } else if (updateTarget === 'both') {
+        updateDoc.price_ngn = newPrice;
+        updateDoc.cost_price_ngn = newPrice;
+      } else if (updateTarget === 'cost_price') {
+        updateDoc.cost_price_ngn = newPrice;
+      }
+
+      await Product.updateOne({ _id: prod._id }, { $set: updateDoc });
+      updatedCount++;
+
+      updatedProducts.push({
+        id: prod.id,
+        sku: prod.sku,
+        name: prod.name,
+        previous_price_ngn: prevSellingPrice,
+        new_price_ngn: updateDoc.price_ngn !== undefined ? updateDoc.price_ngn : prevSellingPrice,
+        previous_cost_ngn: prevCostPrice,
+        new_cost_ngn: updateDoc.cost_price_ngn !== undefined ? updateDoc.cost_price_ngn : prevCostPrice,
+        updateTarget
+      });
+
+      try {
+        await AuditLog.create({
+          user_id: req.user.id || null,
+          user_email: req.user.email || 'admin@devicepro.ng',
+          action: 'PRODUCT_BULK_PRICE_UPDATED',
+          target_type: 'product',
+          target_id: String(prod.id),
+          details: `Bulk updated price for ${prod.name} (${prod.sku}) from ₦${prevSellingPrice.toLocaleString()} to ₦${(updateDoc.price_ngn || prevSellingPrice).toLocaleString()} (Target: ${updateTarget}, File: ${filename || 'Pricelist'})`,
+          created_at: new Date()
+        });
+      } catch (e) {}
+    }
+
+    res.json({
+      success: true,
+      message: `Successfully updated prices for ${updatedCount} products in the live catalog.`,
+      updatedCount,
+      updatedProducts,
+      errors
+    });
+  } catch (error) {
+    console.error('[APPLY TO PRODUCTS ERROR]:', error);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

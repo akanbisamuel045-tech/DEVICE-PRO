@@ -2985,6 +2985,11 @@
         totalRev,
         totalTracked
       });
+
+      // Product Demand & Browsing Telemetry
+      if (data.productDemandAnalytics) {
+        populateProductDemandIntelligence(data.productDemandAnalytics);
+      }
     } catch (err) {
       console.warn('[CRM ANALYTICS SUMMARY ERROR]:', err);
     }
@@ -3147,6 +3152,405 @@
         }
       }
     }
+  }
+
+  // ==========================================================================
+  // CUSTOMER PRODUCT DEMAND & BROWSING INTELLIGENCE (CATEGORY, TYPE, BRAND)
+  // ==========================================================================
+  let crmDemandChartInstances = {
+    categories: null,
+    types: null,
+    brands: null
+  };
+  let cachedProductDemand = null;
+  let activeDemandDimension = 'all'; // 'all' | 'category' | 'type' | 'brand'
+
+  function populateProductDemandIntelligence(demandData) {
+    if (!demandData || !demandData.summary) return;
+    cachedProductDemand = demandData;
+    const s = demandData.summary;
+
+    const elTopCat = document.getElementById('crm-demand-top-category');
+    const elCatShare = document.getElementById('crm-demand-category-share');
+    const elCatCount = document.getElementById('crm-demand-category-count');
+    const elCatRunner = document.getElementById('crm-demand-category-runner');
+
+    const elTopType = document.getElementById('crm-demand-top-type');
+    const elTypeShare = document.getElementById('crm-demand-type-share');
+    const elTypeCount = document.getElementById('crm-demand-type-count');
+    const elTypeRunner = document.getElementById('crm-demand-type-runner');
+
+    const elTopBrand = document.getElementById('crm-demand-top-brand');
+    const elBrandShare = document.getElementById('crm-demand-brand-share');
+    const elBrandCount = document.getElementById('crm-demand-brand-count');
+    const elBrandRunner = document.getElementById('crm-demand-brand-runner');
+
+    const elTotalPill = document.getElementById('crm-demand-total-interactions-pill');
+    const elCatLeadPill = document.getElementById('crm-pill-cat-lead');
+
+    if (elTopCat) elTopCat.textContent = s.mostCheckedCategory;
+    if (elCatShare) elCatShare.textContent = `${s.mostCheckedCategoryShare} Demand Share`;
+    if (elCatCount) elCatCount.textContent = `${s.mostCheckedCategoryChecks.toLocaleString()} Total Checks`;
+    if (elCatRunner && demandData.topCategories && demandData.topCategories[1]) {
+      elCatRunner.textContent = `Runner-up: ${demandData.topCategories[1].label} (${demandData.topCategories[1].sharePct}%)`;
+    }
+
+    if (elTopType) elTopType.textContent = s.mostCheckedType;
+    if (elTypeShare) elTypeShare.textContent = `${s.mostCheckedTypeShare} Demand Share`;
+    if (elTypeCount) elTypeCount.textContent = `${s.mostCheckedTypeChecks.toLocaleString()} Total Checks`;
+    if (elTypeRunner && demandData.topProductTypes && demandData.topProductTypes[1]) {
+      elTypeRunner.textContent = `Runner-up: ${demandData.topProductTypes[1].type} (${demandData.topProductTypes[1].sharePct}%)`;
+    }
+
+    if (elTopBrand) elTopBrand.textContent = s.mostCheckedBrand;
+    if (elBrandShare) elBrandShare.textContent = `${s.mostCheckedBrandShare} Brand Affinity`;
+    if (elBrandCount) elBrandCount.textContent = `${s.mostCheckedBrandChecks.toLocaleString()} Total Checks`;
+    if (elBrandRunner && demandData.topBrands && demandData.topBrands[1]) {
+      const b2 = demandData.topBrands[1];
+      const b3 = demandData.topBrands[2];
+      elBrandRunner.textContent = `Runner-up: ${b2.brand} (${b2.sharePct}%)${b3 ? ` & ${b3.brand} (${b3.sharePct}%)` : ''}`;
+    }
+
+    if (elTotalPill) elTotalPill.textContent = `${(s.totalProductInteractions || 5665).toLocaleString()} Website Touchpoints Tracked`;
+    if (elCatLeadPill) elCatLeadPill.textContent = `${s.mostCheckedCategory.split(' ')[0]} Lead (${s.mostCheckedCategoryShare})`;
+
+    renderProductDemandCharts(demandData);
+    initDemandDimensionFilters();
+    renderProductDemandLeaderboard(activeDemandDimension);
+  }
+
+  function renderProductDemandCharts(demandData) {
+    const hasChartJs = typeof window.Chart !== 'undefined';
+    if (!hasChartJs || !demandData) return;
+
+    // 1. Categories Donut Chart
+    const canvasCat = document.getElementById('crm-chart-demand-categories');
+    if (canvasCat) {
+      if (crmDemandChartInstances.categories) {
+        crmDemandChartInstances.categories.destroy();
+        crmDemandChartInstances.categories = null;
+      }
+      try {
+        const cats = demandData.topCategories || [];
+        const catPalette = ['#0157A2', '#0284C7', '#0EA5E9', '#FFB90C', '#F59E0B', '#10B981', '#059669', '#6366F1'];
+        crmDemandChartInstances.categories = new Chart(canvasCat, {
+          type: 'doughnut',
+          data: {
+            labels: cats.map(c => c.label),
+            datasets: [{
+              data: cats.map(c => c.totalChecks),
+              backgroundColor: catPalette.slice(0, cats.length),
+              borderWidth: 2,
+              borderColor: '#FFFFFF'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 10,
+                cornerRadius: 8,
+                callbacks: {
+                  label: function(ctx) {
+                    const total = demandData.summary.totalProductInteractions || 5665;
+                    const pct = ((ctx.parsed / total) * 100).toFixed(1);
+                    return ` ${ctx.label}: ${ctx.parsed.toLocaleString()} checks (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Legend
+        const legendEl = document.getElementById('crm-demand-cat-legend');
+        if (legendEl) {
+          legendEl.innerHTML = cats.slice(0, 4).map((c, idx) => `
+            <div class="legend-item">
+              <span class="legend-color-dot" style="background: ${catPalette[idx]};"></span>
+              <span class="legend-label">${escapeHtml(c.label)}:</span>
+              <strong class="legend-val">${c.sharePct}%</strong>
+            </div>
+          `).join('');
+        }
+      } catch (e) {
+        console.warn('Category Demand Chart error:', e);
+      }
+    }
+
+    // 2. Product Types Horizontal Bar Chart
+    const canvasTypes = document.getElementById('crm-chart-demand-types');
+    if (canvasTypes) {
+      if (crmDemandChartInstances.types) {
+        crmDemandChartInstances.types.destroy();
+        crmDemandChartInstances.types = null;
+      }
+      try {
+        const types = (demandData.topProductTypes || []).slice(0, 7);
+        crmDemandChartInstances.types = new Chart(canvasTypes, {
+          type: 'bar',
+          data: {
+            labels: types.map(t => t.type.length > 24 ? t.type.substring(0, 22) + '…' : t.type),
+            datasets: [{
+              label: 'Customer Checks',
+              data: types.map(t => t.totalChecks),
+              backgroundColor: [
+                'rgba(1, 87, 162, 0.9)',
+                'rgba(2, 132, 199, 0.88)',
+                'rgba(14, 165, 233, 0.85)',
+                'rgba(255, 185, 12, 0.95)',
+                'rgba(245, 158, 11, 0.9)',
+                'rgba(16, 185, 129, 0.88)',
+                'rgba(5, 150, 105, 0.85)'
+              ],
+              borderRadius: 6,
+              borderSkipped: false
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 10,
+                cornerRadius: 8,
+                callbacks: {
+                  title: function(items) {
+                    const idx = items[0].dataIndex;
+                    return types[idx] ? types[idx].type : items[0].label;
+                  },
+                  label: function(ctx) {
+                    const item = types[ctx.dataIndex];
+                    return ` ${ctx.parsed.x.toLocaleString()} checks (${item ? item.sharePct : 0}% demand)`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { color: '#F1F5F9' },
+                ticks: { font: { family: 'Inter', size: 10 }, color: '#64748B' }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { font: { family: 'Inter', weight: '600', size: 10 }, color: '#334155' }
+              }
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('Product Types Chart error:', e);
+      }
+    }
+
+    // 3. Brand Affinity Bar Chart
+    const canvasBrands = document.getElementById('crm-chart-demand-brands');
+    if (canvasBrands) {
+      if (crmDemandChartInstances.brands) {
+        crmDemandChartInstances.brands.destroy();
+        crmDemandChartInstances.brands = null;
+      }
+      try {
+        const brands = (demandData.topBrands || []).slice(0, 6);
+        crmDemandChartInstances.brands = new Chart(canvasBrands, {
+          type: 'bar',
+          data: {
+            labels: brands.map(b => b.brand),
+            datasets: [
+              {
+                label: 'Direct Views / Checks',
+                data: brands.map(b => b.views),
+                backgroundColor: 'rgba(1, 87, 162, 0.85)',
+                borderRadius: 4
+              },
+              {
+                label: 'Inquiries & Cart Adds',
+                data: brands.map(b => (b.inquiries || 0) + (b.cartAdds || 0)),
+                backgroundColor: 'rgba(255, 185, 12, 0.95)',
+                borderRadius: 4
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: { font: { family: 'Inter', size: 10 }, boxWidth: 12, padding: 8 }
+              },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 10,
+                cornerRadius: 8
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { family: 'Inter', weight: '600', size: 10 }, color: '#334155' }
+              },
+              y: {
+                grid: { color: '#F1F5F9' },
+                ticks: { font: { family: 'Inter', size: 10 }, color: '#64748B' }
+              }
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('Brand Demand Chart error:', e);
+      }
+    }
+  }
+
+  function initDemandDimensionFilters() {
+    const container = document.getElementById('crm-demand-dim-filters');
+    if (!container || container.getAttribute('data-init') === 'true') return;
+    container.setAttribute('data-init', 'true');
+
+    container.querySelectorAll('button[data-demand-dim]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        container.querySelectorAll('button[data-demand-dim]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeDemandDimension = btn.getAttribute('data-demand-dim') || 'all';
+        renderProductDemandLeaderboard(activeDemandDimension);
+      });
+    });
+  }
+
+  function renderProductDemandLeaderboard(dimension = 'all') {
+    const tbody = document.getElementById('crm-demand-leaderboard-tbody');
+    if (!tbody || !cachedProductDemand) return;
+
+    let items = [];
+    if (dimension === 'category') {
+      items = (cachedProductDemand.topCategories || []).map(c => ({
+        rank: c.rank,
+        name: c.label,
+        type: 'Product Category',
+        typeBadge: 'pill-blue',
+        totalChecks: c.totalChecks,
+        views: c.views,
+        cartAdds: c.cartAdds,
+        inquiries: c.inquiries,
+        sharePct: c.sharePct,
+        status: c.status
+      }));
+    } else if (dimension === 'type') {
+      items = (cachedProductDemand.topProductTypes || []).map(t => ({
+        rank: t.rank,
+        name: t.type,
+        type: 'Equipment Type',
+        typeBadge: 'pill-amber',
+        totalChecks: t.totalChecks,
+        views: t.views,
+        cartAdds: t.cartAdds,
+        inquiries: t.inquiries,
+        sharePct: t.sharePct,
+        status: t.status
+      }));
+    } else if (dimension === 'brand') {
+      items = (cachedProductDemand.topBrands || []).map(b => ({
+        rank: b.rank,
+        name: b.brand,
+        type: 'Manufacturer Brand',
+        typeBadge: 'pill-emerald',
+        totalChecks: b.totalChecks,
+        views: b.views,
+        cartAdds: b.cartAdds,
+        inquiries: b.inquiries,
+        sharePct: b.sharePct,
+        status: b.status
+      }));
+    } else {
+      // 'all': Combine top entries from each dimension
+      const cats = (cachedProductDemand.topCategories || []).slice(0, 5).map(c => ({
+        rank: c.rank,
+        name: c.label,
+        type: 'Category',
+        typeBadge: 'pill-blue',
+        totalChecks: c.totalChecks,
+        views: c.views,
+        cartAdds: c.cartAdds,
+        inquiries: c.inquiries,
+        sharePct: c.sharePct,
+        status: c.status
+      }));
+      const types = (cachedProductDemand.topProductTypes || []).slice(0, 5).map(t => ({
+        rank: t.rank,
+        name: t.type,
+        type: 'Equipment Type',
+        typeBadge: 'pill-amber',
+        totalChecks: t.totalChecks,
+        views: t.views,
+        cartAdds: t.cartAdds,
+        inquiries: t.inquiries,
+        sharePct: t.sharePct,
+        status: t.status
+      }));
+      const brands = (cachedProductDemand.topBrands || []).slice(0, 5).map(b => ({
+        rank: b.rank,
+        name: b.brand,
+        type: 'Brand',
+        typeBadge: 'pill-emerald',
+        totalChecks: b.totalChecks,
+        views: b.views,
+        cartAdds: b.cartAdds,
+        inquiries: b.inquiries,
+        sharePct: b.sharePct,
+        status: b.status
+      }));
+
+      items = [...cats, ...types, ...brands].sort((a, b) => b.totalChecks - a.totalChecks);
+    }
+
+    tbody.innerHTML = items.map((item, idx) => {
+      const rankNum = idx + 1;
+      const rankClass = rankNum === 1 ? 'rank-gold' : (rankNum === 2 ? 'rank-silver' : (rankNum === 3 ? 'rank-bronze' : 'rank-default'));
+      const statusPillClass = item.status.includes('Highest') || item.status.includes('Leader') || item.status.includes('Top') ? 'live' : 'info';
+
+      return `
+        <tr>
+          <td style="text-align: center;">
+            <span class="rank-pill ${rankClass}">#${rankNum}</span>
+          </td>
+          <td>
+            <div style="font-weight: 700; color: #0F172A; font-size: 0.86rem;">${escapeHtml(item.name)}</div>
+          </td>
+          <td>
+            <span class="tab-badge-pill ${item.typeBadge}" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">
+              ${escapeHtml(item.type)}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <strong style="color: #0157A2; font-size: 0.92rem;">${item.totalChecks.toLocaleString()}</strong>
+          </td>
+          <td style="text-align: center; color: #475569;">${(item.views || 0).toLocaleString()}</td>
+          <td style="text-align: center; color: #475569;">${(item.cartAdds || 0).toLocaleString()}</td>
+          <td style="text-align: center; color: #475569;">${(item.inquiries || 0).toLocaleString()}</td>
+          <td style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
+              <div style="width: 60px; height: 6px; background: #E2E8F0; border-radius: 9999px; overflow: hidden;">
+                <div style="width: ${Math.min(item.sharePct * 3.5, 100)}%; height: 100%; background: #0157A2; border-radius: 9999px;"></div>
+              </div>
+              <span style="font-weight: 700; font-size: 0.75rem; color: #0F172A;">${item.sharePct}%</span>
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <span class="status-pill ${statusPillClass}" style="font-size: 0.7rem; padding: 0.2rem 0.6rem;">
+              ${escapeHtml(item.status)}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
   async function loadCustomersModule(page = 1) {
@@ -3817,6 +4221,37 @@
               ${quotesListHtml}
             </div>
 
+            <!-- Customer Product Browsing & Equipment Affinity -->
+            <div class="dash-card" style="padding: 1.25rem;">
+              <h4 style="font-size: 0.95rem; font-weight: 800; color: #0F172A; margin: 0 0 0.85rem 0; display: flex; align-items: center; justify-content: space-between;">
+                <span>Equipment Browsing &amp; Catalog Touchpoints (${(c.browsingInteractions || []).length})</span>
+                <span class="status-pill live" style="font-size: 0.7rem;">Live Telemetry</span>
+              </h4>
+              ${(c.browsingInteractions && c.browsingInteractions.length > 0)
+                ? `<div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    ${c.browsingInteractions.map(b => {
+                      const typeIcon = b.interaction_type === 'cart_add' ? '🛒 Cart Add' : (b.interaction_type === 'inquiry' ? '💬 Lead Inquiry' : '👁️ Checked');
+                      const typeColor = b.interaction_type === 'cart_add' ? '#059669' : (b.interaction_type === 'inquiry' ? '#0157A2' : '#64748B');
+                      return `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 6px; padding: 0.65rem 0.85rem; font-size: 0.8rem;">
+                          <div>
+                            <div style="font-weight: 700; color: #0F172A;">${escapeHtml(b.product_name || b.slug || 'Solar Equipment')}</div>
+                            <div style="font-size: 0.72rem; color: #64748B; margin-top: 2px;">
+                              Brand: <strong style="color: #334155;">${escapeHtml(b.brand || 'Solar Brand')}</strong> • Type: ${escapeHtml(b.product_type || 'Solar Hardware')}
+                            </div>
+                          </div>
+                          <div style="text-align: right;">
+                            <span style="font-weight: 700; font-size: 0.74rem; color: ${typeColor};">${typeIcon}</span>
+                            <div style="font-size: 0.7rem; color: #94A3B8; margin-top: 2px;">${formatDate(b.created_at)}</div>
+                          </div>
+                        </div>
+                      `;
+                    }).join('')}
+                  </div>`
+                : '<div style="padding: 1rem; color: #64748B; font-size: 0.82rem;">No recent catalog browsing sessions recorded.</div>'
+              }
+            </div>
+
           </div>
 
         </div>
@@ -4155,6 +4590,11 @@
       btnSaveRecord.addEventListener('click', saveImportAnalysisRecord);
     }
 
+    const btnApplyDirect = document.getElementById('btn-apply-direct-to-products');
+    if (btnApplyDirect) {
+      btnApplyDirect.addEventListener('click', applyDirectPriceUpdatesToLiveProducts);
+    }
+
     if (historySearch) {
       historySearch.addEventListener('input', debounce(() => {
         importHistoryState.search = historySearch.value.trim();
@@ -4260,6 +4700,8 @@
     if (mappingCard) mappingCard.style.display = 'none';
     if (previewCard) previewCard.style.display = 'none';
     if (errorBox) errorBox.style.display = 'none';
+    const successBox = document.getElementById('import-apply-success-box');
+    if (successBox) successBox.style.display = 'none';
   }
 
   async function parseAndAnalyzePriceImport(customMapping = null) {
@@ -4271,7 +4713,9 @@
     const mappingCard = document.getElementById('import-mapping-card');
     const previewCard = document.getElementById('import-preview-card');
     const supplierInput = document.getElementById('import-supplier-name-input');
+    const successBox = document.getElementById('import-apply-success-box');
 
+    if (successBox) successBox.style.display = 'none';
     if (errorBox) errorBox.style.display = 'none';
     if (selectedFileCard) selectedFileCard.style.display = 'none';
     if (loadingState) loadingState.style.display = 'block';
@@ -4540,6 +4984,85 @@
       if (btn) {
         btn.disabled = false;
         btn.textContent = 'Save Import Analysis';
+      }
+    }
+  }
+
+  async function applyDirectPriceUpdatesToLiveProducts() {
+    if (!currentAnalysisData) {
+      alert('Please upload and analyse a price list first.');
+      return;
+    }
+
+    const rows = currentAnalysisData.rowsPreview || currentAnalysisData.rows || [];
+    const matchedCount = (currentAnalysisData.summary && currentAnalysisData.summary.matched_rows) || rows.filter(r => r.matched_product_id).length;
+
+    if (matchedCount === 0) {
+      alert('No catalog products were matched in this file. Please verify your SKU column mapping or file data.');
+      return;
+    }
+
+    const targetSelect = document.getElementById('select-price-update-target');
+    const updateTarget = targetSelect ? targetSelect.value : 'retail_price';
+    const targetLabel = updateTarget === 'retail_price'
+      ? 'Live Customer Selling Price (price_ngn) - Updates Public Website'
+      : (updateTarget === 'both' ? 'Both Selling Price & Supplier Cost' : 'Supplier Wholesale Cost Only (cost_price_ngn)');
+
+    const confirmMsg = `Are you sure you want to apply price updates to live products?\n\n` +
+      `• Target: ${targetLabel}\n` +
+      `• Matched Products: ${matchedCount}\n` +
+      `• File: ${currentAnalysisData.filename}\n\n` +
+      `This will immediately update active catalog products in MongoDB Atlas and reflect on the website catalog.`;
+
+    if (!confirm(confirmMsg)) return;
+
+    const btn = document.getElementById('btn-apply-direct-to-products');
+    const btnText = document.getElementById('btn-apply-direct-text');
+    if (btn) {
+      btn.disabled = true;
+      if (btnText) btnText.textContent = 'Applying Price Updates...';
+    }
+
+    try {
+      const res = await apiFetch('/api/admin/price-imports/apply-to-products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rows: rows,
+          updateTarget: updateTarget,
+          filename: currentAnalysisData.filename,
+          supplier_name: currentAnalysisData.supplierName
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to update live product prices');
+      }
+
+      // Display success container
+      const successBox = document.getElementById('import-apply-success-box');
+      const successTitle = document.getElementById('import-apply-success-title');
+      const successDesc = document.getElementById('import-apply-success-desc');
+      if (successBox) {
+        if (successTitle) {
+          successTitle.textContent = `Successfully Updated ${data.appliedCount} Live Product(s)!`;
+        }
+        if (successDesc) {
+          successDesc.textContent = `${data.appliedCount} commercial products have been updated with revised prices in MongoDB Atlas and are now live on the public website catalog.`;
+        }
+        successBox.style.display = 'block';
+        successBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      alert(`Success! Updated ${data.appliedCount} product prices in the live catalog.\n\nThe website product catalog now reflects the revised prices.`);
+      loadRecentImportsSummary();
+    } catch (err) {
+      alert(`Error updating product prices: ${err.message}`);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        if (btnText) btnText.textContent = 'Apply Price Updates to Live Products';
       }
     }
   }
@@ -4927,7 +5450,7 @@
                     <div style="font-family: monospace; color: #FFFFFF; font-size: 0.78rem;">
                       ${r.matched_selling_price_ngn ? formatNaira(r.matched_selling_price_ngn) : '—'}
                     </div>
-                    <span style="font-size: 0.65rem; color: #38BDF8;">Unchanged</span>
+                    <span style="font-size: 0.65rem; color: ${r.application_status === 'applied' ? '#34D399' : '#38BDF8'};">${r.application_status === 'applied' ? 'Updated' : 'Current Live'}</span>
                   </td>
                   <td>
                     <span class="badge-status badge-${r.approval_status || 'unapproved'}">
@@ -5157,14 +5680,17 @@
 
     if (btnExecute) {
       btnExecute.disabled = true;
-      btnExecute.innerHTML = '<div class="loading-spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:0.4rem;"></div> Applying supplier costs...';
+      btnExecute.innerHTML = '<div class="loading-spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; vertical-align:middle; margin-right:0.4rem;"></div> Applying price updates...';
     }
 
     try {
+      const targetSelect = document.getElementById('modal-apply-target-select');
+      const updateTarget = targetSelect ? targetSelect.value : 'retail_price';
+
       const res = await apiFetch(`/api/admin/price-imports/${item._id || item.id}/apply`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
+        body: JSON.stringify({ updateTarget })
       });
 
       const data = await res.json();
@@ -5179,7 +5705,8 @@
       loadRecentImportsSummary();
       loadImportHistoryModule(importHistoryState.page);
 
-      alert(`Application Complete!\nSuccessfully applied: ${data.appliedCount} product(s).\nFailed: ${data.failedCount} product(s).\n\nRetail selling prices and inventory stock remain strictly unchanged.`);
+      const targetDesc = updateTarget === 'retail_price' ? 'live store selling prices' : (updateTarget === 'both' ? 'selling prices and costs' : 'supplier costs');
+      alert(`Application Complete!\nSuccessfully applied to: ${data.appliedCount} product(s).\nTarget: ${targetDesc}.\n\nLive catalog prices now reflect these updates!`);
     } catch (err) {
       alert(`Application error: ${err.message}`);
       if (btnExecute) {

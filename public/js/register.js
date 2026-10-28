@@ -202,7 +202,7 @@
           }, 800);
         }
       }
-    } catch (e) {}
+    } catch (e) { }
   }
   checkExistingAuth();
 
@@ -256,7 +256,7 @@
         // Accept common Nigerian formats (080..., 070..., 090..., +234...) and international E.164
         const cleanPhone = phone.replace(/[\s\-()]/g, '');
         if (!/^(\+?[0-9]{8,15})$/.test(cleanPhone)) {
-          setFieldError(phoneWrapper, phoneError, 'Please enter a valid phone number (e.g. +234 803 123 4567 or 08012345678).');
+          setFieldError(phoneWrapper, phoneError, 'Please enter a valid phone number (e.g. +234 803 123 4567 or 08033882268).');
           hasError = true;
         } else {
           clearFieldError(phoneWrapper, phoneError);
@@ -323,7 +323,7 @@
             try {
               sessionStorage.setItem('devicepro_auth_token', data.token);
               sessionStorage.setItem('devicepro_user', JSON.stringify(data.user));
-            } catch (err) {}
+            } catch (err) { }
           }
 
           showAlert('Account created successfully! Welcome to DEVICE PRO. Redirecting...', 'success');

@@ -103,7 +103,7 @@ async function run() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         fullName: 'Test <script>alert(1)</script>',
-        phone: '08012345678',
+        phone: '08033882268',
         email: 'xss@test.ng',
         state: 'Lagos',
         message: '<img src=x onerror=alert(document.cookie)>'

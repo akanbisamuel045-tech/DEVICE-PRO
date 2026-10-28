@@ -1490,7 +1490,7 @@ if (userCount === 0) {
       email: 'sales@devicepro.com',
       passwordHash: '8724095a9bbb4dbf0b4a4825cce9cab5d5d357258d9ab850207b5dd90ab51e8f83bd23aac1ac21e87189dd03bf9322b96cd93d4533e33a3b0345b118c7204dbf',
       salt: '270212d1c2c9d51bfc7ccfc8e4eff351',
-      fullName: 'Victoria Island Showroom Desk',
+      fullName: 'Ikeja Store Showroom Desk',
       role: 'sales'
     }
   ];
@@ -2421,7 +2421,7 @@ function seedStage16DemoData() {
       customerPhone: '08031234567',
       customerEmail: 'musa.danjuma@example.com',
       warrantyYears: 5,
-      coverageSummary: '5-Year Manufacturer Warranty. 24-48h rapid swap units available at Victoria Island Engineering Hub.'
+      coverageSummary: '5-Year Manufacturer Warranty. 24-48h rapid swap units available at No 13 adepele street, computervillage, ikeja, lagos.'
     });
 
     createWarrantyRecord({

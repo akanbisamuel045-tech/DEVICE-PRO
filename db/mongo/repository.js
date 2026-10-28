@@ -2333,17 +2333,20 @@ async function applyPriceImport(id, user = {}, options = {}) {
       try {
         const opts = session ? { session } : {};
 
-        // CRITICAL STAGE 6 BOUNDARY:
-        // Update ONLY cost_price_ngn!
-        // price_ngn (selling price), stock_quantity, published, specs, warranty are 100% UNTOUCHED!
+        // Apply price update to product based on updateTarget option
+        const updateFields = { updated_at: new Date() };
+        if (options && (options.updateTarget === 'retail_price' || options.updateTarget === 'selling_price')) {
+          updateFields.price_ngn = newCost;
+        } else if (options && options.updateTarget === 'both') {
+          updateFields.price_ngn = newCost;
+          updateFields.cost_price_ngn = newCost;
+        } else {
+          updateFields.cost_price_ngn = newCost;
+        }
+
         await Product.updateOne(
           { _id: prod._id },
-          {
-            $set: {
-              cost_price_ngn: newCost,
-              updated_at: new Date()
-            }
-          },
+          { $set: updateFields },
           opts
         );
 

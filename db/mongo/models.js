@@ -529,6 +529,26 @@ const packageBomSchema = new mongoose.Schema({
   }]
 }, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
 
+// 17. ProductInteraction Schema (Customer Browsing & Demand Analytics)
+const productInteractionSchema = new mongoose.Schema({
+  product_id: { type: Number, index: true },
+  slug: { type: String, index: true },
+  product_name: { type: String, required: true },
+  category: { type: String, required: true, index: true },
+  category_label: { type: String },
+  brand: { type: String, required: true, index: true },
+  product_type: { type: String, index: true },
+  interaction_type: { type: String, default: 'view', enum: ['view', 'click', 'cart_add', 'inquiry', 'quote_match'], index: true },
+  customer_email: { type: String, index: true },
+  user_id: { type: Number },
+  session_id: { type: String },
+  ip_address: { type: String }
+}, { timestamps: { createdAt: 'created_at' } });
+
+productInteractionSchema.index({ category: 1, created_at: -1 });
+productInteractionSchema.index({ brand: 1, created_at: -1 });
+productInteractionSchema.index({ product_type: 1, created_at: -1 });
+
 module.exports = {
   Category: mongoose.models.Category || mongoose.model('Category', categorySchema),
   Product: mongoose.models.Product || mongoose.model('Product', productSchema),
@@ -545,7 +565,8 @@ module.exports = {
   PasswordReset: mongoose.models.PasswordReset || mongoose.model('PasswordReset', passwordResetSchema),
   PriceImport: mongoose.models.PriceImport || mongoose.model('PriceImport', priceImportSchema),
   PriceIntelligenceSettings: mongoose.models.PriceIntelligenceSettings || mongoose.model('PriceIntelligenceSettings', priceIntelligenceSettingsSchema),
-  PackageBom: mongoose.models.PackageBom || mongoose.model('PackageBom', packageBomSchema)
+  PackageBom: mongoose.models.PackageBom || mongoose.model('PackageBom', packageBomSchema),
+  ProductInteraction: mongoose.models.ProductInteraction || mongoose.model('ProductInteraction', productInteractionSchema)
 };
 
 

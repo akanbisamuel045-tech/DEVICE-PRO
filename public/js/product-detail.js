@@ -315,7 +315,7 @@
       },
       {
         q: 'How quickly will my order be dispatched after confirmation?',
-        a: 'Lagos orders confirmed before noon are dispatched same-day or next-day. Regional deliveries across South-West, Abuja, and Port Harcourt take 2 to 4 business days via insured freight carriers.'
+        a: 'Lagos orders confirmed before noon are dispatched same-day or next-day. Nationwide deliveries take 2 to 4 business days via insured freight carriers.'
       },
       {
         q: 'Can I inspect the equipment before final installation?',
@@ -530,6 +530,13 @@
       if (waBtn) {
         const msg = encodeURIComponent(`Hello DEVICE PRO, I would like to inquire about ${product.name} (SKU: ${product.sku || product.id}) priced at ₦${formatNaira(product.price_ngn)}.`);
         waBtn.href = `https://wa.me/2348031234567?text=${msg}`;
+        waBtn.onclick = () => {
+          fetch('/api/analytics/track-product-view', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: product.id, slug: product.slug, interactionType: 'inquiry' })
+          }).catch(() => {});
+        };
       }
 
       // Quantity controls
@@ -561,6 +568,12 @@
             price: product.price_ngn,
             image: imgPath
           }, qty);
+
+          fetch('/api/analytics/track-product-view', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: product.id, slug: product.slug, interactionType: 'cart_add' })
+          }).catch(() => {});
         };
       }
 

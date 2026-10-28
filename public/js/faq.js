@@ -182,9 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
       id: 'faq-15',
       category: 'pricing',
       categoryName: 'Pricing & Warranties',
-      question: 'How does DEVICE PRO handle after-sales service and replacement parts in Lagos, Abuja, and Port Harcourt?',
+      question: 'How does DEVICE PRO handle after-sales service and replacement parts in Nigeria?',
       answer: `
-        <p>Unlike market traders who must ship faulty units back overseas (taking 3 to 6 months), DEVICE PRO maintains dedicated regional technical depots in <strong>Lagos (Victoria Island), Abuja (CBD), and Port Harcourt (Trans-Amadi)</strong>.</p>
+        <p>Unlike market traders who must ship faulty units back overseas (taking 3 to 6 months), DEVICE PRO maintains a dedicated engineering and service store at <strong>No 13 adepele street, computervillage, ikeja, lagos.</strong></p>
         <p>We stock genuine replacement motherboard modules, MPPT controllers, BMS boards, and contactors. If an inverter or battery develops an in-warranty fault, our field engineers provide rapid swap units within 24 to 48 hours to ensure zero prolonged blackout.</p>
       `
     }
