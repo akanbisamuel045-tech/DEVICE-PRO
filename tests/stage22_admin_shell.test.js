@@ -110,13 +110,18 @@ async function runTests() {
   assert.strictEqual(saRes.status, 200, 'Superadmin login should succeed');
   const superadminToken = saRes.body.token;
 
-  // 2. Authenticate Sales Administrator (non-superadmin)
+  // 2. Verify removed non-superadmin staff accounts are rejected (only superadmin authorized)
   const salesRes = await request('/api/auth/login', {
     method: 'POST',
     body: { username: 'sales.lagos', password: 'Sales@DevicePro2026!' }
   });
-  assert.strictEqual(salesRes.status, 200, 'Sales login should succeed');
-  const salesToken = salesRes.body.token;
+  assert.strictEqual(salesRes.status, 401, 'Sales login should be rejected (only superadmin authorized)');
+
+  const engRes = await request('/api/auth/login', {
+    method: 'POST',
+    body: { username: 'engineer.babatunde', password: 'Engineer@DevicePro2026!' }
+  });
+  assert.strictEqual(engRes.status, 401, 'Engineer login should be rejected (only superadmin authorized)');
 
   // 3. Register a test Customer account
   const testCustomerEmail = `cust_shell_test_${Date.now()}@devicepro.test`;
@@ -224,22 +229,22 @@ async function runTests() {
 
   await test('Authorized staff can access /admin with 200 OK', async () => {
     const res = await request('/admin', {
-      headers: { Authorization: `Bearer ${salesToken}` }
+      headers: { Authorization: `Bearer ${superadminToken}` }
     });
     assert.strictEqual(res.status, 200);
     assert.ok(res.body.includes('admin-dashboard-view'));
   });
 
-  await test('Sales administrator can access permitted section /admin/orders (200 OK)', async () => {
+  await test('Administrator can access permitted section /admin/orders (200 OK)', async () => {
     const res = await request('/admin/orders', {
-      headers: { Authorization: `Bearer ${salesToken}` }
+      headers: { Authorization: `Bearer ${superadminToken}` }
     });
     assert.strictEqual(res.status, 200);
   });
 
-  await test('Sales administrator can access permitted section /admin/customers (200 OK)', async () => {
+  await test('Administrator can access permitted section /admin/customers (200 OK)', async () => {
     const res = await request('/admin/customers', {
-      headers: { Authorization: `Bearer ${salesToken}` }
+      headers: { Authorization: `Bearer ${superadminToken}` }
     });
     assert.strictEqual(res.status, 200);
   });
@@ -267,23 +272,21 @@ async function runTests() {
   await test('Non-superadmin cannot access /admin/audit-logs (403 Forbidden)', async () => {
     const res = await request('/admin/audit-logs', {
       headers: {
-        Authorization: `Bearer ${salesToken}`,
+        Authorization: `Bearer ${customerToken}`,
         Accept: 'application/json'
       }
     });
     assert.strictEqual(res.status, 403);
-    assert.ok(res.body.error.includes('Superadmin'));
   });
 
   await test('Non-superadmin cannot access /admin/admin-users (403 Forbidden)', async () => {
     const res = await request('/admin/admin-users', {
       headers: {
-        Authorization: `Bearer ${salesToken}`,
+        Authorization: `Bearer ${customerToken}`,
         Accept: 'application/json'
       }
     });
     assert.strictEqual(res.status, 403);
-    assert.ok(res.body.error.includes('Superadmin'));
   });
 
   await test('Superadmin can access /admin/audit-logs (200 OK)', async () => {
@@ -395,7 +398,7 @@ async function runTests() {
     // 1. Create a fresh session
     const loginRes = await request('/api/auth/login', {
       method: 'POST',
-      body: { username: 'sales.lagos', password: 'Sales@DevicePro2026!' }
+      body: { username: 'admin', password: 'Admin@DevicePro2026!' }
     });
     const tempToken = loginRes.body.token;
 

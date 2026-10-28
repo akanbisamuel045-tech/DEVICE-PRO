@@ -138,7 +138,7 @@
         const res = await apiFetch('/api/auth/me');
         const data = await res.json();
         if (data.success && data.user) {
-          const allowedRoles = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
+          const allowedRoles = ['admin', 'superadmin'];
           if (allowedRoles.includes(data.user.role)) {
             currentUser = data.user;
             showDashboard();
@@ -450,7 +450,7 @@
             throw new Error(data.error || 'Authentication rejected. Verify credentials.');
           }
 
-          const allowedRoles = ['admin', 'superadmin', 'engineer', 'sales', 'staff'];
+          const allowedRoles = ['admin', 'superadmin'];
           if (!allowedRoles.includes(data.user.role)) {
             clearToken();
             throw new Error('Access denied: Customer accounts do not have administrative console permissions.');
@@ -1332,15 +1332,15 @@
         <td>${formatDate(o.created_at)}</td>
         <td>
           <div style="font-weight: 600;">${escapeHtml(o.customer_name)}</div>
-          <div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(o.customer_phone)}</div>
+          <div style="font-size: 0.72rem; color: #64748B;">${escapeHtml(o.customer_phone)}</div>
         </td>
         <td>${escapeHtml(o.delivery_state)}</td>
         <td>
           <span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600;">${o.payment_method}</span>
-          <div style="font-size: 0.68rem; color: rgba(238,241,248,0.5);">${o.payment_status}</div>
+          <div style="font-size: 0.68rem; color: #64748B;">${o.payment_status}</div>
         </td>
         <td><span class="status-pill status-${o.order_status}">${o.order_status}</span></td>
-        <td style="text-align: right; font-weight: 700; color: #FFFFFF;">${formatNaira(o.total_ngn)}</td>
+        <td style="text-align: right; font-weight: 700; color: #0F172A;">${formatNaira(o.total_ngn)}</td>
         <td style="text-align: center;">
           <button type="button" class="btn-table-action" onclick="window.adminOpenOrderModal('${o.order_number}')">
             View / Update
@@ -1370,8 +1370,8 @@
     const itemsHtml = items.map(item => `
       <div class="modal-item-row">
         <div>
-          <span style="font-weight: 600; color: #FFFFFF;">${escapeHtml(item.name)}</span>
-          <span style="font-size: 0.72rem; color: rgba(238,241,248,0.5); margin-left: 0.5rem;">Qty: ${item.quantity}</span>
+          <span style="font-weight: 600; color: #0F172A;">${escapeHtml(item.name)}</span>
+          <span style="font-size: 0.72rem; color: #64748B; margin-left: 0.5rem;">Qty: ${item.quantity}</span>
         </div>
         <div style="font-weight: 700;">${formatNaira(item.subtotal || item.price * item.quantity)}</div>
       </div>
@@ -1397,7 +1397,7 @@
         </div>
       </div>
 
-      <div style="margin-bottom: 0.5rem; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; color: rgba(238,241,248,0.6);">
+      <div style="margin-bottom: 0.5rem; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; color: #475569;">
         Equipment Line Items (${items.length})
       </div>
       <div class="modal-items-list">
@@ -1549,8 +1549,8 @@
     tbody.innerHTML = filtered.map(o => {
       const commStatus = o.commissioning_status || 'pending';
       const courier = o.courier_partner || 'DEVICE PRO Fleet';
-      const waybill = o.waybill_number ? `<code>${escapeHtml(o.waybill_number)}</code>` : '<span style="color: rgba(238,241,248,0.4);">Unassigned</span>';
-      const engineer = o.assigned_engineer ? escapeHtml(o.assigned_engineer) : '<span style="color: rgba(238,241,248,0.4);">Unassigned</span>';
+      const waybill = o.waybill_number ? `<code>${escapeHtml(o.waybill_number)}</code>` : '<span style="color: #94A3B8;">Unassigned</span>';
+      const engineer = o.assigned_engineer ? escapeHtml(o.assigned_engineer) : '<span style="color: #94A3B8;">Unassigned</span>';
       const schedDate = o.installation_scheduled_date ? o.installation_scheduled_date : '—';
       const eta = o.estimated_delivery ? o.estimated_delivery : '—';
 
@@ -1559,7 +1559,7 @@
           <td><strong>${escapeHtml(o.order_number)}</strong></td>
           <td>
             <div style="font-weight: 600;">${escapeHtml(o.customer_name)}</div>
-            <div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(o.delivery_state || 'Nigeria')}</div>
+            <div style="font-size: 0.72rem; color: #64748B;">${escapeHtml(o.delivery_state || 'Nigeria')}</div>
           </td>
           <td>
             <div style="font-size: 0.8rem; font-weight: 500;">${escapeHtml(courier)}</div>
@@ -1568,7 +1568,7 @@
           <td style="white-space: nowrap;">${eta}</td>
           <td>
             <div style="font-size: 0.82rem; font-weight: 600;">${engineer}</div>
-            ${o.engineer_phone ? `<div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(o.engineer_phone)}</div>` : ''}
+            ${o.engineer_phone ? `<div style="font-size: 0.72rem; color: #64748B;">${escapeHtml(o.engineer_phone)}</div>` : ''}
           </td>
           <td style="white-space: nowrap;">${schedDate}</td>
           <td>
@@ -1789,7 +1789,7 @@
         <td><strong>${escapeHtml(t.ticket_number)}</strong></td>
         <td>
           <div style="font-weight: 600;">${escapeHtml(t.customer_name)}</div>
-          <div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(t.customer_phone)}</div>
+          <div style="font-size: 0.72rem; color: #64748B;">${escapeHtml(t.customer_phone)}</div>
         </td>
         <td><span style="font-size: 0.75rem; text-transform: uppercase; font-weight: 600; color: var(--color-brand-yellow);">${escapeHtml(t.issue_category)}</span></td>
         <td><span class="status-pill status-${t.priority}">${t.priority}</span></td>
@@ -1827,7 +1827,7 @@
           <td><code>${escapeHtml(w.serial_number)}</code></td>
           <td>
             <div style="font-weight: 600;">${escapeHtml(w.product_name)}</div>
-            <div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(w.brand || 'Tier-1 Certified')}</div>
+            <div style="font-size: 0.72rem; color: #64748B;">${escapeHtml(w.brand || 'Tier-1 Certified')}</div>
           </td>
           <td>${escapeHtml(w.customer_name)}</td>
           <td>${w.warranty_duration_months} mo (${years} yrs)</td>
@@ -1971,13 +1971,13 @@
         <td>${formatDate(q.created_at)}</td>
         <td>
           <div style="font-weight: 600;">${escapeHtml(q.name)}</div>
-          <div style="font-size: 0.72rem; color: rgba(238,241,248,0.6);">${escapeHtml(q.phone)} ${q.state ? '• ' + escapeHtml(q.state) : ''}</div>
+          <div style="font-size: 0.72rem; color: #64748B;">${escapeHtml(q.phone)} ${q.state ? '• ' + escapeHtml(q.state) : ''}</div>
         </td>
         <td>${escapeHtml(q.property_type || 'Residential')}</td>
         <td>${escapeHtml(q.package_name || 'Custom Sizing')}</td>
         <td>
           <div style="font-size: 0.75rem;">${q.indicative_inverter_kva ? q.indicative_inverter_kva + 'kVA Inverter' : '—'}</div>
-          <div style="font-size: 0.7rem; color: rgba(238,241,248,0.5);">${q.indicative_battery_kwh ? q.indicative_battery_kwh + 'kWh Storage' : ''}</div>
+          <div style="font-size: 0.7rem; color: #64748B;">${q.indicative_battery_kwh ? q.indicative_battery_kwh + 'kWh Storage' : ''}</div>
         </td>
         <td><span class="status-pill status-${q.status}">${q.status}</span></td>
         <td style="text-align: center;">
@@ -2129,11 +2129,11 @@
         <td>${escapeHtml(e.name)}</td>
         <td>
           <div>${escapeHtml(e.phone)}</div>
-          <div style="font-size: 0.72rem; color: rgba(238,241,248,0.5);">${escapeHtml(e.email || '')}</div>
+          <div style="font-size: 0.72rem; color: #64748B;">${escapeHtml(e.email || '')}</div>
         </td>
         <td>
           <div style="font-weight: 600;">${escapeHtml(e.subject || 'General Inquiry')}</div>
-          <div style="font-size: 0.75rem; color: rgba(238,241,248,0.7); max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          <div style="font-size: 0.75rem; color: #475569; max-width: 320px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
             ${escapeHtml(e.message || '')}
           </div>
         </td>
@@ -2259,7 +2259,7 @@
             ${hasCost ? `
               <div style="font-weight: 600;">${formatNaira(rawCost)}</div>
               <div style="margin-top: 2px;"><span class="margin-pill ${marginClass}">${marginPct}%</span></div>
-            ` : `<span style="color: rgba(238,241,248,0.4); font-size: 0.75rem;">—</span>`}
+            ` : `<span style="color: #94A3B8; font-size: 0.75rem;">—</span>`}
           </td>
         `;
       }
@@ -2284,8 +2284,8 @@
           </td>
           <td><code>${escapeHtml(p.sku || 'N/A')}</code></td>
           <td>
-            <div style="font-weight: 700; color: #FFFFFF;">${escapeHtml(p.name)}</div>
-            <div style="font-size: 0.72rem; color: rgba(238,241,248,0.5); max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(p.specifications || '')}">
+            <div style="font-weight: 700; color: #0F172A;">${escapeHtml(p.name)}</div>
+            <div style="font-size: 0.72rem; color: #64748B; max-width: 280px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${escapeHtml(p.specifications || '')}">
               ${escapeHtml(p.specifications || 'Standard specifications')}
             </div>
           </td>
@@ -2294,13 +2294,13 @@
             <span style="font-size: 0.7rem; text-transform: uppercase; color: var(--color-brand-yellow);">${escapeHtml(p.category_label || p.category)}</span>
           </td>
           <td style="text-align: right;">
-            <div style="font-weight: 800; color: #FFFFFF;">${formatNaira(p.price_ngn)}</div>
-            ${p.previous_price_ngn ? `<div style="font-size: 0.7rem; color: rgba(238,241,248,0.4); text-decoration: line-through;">${formatNaira(p.previous_price_ngn)}</div>` : ''}
+            <div style="font-weight: 800; color: #0F172A;">${formatNaira(p.price_ngn)}</div>
+            ${p.previous_price_ngn ? `<div style="font-size: 0.7rem; color: #94A3B8; text-decoration: line-through;">${formatNaira(p.previous_price_ngn)}</div>` : ''}
           </td>
           ${costColHtml}
           <td>
             ${stockBadge}
-            <div style="font-size: 0.7rem; color: rgba(238,241,248,0.5); margin-top: 2px;">Qty: ${p.stock_quantity ?? 50}</div>
+            <div style="font-size: 0.7rem; color: #64748B; margin-top: 2px;">Qty: ${p.stock_quantity ?? 50}</div>
           </td>
           <td>${stateBadge}</td>
           <td style="text-align: center;">
@@ -2380,12 +2380,12 @@
         <div style="flex-grow: 1;">
           <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
             <span class="user-role-badge" style="background: rgba(255,185,12,0.15); color: var(--color-brand-yellow);">${escapeHtml(prod.brand || 'DEVICE PRO')}</span>
-            <span style="font-size: 0.75rem; text-transform: uppercase; color: rgba(238,241,248,0.6);">${escapeHtml(prod.category_label || prod.category)}</span>
+            <span style="font-size: 0.75rem; text-transform: uppercase; color: #64748B;">${escapeHtml(prod.category_label || prod.category)}</span>
             <span class="status-pill status-${prod.stock_status || 'in_stock'}">${(prod.stock_status || 'in_stock').replace('_', ' ')}</span>
             ${prod.published === 0 ? '<span class="status-pill status-archived">Archived</span>' : '<span class="status-pill status-active">Active</span>'}
           </div>
-          <h4 style="font-size: 1.15rem; font-weight: 800; color: #FFFFFF; margin: 0 0 0.5rem 0;">${escapeHtml(prod.name)}</h4>
-          <div style="font-size: 0.8rem; color: rgba(238,241,248,0.7);">
+          <h4 style="font-size: 1.15rem; font-weight: 800; color: #0F172A; margin: 0 0 0.5rem 0;">${escapeHtml(prod.name)}</h4>
+          <div style="font-size: 0.8rem; color: #475569;">
             <strong>SKU:</strong> <code>${escapeHtml(prod.sku)}</code> • <strong>ID:</strong> ${prod.id || prod._id}
           </div>
         </div>
@@ -2394,8 +2394,8 @@
       <div class="modal-info-grid">
         <div class="detail-group">
           <span class="detail-label">Retail Selling Price</span>
-          <span class="detail-value" style="font-size: 1.1rem; font-weight: 800; color: #FFFFFF;">${formatNaira(prod.price_ngn)}</span>
-          ${prod.previous_price_ngn ? `<div style="font-size: 0.72rem; color: rgba(238,241,248,0.4); text-decoration: line-through;">List: ${formatNaira(prod.previous_price_ngn)}</div>` : ''}
+          <span class="detail-value" style="font-size: 1.1rem; font-weight: 800; color: #0F172A;">${formatNaira(prod.price_ngn)}</span>
+          ${prod.previous_price_ngn ? `<div style="font-size: 0.72rem; color: #94A3B8; text-decoration: line-through;">List: ${formatNaira(prod.previous_price_ngn)}</div>` : ''}
         </div>
         ${canSeeCost ? `
           <div class="detail-group">
@@ -2429,7 +2429,7 @@
 
       <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06); margin-bottom: 1rem;">
         <span class="detail-label" style="display: block; margin-bottom: 0.4rem;">Engineering Specifications</span>
-        <div style="font-size: 0.82rem; line-height: 1.5; color: #EEF1F8;">
+        <div style="font-size: 0.82rem; line-height: 1.5; color: #1E293B;">
           ${escapeHtml(prod.specifications || 'No technical specifications provided.')}
         </div>
       </div>
@@ -2437,7 +2437,7 @@
       ${prod.description ? `
         <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
           <span class="detail-label" style="display: block; margin-bottom: 0.4rem;">Commercial Description</span>
-          <div style="font-size: 0.82rem; line-height: 1.5; color: rgba(238,241,248,0.8);">
+          <div style="font-size: 0.82rem; line-height: 1.5; color: #334155;">
             ${escapeHtml(prod.description)}
           </div>
         </div>
@@ -2767,12 +2767,12 @@
     }
 
     bodyEl.innerHTML = `
-      <p style="font-size: 0.9rem; line-height: 1.5; color: #EEF1F8; margin-bottom: 1rem;">
+      <p style="font-size: 0.9rem; line-height: 1.5; color: #1E293B; margin-bottom: 1rem;">
         Are you sure you want to <strong>${isCurrentlyPublished ? 'unpublish/archive' : 'reactivate and restore'}</strong>:
       </p>
       <div style="background: rgba(255,255,255,0.03); padding: 0.85rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 1rem;">
-        <div style="font-weight: 700; color: #FFFFFF;">${escapeHtml(name)}</div>
-        <div style="font-size: 0.75rem; color: rgba(238,241,248,0.6); margin-top: 2px;">Record ID: ${id}</div>
+        <div style="font-weight: 700; color: #0F172A;">${escapeHtml(name)}</div>
+        <div style="font-size: 0.75rem; color: #64748B; margin-top: 2px;">Record ID: ${id}</div>
       </div>
       <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; padding: 0.75rem; font-size: 0.78rem; color: #93C5FD; line-height: 1.4;">
         🔒 <strong>Database Integrity Guarantee:</strong> Historical customer orders and invoices referencing this product remain intact and authoritative. Archiving only removes the item from new catalog checkout.
@@ -3264,12 +3264,12 @@
       <tr>
         <td style="white-space: nowrap;">${formatDate(l.created_at)}</td>
         <td>
-          <span style="font-weight: 600; color: #FFFFFF;">${escapeHtml(l.username || 'System / Customer')}</span>
+          <span style="font-weight: 600; color: #0F172A;">${escapeHtml(l.username || 'System / Customer')}</span>
         </td>
         <td><code>${escapeHtml(l.action)}</code></td>
         <td><span style="text-transform: uppercase; font-size: 0.72rem;">${escapeHtml(l.entity_type)}</span></td>
         <td><strong>${escapeHtml(l.entity_id || '—')}</strong></td>
-        <td style="font-size: 0.78rem; color: rgba(238,241,248,0.7);">${escapeHtml(l.details || '')}</td>
+        <td style="font-size: 0.78rem; color: #334155;">${escapeHtml(l.details || '')}</td>
       </tr>
     `).join('');
   }
@@ -5333,7 +5333,7 @@
         : '<span style="color:#34D399; font-size:0.75rem;">✓ Valid</span>';
 
       const matchedDesc = row.matched_product_name
-        ? `<div style="font-weight:700; color:#FFFFFF; font-size:0.82rem;">${escapeHtml(row.matched_product_name)}</div>
+        ? `<div style="font-weight:700; color:#0F172A; font-size:0.82rem;">${escapeHtml(row.matched_product_name)}</div>
            <div style="font-size:0.72rem; color:var(--color-d-text-muted);">SKU: ${escapeHtml(row.matched_product_sku)} • Cat ID: #${row.matched_product_id}</div>`
         : '<span style="color:var(--color-d-text-subtle); font-size:0.78rem;">— No active catalog match —</span>';
 
@@ -5344,11 +5344,11 @@
             <strong style="color:var(--color-brand-yellow); font-family:monospace; font-size:0.82rem;">${escapeHtml(row.raw_sku || '—')}</strong>
           </td>
           <td>
-            <div style="font-weight:600; color:#FFFFFF; font-size:0.84rem;">${escapeHtml(row.raw_name || '—')}</div>
+            <div style="font-weight:600; color:#0F172A; font-size:0.84rem;">${escapeHtml(row.raw_name || '—')}</div>
             <div style="font-size:0.72rem; color:var(--color-d-text-muted);">${escapeHtml(row.raw_brand || '')} ${escapeHtml(row.raw_category ? '• ' + row.raw_category : '')}</div>
           </td>
           <td>
-            <strong style="color:#FFFFFF; font-size:0.84rem;">${row.normalized_cost_ngn ? formatNaira(row.normalized_cost_ngn) : '—'}</strong>
+            <strong style="color:#0F172A; font-size:0.84rem;">${row.normalized_cost_ngn ? formatNaira(row.normalized_cost_ngn) : '—'}</strong>
             <div style="font-size:0.7rem; color:var(--color-d-text-muted);">${escapeHtml(row.currency || 'NGN')} (Raw: ${escapeHtml(String(row.raw_cost || '—'))})</div>
           </td>
           <td>${matchedDesc}</td>
@@ -5530,13 +5530,13 @@
       tbody.innerHTML = imports.map(item => `
         <tr>
           <td style="font-family:monospace; font-weight:700; color:var(--color-brand-yellow);">#IMP-${item.id || item._id.slice(-6)}</td>
-          <td style="font-weight:700; color:#FFFFFF;">${escapeHtml(item.filename)}</td>
+          <td style="font-weight:700; color:#0F172A;">${escapeHtml(item.filename)}</td>
           <td><span class="status-pill" style="font-size:0.7rem;">${escapeHtml((item.file_format || '').toUpperCase())}</span></td>
           <td style="color:var(--color-d-text-muted);">${escapeHtml(item.supplier_name || 'Generic')}</td>
           <td style="font-size:0.78rem;">${escapeHtml(item.uploaded_by_email || 'staff@devicepro.ng')}</td>
           <td style="font-size:0.78rem; color:var(--color-d-text-muted);">${formatDate(item.created_at)}</td>
           <td>
-            <div style="font-size:0.78rem; font-weight:600; color:#FFFFFF;">${item.summary ? item.summary.total_rows : 0} rows</div>
+            <div style="font-size:0.78rem; font-weight:600; color:#0F172A;">${item.summary ? item.summary.total_rows : 0} rows</div>
             <div style="font-size:0.7rem; color:#34D399;">${item.summary ? item.summary.matched_rows : 0} matched active SKUs</div>
           </td>
           <td>
@@ -5621,13 +5621,13 @@
       tbody.innerHTML = imports.map(item => `
         <tr>
           <td style="font-family:monospace; font-weight:700; color:var(--color-brand-yellow);">#IMP-${item.id || item._id.slice(-6)}</td>
-          <td style="font-weight:700; color:#FFFFFF;">${escapeHtml(item.filename)}</td>
+          <td style="font-weight:700; color:#0F172A;">${escapeHtml(item.filename)}</td>
           <td><span class="status-pill" style="font-size:0.7rem;">${escapeHtml((item.file_format || '').toUpperCase())}</span></td>
           <td style="color:var(--color-d-text-muted);">${escapeHtml(item.supplier_name || 'Generic')}</td>
           <td style="font-size:0.78rem;">${escapeHtml(item.uploaded_by_email || 'staff@devicepro.ng')}</td>
           <td style="font-size:0.78rem; color:var(--color-d-text-muted);">${formatDate(item.created_at)}</td>
           <td>
-            <div style="font-size:0.78rem; font-weight:600; color:#FFFFFF;">${item.summary ? item.summary.total_rows : 0} rows</div>
+            <div style="font-size:0.78rem; font-weight:600; color:#0F172A;">${item.summary ? item.summary.total_rows : 0} rows</div>
             <div style="font-size:0.7rem; color:#34D399;">${item.summary ? item.summary.matched_rows : 0} matched active SKUs</div>
           </td>
           <td>
@@ -5669,7 +5669,7 @@
     activeReviewState.acknowledgeHighVariance = false;
     activeReviewState.currentFilter = 'all';
 
-    bodyEl.innerHTML = '<div style="padding:3rem 1rem; text-align:center;"><div class="loading-spinner" style="margin:0 auto 1rem;"></div><div style="color:#FFF; font-weight:700;">Opening price review console...</div><p style="font-size:0.8rem; color:var(--color-d-text-muted); margin-top:0.35rem;">Computing live catalog cost diffs, variance thresholds, and row eligibility.</p></div>';
+    bodyEl.innerHTML = '<div style="padding:3rem 1rem; text-align:center;"><div class="loading-spinner" style="margin:0 auto 1rem;"></div><div style="color:#0F172A; font-weight:700;">Opening price review console...</div><p style="font-size:0.8rem; color:var(--color-d-text-muted); margin-top:0.35rem;">Computing live catalog cost diffs, variance thresholds, and row eligibility.</p></div>';
     modal.showModal();
 
     try {
@@ -5762,7 +5762,7 @@
           <strong style="color: #38BDF8; font-size: 0.82rem; display: block; margin-bottom: 0.15rem;">
             STAGE 6 GOVERNANCE: CANONICAL SUPPLIER COST (cost_price_ngn) APPLICATION ONLY
           </strong>
-          <span style="font-size: 0.76rem; color: rgba(238, 241, 248, 0.85); line-height: 1.4;">
+          <span style="font-size: 0.76rem; color: #475569; line-height: 1.4;">
             Approval and application update purchasing costs ONLY. Retail selling prices (<code>price_ngn</code>), active inventory, and archived products are 100% protected and remain unchanged.
           </span>
         </div>
@@ -5851,7 +5851,7 @@
                   </td>
                   <td style="color: var(--color-d-text-muted); font-size: 0.75rem;">${r.row_number}</td>
                   <td>
-                    <div style="font-weight: 700; color: #FFFFFF; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.matched_product_name || r.raw_name || '—')}">
+                    <div style="font-weight: 700; color: #0F172A; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.matched_product_name || r.raw_name || '—')}">
                       ${escapeHtml(r.matched_product_name || r.raw_name || '—')}
                     </div>
                     <div style="display: flex; gap: 0.4rem; font-size: 0.72rem; align-items: center; margin-top: 0.15rem;">
@@ -5862,7 +5862,7 @@
                   <td style="color: var(--color-d-text-muted); font-family: monospace;">
                     ${r.matched_current_cost_ngn ? formatNaira(r.matched_current_cost_ngn) : '—'}
                   </td>
-                  <td style="font-weight: 800; color: #FFFFFF; font-family: monospace;">
+                  <td style="font-weight: 800; color: #0F172A; font-family: monospace;">
                     ${r.normalized_cost_ngn ? formatNaira(r.normalized_cost_ngn) : '—'}
                   </td>
                   <td>${diffPill}</td>
@@ -5873,7 +5873,7 @@
                     </div>
                   </td>
                   <td>
-                    <div style="font-family: monospace; color: #FFFFFF; font-size: 0.78rem;">
+                    <div style="font-family: monospace; color: #0F172A; font-size: 0.78rem;">
                       ${r.matched_selling_price_ngn ? formatNaira(r.matched_selling_price_ngn) : '—'}
                     </div>
                     <span style="font-size: 0.65rem; color: ${r.application_status === 'applied' ? '#34D399' : '#38BDF8'};">${r.application_status === 'applied' ? 'Updated' : 'Current Live'}</span>
@@ -5903,7 +5903,7 @@
           <strong style="color: #FBBF24; font-size: 0.85rem; display: block; margin-bottom: 0.2rem;">
             Elevated Variance Acknowledgment Required (&gt; 30% Cost Change)
           </strong>
-          <span style="font-size: 0.78rem; color: rgba(238, 241, 248, 0.88); line-height: 1.45;">
+          <span style="font-size: 0.78rem; color: #475569; line-height: 1.45;">
             One or more selected rows involve significant supplier cost shifts exceeding 30%. I confirm that I have verified distributor wholesale pricing and explicitly authorize approval of these high-variance items.
           </span>
         </div>
@@ -6368,7 +6368,7 @@
       // Markup display
       let markupDisplay = '<span style="color: var(--color-d-text-muted);">Unavailable</span>';
       if (p.markup_percent != null) {
-        markupDisplay = `<span style="color: rgba(255,255,255,0.85);">${p.markup_percent}%</span>`;
+        markupDisplay = `<span style="color: #0F172A;">${p.markup_percent}%</span>`;
       }
 
       const prodJson = escapeHtml(JSON.stringify({
@@ -6386,11 +6386,11 @@
       return `
         <tr>
           <td>
-            <strong style="color: #FFFFFF; font-size: 0.88rem; display: block;">${escapeHtml(p.name)}</strong>
+            <strong style="color: #0F172A; font-size: 0.88rem; display: block;">${escapeHtml(p.name)}</strong>
             <span style="font-family: monospace; font-size: 0.74rem; color: var(--color-d-text-muted);">${escapeHtml(p.sku)}</span>
           </td>
           <td>
-            <span style="display: block; font-size: 0.82rem; color: rgba(255,255,255,0.9);">${escapeHtml(p.category_label)}</span>
+            <span style="display: block; font-size: 0.82rem; color: #334155;">${escapeHtml(p.category_label)}</span>
             <span style="font-size: 0.74rem; color: var(--color-d-text-muted);">${escapeHtml(p.brand)}</span>
           </td>
           <td style="font-size: 0.85rem; font-weight: 600;">${costDisplay}</td>
@@ -6719,11 +6719,11 @@
           contentArea.innerHTML = `
             <div style="text-align: center; padding: 2.5rem 1rem;">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-d-text-muted)" stroke-width="1.5" style="margin-bottom: 0.75rem;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-              <h4 style="color: #FFFFFF; font-size: 1rem; margin-bottom: 0.25rem;">No Historical Cost Movements Recorded</h4>
+              <h4 style="color: #0F172A; font-size: 1rem; margin-bottom: 0.25rem;">No Historical Cost Movements Recorded</h4>
               <p style="color: var(--color-d-text-muted); font-size: 0.82rem; max-width: 480px; margin: 0 auto 1rem;">
                 No supplier price imports have been approved and applied to this product yet. Current supplier cost is ${data.current_supplier_cost_ngn ? '₦' + Number(data.current_supplier_cost_ngn).toLocaleString() : 'not recorded'}.
               </p>
-              <span class="status-pill" style="background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); font-size: 0.75rem;">
+              <span class="status-pill" style="background: rgba(15,23,42,0.06); color: #475569; font-size: 0.75rem;">
                 UNMODIFIED ORIGINAL CATALOG RECORD
               </span>
             </div>
@@ -6754,12 +6754,12 @@
                     <tr>
                       <td style="font-size: 0.8rem;">${formatDate(h.applied_at)}</td>
                       <td style="font-size: 0.82rem;">₦${Number(h.previous_cost_ngn || 0).toLocaleString()}</td>
-                      <td style="font-size: 0.82rem; font-weight: 700; color: #FFFFFF;">₦${Number(h.applied_cost_ngn).toLocaleString()}</td>
+                      <td style="font-size: 0.82rem; font-weight: 700; color: #0F172A;">₦${Number(h.applied_cost_ngn).toLocaleString()}</td>
                       <td style="font-size: 0.82rem; font-weight: 700; color: ${diffColor};">
                         ${sign}₦${Number(h.cost_change_ngn).toLocaleString()} (${sign}${h.cost_change_percent}%)
                       </td>
                       <td style="font-size: 0.78rem;">
-                        <span style="display: block; color: #FFFFFF;">${escapeHtml(h.import_filename)}</span>
+                        <span style="display: block; color: #0F172A;">${escapeHtml(h.import_filename)}</span>
                         <span style="font-family: monospace; color: var(--color-d-text-muted); font-size: 0.72rem;">${escapeHtml(h.import_id)}</span>
                       </td>
                       <td style="font-size: 0.78rem; color: var(--color-d-text-muted);">${escapeHtml(h.applied_by_email)}</td>
@@ -7082,16 +7082,16 @@
       return `
         <tr>
           <td>
-            <div style="font-weight: 700; color: #FFFFFF;">${escapeHtml(pkg.name)}</div>
+            <div style="font-weight: 700; color: #0F172A;">${escapeHtml(pkg.name)}</div>
             <a href="/packages/${encodeURIComponent(pkg.slug)}" target="_blank" style="font-size: 0.74rem; color: #38BDF8; text-decoration: none;">
               /${escapeHtml(pkg.slug)} ↗
             </a>
           </td>
           <td>
-            <div style="font-family: monospace; font-size: 0.8rem; color: #94A3B8;">${escapeHtml(pkg.sku)}</div>
+            <div style="font-family: monospace; font-size: 0.8rem; color: #475569;">${escapeHtml(pkg.sku)}</div>
             <div style="font-size: 0.74rem; color: var(--color-d-text-muted);">${escapeHtml(pkg.power_rating || '—')}</div>
           </td>
-          <td style="text-align: right; font-weight: 700; color: #FFFFFF;">
+          <td style="text-align: right; font-weight: 700; color: #0F172A;">
             ₦${Number(pkg.price_ngn).toLocaleString()}
             ${pkg.previous_price_ngn ? `<div style="font-size: 0.72rem; color: var(--color-d-text-muted); text-decoration: line-through;">₦${Number(pkg.previous_price_ngn).toLocaleString()}</div>` : ''}
           </td>
@@ -7846,7 +7846,7 @@
 
       return `
         <tr>
-          <td><strong style="color: #FFFFFF;">Rev ${rev.revision}</strong></td>
+          <td><strong style="color: #0F172A;">Rev ${rev.revision}</strong></td>
           <td style="font-size: 0.76rem; color: var(--color-d-text-muted);">${dateStr}</td>
           <td style="font-size: 0.76rem;">${escapeHtml(rev.saved_by_email || '—')}</td>
           <td style="text-align: center;">

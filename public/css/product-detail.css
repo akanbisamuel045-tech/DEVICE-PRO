@@ -31,7 +31,7 @@
 }
 
 .breadcrumb-strip .breadcrumb-sep {
-  color: #CBD5E1;
+  color: #64748B;
 }
 
 .breadcrumb-strip .breadcrumb-current {
@@ -107,7 +107,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #94A3B8;
+  color: #64748B;
   cursor: pointer;
   z-index: 2;
   transition: all 0.2s ease;
@@ -266,7 +266,7 @@
 }
 
 .meta-divider {
-  color: #CBD5E1;
+  color: #64748B;
 }
 
 .stock-status-pill {
@@ -314,7 +314,7 @@
 .previous-price {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #94A3B8;
+  color: #64748B;
   text-decoration: line-through;
 }
 

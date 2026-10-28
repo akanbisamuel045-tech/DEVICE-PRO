@@ -220,6 +220,27 @@ p, .text-body {
   color: var(--color-d-text-muted);
 }
 
+/* Ensure crisp contrast on light surfaces */
+.bg-white p, .bg-white .text-body,
+.surface-light p, .surface-light .text-body,
+.product-card p, .product-card .text-body,
+.admin-body p, .admin-body .text-body,
+.dash-card p, .dash-card .text-body,
+.modal-body p, .modal-body .text-body,
+.drawer-body p, .drawer-body .text-body,
+.catalogue-layout-section p,
+.products-page-body p,
+.products-page-body .text-body,
+.about-page-body .story-card p,
+.profile-page-body p,
+.profile-page-body .text-body,
+.solutions-page-body p,
+.solutions-page-body .text-body,
+.policy-page-body p,
+.policy-page-body .text-body {
+  color: #334155;
+}
+
 .eyebrow {
   font-family: var(--font-family-mono);
   font-size: var(--font-size-xs);
@@ -1388,8 +1409,11 @@ textarea:focus-visible,
   line-height: 1;
 }
 
-/* User Profile Navigation Button */
+/* User Profile Navigation Button - Shown on Desktop and Tablet sizes without hamburger menu */
 .header-user-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #061C35;
   transition: all 0.2s ease;
   text-decoration: none;
@@ -1428,6 +1452,13 @@ textarea:focus-visible,
   border-radius: 50%;
   background: #10B981;
   border: 1.5px solid #FFFFFF;
+}
+
+/* Hide profile button in top navbar on screens that have the hamburger menu */
+@media (max-width: 992px) {
+  .header-user-btn {
+    display: none !important;
+  }
 }
 
 /* Mobile Nav Toggle: Hidden on Desktop (min-width: 1025px) */

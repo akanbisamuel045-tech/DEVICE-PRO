@@ -222,30 +222,30 @@ async function authenticate(req, res, next) {
   }
 }
 
-const ADMIN_ROLES = ['admin', 'superadmin', 'engineer', 'sales', 'staff', 'finance'];
+const ADMIN_ROLES = ['admin', 'superadmin'];
 
-// Stage 3: Section permissions matrix for all 16 administration modules
+// Section permissions matrix for administration modules
 const ADMIN_SECTION_PERMISSIONS = {
-  'overview': ['superadmin', 'admin', 'engineer', 'sales', 'staff', 'finance'],
-  'products': ['superadmin', 'admin', 'engineer'],
+  'overview': ['superadmin', 'admin'],
+  'products': ['superadmin', 'admin'],
   'supplier-imports': ['superadmin', 'admin'],
   'supplier-price-imports': ['superadmin', 'admin'],
-  'categories': ['superadmin', 'admin', 'engineer'],
-  'brands': ['superadmin', 'admin', 'engineer'],
-  'solar-packages': ['superadmin', 'admin', 'engineer', 'finance'],
+  'categories': ['superadmin', 'admin'],
+  'brands': ['superadmin', 'admin'],
+  'solar-packages': ['superadmin', 'admin'],
   'content': ['superadmin', 'admin'],
   'website-content': ['superadmin', 'admin'],
   'images': ['superadmin', 'admin'],
   'image-manager': ['superadmin', 'admin'],
-  'orders': ['superadmin', 'admin', 'sales'],
-  'customers': ['superadmin', 'admin', 'sales'],
-  'quotes-enquiries': ['superadmin', 'admin', 'sales', 'engineer'],
-  'quotes': ['superadmin', 'admin', 'sales', 'engineer'],
-  'enquiries': ['superadmin', 'admin', 'sales', 'engineer'],
-  'projects': ['superadmin', 'admin', 'engineer'],
+  'orders': ['superadmin', 'admin'],
+  'customers': ['superadmin', 'admin'],
+  'quotes-enquiries': ['superadmin', 'admin'],
+  'quotes': ['superadmin', 'admin'],
+  'enquiries': ['superadmin', 'admin'],
+  'projects': ['superadmin', 'admin'],
   'import-history': ['superadmin', 'admin'],
-  'audit-logs': ['superadmin'],
-  'admin-users': ['superadmin'],
+  'audit-logs': ['superadmin', 'admin'],
+  'admin-users': ['superadmin', 'admin'],
   'settings': ['superadmin', 'admin']
 };
 

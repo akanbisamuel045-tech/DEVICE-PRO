@@ -1476,22 +1476,6 @@ if (userCount === 0) {
       salt: 'da08867c8cff8a6e620bee12be23034d',
       fullName: 'DEVICE PRO Administrator',
       role: 'superadmin'
-    },
-    {
-      username: 'engineer.babatunde',
-      email: 'babatunde@devicepro.com',
-      passwordHash: '9e080e986be2d19f6c268aaecc55fa209529174bff22dba9d23a50a930d7d41aa729c5142ee346cfc6ae8934e52ff0ccf4f1959ed59197c52be8e22c86649386',
-      salt: '55999f24ccd06d2acfc69cd73375533a',
-      fullName: 'Engr. Babatunde Adeyemi (Director of Engineering)',
-      role: 'engineer'
-    },
-    {
-      username: 'sales.lagos',
-      email: 'sales@devicepro.com',
-      passwordHash: '8724095a9bbb4dbf0b4a4825cce9cab5d5d357258d9ab850207b5dd90ab51e8f83bd23aac1ac21e87189dd03bf9322b96cd93d4533e33a3b0345b118c7204dbf',
-      salt: '270212d1c2c9d51bfc7ccfc8e4eff351',
-      fullName: 'Ikeja Store Showroom Desk',
-      role: 'sales'
     }
   ];
 

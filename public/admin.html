@@ -36,7 +36,7 @@
         <img src="/images/logo.svg" alt="DEVICE PRO" class="auth-logo">
         <span class="auth-badge">STAFF OPERATIONS PORTAL</span>
         <h1 class="auth-title">Administrative Sign In</h1>
-        <p class="auth-sub">Authorized engineering, sales, and executive management access only.</p>
+        <p class="auth-sub">Authorized superadmin staff access only.</p>
       </div>
 
       <div id="auth-error-alert" class="auth-error-box" role="alert" style="display: none;"></div>
@@ -60,16 +60,10 @@
 
       <!-- Quick Demo Account Fillers -->
       <div class="auth-demo-accounts">
-        <span class="demo-title">Quick Test Accounts (Seeded in MongoDB Atlas):</span>
+        <span class="demo-title">Authorized Staff Credentials:</span>
         <div class="demo-pills">
           <button type="button" class="demo-pill" data-user="admin" data-pass="Admin@DevicePro2026!">
             <i data-lucide="shield" class="lucide-sm" style="margin-right:4px;"></i> Superadmin (admin)
-          </button>
-          <button type="button" class="demo-pill" data-user="engineer.babatunde" data-pass="Engineer@DevicePro2026!">
-            <i data-lucide="zap" class="lucide-sm" style="margin-right:4px;"></i> Lead Engineer (babatunde)
-          </button>
-          <button type="button" class="demo-pill" data-user="sales.lagos" data-pass="Sales@DevicePro2026!">
-            <i data-lucide="briefcase" class="lucide-sm" style="margin-right:4px;"></i> Showroom Sales (lagos)
           </button>
         </div>
       </div>
@@ -473,7 +467,7 @@
             <div class="dash-card-header">
               <div>
                 <h3 style="font-size: 1.05rem; font-weight: 800; color: #0F172A;">Admin System Capabilities &amp; Implementation Roadmap</h3>
-                <p style="font-size: 0.8rem; color: rgba(238, 241, 248, 0.65); margin-top: 0.2rem;">
+                <p style="font-size: 0.8rem; color: #64748B; margin-top: 0.2rem;">
                   Authoritative status matrix of operational capabilities versus scheduled feature stages.
                 </p>
               </div>
@@ -2867,18 +2861,10 @@
           </div>
 
           <!-- RBAC Roles Information Card -->
-          <div class="kpi-cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+          <div class="kpi-cards-grid" style="grid-template-columns: 1fr;">
             <div class="dash-card" style="padding: 1rem;">
-              <h4 style="font-size: 0.9rem; font-weight: 800; color: #0157A2; margin: 0 0 0.35rem 0;">Superadmin</h4>
-              <p style="font-size: 0.78rem; color: #64748B; margin: 0;">Unrestricted access: staff provisioning, database backup downloads, immutable audit log inspection, and dual-auth BOM approvals.</p>
-            </div>
-            <div class="dash-card" style="padding: 1rem;">
-              <h4 style="font-size: 0.9rem; font-weight: 800; color: #0284C7; margin: 0 0 0.35rem 0;">Lead Engineer</h4>
-              <p style="font-size: 0.78rem; color: #64748B; margin: 0;">Technical operations: solar sizing review, BOM creation, equipment specification edits, and COREN commissioning sign-offs.</p>
-            </div>
-            <div class="dash-card" style="padding: 1rem;">
-              <h4 style="font-size: 0.9rem; font-weight: 800; color: #B45309; margin: 0 0 0.35rem 0;">Sales Desk</h4>
-              <p style="font-size: 0.78rem; color: #64748B; margin: 0;">Commercial operations: customer order fulfillment, waybill tracking updates, quote proposals triage, and contact desk inquiries.</p>
+              <h4 style="font-size: 0.9rem; font-weight: 800; color: #0157A2; margin: 0 0 0.35rem 0;">Superadmin (Exclusive Authorized Staff)</h4>
+              <p style="font-size: 0.78rem; color: #64748B; margin: 0;">Sole authorized administrative staff account: product catalog management, supplier price imports, order fulfillment, customer records, database backup downloads, audit logs, and BOM approvals.</p>
             </div>
           </div>
 
@@ -4122,7 +4108,7 @@
               <div style="font-size: 0.74rem; color: var(--color-d-text-muted);" id="bom-finance-reviewer-info">
                 No formal review submitted yet. Requires 100% complete verified costing.
               </div>
-              <div id="bom-finance-review-notes-wrap" style="display: none; margin-top: 0.35rem; font-size: 0.72rem; color: #E2E8F0; font-style: italic;">
+              <div id="bom-finance-review-notes-wrap" style="display: none; margin-top: 0.35rem; font-size: 0.72rem; color: #64748B; font-style: italic;">
                 Notes: <span id="bom-finance-review-notes"></span>
               </div>
             </div>
