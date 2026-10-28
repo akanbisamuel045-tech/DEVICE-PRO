@@ -66,6 +66,7 @@
   const addProductModal = document.getElementById('add-product-modal');
   const productInspectModal = document.getElementById('product-inspect-modal');
   const productArchiveModal = document.getElementById('product-archive-modal');
+  const bulkProductImportModal = document.getElementById('bulk-product-import-modal');
 
   // Formatters
   function formatNaira(num) {
@@ -716,6 +717,13 @@
         const marginEl = document.getElementById('add-prod-margin-preview');
         if (marginEl) marginEl.textContent = '—';
         addProductModal.showModal();
+      });
+    }
+
+    const btnOpenBulkProdImport = document.getElementById('btn-open-bulk-product-import');
+    if (btnOpenBulkProdImport && bulkProductImportModal) {
+      btnOpenBulkProdImport.addEventListener('click', () => {
+        openBulkProductImportModal();
       });
     }
 
@@ -2803,6 +2811,424 @@
         btn.textContent = 'Confirm Action';
       }
     }
+  }
+
+  // ==========================================================================
+  // BULK PRODUCT CREATION & CATALOG MANAGEMENT (EXCEL / CSV)
+  // Enables downloading the official template, uploading spreadsheet,
+  // previewing automated diff analysis, and publishing catalog updates live.
+  // ==========================================================================
+  let currentBulkProductData = null;
+  let currentBulkProductFile = null;
+
+  function openBulkProductImportModal() {
+    if (!bulkProductImportModal) return;
+
+    // Reset error & success notifications
+    const errAlert = document.getElementById('bulk-prod-error-alert');
+    if (errAlert) { errAlert.textContent = ''; errAlert.style.display = 'none'; }
+
+    const successBanner = document.getElementById('bulk-prod-success-banner');
+    if (successBanner) successBanner.style.display = 'none';
+
+    // Reset analysis preview
+    const analysisWrap = document.getElementById('bulk-prod-analysis-wrap');
+    if (analysisWrap) analysisWrap.style.display = 'none';
+
+    // Reset dropzone & loading spinner
+    const loading = document.getElementById('bulk-prod-loading');
+    if (loading) loading.style.display = 'none';
+
+    const dropzone = document.getElementById('bulk-prod-dropzone');
+    if (dropzone) dropzone.style.display = 'block';
+
+    const dropLabel = document.getElementById('bulk-prod-dropzone-label');
+    if (dropLabel) dropLabel.textContent = 'Click to browse or drag & drop product spreadsheet';
+
+    const fileInput = document.getElementById('bulk-prod-file-input');
+    if (fileInput) fileInput.value = '';
+
+    // Reset buttons and controls
+    const applyBtn = document.getElementById('btn-bulk-product-apply');
+    if (applyBtn) {
+      applyBtn.disabled = true;
+      const applyText = document.getElementById('btn-bulk-product-apply-text');
+      if (applyText) applyText.textContent = 'Publish Products to Catalog';
+    }
+
+    const footerStatus = document.getElementById('bulk-prod-footer-status');
+    if (footerStatus) footerStatus.textContent = 'Upload a spreadsheet to preview diff';
+
+    const modeSelect = document.getElementById('bulk-prod-import-mode');
+    if (modeSelect) modeSelect.value = 'all';
+
+    const filterInput = document.getElementById('bulk-prod-search-filter');
+    if (filterInput) filterInput.value = '';
+
+    const tbody = document.getElementById('bulk-prod-preview-tbody');
+    if (tbody) tbody.innerHTML = '';
+
+    currentBulkProductData = null;
+    currentBulkProductFile = null;
+
+    bulkProductImportModal.showModal();
+  }
+
+  // Template Download Handler with Bearer Auth
+  const btnDownloadTemplate = document.getElementById('btn-download-product-import-template');
+  if (btnDownloadTemplate) {
+    btnDownloadTemplate.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        const res = await apiFetch('/api/admin/products/import-template');
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Failed to download product catalog template.');
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'DEVICE_PRO_PRODUCT_CATALOG_TEMPLATE.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        showBulkProductError(err.message);
+      }
+    });
+  }
+
+  // Setup Dropzone & File Input Listeners
+  const bulkProdDropzone = document.getElementById('bulk-prod-dropzone');
+  const bulkProdFileInput = document.getElementById('bulk-prod-file-input');
+
+  if (bulkProdDropzone && bulkProdFileInput) {
+    bulkProdDropzone.addEventListener('click', () => {
+      bulkProdFileInput.click();
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      bulkProdDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        bulkProdDropzone.style.borderColor = '#0157A2';
+        bulkProdDropzone.style.backgroundColor = '#EFF6FF';
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      bulkProdDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        bulkProdDropzone.style.borderColor = '#CBD5E1';
+        bulkProdDropzone.style.backgroundColor = 'transparent';
+      });
+    });
+
+    bulkProdDropzone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length > 0) {
+        handleBulkProductFileSelect(dt.files[0]);
+      }
+    });
+
+    bulkProdFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleBulkProductFileSelect(e.target.files[0]);
+      }
+    });
+  }
+
+  function showBulkProductError(message) {
+    const errAlert = document.getElementById('bulk-prod-error-alert');
+    if (errAlert) {
+      errAlert.textContent = message;
+      errAlert.style.display = 'block';
+    }
+  }
+
+  async function handleBulkProductFileSelect(file) {
+    if (!file) return;
+
+    // Reset error & success
+    const errAlert = document.getElementById('bulk-prod-error-alert');
+    if (errAlert) { errAlert.textContent = ''; errAlert.style.display = 'none'; }
+
+    const successBanner = document.getElementById('bulk-prod-success-banner');
+    if (successBanner) successBanner.style.display = 'none';
+
+    // File type validation
+    const validExts = ['.xlsx', '.csv'];
+    const lowerName = file.name.toLowerCase();
+    const isValidExt = validExts.some(ext => lowerName.endsWith(ext));
+    if (!isValidExt) {
+      showBulkProductError('Invalid file type. Please upload a Microsoft Excel (.xlsx) or Comma-Separated Values (.csv) file.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      showBulkProductError(`File size (${(file.size / (1024 * 1024)).toFixed(1)}MB) exceeds the maximum permitted limit of 5MB.`);
+      return;
+    }
+
+    currentBulkProductFile = file;
+
+    // UI state: loading
+    const dropzone = document.getElementById('bulk-prod-dropzone');
+    const loading = document.getElementById('bulk-prod-loading');
+    const dropLabel = document.getElementById('bulk-prod-dropzone-label');
+    if (dropzone) dropzone.style.display = 'none';
+    if (loading) loading.style.display = 'block';
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await apiFetch('/api/admin/products/bulk-upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to analyze uploaded product catalog file.');
+      }
+
+      currentBulkProductData = data;
+
+      // Update dropzone label to indicate selected file
+      if (dropLabel) {
+        dropLabel.textContent = `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+      }
+
+      // Display metrics
+      const statTotal = document.getElementById('bulk-stat-total');
+      const statNew = document.getElementById('bulk-stat-new');
+      const statUpdate = document.getElementById('bulk-stat-update');
+      const statErrors = document.getElementById('bulk-stat-errors');
+      const errorsWrap = document.getElementById('bulk-stat-errors-wrap');
+
+      if (statTotal) statTotal.textContent = data.summary.total_rows || 0;
+      if (statNew) statNew.textContent = data.summary.create_count || 0;
+      if (statUpdate) statUpdate.textContent = data.summary.update_count || 0;
+      if (statErrors) statErrors.textContent = data.summary.error_count || 0;
+
+      if (errorsWrap) {
+        errorsWrap.style.display = data.summary.error_count > 0 ? 'block' : 'none';
+      }
+
+      // Show analysis wrap
+      const analysisWrap = document.getElementById('bulk-prod-analysis-wrap');
+      if (analysisWrap) analysisWrap.style.display = 'block';
+
+      // Render preview rows
+      renderBulkProductPreview();
+
+      // Update apply button & status text
+      const applyBtn = document.getElementById('btn-bulk-product-apply');
+      const footerStatus = document.getElementById('bulk-prod-footer-status');
+      const validCount = (data.summary.create_count || 0) + (data.summary.update_count || 0);
+
+      if (applyBtn) {
+        applyBtn.disabled = validCount === 0;
+      }
+
+      if (footerStatus) {
+        if (validCount > 0) {
+          footerStatus.textContent = `Ready to publish ${data.summary.create_count || 0} new products and update ${data.summary.update_count || 0} existing products.`;
+        } else {
+          footerStatus.textContent = 'No valid products available to publish (check errors above).';
+        }
+      }
+    } catch (err) {
+      showBulkProductError(err.message || 'Error uploading file.');
+    } finally {
+      if (loading) loading.style.display = 'none';
+      if (dropzone) dropzone.style.display = 'block';
+    }
+  }
+
+  // Filter & Mode change listeners
+  const bulkSearchFilter = document.getElementById('bulk-prod-search-filter');
+  if (bulkSearchFilter) {
+    bulkSearchFilter.addEventListener('input', () => {
+      renderBulkProductPreview();
+    });
+  }
+
+  const bulkImportMode = document.getElementById('bulk-prod-import-mode');
+  if (bulkImportMode) {
+    bulkImportMode.addEventListener('change', () => {
+      renderBulkProductPreview();
+    });
+  }
+
+  function renderBulkProductPreview() {
+    if (!currentBulkProductData || !Array.isArray(currentBulkProductData.rows)) return;
+
+    const tbody = document.getElementById('bulk-prod-preview-tbody');
+    if (!tbody) return;
+
+    const query = (document.getElementById('bulk-prod-search-filter')?.value || '').toLowerCase().trim();
+    const mode = document.getElementById('bulk-prod-import-mode')?.value || 'all';
+
+    let rows = currentBulkProductData.rows;
+
+    if (query) {
+      rows = rows.filter(r => {
+        return (
+          (r.name && r.name.toLowerCase().includes(query)) ||
+          (r.sku && r.sku.toLowerCase().includes(query)) ||
+          (r.brand && r.brand.toLowerCase().includes(query)) ||
+          (r.category && r.category.toLowerCase().includes(query))
+        );
+      });
+    }
+
+    if (rows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #64748B;">No rows match filter criteria.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = rows.map(r => {
+      // Determine action badge & mode skip status
+      let actionBadge = '';
+      let isSkippedByMode = false;
+
+      if (r.action === 'CREATE_NEW') {
+        if (mode === 'update_only') isSkippedByMode = true;
+        actionBadge = isSkippedByMode 
+          ? `<span class="status-pill" style="background:#F1F5F9; color:#64748B; font-weight:700; font-size:0.72rem;">SKIPPED (MODE)</span>`
+          : `<span class="status-pill" style="background:#ECFDF5; color:#047857; font-weight:700; font-size:0.72rem;">🟢 NEW PRODUCT</span>`;
+      } else if (r.action === 'UPDATE_EXISTING') {
+        if (mode === 'create_only') isSkippedByMode = true;
+        actionBadge = isSkippedByMode
+          ? `<span class="status-pill" style="background:#F1F5F9; color:#64748B; font-weight:700; font-size:0.72rem;">SKIPPED (MODE)</span>`
+          : `<span class="status-pill" style="background:#EFF6FF; color:#1D4ED8; font-weight:700; font-size:0.72rem;">🔵 UPDATE</span>`;
+      } else {
+        actionBadge = `<span class="status-pill" style="background:#FEF2F2; color:#B91C1C; font-weight:700; font-size:0.72rem;">🔴 ERROR</span>`;
+      }
+
+      // Format Price and Diff
+      let priceDisplay = '—';
+      if (r.price_ngn !== null && r.price_ngn !== undefined) {
+        priceDisplay = `₦${Number(r.price_ngn).toLocaleString()}`;
+        if (r.action === 'UPDATE_EXISTING' && r.price_diff) {
+          const diffPct = Number(r.price_diff.pct || 0);
+          const diffColor = diffPct > 0 ? '#059669' : (diffPct < 0 ? '#DC2626' : '#64748B');
+          const diffSign = diffPct > 0 ? '+' : '';
+          priceDisplay += `<div style="font-size:0.72rem; color:${diffColor}; font-weight:600;">${diffSign}${diffPct.toFixed(1)}% (was ₦${Number(r.price_diff.current).toLocaleString()})</div>`;
+        } else if (r.action === 'CREATE_NEW') {
+          priceDisplay += `<div style="font-size:0.72rem; color:#059669; font-weight:600;">(New SKU)</div>`;
+        }
+      }
+
+      // Format Stock & Warranty
+      const stockInfo = `${r.stock_quantity ?? 50} units<div style="font-size:0.72rem; color:#64748B;">${r.warranty_years || 5}yr warranty</div>`;
+
+      // Remarks & Errors
+      let remarks = '';
+      if (r.errors && r.errors.length > 0) {
+        remarks = `<div style="color:#DC2626; font-size:0.74rem; font-weight:600;">⚠️ ${r.errors.map(escapeHtml).join('; ')}</div>`;
+      } else if (isSkippedByMode) {
+        remarks = `<div style="color:#64748B; font-size:0.74rem;">Row skipped due to mode selector ("${mode}").</div>`;
+      } else if (r.action === 'UPDATE_EXISTING') {
+        const diffList = [];
+        if (r.price_diff && r.price_diff.pct !== 0) diffList.push('Price updated');
+        if (r.warranty_years) diffList.push('Warranty');
+        if (r.stock_quantity !== undefined) diffList.push('Stock');
+        remarks = `<div style="color:#2563EB; font-size:0.74rem;">${diffList.length > 0 ? diffList.join(', ') : 'Specifications synchronized'}</div>`;
+      } else {
+        remarks = `<div style="color:#059669; font-size:0.74rem;">Ready to publish to live catalog</div>`;
+      }
+
+      const rowOpacity = isSkippedByMode ? 'opacity: 0.6;' : '';
+
+      return `
+        <tr style="${rowOpacity}">
+          <td style="padding: 0.65rem 0.8rem; white-space: nowrap;">${actionBadge}</td>
+          <td style="padding: 0.65rem 0.8rem;"><code style="font-weight: 700; color: #0F172A;">${escapeHtml(r.sku || '—')}</code></td>
+          <td style="padding: 0.65rem 0.8rem;">
+            <div style="font-weight: 700; color: #0F172A;">${escapeHtml(r.name || '—')}</div>
+            <div style="font-size: 0.72rem; color: #64748B;">Brand: ${escapeHtml(r.brand || 'DEVICE PRO')} ${r.power_rating ? `• ${escapeHtml(r.power_rating)}` : ''}</div>
+          </td>
+          <td style="padding: 0.65rem 0.8rem;"><span class="status-pill" style="font-size: 0.72rem;">${escapeHtml(r.category_label || r.category || '—')}</span></td>
+          <td style="padding: 0.65rem 0.8rem; text-align: right; font-weight: 700;">${priceDisplay}</td>
+          <td style="padding: 0.65rem 0.8rem;">${stockInfo}</td>
+          <td style="padding: 0.65rem 0.8rem;">${remarks}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // Publish / Apply Button Handler
+  const btnBulkApply = document.getElementById('btn-bulk-product-apply');
+  if (btnBulkApply) {
+    btnBulkApply.addEventListener('click', async () => {
+      if (!currentBulkProductData || !Array.isArray(currentBulkProductData.rows)) return;
+
+      const mode = document.getElementById('bulk-prod-import-mode')?.value || 'all';
+      const applyText = document.getElementById('btn-bulk-product-apply-text');
+      const errAlert = document.getElementById('bulk-prod-error-alert');
+      const successBanner = document.getElementById('bulk-prod-success-banner');
+      const successTitle = document.getElementById('bulk-prod-success-title');
+      const successDesc = document.getElementById('bulk-prod-success-desc');
+
+      if (errAlert) { errAlert.textContent = ''; errAlert.style.display = 'none'; }
+      if (successBanner) successBanner.style.display = 'none';
+
+      btnBulkApply.disabled = true;
+      if (applyText) applyText.textContent = 'Publishing Products...';
+
+      try {
+        const res = await apiFetch('/api/admin/products/bulk-apply', {
+          method: 'POST',
+          body: JSON.stringify({
+            rows: currentBulkProductData.rows,
+            mode
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Failed to apply product catalog updates.');
+        }
+
+        // Show success notification
+        if (successBanner) {
+          if (successTitle) {
+            successTitle.textContent = `Catalog Successfully Published (${data.summary.created_count} New, ${data.summary.updated_count} Updated)!`;
+          }
+          if (successDesc) {
+            successDesc.textContent = `Processed ${data.summary.total_processed} items. All records are active on MongoDB Atlas and immediately viewable on the public catalog.`;
+          }
+          successBanner.style.display = 'block';
+        }
+
+        // Refresh products catalog in background
+        loadProducts(1);
+        loadDashboardStats();
+
+        // Update footer status
+        const footerStatus = document.getElementById('bulk-prod-footer-status');
+        if (footerStatus) {
+          footerStatus.textContent = `Successfully published: ${data.summary.created_count} created, ${data.summary.updated_count} updated.`;
+        }
+
+        // Smooth scroll to top so user sees the success banner and live link
+        const modalBody = document.querySelector('#bulk-product-import-modal .modal-body');
+        if (modalBody) {
+          modalBody.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } catch (err) {
+        showBulkProductError(err.message || 'Error applying product catalog updates.');
+        btnBulkApply.disabled = false;
+      } finally {
+        if (applyText) applyText.textContent = 'Publish Products to Catalog';
+      }
+    });
   }
 
   // ==========================================================================

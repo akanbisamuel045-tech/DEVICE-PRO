@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const compression = require('compression');
 const crypto = require('crypto');
+const multer = require('multer');
 const {
   getProducts, getProductBySlug, getProductById, getProductFacets, getRelatedProducts,
   updateProduct, createProduct, deleteProduct, archiveProduct,
@@ -2941,6 +2942,110 @@ app.get('/api/admin/products', requireAuth, requireRole('superadmin', 'admin', '
   }
 });
 
+// =========================================================================
+// BULK PRODUCT CREATION & CATALOG MANAGEMENT (EXCEL / CSV)
+// Endpoints are declared before :id route to prevent routing collisions
+// =========================================================================
+const {
+  generateProductImportTemplate,
+  parseProductCatalogFile,
+  applyProductCatalogImport
+} = require('./lib/product-catalog-importer');
+
+const productCatalogUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB maximum
+    files: 1
+  }
+});
+
+function handleProductCatalogUpload(req, res, next) {
+  productCatalogUpload.single('file')(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({
+          success: false,
+          error: 'File size exceeds the maximum permitted limit of 5MB.'
+        });
+      }
+      return res.status(400).json({
+        success: false,
+        error: err.message || 'File upload failed.'
+      });
+    }
+    next();
+  });
+}
+
+// 1. Download official Excel import template
+app.get('/api/admin/products/import-template', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const buffer = await generateProductImportTemplate();
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="DEVICE_PRO_PRODUCT_CATALOG_TEMPLATE.xlsx"');
+    res.setHeader('Content-Length', buffer.length);
+    return res.end(buffer);
+  } catch (err) {
+    console.error('[IMPORT TEMPLATE ERROR]:', err);
+    return res.status(500).json({ success: false, error: err.message || 'Failed to generate product import template.' });
+  }
+});
+
+// 2. Parse & diff uploaded catalog file (.xlsx / .csv)
+app.post('/api/admin/products/bulk-upload', requireAuth, requireRole('superadmin', 'admin'), handleProductCatalogUpload, async (req, res) => {
+  try {
+    let fileBuffer = null;
+    let originalName = 'import.xlsx';
+
+    if (req.file && req.file.buffer) {
+      fileBuffer = req.file.buffer;
+      originalName = req.file.originalname || 'import.xlsx';
+    } else if (req.body && req.body.fileBase64) {
+      fileBuffer = Buffer.from(req.body.fileBase64, 'base64');
+      originalName = req.body.filename || 'import.xlsx';
+    }
+
+    if (!fileBuffer || fileBuffer.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No file provided. Please upload an .xlsx or .csv catalog file or send base64 data.'
+      });
+    }
+
+    const parseResult = await parseProductCatalogFile(fileBuffer, originalName);
+    return res.json(parseResult);
+  } catch (err) {
+    console.error('[BULK UPLOAD PARSE ERROR]:', err);
+    return res.status(400).json({
+      success: false,
+      error: err.message || 'Failed to parse uploaded product catalog file.'
+    });
+  }
+});
+
+// 3. Apply bulk product catalog import (create new and/or update existing)
+app.post('/api/admin/products/bulk-apply', requireAuth, requireRole('superadmin', 'admin'), async (req, res) => {
+  try {
+    const { rows, mode } = req.body;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return res.status(400).json({
+        success: false,
+        error: 'No product rows provided to apply.'
+      });
+    }
+
+    const result = await applyProductCatalogImport(rows, { mode: mode || 'all' }, req.user);
+    return res.json(result);
+  } catch (err) {
+    console.error('[BULK APPLY ERROR]:', err);
+    return res.status(500).json({
+      success: false,
+      error: err.message || 'Failed to apply bulk product catalog import.'
+    });
+  }
+});
+
 // Single product details for admin inspection
 app.get('/api/admin/products/:id', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'sales', 'staff'), async (req, res) => {
   try {
@@ -3025,8 +3130,6 @@ app.delete('/api/admin/products/:id', requireAuth, requireRole('superadmin', 'ad
 // Allows authorized staff (superadmin, admin, engineer) to upload product photos
 // and manage media assets stored in public/images/products.
 // =========================================================================
-
-const multer = require('multer');
 
 const productImageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
