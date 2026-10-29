@@ -1530,5 +1530,254 @@ textarea:focus-visible,
   color: #16A34A;
 }
 
+/* =========================================================================
+   PHONE QUICK-CONNECT POPUP MODAL (Replaces OS "Open Pick an app" Dialog)
+   ========================================================================= */
+.phone-action-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 28, 53, 0.68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0.22s ease;
+  padding: 16px;
+}
 
+.phone-action-modal-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
 
+.phone-action-modal {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  transform: translateY(12px) scale(0.97);
+  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #0F172A;
+}
+
+.phone-action-modal-backdrop.is-open .phone-action-modal {
+  transform: translateY(0) scale(1);
+}
+
+.phone-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.phone-modal-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.phone-modal-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #EBF3FB;
+  color: #0157A2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.phone-modal-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #082D50;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.phone-modal-subtitle {
+  font-size: 0.78125rem;
+  color: #64748B;
+  margin: 2px 0 0;
+}
+
+.phone-modal-close {
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.phone-modal-close:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+/* Number Highlight Box */
+.phone-modal-number-card {
+  background: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.phone-modal-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #16A34A;
+  margin-bottom: 8px;
+}
+
+.phone-modal-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #16A34A;
+  box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.2);
+  animation: modalPulse 2s infinite;
+}
+
+@keyframes modalPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.4); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(22, 163, 74, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+}
+
+.phone-modal-display-num {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #082D50;
+  letter-spacing: -0.01em;
+  margin: 0;
+  user-select: all;
+  -webkit-user-select: all;
+}
+
+.phone-modal-hours {
+  font-size: 0.75rem;
+  color: #64748B;
+  margin: 4px 0 0;
+}
+
+/* Actions */
+.phone-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-phone-copy {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 18px;
+  background: #082D50;
+  color: #FFFFFF !important;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border: 1px solid #082D50;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(8, 45, 80, 0.16);
+}
+
+.btn-phone-copy:hover {
+  background: #0157A2;
+  border-color: #0157A2;
+  transform: translateY(-1px);
+}
+
+.btn-phone-copy.is-copied {
+  background: #16A34A !important;
+  border-color: #16A34A !important;
+  color: #FFFFFF !important;
+}
+
+.btn-phone-whatsapp {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 18px;
+  background: #25D366;
+  color: #FFFFFF !important;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border: 1px solid #20BA5A;
+  border-radius: 12px;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(37, 211, 102, 0.2);
+}
+
+.btn-phone-whatsapp:hover {
+  background: #20BA5A;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.phone-modal-alt-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px 0;
+  font-size: 0.78125rem;
+}
+
+.btn-phone-dial-direct {
+  color: #0157A2;
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-phone-dial-direct:hover {
+  text-decoration: underline;
+}
+
+.phone-modal-footer-note {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #F1F5F9;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #94A3B8;
+  line-height: 1.4;
+}

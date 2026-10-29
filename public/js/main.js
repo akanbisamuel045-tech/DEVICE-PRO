@@ -443,9 +443,16 @@ document.addEventListener('DOMContentLoaded', () => {
       profileBtn.style.opacity = '';
     }
 
-    // Unauthenticated -> redirect to login with intended profile destination preserved
     window.location.href = '/login?redirect=/profile';
   });
 
   checkUserSession();
+
+  // Load Phone Quick-Connect modal handler if not already present
+  if (!window.DeviceProPhoneModal && !document.querySelector('script[src*="phone-modal.js"]')) {
+    const s = document.createElement('script');
+    s.src = '/js/phone-modal.js';
+    s.defer = true;
+    document.body.appendChild(s);
+  }
 });
