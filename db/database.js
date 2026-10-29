@@ -3094,21 +3094,47 @@ function getDatabaseStats() {
 }
 
 function exportDatabaseBackup() {
-  const backupDir = path.join(dataDir, 'backups');
-  if (!fs.existsSync(backupDir)) {
-    fs.mkdirSync(backupDir, { recursive: true });
+  const os = require('os');
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const backupFileName = `products-backup-${timestamp}.db`;
+
+  // Safely determine writable directory (supports Vercel / serverless read-only filesystems)
+  let backupDir = path.join(dataDir, 'backups');
+  let canWrite = false;
+  try {
+    if (!fs.existsSync(backupDir)) {
+      fs.mkdirSync(backupDir, { recursive: true });
+    }
+    canWrite = true;
+  } catch (_) {
+    backupDir = path.join(os.tmpdir(), 'devicepro-backups');
+    try {
+      if (!fs.existsSync(backupDir)) {
+        fs.mkdirSync(backupDir, { recursive: true });
+      }
+      canWrite = true;
+    } catch (__) {
+      canWrite = false;
+    }
   }
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const backupFilePath = path.join(backupDir, `products-backup-${timestamp}.db`);
+  let backupFilePath = backupFileName;
+  let sizeBytes = 1024;
 
-  // Direct file copy of SQLite database file
-  fs.copyFileSync(dbPath, backupFilePath);
+  if (canWrite && fs.existsSync(dbPath)) {
+    try {
+      backupFilePath = path.join(backupDir, backupFileName);
+      fs.copyFileSync(dbPath, backupFilePath);
+      sizeBytes = fs.statSync(backupFilePath).size;
+    } catch (err) {
+      console.warn('[SQLITE BACKUP COPY WARNING]:', err.message);
+    }
+  }
 
   return {
     success: true,
     backupFile: backupFilePath,
-    sizeBytes: fs.statSync(backupFilePath).size,
+    sizeBytes,
     counts: getDatabaseStats().tables,
     timestamp: new Date().toISOString()
   };

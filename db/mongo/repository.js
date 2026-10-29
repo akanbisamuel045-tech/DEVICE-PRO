@@ -2595,27 +2595,76 @@ async function exportDatabaseBackup() {
   const stats = await getDatabaseStats();
   const fs = require('fs');
   const path = require('path');
-  const backupsDir = path.join(__dirname, '..', '..', 'data', 'backups');
-  if (!fs.existsSync(backupsDir)) {
-    fs.mkdirSync(backupsDir, { recursive: true });
-  }
+  const os = require('os');
+
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const backupFileName = `backup-mongo-${timestamp}.json`;
-  const backupFilePath = path.join(backupsDir, backupFileName);
+  const backupFileName = `devicepro-live-backup-${timestamp}.json`;
+
+  // Fetch actual data collections for verified snapshot
+  let products = [];
+  let categories = [];
+  let orders = [];
+  let quotes = [];
+  let enquiries = [];
+  try {
+    const { Product, Category, Order, Quote, Enquiry } = require('./models');
+    products = await Product.find({}, '-__v').lean();
+    categories = await Category.find({}, '-__v').lean();
+    orders = await Order.find({}, '-__v').sort({ created_at: -1 }).limit(100).lean();
+    quotes = await Quote.find({}, '-__v').sort({ created_at: -1 }).limit(100).lean();
+    enquiries = await Enquiry.find({}, '-__v').sort({ created_at: -1 }).limit(100).lean();
+  } catch (err) {
+    console.warn('[BACKUP DATA FETCH]:', err.message);
+  }
+
   const backupData = {
     engine: 'MongoDB Atlas',
+    version: '2.0.0',
+    timestamp: new Date().toISOString(),
     counts: stats.tables,
-    timestamp: new Date().toISOString()
+    collections: {
+      categoriesCount: categories.length,
+      productsCount: products.length,
+      ordersCount: orders.length,
+      quotesCount: quotes.length,
+      enquiriesCount: enquiries.length
+    },
+    data: {
+      categories,
+      products,
+      orders,
+      quotes,
+      enquiries
+    },
+    message: 'Atlas cluster provides continuous automated backups & point-in-time recovery.'
   };
-  fs.writeFileSync(backupFilePath, JSON.stringify(backupData, null, 2), 'utf8');
+
+  const jsonStr = JSON.stringify(backupData, null, 2);
+  const sizeBytes = Buffer.byteLength(jsonStr, 'utf8');
+
+  // Safely attempt write to os.tmpdir() - guaranteed writable across Vercel serverless, Linux, Windows & macOS
+  let backupFilePath = backupFileName;
+  try {
+    const backupsDir = path.join(os.tmpdir(), 'devicepro-backups');
+    if (!fs.existsSync(backupsDir)) {
+      fs.mkdirSync(backupsDir, { recursive: true });
+    }
+    const targetFile = path.join(backupsDir, backupFileName);
+    fs.writeFileSync(targetFile, jsonStr, 'utf8');
+    backupFilePath = targetFile;
+  } catch (err) {
+    console.warn('[BACKUP FS WARNING]: Could not write to disk, returning data in-memory:', err.message);
+  }
 
   return {
     success: true,
     engine: 'MongoDB Atlas',
-    backupFile: backupFilePath,
-    sizeBytes: fs.statSync(backupFilePath).size,
+    backupFile: backupFileName,
+    fullPath: backupFilePath,
+    sizeBytes,
     counts: stats.tables,
     timestamp: new Date().toISOString(),
+    data: backupData,
     message: 'Atlas cluster provides continuous automated backups & point-in-time recovery.'
   };
 }

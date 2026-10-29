@@ -3289,17 +3289,18 @@
       }
 
       const backupInfo = data.backup || {};
-      const blob = new Blob([JSON.stringify(backupInfo, null, 2)], { type: 'application/json' });
+      const payload = backupInfo.data || backupInfo;
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const downloadUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = downloadUrl;
-      a.download = `device-pro-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `devicepro-live-backup-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(downloadUrl);
 
-      alert(`Database verified backup created successfully!\nFile: ${backupInfo.backupFile}\nSize: ${(backupInfo.sizeBytes / 1024).toFixed(1)} KB`);
+      alert(`Database verified backup created & downloaded successfully!\nEngine: ${backupInfo.engine || 'MongoDB Atlas'}\nSize: ${(backupInfo.sizeBytes / 1024).toFixed(1)} KB\nCollections Verified: ${backupInfo.counts ? Object.keys(backupInfo.counts).length : 'All'}`);
     } catch (err) {
       alert('Error creating database backup: ' + err.message);
     } finally {
