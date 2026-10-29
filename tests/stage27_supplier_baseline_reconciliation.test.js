@@ -507,7 +507,7 @@ async function runTests() {
         quote_date: '2026-10-24',
         freshness_status: 'fresh',
         availability: 'In Stock Lagos (500 units)',
-        warranty_terms: '25 Years Output Warranty',
+        warranty_terms: '15 Years Output Warranty',
         is_eligible_for_approval: true
       },
       {
@@ -521,7 +521,7 @@ async function runTests() {
         quote_date: '2026-10-22',
         freshness_status: 'fresh',
         availability: 'In Stock Abuja (200 units)',
-        warranty_terms: '25 Years Output Warranty',
+        warranty_terms: '15 Years Output Warranty',
         is_eligible_for_approval: true
       }
     ];

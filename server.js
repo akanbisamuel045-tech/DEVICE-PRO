@@ -482,7 +482,7 @@ app.get('/api/health', async (req, res) => {
 
   if (!mongoConnected) {
     if (mongoUriConfigured) {
-      try { await connectMongo(); } catch (e) {}
+      try { await connectMongo(); } catch (e) { }
     }
   }
 
@@ -494,7 +494,7 @@ app.get('/api/health', async (req, res) => {
         engine: 'MongoDB Atlas',
         status: 'disconnected',
         uriConfigured: mongoUriConfigured,
-        reason: mongoUriConfigured 
+        reason: mongoUriConfigured
           ? 'Connecting or IP blocked by MongoDB Atlas Network Access whitelist (ensure 0.0.0.0/0 is permitted in Atlas)'
           : 'MONGODB_URI is not configured in Vercel environment variables'
       }
@@ -517,7 +517,7 @@ app.get('/api/health', async (req, res) => {
 app.get('/api/categories', async (req, res) => {
   try {
     if (!isMongoConnected() && process.env.MONGODB_URI) {
-      try { await connectMongo(); } catch (e) {}
+      try { await connectMongo(); } catch (e) { }
     }
     const categories = await getCategories();
     res.json({ success: true, count: (categories || []).length, categories: categories || [] });
@@ -530,7 +530,7 @@ app.get('/api/categories', async (req, res) => {
 app.get('/api/products', async (req, res) => {
   try {
     if (!isMongoConnected() && process.env.MONGODB_URI) {
-      try { await connectMongo(); } catch (e) {}
+      try { await connectMongo(); } catch (e) { }
     }
 
     const result = await getProducts(req.query);
@@ -553,7 +553,7 @@ app.get('/api/products', async (req, res) => {
 app.get('/api/products/:slug', async (req, res) => {
   try {
     if (!isMongoConnected() && process.env.MONGODB_URI) {
-      try { await connectMongo(); } catch (e) {}
+      try { await connectMongo(); } catch (e) { }
     }
 
     const param = req.params.slug;
@@ -578,7 +578,7 @@ app.get('/api/products/:slug', async (req, res) => {
         interactionType: 'view',
         ipAddress: req.ip || '',
         userAgent: req.headers['user-agent'] || ''
-      }).catch(() => {});
+      }).catch(() => { });
     }
 
     res.json({
@@ -1436,7 +1436,7 @@ app.post('/api/payments/webhook', async (req, res) => {
       }
 
       const orderNumber = (data.metadata && data.metadata.orderNumber) ||
-                          (existingPayment ? existingPayment.order_number : null);
+        (existingPayment ? existingPayment.order_number : null);
 
       if (orderNumber) {
         const order = await getOrderByNumber(orderNumber);
@@ -1761,7 +1761,7 @@ app.post('/api/auth/login', rateLimiter(60000, 30), async (req, res) => {
     if (req.token) {
       try {
         await revokeSession(req.token);
-      } catch (_) {}
+      } catch (_) { }
     }
 
     const maxAgeSeconds = rememberMe ? 30 * 24 * 60 * 60 : 7 * 24 * 60 * 60;
@@ -1901,8 +1901,8 @@ app.post('/api/auth/change-password', requireAuth, rateLimiter(60000, 10), async
     await changeUserPassword(req.user.id, currentPassword, newPassword);
 
     try {
-      sendPasswordChangedNotificationEmail(req.user.email, { ipAddress: req.ip }).catch(() => {});
-    } catch (_) {}
+      sendPasswordChangedNotificationEmail(req.user.email, { ipAddress: req.ip }).catch(() => { });
+    } catch (_) { }
 
     res.json({ success: true, message: 'Password changed successfully.' });
   } catch (error) {
@@ -2071,9 +2071,9 @@ app.post('/api/auth/resend-code', rateLimiter(60000, 10), async (req, res) => {
     }
 
     if (result.status === 'GOOGLE_ONLY') {
-      await sendGoogleAccountNoticeEmail(cleanEmail, (result.user && result.user.fullName) || 'Valued Customer').catch(() => {});
+      await sendGoogleAccountNoticeEmail(cleanEmail, (result.user && result.user.fullName) || 'Valued Customer').catch(() => { });
     } else if (result.status === 'CODE_CREATED') {
-      await sendPasswordResetCodeEmail(cleanEmail, rawCode, (result.user && result.user.fullName) || 'Valued Customer').catch(() => {});
+      await sendPasswordResetCodeEmail(cleanEmail, rawCode, (result.user && result.user.fullName) || 'Valued Customer').catch(() => { });
     }
 
     res.json({
@@ -2555,7 +2555,7 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
   try {
     if (isMongoConnected()) {
       const { User: MongoUser, Order: MongoOrder, Quote: MongoQuote, Enquiry: MongoEnquiry } = require('./db/mongo/models');
-      
+
       const [registeredDocs, orders, quotes, enquiries] = await Promise.all([
         MongoUser.find({ role: 'customer' }).select('id full_name email phone state email_verified created_at').lean(),
         MongoOrder.find().select('order_number customer_name customer_email customer_phone delivery_address delivery_state total_ngn order_status payment_status created_at').lean(),
@@ -2662,11 +2662,11 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
           averageOrderValue: paidOrdersCount > 0 ? Math.round(totalRevenue / paidOrdersCount) : 0
         },
         productDemandAnalytics: productDemand,
-        guestBuyers: guestBuyers.sort((a,b) => b.totalSpent - a.totalSpent),
-        topRegistered: enhancedRegistered.sort((a,b) => b.totalSpent - a.totalSpent),
+        guestBuyers: guestBuyers.sort((a, b) => b.totalSpent - a.totalSpent),
+        topRegistered: enhancedRegistered.sort((a, b) => b.totalSpent - a.totalSpent),
         quoteLeads: quotes,
         enquiryLeads: enquiries,
-        geographicDistribution: [...stateStats.values()].sort((a,b) => b.ordersCount - a.ordersCount)
+        geographicDistribution: [...stateStats.values()].sort((a, b) => b.ordersCount - a.ordersCount)
       });
     }
 
@@ -2775,6 +2775,40 @@ app.patch('/api/admin/solar-packages/:id', requireAuth, requireRole('superadmin'
   }
 });
 
+// Admin Solar Package Create (Turnkey Solar Package Configurator)
+app.post('/api/admin/solar-packages', requireAuth, requireRole('superadmin', 'admin', 'engineer'), async (req, res) => {
+  try {
+    const { name, sku, price_ngn, power_rating, specifications } = req.body;
+    if (!name || !sku || price_ngn === undefined || price_ngn === null) {
+      return res.status(400).json({ success: false, error: 'Package Name, SKU, and Selling Price are required.' });
+    }
+
+    const payload = {
+      ...req.body,
+      category: 'solar-packages',
+      category_label: 'Turnkey Solar Packages',
+      brand: req.body.brand || 'DEVICE PRO Turnkey',
+      power_rating: power_rating || 'Turnkey Solar Kit',
+      specifications: specifications || req.body.description || 'Tier-1 Engineered Solar Power Kit',
+      warranty_years: req.body.warranty_years ? Number(req.body.warranty_years) : 5,
+      rating: req.body.rating ? Number(req.body.rating) : 5.0,
+      stock_status: req.body.stock_status || 'in_stock',
+      published: req.body.is_active === false || req.body.published === false ? 0 : 1
+    };
+
+    const created = await createProduct(payload, req.user.id);
+    res.status(201).json({ success: true, package: created, message: 'Turnkey solar package created successfully' });
+  } catch (error) {
+    const statusCode = error.message && (
+      error.message.includes('required') ||
+      error.message.includes('already in use') ||
+      error.message.includes('must be a valid') ||
+      error.message.includes('non-negative')
+    ) ? 400 : 500;
+    res.status(statusCode).json({ success: false, error: error.message });
+  }
+});
+
 // Admin Brands Directory
 app.get('/api/admin/brands', requireAuth, requireRole('superadmin', 'admin', 'engineer', 'sales', 'staff'), async (req, res) => {
   try {
@@ -2783,8 +2817,8 @@ app.get('/api/admin/brands', requireAuth, requireRole('superadmin', 'admin', 'en
       { name: 'Deye', country: 'China / Global', category: 'Hybrid Inverters & HV Batteries', warranty: '5 - 10 Years', tier1: true, website: 'https://deyeinverter.com', description: 'Industry-leading high voltage hybrid converters and lithium energy storage.' },
       { name: 'Felicity Solar', country: 'China / Nigeria', category: 'LiFePO4 Batteries & Inverters', warranty: '5 - 10 Years', tier1: true, website: 'https://felicitysolar.com', description: 'High-reliability low-voltage wall and rack-mount battery storage units.' },
       { name: 'Growatt', country: 'China / Global', category: 'Smart Converters & String Inverters', warranty: '5 Years', tier1: true, website: 'https://growatt.com', description: 'Award-winning residential and commercial smart solar inverters.' },
-      { name: 'Jinko Solar', country: 'China / Global', category: 'Tier-1 Monocrystalline PV Modules', warranty: '12 - 25 Years', tier1: true, website: 'https://jinkosolar.com', description: 'World-record N-Type TOPCon solar panels with high temperature tolerance.' },
-      { name: 'Canadian Solar', country: 'Canada / Global', category: 'Tier-1 Mono PERC & Bifacial Modules', warranty: '12 - 25 Years', tier1: true, website: 'https://canadiansolar.com', description: 'Global Tier-1 solar manufacturer renowned for heavy duty yield in high-heat zones.' },
+      { name: 'Jinko Solar', country: 'China / Global', category: 'Tier-1 Monocrystalline PV Modules', warranty: '12 - 15 Years', tier1: true, website: 'https://jinkosolar.com', description: 'World-record N-Type TOPCon solar panels with high temperature tolerance.' },
+      { name: 'Canadian Solar', country: 'Canada / Global', category: 'Tier-1 Mono PERC & Bifacial Modules', warranty: '12 - 15 Years', tier1: true, website: 'https://canadiansolar.com', description: 'Global Tier-1 solar manufacturer renowned for heavy duty yield in high-heat zones.' },
       { name: 'Victron Energy', country: 'Netherlands / Europe', category: 'Industrial Inverter-Chargers & MPPTs', warranty: '5 Years', tier1: true, website: 'https://victronenergy.com', description: 'Heavy duty off-grid power conversion and marine-grade power systems.' },
       { name: 'Must Energy', country: 'China / Nigeria', category: 'Cost-Effective Hybrid Inverters', warranty: '2 - 3 Years', tier1: true, website: 'https://mustpower.com', description: 'Affordable pure sine wave backup and hybrid inverters for homes.' }
     ];
@@ -3741,7 +3775,7 @@ app.post('/api/admin/price-imports/apply-to-products', requireAuth, requireRole(
           details: `Bulk updated price for ${prod.name} (${prod.sku}) from ₦${prevSellingPrice.toLocaleString()} to ₦${(updateDoc.price_ngn || prevSellingPrice).toLocaleString()} (Target: ${updateTarget}, File: ${filename || 'Pricelist'})`,
           created_at: new Date()
         });
-      } catch (e) {}
+      } catch (e) { }
     }
 
     res.json({
@@ -4074,7 +4108,7 @@ async function generateSitemapXml() {
     try {
       const parsed = new Date(d);
       if (!isNaN(parsed.getTime())) return parsed.toISOString().split('T')[0];
-    } catch (e) {}
+    } catch (e) { }
     return today;
   }
 
@@ -4136,7 +4170,7 @@ generateSitemapXml().then(initialSitemap => {
   } catch (e) {
     console.warn('Initial sitemap generation warning:', e.message);
   }
-}).catch(() => {});
+}).catch(() => { });
 
 // Sitemap endpoint
 app.get('/sitemap.xml', async (req, res) => {
@@ -4203,7 +4237,7 @@ if (require.main === module) {
   module.exports = server;
 } else {
   if (process.env.MONGODB_URI) {
-    connectMongo().catch(() => {});
+    connectMongo().catch(() => { });
   }
   module.exports = app;
 }

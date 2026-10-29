@@ -307,7 +307,7 @@
   - 500+ Commissioned Sites
   - 99.8% System Reliability
   - 70% Avg. Diesel Savings
-  - 25 Yrs Module Performance
+  - 15 Yrs Module Performance
 - [x] Section 4: Quick Sector Navigation Strip with smooth-scrolling pills:
   - 🏡 Residential Solar (`#residential`)
   - 🏢 Commercial & Business (`#commercial`)

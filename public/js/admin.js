@@ -965,10 +965,36 @@
       });
     }
 
-    // Solar Packages Quick Edit Save
+    // Solar Packages Quick Edit & Add Configurator
     const btnSaveSolarPkg = document.getElementById('btn-save-solar-package');
     if (btnSaveSolarPkg) {
       btnSaveSolarPkg.addEventListener('click', saveSolarPackageChanges);
+    }
+
+    const btnOpenAddSolarPkg = document.getElementById('btn-open-add-solar-package');
+    const modalAddSolarPkg = document.getElementById('modal-add-solar-package');
+    if (btnOpenAddSolarPkg && modalAddSolarPkg) {
+      btnOpenAddSolarPkg.addEventListener('click', () => {
+        const form = document.getElementById('form-add-solar-package');
+        if (form) form.reset();
+        const errBox = document.getElementById('add-pkg-error-alert');
+        if (errBox) errBox.style.display = 'none';
+        document.querySelectorAll('#modal-add-solar-package .field-error-msg').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('#modal-add-solar-package .form-input, #modal-add-solar-package .form-textarea').forEach(el => el.classList.remove('input-error'));
+        const preview = document.getElementById('add-pkg-img-preview');
+        if (preview) preview.src = '/images/logo-mark.svg';
+        const addStatus = document.getElementById('add-pkg-upload-status');
+        if (addStatus) {
+          addStatus.textContent = 'PNG, JPG, WEBP up to 5MB';
+          addStatus.className = 'upload-status-text';
+        }
+        modalAddSolarPkg.showModal();
+      });
+    }
+
+    const formAddSolarPkg = document.getElementById('form-add-solar-package');
+    if (formAddSolarPkg) {
+      formAddSolarPkg.addEventListener('submit', handleAddSolarPackageSubmit);
     }
 
     // Module Refresh Buttons
@@ -7015,6 +7041,102 @@
     }
   }
 
+  async function handleAddSolarPackageSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('add-pkg-name')?.value.trim();
+    const sku = document.getElementById('add-pkg-sku')?.value.trim().toUpperCase();
+    const power_rating = document.getElementById('add-pkg-power')?.value.trim();
+    const target_application = document.getElementById('add-pkg-target')?.value.trim();
+    const priceRaw = document.getElementById('add-pkg-price')?.value;
+    const prevPriceRaw = document.getElementById('add-pkg-previous-price')?.value;
+    const stock_status = document.getElementById('add-pkg-stock')?.value || 'in_stock';
+    const is_active = document.getElementById('add-pkg-published')?.value === 'true';
+    const warranty_years = parseInt(document.getElementById('add-pkg-warranty')?.value, 10) || 5;
+    const rating = parseFloat(document.getElementById('add-pkg-rating')?.value) || 5.0;
+    const specifications = document.getElementById('add-pkg-specs')?.value.trim();
+    const description = document.getElementById('add-pkg-desc')?.value.trim();
+    const image_url = document.getElementById('add-pkg-image')?.value.trim();
+
+    const errBox = document.getElementById('add-pkg-error-alert');
+    if (errBox) errBox.style.display = 'none';
+
+    let hasErrors = false;
+    function flagPkgError(inputId, errId, msg) {
+      hasErrors = true;
+      const input = document.getElementById(inputId);
+      const errEl = document.getElementById(errId);
+      if (input) input.classList.add('input-error');
+      if (errEl) {
+        if (msg) errEl.textContent = msg;
+        errEl.style.display = 'block';
+      }
+    }
+
+    document.querySelectorAll('#modal-add-solar-package .field-error-msg').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('#modal-add-solar-package .form-input, #modal-add-solar-package .form-textarea').forEach(el => el.classList.remove('input-error'));
+
+    if (!name) flagPkgError('add-pkg-name', 'error-add-pkg-name', 'Package name is required.');
+    if (!sku) flagPkgError('add-pkg-sku', 'error-add-pkg-sku', 'Package SKU code is required.');
+    if (!power_rating) flagPkgError('add-pkg-power', 'error-add-pkg-power', 'Power rating is required.');
+    if (!priceRaw || isNaN(priceRaw) || Number(priceRaw) <= 0) {
+      flagPkgError('add-pkg-price', 'error-add-pkg-price', 'Valid selling price (minimum ₦100,000) is required.');
+    }
+    if (!specifications) flagPkgError('add-pkg-specs', 'error-add-pkg-specs', 'Package hardware specifications are required.');
+
+    if (hasErrors) return;
+
+    const btn = document.getElementById('btn-create-solar-package');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Publishing Package...';
+    }
+
+    try {
+      const payload = {
+        name,
+        sku,
+        power_rating,
+        target_application,
+        price_ngn: Number(priceRaw),
+        previous_price_ngn: prevPriceRaw ? Number(prevPriceRaw) : null,
+        stock_status,
+        is_active,
+        warranty_years,
+        rating,
+        specifications,
+        description,
+        image_url
+      };
+
+      const res = await apiFetch('/api/admin/solar-packages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create solar package');
+      }
+
+      const modal = document.getElementById('modal-add-solar-package');
+      if (modal) modal.close();
+
+      await loadSolarPackagesModule();
+    } catch (err) {
+      if (errBox) {
+        errBox.textContent = err.message;
+        errBox.style.display = 'block';
+      } else {
+        alert('Error creating solar package: ' + err.message);
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Publish Turnkey Solar Package';
+      }
+    }
+  }
+
   function renderSolarPackagesTable(packages) {
     const tbody = document.getElementById('solar-packages-tbody');
     if (!tbody) return;
@@ -8031,6 +8153,16 @@
       statusId: 'add-prod-upload-status',
       containerId: 'add-prod-preview-container',
       previewBtnId: 'btn-add-prod-preview-link'
+    });
+
+    // Bind Solar Package Add Modal
+    bindUploader({
+      btnId: 'btn-add-pkg-choose-file',
+      fileInputId: 'add-pkg-file-input',
+      textInputId: 'add-pkg-image',
+      previewImgId: 'add-pkg-img-preview',
+      statusId: 'add-pkg-upload-status',
+      containerId: 'add-pkg-preview-container'
     });
   }
 
