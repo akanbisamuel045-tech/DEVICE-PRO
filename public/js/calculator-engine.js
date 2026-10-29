@@ -101,6 +101,7 @@
       name: 'Inverter Refrigerator (Double Door)',
       category: 'Refrigeration',
       watts: 150,
+      dutyCycle: 0.40,
       defaultQty: 1,
       defaultHoursDay: 12,
       defaultHoursNight: 12,
@@ -113,6 +114,7 @@
       name: 'Deep Chest Freezer (Medium)',
       category: 'Refrigeration',
       watts: 250,
+      dutyCycle: 0.45,
       defaultQty: 1,
       defaultHoursDay: 8,
       defaultHoursNight: 6,
@@ -125,6 +127,7 @@
       name: '1.0 HP Inverter Air Conditioner',
       category: 'Climate',
       watts: 900,
+      dutyCycle: 0.55,
       defaultQty: 0,
       defaultHoursDay: 2,
       defaultHoursNight: 6,
@@ -137,6 +140,7 @@
       name: '1.5 HP Inverter Air Conditioner',
       category: 'Climate',
       watts: 1350,
+      dutyCycle: 0.55,
       defaultQty: 0,
       defaultHoursDay: 2,
       defaultHoursNight: 6,
@@ -149,6 +153,7 @@
       name: '2.0 HP Inverter Air Conditioner',
       category: 'Climate',
       watts: 1800,
+      dutyCycle: 0.60,
       defaultQty: 0,
       defaultHoursDay: 0,
       defaultHoursNight: 6,
@@ -348,10 +353,18 @@
       const totalHours = Math.min(24, hoursDay + hoursNight);
       const surgeMultiplier = item.hasSurge ? Math.max(1.0, parseFloat(item.surgeMultiplier) || 2.0) : 1.0;
 
+      // Realistic duty cycle for cycling refrigeration & climate compressors
+      const dutyCycle = typeof item.dutyCycle === 'number'
+        ? item.dutyCycle
+        : (item.id === 'inverter-refrigerator' ? 0.40
+          : item.id === 'chest-freezer' ? 0.45
+          : (item.id && item.id.startsWith('inverter-ac')) ? 0.55
+          : 1.0);
+
       const itemConnectedWatts = watts * qty;
-      const itemDailyWh = itemConnectedWatts * totalHours;
-      const itemDayWh = itemConnectedWatts * hoursDay;
-      const itemNightWh = itemConnectedWatts * hoursNight;
+      const itemDailyWh = Math.round(itemConnectedWatts * totalHours * dutyCycle);
+      const itemDayWh = Math.round(itemConnectedWatts * hoursDay * dutyCycle);
+      const itemNightWh = Math.round(itemConnectedWatts * hoursNight * dutyCycle);
       const itemSurgeWatts = item.hasSurge ? (watts * surgeMultiplier) : watts;
 
       if (qty > 0) {
@@ -387,6 +400,7 @@
         name: item.name,
         qty,
         watts,
+        dutyCycle,
         hoursDay,
         hoursNight,
         totalHours,
@@ -419,66 +433,84 @@
     const dayEnergyKwh = +(dayEnergyWattHours / 1000).toFixed(2);
     const nightEnergyKwh = +(nightEnergyWattHours / 1000).toFixed(2);
 
-    // 4. Battery Storage Sizing:
-    // Usable energy = (Night energy + fraction of daytime autonomy) / inverterEfficiency (90%)
-    const inverterEfficiency = 0.90;
-    // For off-grid/hybrid autonomy, night load must be fully stored, plus partial daytime cloudy buffer
-    const baseStorageKwh = (nightEnergyKwh + (dayEnergyKwh * 0.35)) * autonomyDays;
-    const usableStorageKwh = +(baseStorageKwh / inverterEfficiency).toFixed(2);
-
-    // Nominal battery bank = Usable / DoD / RoundTripEfficiency
-    const nominalStorageKwh = +(usableStorageKwh / (batteryData.recommendedDoD * batteryData.roundTripEfficiency)).toFixed(2);
-
-    // Equivalent in standard 48V Ampere-hours (Ah)
-    const systemVoltage = recommendedInverterKva >= 3.0 ? 48 : 24;
-    const batteryAh48V = Math.round((nominalStorageKwh * 1000) / systemVoltage);
-
-    // 5. Solar PV Array Sizing:
-    // Daily energy needed + 30% Balance of System (BOS) loss factor for Nigerian heat, dust, wiring
-    const bosLossFactor = 1.30;
-    const totalGenerationRequiredKwh = dailyEnergyKwh * bosLossFactor;
-    const solarArrayKwp = +(totalGenerationRequiredKwh / regionData.psh).toFixed(2);
-
-    // Recommended panel quantity (using standard Tier-1 550W / 600W Monocrystalline panels)
-    const standardPanelWatts = 550;
-    const recommendedPanelCount = Math.max(2, Math.ceil((solarArrayKwp * 1000) / standardPanelWatts));
-    const installedPvKwp = +((recommendedPanelCount * standardPanelWatts) / 1000).toFixed(2);
-
-    // 6. Match with standard DEVICE PRO Turnkey Package
+    // 4. Match with standard DEVICE PRO Turnkey Package based on inverter capacity tier
     let matchedPackage = null;
     let nextTierPackage = null;
 
     for (let i = 0; i < STANDARD_PACKAGES.length; i++) {
       const pkg = STANDARD_PACKAGES[i];
-      if (
-        pkg.inverterKva >= recommendedInverterKva &&
-        pkg.batteryKwh >= (nominalStorageKwh * 0.85) &&
-        pkg.solarKwp >= (solarArrayKwp * 0.80)
-      ) {
+      if (pkg.inverterKva >= recommendedInverterKva) {
         matchedPackage = pkg;
         nextTierPackage = STANDARD_PACKAGES[i + 1] || null;
         break;
       }
     }
 
-    // If demand exceeds the 15kVA package
-    const isCustomCommercial = !matchedPackage && (recommendedInverterKva > 15 || nominalStorageKwh > 32);
-    if (isCustomCommercial) {
-      matchedPackage = {
-        slug: 'custom-commercial-microgrid',
-        name: `${Math.ceil(recommendedInverterKva)}kVA Custom Industrial Microgrid`,
-        inverterKva: Math.ceil(recommendedInverterKva),
-        continuousKw: Math.ceil(continuousKw),
-        batteryKwh: Math.ceil(nominalStorageKwh),
-        solarKwp: Math.ceil(solarArrayKwp),
-        priceNgn: null,
-        idealFor: 'Custom Engineered Multi-Phase / Commercial Microgrid'
-      };
-    } else if (!matchedPackage) {
-      // Default to smallest package if minimal loads
-      matchedPackage = STANDARD_PACKAGES[0];
-      nextTierPackage = STANDARD_PACKAGES[1];
+    if (!matchedPackage) {
+      if (recommendedInverterKva > 15) {
+        matchedPackage = {
+          slug: 'custom-commercial-microgrid',
+          name: `${Math.ceil(recommendedInverterKva)}kVA Custom Industrial Microgrid`,
+          inverterKva: Math.ceil(recommendedInverterKva),
+          continuousKw: Math.ceil(continuousKw),
+          batteryKwh: 30.72,
+          solarKwp: Math.ceil(continuousKw * 1.2),
+          priceNgn: null,
+          idealFor: 'Custom Engineered Multi-Phase / Commercial Microgrid'
+        };
+      } else {
+        matchedPackage = STANDARD_PACKAGES[0];
+        nextTierPackage = STANDARD_PACKAGES[1];
+      }
     }
+
+    // 5. Battery Storage Sizing:
+    // Sized with practical lithium modular battery sizes in Nigeria (2.56, 5.12, 10.24, 15.36, 20.48, 30.72 kWh)
+    // and balanced to match the inverter capacity class and night essential load
+    const systemVoltage = recommendedInverterKva >= 3.0 ? 48 : 24;
+    let nominalStorageKwh = matchedPackage.batteryKwh || 5.12;
+
+    // Allow expansion if high night demand warrants an additional battery module
+    const inverterEfficiency = 0.90;
+    const baseStorageKwh = (nightEnergyKwh * 0.65) * autonomyDays;
+    const usableStorageKwh = +(baseStorageKwh / inverterEfficiency).toFixed(2);
+    const rawNominalStorageKwh = usableStorageKwh > 0
+      ? +(usableStorageKwh / batteryData.recommendedDoD).toFixed(2)
+      : 0;
+
+    if (recommendedInverterKva <= 2.0) {
+      nominalStorageKwh = rawNominalStorageKwh > 3.5 ? 5.12 : 2.56;
+    } else if (recommendedInverterKva <= 3.5) {
+      nominalStorageKwh = rawNominalStorageKwh > 7.0 ? 10.24 : 5.12;
+    } else if (recommendedInverterKva <= 5.0) {
+      nominalStorageKwh = rawNominalStorageKwh > 12.0 ? 15.36 : 10.24;
+    } else if (recommendedInverterKva <= 7.5) {
+      nominalStorageKwh = rawNominalStorageKwh > 16.0 ? 20.48 : 15.36;
+    } else if (recommendedInverterKva <= 10.0) {
+      nominalStorageKwh = rawNominalStorageKwh > 22.0 ? 25.60 : 20.48;
+    } else {
+      nominalStorageKwh = Math.min(30.72, Math.max(20.48, Math.ceil(rawNominalStorageKwh / 5.12) * 5.12));
+    }
+
+    const batteryAh48V = Math.round((nominalStorageKwh * 1000) / systemVoltage);
+
+    // 6. Solar PV Array Sizing:
+    // Generates enough power during peak sun hours (PSH) to supply daytime load and replenish the battery bank
+    const standardPanelWatts = 550;
+    const basePackageSolarKwp = matchedPackage.solarKwp || 2.2;
+    let solarArrayKwp = basePackageSolarKwp;
+
+    if (dailyEnergyKwh > 0 || simultaneousLoadWatts > 0) {
+      const batteryRechargeKwh = (nominalStorageKwh * batteryData.recommendedDoD) / 0.92;
+      const dailySolarGenerationTargetKwh = (dayEnergyKwh + batteryRechargeKwh) * 1.10;
+      const calculatedArrayKwp = +(dailySolarGenerationTargetKwh / regionData.psh).toFixed(2);
+
+      // Realistic limits matching inverter MPPT input
+      const maxMpptArrayKwp = Math.max(basePackageSolarKwp, +(continuousKw * 1.25).toFixed(2));
+      solarArrayKwp = +(Math.min(maxMpptArrayKwp, Math.max(basePackageSolarKwp, calculatedArrayKwp))).toFixed(2);
+    }
+    const recommendedPanelCount = Math.max(2, Math.round((solarArrayKwp * 1000) / standardPanelWatts));
+    const installedPvKwp = +((recommendedPanelCount * standardPanelWatts) / 1000).toFixed(2);
 
     return {
       version: '1.0.0',

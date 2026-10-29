@@ -174,7 +174,12 @@
         : '';
 
       const totalHours = Math.min(24, (parseFloat(app.hoursDay) || 0) + (parseFloat(app.hoursNight) || 0));
-      const dailyWh = Math.round((app.watts || 0) * (app.qty || 0) * totalHours);
+      const duty = typeof app.dutyCycle === 'number' ? app.dutyCycle : (
+        app.id === 'inverter-refrigerator' ? 0.40 :
+        app.id === 'chest-freezer' ? 0.45 :
+        (app.id && app.id.startsWith('inverter-ac')) ? 0.55 : 1.0
+      );
+      const dailyWh = Math.round((app.watts || 0) * (app.qty || 0) * totalHours * duty);
 
       row.innerHTML = `
         <td class="app-info-td">
@@ -439,7 +444,12 @@
     const app = currentAppliances[index];
     if (!app) return;
     const totalHours = Math.min(24, (parseFloat(app.hoursDay) || 0) + (parseFloat(app.hoursNight) || 0));
-    const dailyWh = Math.round((app.watts || 0) * (app.qty || 0) * totalHours);
+    const duty = typeof app.dutyCycle === 'number' ? app.dutyCycle : (
+      app.id === 'inverter-refrigerator' ? 0.40 :
+      app.id === 'chest-freezer' ? 0.45 :
+      (app.id && app.id.startsWith('inverter-ac')) ? 0.55 : 1.0
+    );
+    const dailyWh = Math.round((app.watts || 0) * (app.qty || 0) * totalHours * duty);
     const subEl = document.getElementById(`subtotal-${index}`);
     if (subEl) {
       subEl.textContent = `${dailyWh.toLocaleString()} Wh`;
@@ -530,7 +540,9 @@
     if (resDailyKwh) resDailyKwh.textContent = `${dem.dailyEnergyKwh} kWh`;
     if (resBatteryKwh) resBatteryKwh.textContent = `${rec.battery.nominalStorageKwh} kWh`;
     if (resBatteryAh) resBatteryAh.textContent = `${rec.battery.recommendedAh} Ah`;
-    if (resSolarKwp) resSolarKwp.textContent = `${rec.solarArray.minimumKwp} kWp`;
+    const resBatteryVolts = document.getElementById('res-battery-volts');
+    if (resBatteryVolts) resBatteryVolts.textContent = rec.battery.voltage ? rec.battery.voltage.replace(' DC', '') : '48V';
+    if (resSolarKwp) resSolarKwp.textContent = `${rec.solarArray.installedKwp || rec.solarArray.minimumKwp} kWp`;
     if (resPanelCount) resPanelCount.textContent = `${rec.solarArray.recommendedPanelCount} × 550W`;
     if (resRoofSpace) resRoofSpace.textContent = `${rec.solarArray.roofSpaceRequiredSqm} m²`;
 
