@@ -350,7 +350,7 @@
     const cardsHtml = relatedList.map(item => {
       const isWishlisted = wishlist.includes(item.id);
       return `
-        <article class="product-card" data-product-id="${item.id}">
+        <article class="product-card hover-lift reveal-item" data-product-id="${item.id}">
           <div class="card-top-row">
             <span class="category-badge-pill">${item.category_label || 'Equipment'}</span>
             <button type="button" class="btn-wishlist ${isWishlisted ? 'active' : ''}" data-wishlist-id="${item.id}" aria-label="Save to wishlist">
@@ -359,9 +359,9 @@
               </svg>
             </button>
           </div>
-          <div class="card-image-wrap">
+          <div class="card-image-wrap hover-scale-wrapper">
             <a href="/products/${item.slug}" title="${item.name}" class="card-image-link">
-              <img src="/${item.image_url}" alt="${item.name}" class="card-product-img" loading="lazy">
+              <img src="/${item.image_url}" alt="${item.name}" class="card-product-img hover-scale-img" loading="lazy">
             </a>
           </div>
           <div class="card-brand">${item.brand}</div>
@@ -397,6 +397,9 @@
     }).join('');
 
     container.innerHTML = cardsHtml;
+    if (window.DeviceProAnimation && typeof window.DeviceProAnimation.refresh === 'function') {
+      window.DeviceProAnimation.refresh();
+    }
     const section = document.getElementById('related-products-section');
     if (section) section.style.display = 'block';
   }
@@ -612,6 +615,9 @@
       if (loadingState) loadingState.style.display = 'none';
       if (showcaseSection) showcaseSection.style.display = 'block';
       if (tabsSection) tabsSection.style.display = 'block';
+      if (window.DeviceProAnimation && typeof window.DeviceProAnimation.refresh === 'function') {
+        window.DeviceProAnimation.refresh();
+      }
 
     } catch (err) {
       console.error('[PRODUCT DETAIL LOAD ERROR]:', err);

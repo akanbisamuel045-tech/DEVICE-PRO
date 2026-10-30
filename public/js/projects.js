@@ -168,9 +168,9 @@
     }
 
     container.innerHTML = filtered.map(p => `
-      <article class="project-card" data-project-id="${p.id}">
-        <div class="project-thumb-wrap">
-          <img src="/${p.image}" alt="${p.title}" class="project-thumb-img" loading="lazy">
+      <article class="project-card hover-lift reveal-item" data-project-id="${p.id}">
+        <div class="project-thumb-wrap hover-scale-wrapper">
+          <img src="/${p.image}" alt="${p.title}" class="project-thumb-img hover-scale-img" loading="lazy">
           <span class="project-sector-tag">${p.sector_label}</span>
           <div class="project-location-badge">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -217,6 +217,10 @@
         </div>
       </article>
     `).join('');
+
+    if (window.DeviceProAnimation && typeof window.DeviceProAnimation.refresh === 'function') {
+      window.DeviceProAnimation.refresh();
+    }
 
     container.querySelectorAll('[data-open-project]').forEach(btn => {
       btn.addEventListener('click', () => {

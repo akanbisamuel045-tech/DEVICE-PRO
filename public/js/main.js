@@ -185,20 +185,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4. Smooth Anchor Scroll
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      const targetId = this.getAttribute('href');
-      if (targetId && targetId !== '#') {
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-          e.preventDefault();
-          closeAll();
-          targetElement.scrollIntoView({ behavior: 'smooth' });
+  // 4. Smooth Anchor Scroll (Delegated to DeviceProAnimation)
+  if (!window.DeviceProAnimation) {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href');
+        if (targetId && targetId !== '#') {
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            e.preventDefault();
+            closeAll();
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+          }
         }
-      }
+      });
     });
-  });
+  }
 
   // 5. Quote Form Submission Simulation
   const quoteForm = document.getElementById('quick-quote-form');

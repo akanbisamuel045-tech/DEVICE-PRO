@@ -258,7 +258,7 @@
       const categoryBadge = product.category_label || 'Equipment';
 
       return `
-        <article class="product-card" data-product-id="${product.id}" data-slug="${product.slug}">
+        <article class="product-card hover-lift reveal-item" data-product-id="${product.id}" data-slug="${product.slug}">
           
           <!-- Top Row: Category Badge -->
           <div class="card-top-row">
@@ -266,9 +266,9 @@
           </div>
 
           <!-- Product Image -->
-          <div class="card-image-wrap">
+          <div class="card-image-wrap hover-scale-wrapper">
             <a href="/products/${product.slug}" title="${product.name}" class="card-image-link">
-              <img src="${product.image_url}" alt="${product.name}" class="card-product-img" loading="lazy">
+              <img src="${product.image_url}" alt="${product.name}" class="card-product-img hover-scale-img" loading="lazy">
             </a>
           </div>
 
@@ -314,6 +314,9 @@
     }).join('');
 
     gridContainer.innerHTML = cardsHtml;
+    if (window.DeviceProAnimation && typeof window.DeviceProAnimation.refresh === 'function') {
+      window.DeviceProAnimation.refresh();
+    }
   }
 
   // Render Pagination Controls < 1 2 3 4 5 >

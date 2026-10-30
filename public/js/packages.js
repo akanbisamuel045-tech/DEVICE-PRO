@@ -170,7 +170,7 @@
       `).join('');
 
       return `
-        <article class="package-card ${isFeatured}" data-pkg-id="${pkg.id}">
+        <article class="package-card ${isFeatured} hover-lift reveal-item" data-pkg-id="${pkg.id}">
           <div class="package-card-header">
             <span class="pkg-type-badge">${d.system_type || 'Hybrid Solar'}</span>
             ${pkg.featured ? '<span class="pkg-featured-badge"><i data-lucide="star" class="lucide-sm" style="fill:#FFB90C;stroke:#FFB90C;margin-right:3px;"></i> Most Popular</span>' : ''}
@@ -283,6 +283,10 @@
         </article>
       `;
     }).join('');
+
+    if (window.DeviceProAnimation && typeof window.DeviceProAnimation.refresh === 'function') {
+      window.DeviceProAnimation.refresh();
+    }
 
     // Attach event listeners for internal card accordions
     container.querySelectorAll('.card-acc-btn').forEach(btn => {

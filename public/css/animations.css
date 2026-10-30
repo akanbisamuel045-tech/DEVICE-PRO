@@ -1,0 +1,342 @@
+/**
+ * DEVICE PRO — Website-Wide Premium Motion & Animation System
+ * Architecture: Hardware-Accelerated (GPU), Zero-Dependency, WCAG 2.2 AA Accessible
+ * Supports: Progressive Enhancement, IntersectionObserver reveals, Stagger choreography,
+ *           Hover elevations, Smooth scroll with header offsets, and Prefers-Reduced-Motion.
+ */
+
+:root {
+  /* Motion Curves (Cubic-Bezier Easing) */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-cubic: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-in-out-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* Durations */
+  --dur-instant: 120ms;
+  --dur-fast: 220ms;
+  --dur-normal: 380ms;
+  --dur-reveal: 600ms;
+  --dur-slow: 800ms;
+
+  /* Spatial Distance Tokens */
+  --motion-distance-y: 22px;
+  --motion-distance-sm: 12px;
+  --motion-distance-x: 24px;
+}
+
+/* =============================================================================
+   1. GLOBAL SMOOTH SCROLLING & ANCHOR OFFSETS
+   ============================================================================= */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-height, 76px) + 24px);
+}
+
+/* Target highlight pseudo-element when navigated via internal anchor */
+:target {
+  scroll-margin-top: calc(var(--nav-height, 76px) + 24px);
+}
+
+/* =============================================================================
+   2. PROGRESSIVE ENHANCEMENT REVEAL SYSTEM
+   Note: Elements default to opacity: 1. They are only transitioned from opacity: 0
+   when JavaScript adds the class .dp-anim-ready to <html>. This guarantees that
+   if JS fails or is slow to initialize, zero content is ever hidden.
+   ============================================================================= */
+
+/* Base Reveal (Fade + Slide Up) */
+html.dp-anim-ready .reveal {
+  opacity: 0;
+  transform: translateY(var(--motion-distance-y));
+  transition: opacity var(--dur-reveal) var(--ease-out-expo),
+              transform var(--dur-reveal) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+html.dp-anim-ready .reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Subtle Reveal (Smaller displacement, great for headings and subheadings) */
+html.dp-anim-ready .reveal-sm {
+  opacity: 0;
+  transform: translateY(var(--motion-distance-sm));
+  transition: opacity var(--dur-normal) var(--ease-out-expo),
+              transform var(--dur-normal) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+html.dp-anim-ready .reveal-sm.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fade Only (No movement, ideal for badges, backdrops, and diagrams) */
+html.dp-anim-ready .reveal-fade {
+  opacity: 0;
+  transition: opacity var(--dur-reveal) var(--ease-out-cubic);
+  will-change: opacity;
+}
+
+html.dp-anim-ready .reveal-fade.is-revealed {
+  opacity: 1;
+}
+
+/* Scale-In Reveal (Subtle zoom from 0.96 to 1, great for hero images & CTA cards) */
+html.dp-anim-ready .reveal-scale {
+  opacity: 0;
+  transform: scale(0.96) translateY(10px);
+  transition: opacity var(--dur-reveal) var(--ease-out-expo),
+              transform var(--dur-reveal) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+html.dp-anim-ready .reveal-scale.is-revealed {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Slide From Left */
+html.dp-anim-ready .reveal-left {
+  opacity: 0;
+  transform: translateX(calc(-1 * var(--motion-distance-x)));
+  transition: opacity var(--dur-reveal) var(--ease-out-expo),
+              transform var(--dur-reveal) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+html.dp-anim-ready .reveal-left.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slide From Right */
+html.dp-anim-ready .reveal-right {
+  opacity: 0;
+  transform: translateX(var(--motion-distance-x));
+  transition: opacity var(--dur-reveal) var(--ease-out-expo),
+              transform var(--dur-reveal) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+html.dp-anim-ready .reveal-right.is-revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* =============================================================================
+   3. STAGGERED GRID & CARD CHOREOGRAPHY
+   Container: .reveal-group (or [data-reveal-group])
+   Children:  .reveal-item  (or [data-reveal-item])
+   ============================================================================= */
+
+html.dp-anim-ready .reveal-group .reveal-item {
+  opacity: 0;
+  transform: translateY(var(--motion-distance-y));
+  transition: opacity var(--dur-reveal) var(--ease-out-expo),
+              transform var(--dur-reveal) var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Precise Stagger Delays (capped at 500ms to preserve snappy usability) */
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(1) { transition-delay: 40ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(2) { transition-delay: 90ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(3) { transition-delay: 140ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(4) { transition-delay: 190ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(5) { transition-delay: 240ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(6) { transition-delay: 290ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(7) { transition-delay: 340ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(8) { transition-delay: 390ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(9) { transition-delay: 440ms; }
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item:nth-child(10) { transition-delay: 480ms; }
+
+/* Dynamic Inline Stagger Index override if needed */
+html.dp-anim-ready .reveal-group.is-revealed .reveal-item[data-stagger-index] {
+  transition-delay: calc(min(var(--stagger-index, 0) * 50ms, 450ms));
+}
+
+/* =============================================================================
+   4. INTERACTIVE HOVER & MICRO-INTERACTIONS
+   ============================================================================= */
+
+/* Premium Card Elevation (Restrained lift with deep soft shadow) */
+.hover-lift {
+  transition: transform var(--dur-fast) var(--ease-out-expo),
+              box-shadow var(--dur-fast) var(--ease-out-expo),
+              border-color var(--dur-fast) var(--ease-out-expo) !important;
+  will-change: transform, box-shadow;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 16px 36px -6px rgba(5, 15, 35, 0.45) !important;
+}
+
+/* Image Scale on Card Hover */
+.hover-scale-wrapper {
+  overflow: hidden;
+}
+
+.hover-scale-wrapper img,
+.hover-scale-img {
+  transition: transform var(--dur-normal) var(--ease-out-expo) !important;
+  will-change: transform;
+}
+
+.hover-scale-wrapper:hover img,
+.hover-lift:hover .hover-scale-img,
+.hover-scale-img:hover {
+  transform: scale(1.03) !important;
+}
+
+/* Tactile Button Press Feedback */
+.btn-press,
+.btn-primary,
+.btn-secondary,
+.btn-gold,
+.cta-btn-primary,
+.site-btn {
+  transition: transform var(--dur-instant) var(--ease-out-cubic),
+              background-color var(--dur-fast) ease,
+              box-shadow var(--dur-fast) ease !important;
+}
+
+.btn-press:active,
+.btn-primary:active,
+.btn-secondary:active,
+.btn-gold:active,
+.cta-btn-primary:active,
+.site-btn:active {
+  transform: scale(0.975) !important;
+}
+
+/* Solar Radiant Ambient Glow Pulse (Zero layout shifts) */
+.pulse-glow {
+  animation: solarAura 3s ease-in-out infinite;
+}
+
+@keyframes solarAura {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(255, 185, 12, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 16px 4px rgba(255, 185, 12, 0.55);
+  }
+}
+
+/* Modal and Drawer Transitions */
+.modal-scale-enter {
+  animation: modalScaleUp var(--dur-fast) var(--ease-out-expo) forwards;
+}
+
+@keyframes modalScaleUp {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Sticky Header Scrolled Enhancement */
+.products-header.scrolled,
+.site-header.scrolled {
+  box-shadow: 0 8px 30px rgba(5, 10, 25, 0.55) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  transition: background-color var(--dur-normal) ease,
+              box-shadow var(--dur-normal) ease,
+              border-color var(--dur-normal) ease !important;
+}
+
+/* Tab Switching Fade */
+.tab-panel-transition {
+  animation: tabFadeIn var(--dur-fast) var(--ease-out-expo);
+}
+
+@keyframes tabFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================================================================
+   5. RESPONSIVE ADAPTATIONS (MOBILE & TABLET)
+   ============================================================================= */
+@media (max-width: 768px) {
+  :root {
+    --motion-distance-y: 12px;
+    --motion-distance-sm: 8px;
+    --motion-distance-x: 14px;
+    --dur-reveal: 450ms;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px) !important;
+  }
+
+  .hover-scale-wrapper:hover img,
+  .hover-lift:hover .hover-scale-img,
+  .hover-scale-img:hover {
+    transform: scale(1.015) !important;
+  }
+}
+
+/* =============================================================================
+   6. ACCESSIBILITY OVERRIDE (PREFERS-REDUCED-MOTION)
+   Mandatory compliance: zero motion, immediate opacity, no scrolling transitions.
+   ============================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html.dp-anim-ready .reveal,
+  html.dp-anim-ready .reveal-sm,
+  html.dp-anim-ready .reveal-fade,
+  html.dp-anim-ready .reveal-scale,
+  html.dp-anim-ready .reveal-left,
+  html.dp-anim-ready .reveal-right,
+  html.dp-anim-ready .reveal-group .reveal-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .hover-lift:hover {
+    transform: none !important;
+  }
+
+  .hover-scale-wrapper:hover img,
+  .hover-scale-img:hover {
+    transform: none !important;
+  }
+
+  .pulse-glow {
+    animation: none !important;
+  }
+}
