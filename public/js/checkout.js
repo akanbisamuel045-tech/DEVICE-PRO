@@ -102,25 +102,19 @@ document.addEventListener('DOMContentLoaded', () => {
     summaryList.innerHTML = html;
   }
 
-  // Calculate delivery fee
+  // Delivery fee (0 - No delivery charge on checkout)
   function getDeliveryFee() {
-    const state = stateSelect.value;
-    if (state === 'Pickup') return 0;
-    if (state === 'Lagos') return 15000;
-    if (state === 'Ogun') return 25000;
-    if (state === 'Oyo') return 30000;
-    return 35000; // Default nationwide shipping
+    return 0;
   }
 
   // Recalculate totals
   function recalculateTotals() {
     const subtotal = window.DeviceProCart ? window.DeviceProCart.getSubtotal() : 0;
-    const delivery = getDeliveryFee();
-    const total = subtotal + delivery;
+    const total = subtotal;
 
-    subtotalEl.textContent = formatNaira(subtotal);
-    deliveryEl.textContent = delivery === 0 ? 'FREE (Pickup)' : formatNaira(delivery);
-    totalEl.textContent = formatNaira(total);
+    if (subtotalEl) subtotalEl.textContent = formatNaira(subtotal);
+    if (deliveryEl) deliveryEl.textContent = 'FREE';
+    if (totalEl) totalEl.textContent = formatNaira(total);
 
     const btnText = submitBtn.querySelector('span:first-child');
     if (btnText) {
@@ -163,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const subtotal = window.DeviceProCart.getSubtotal();
-    const deliveryFee = getDeliveryFee();
+    const deliveryFee = 0;
 
     const orderPayload = {
       customerName,
@@ -182,7 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
       paymentMethod,
       installationOption: 'supply_only',
       installationFeeNgn: 0,
-      deliveryFeeNgn: deliveryFee,
+      deliveryFeeNgn: 0,
+      totalNgn: subtotal,
       notes
     };
 

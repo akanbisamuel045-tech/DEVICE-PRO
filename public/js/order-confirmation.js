@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const address = orderData.delivery_address || orderData.deliveryAddress || 'Standard Delivery';
   const state = orderData.delivery_state || orderData.deliveryState || 'Lagos';
   const subtotal = Number(orderData.subtotal_ngn !== undefined ? orderData.subtotal_ngn : (orderData.subtotalNgn !== undefined ? orderData.subtotalNgn : 0));
-  const deliveryFee = Number(orderData.delivery_fee_ngn !== undefined ? orderData.delivery_fee_ngn : (orderData.deliveryFeeNgn !== undefined ? orderData.deliveryFeeNgn : (state.toLowerCase() === 'lagos' ? 15000 : 35000)));
+  const deliveryFee = Number(orderData.delivery_fee_ngn !== undefined ? orderData.delivery_fee_ngn : (orderData.deliveryFeeNgn !== undefined ? orderData.deliveryFeeNgn : 0));
 
   let installFee = Number(orderData.installation_fee_ngn !== undefined ? orderData.installation_fee_ngn : (orderData.installationFeeNgn !== undefined ? orderData.installationFeeNgn : 0));
   const installOption = orderData.installation_option || orderData.installationOption;
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   custState.textContent = `Region: ${state}`;
 
   subtotalEl.textContent = formatNaira(subtotal);
-  deliveryEl.textContent = formatNaira(deliveryFee);
+  deliveryEl.textContent = deliveryFee > 0 ? formatNaira(deliveryFee) : 'FREE';
 
   if (installFee > 0) {
     installRow.style.display = 'flex';
