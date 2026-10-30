@@ -344,6 +344,10 @@
         cartDrawer.style.setProperty('z-index', '100000', 'important');
         cartDrawer.style.setProperty('background-color', '#FFFFFF', 'important');
         cartDrawer.style.setProperty('background', '#FFFFFF', 'important');
+        cartDrawer.style.setProperty('top', '0', 'important');
+        cartDrawer.style.setProperty('bottom', '0', 'important');
+        cartDrawer.style.setProperty('height', '100%', 'important');
+        cartDrawer.style.setProperty('min-height', '100%', 'important');
         if (backdrop) {
           backdrop.style.setProperty('z-index', '99990', 'important');
           backdrop.classList.add('open');

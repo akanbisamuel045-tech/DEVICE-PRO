@@ -1528,8 +1528,11 @@ body.products-page-body {
   position: fixed;
   top: 0;
   right: 0;
+  bottom: 0 !important;
   width: min(440px, 100vw);
-  height: 100vh;
+  height: 100% !important;
+  min-height: 100% !important;
+  max-height: 100% !important;
   background-color: #FFFFFF !important;
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.22);
   z-index: 100000 !important;

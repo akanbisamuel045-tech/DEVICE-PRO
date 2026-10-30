@@ -771,6 +771,7 @@
 
 /* Empty State Card - Centralized with Corporate Blue Icon */
 .checkout-empty-card {
+  display: none;
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 16px;
@@ -778,11 +779,14 @@
   text-align: center;
   max-width: 580px;
   margin: 48px auto;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+}
+
+.checkout-empty-card.visible {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
 }
 
 .empty-cart-icon-wrap {

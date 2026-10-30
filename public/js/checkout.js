@@ -59,9 +59,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const items = window.DeviceProCart ? window.DeviceProCart.getItems() : [];
 
   if (!items || items.length === 0) {
-    if (cartGrid) cartGrid.style.display = 'none';
-    if (emptyState) emptyState.style.display = 'block';
+    if (cartGrid) cartGrid.style.setProperty('display', 'none', 'important');
+    if (emptyState) {
+      emptyState.classList.add('visible');
+      emptyState.style.setProperty('display', 'flex', 'important');
+    }
     return;
+  } else {
+    if (cartGrid) cartGrid.style.removeProperty('display');
+    if (emptyState) {
+      emptyState.classList.remove('visible');
+      emptyState.style.setProperty('display', 'none', 'important');
+    }
   }
 
   // Currency helper
