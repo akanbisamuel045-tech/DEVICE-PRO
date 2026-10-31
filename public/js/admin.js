@@ -3365,15 +3365,23 @@
       cachedCustomerAnalytics = data;
       const m = data.summary || data.metrics || {};
 
-      const totalReg = m.totalRegistered || m.totalRegisteredAccounts || 310;
-      const totalGuests = m.guestCustomersCount || m.totalGuestBuyers || 167;
-      const totalPaying = m.payingCustomersCount || ((m.guestCustomersCount || 0) + (m.registeredActiveWithOrders || 0)) || 168;
-      const totalQuotes = m.totalQuotes || m.totalQuotesRequested || 182;
-      const totalEnquiries = m.totalEnquiries || m.totalEnquiriesSubmitted || 147;
-      const totalRev = m.totalRevenue || m.totalCommerceRevenue || 424810000;
-      const totalOrders = m.totalOrders || 412;
-      const avgBasket = m.averageOrderValue || 2212552;
-      const totalTracked = m.totalTrackedCustomers || (totalReg + totalGuests) || 477;
+      // Accurate metric parsing: Use nullish coalescing (??) so 0 is recognized as valid reset state
+      const totalReg = Number(m.totalRegistered ?? m.totalRegisteredAccounts ?? 0);
+      const totalGuests = Number(m.guestCustomersCount ?? m.totalGuestBuyers ?? 0);
+      const totalPaying = Number(m.payingCustomersCount ?? ((m.guestCustomersCount || 0) + (m.registeredActiveWithOrders || 0)) ?? 0);
+      const totalQuotes = Number(m.totalQuotes ?? m.totalQuotesRequested ?? 0);
+      const totalEnquiries = Number(m.totalEnquiries ?? m.totalEnquiriesSubmitted ?? 0);
+      const totalRev = Number(m.totalRevenue ?? m.totalCommerceRevenue ?? 0);
+      const totalOrders = Number(m.totalOrders ?? 0);
+      const avgBasket = Number(m.averageOrderValue ?? 0);
+      const totalTracked = Number(m.totalTrackedCustomers ?? (totalReg + totalGuests));
+      const orderStatusCounts = m.orderStatusCounts || {
+        completed: 0,
+        processing: 0,
+        pending: 0,
+        confirmed: 0,
+        cancelled: 0
+      };
 
       // Populate Ribbon KPI numbers
       const elReg = document.getElementById('crm-kpi-registered');
@@ -3392,11 +3400,36 @@
       if (elPaying) elPaying.textContent = totalPaying.toLocaleString();
       if (elQuotes) elQuotes.textContent = totalQuotes.toLocaleString();
       if (elEnq) elEnq.textContent = totalEnquiries.toLocaleString();
-      if (elRev) elRev.textContent = `₦${(totalRev / 1000000).toFixed(1)}M`;
-      if (elAovSub) elAovSub.textContent = `₦${(avgBasket / 1000000).toFixed(2)}M Average Basket`;
+
+      if (elRev) {
+        if (totalRev >= 1000000) {
+          elRev.textContent = `₦${(totalRev / 1000000).toFixed(1)}M`;
+        } else if (totalRev > 0) {
+          elRev.textContent = `₦${totalRev.toLocaleString()}`;
+        } else {
+          elRev.textContent = `₦0`;
+        }
+      }
+      if (elAovSub) {
+        if (avgBasket >= 1000000) {
+          elAovSub.textContent = `₦${(avgBasket / 1000000).toFixed(2)}M Average Basket`;
+        } else if (avgBasket > 0) {
+          elAovSub.textContent = `₦${avgBasket.toLocaleString()} Average Basket`;
+        } else {
+          elAovSub.textContent = `₦0 Average Basket`;
+        }
+      }
       if (elTotalBadge) elTotalBadge.textContent = `${totalTracked} TRACKED CLIENTS`;
       if (elSegmentPill) elSegmentPill.textContent = `${totalTracked} Total Clients`;
-      if (elVolPill) elVolPill.textContent = `₦${(totalRev / 1000000).toFixed(1)}M Volume`;
+      if (elVolPill) {
+        if (totalRev >= 1000000) {
+          elVolPill.textContent = `₦${(totalRev / 1000000).toFixed(1)}M Volume`;
+        } else if (totalRev > 0) {
+          elVolPill.textContent = `₦${totalRev.toLocaleString()} Volume`;
+        } else {
+          elVolPill.textContent = `₦0 Volume`;
+        }
+      }
 
       // Update Subtab Badges
       const bReg = document.getElementById('crm-badge-reg');
@@ -3415,14 +3448,15 @@
       const legReg = document.getElementById('legend-reg-count');
       const legGuest = document.getElementById('legend-guest-count');
       if (legReg) {
-        const regPct = ((totalReg / totalTracked) * 100).toFixed(1);
+        const regPct = totalTracked > 0 ? ((totalReg / totalTracked) * 100).toFixed(1) : '0.0';
         legReg.textContent = `${totalReg} (${regPct}%)`;
       }
       if (legGuest) {
-        const guestPct = ((totalGuests / totalTracked) * 100).toFixed(1);
+        const guestPct = totalTracked > 0 ? ((totalGuests / totalTracked) * 100).toFixed(1) : '0.0';
         legGuest.textContent = `${totalGuests} (${guestPct}%)`;
       }
 
+      // Update Conversion Funnel Stats
       const fQuotes = document.getElementById('stat-funnel-quotes');
       const fEnq = document.getElementById('stat-funnel-enq');
       const fPaying = document.getElementById('stat-funnel-paying');
@@ -3431,6 +3465,24 @@
       if (fEnq) fEnq.textContent = totalEnquiries;
       if (fPaying) fPaying.textContent = totalPaying;
       if (fOrders) fOrders.textContent = totalOrders;
+
+      const convPill = document.getElementById('crm-conversion-pill');
+      if (convPill) {
+        const convRate = totalTracked > 0 ? ((totalPaying / totalTracked) * 100).toFixed(1) : '0.0';
+        convPill.textContent = `${convRate}% Sales Conversion`;
+      }
+
+      // Update Orders Velocity Legend & Description
+      const ordersDesc = document.getElementById('crm-orders-chart-desc');
+      if (ordersDesc) {
+        ordersDesc.textContent = `Logistics pipeline across ${totalOrders} total commercial equipment orders`;
+      }
+      const legCompleted = document.getElementById('legend-orders-completed');
+      const legProcessing = document.getElementById('legend-orders-processing');
+      const legPending = document.getElementById('legend-orders-pending');
+      if (legCompleted) legCompleted.textContent = `${orderStatusCounts.completed} Orders`;
+      if (legProcessing) legProcessing.textContent = `${orderStatusCounts.processing + (orderStatusCounts.confirmed || 0)} Orders`;
+      if (legPending) legPending.textContent = `${orderStatusCounts.pending} Orders`;
 
       // Render Interactive Analytics Charts
       renderCustomerAnalyticsCharts({
@@ -3441,7 +3493,8 @@
         totalEnquiries,
         totalOrders,
         totalRev,
-        totalTracked
+        totalTracked,
+        orderStatusCounts
       });
 
       // Product Demand & Browsing Telemetry
@@ -3466,14 +3519,15 @@
 
       if (hasChartJs) {
         try {
+          const isZero = metrics.totalTracked === 0;
           crmChartInstances.segments = new Chart(canvasSegments, {
             type: 'doughnut',
             data: {
-              labels: ['Registered Accounts', 'Guest Buyers (No Account)'],
+              labels: isZero ? ['No Clients Tracked'] : ['Registered Accounts', 'Guest Buyers (No Account)'],
               datasets: [{
-                data: [metrics.totalReg || 310, metrics.totalGuests || 167],
-                backgroundColor: ['#0157A2', '#FFB90C'],
-                hoverBackgroundColor: ['#003F78', '#F59E0B'],
+                data: isZero ? [1] : [metrics.totalReg, metrics.totalGuests],
+                backgroundColor: isZero ? ['#E2E8F0'] : ['#0157A2', '#FFB90C'],
+                hoverBackgroundColor: isZero ? ['#CBD5E1'] : ['#003F78', '#F59E0B'],
                 borderWidth: 3,
                 borderColor: '#FFFFFF'
               }]
@@ -3492,7 +3546,8 @@
                   cornerRadius: 8,
                   callbacks: {
                     label: function(ctx) {
-                      const total = (metrics.totalReg || 310) + (metrics.totalGuests || 167);
+                      if (isZero) return ' No clients registered or ordered yet';
+                      const total = metrics.totalTracked || 1;
                       const pct = ((ctx.parsed / total) * 100).toFixed(1);
                       return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
                     }
@@ -3524,10 +3579,10 @@
               datasets: [{
                 label: 'Clients',
                 data: [
-                  metrics.totalTracked || 477,
-                  (metrics.totalQuotes || 182) + (metrics.totalEnquiries || 147),
-                  metrics.totalPaying || 168,
-                  metrics.totalOrders || 412
+                  metrics.totalTracked,
+                  metrics.totalQuotes + metrics.totalEnquiries,
+                  metrics.totalPaying,
+                  metrics.totalOrders
                 ],
                 backgroundColor: [
                   'rgba(1, 87, 162, 0.88)',
@@ -3553,8 +3608,9 @@
               },
               scales: {
                 x: {
+                  beginAtZero: true,
                   grid: { color: '#F1F5F9' },
-                  ticks: { font: { family: 'Inter', size: 11 }, color: '#64748B' }
+                  ticks: { font: { family: 'Inter', size: 11 }, color: '#64748B', precision: 0 }
                 },
                 y: {
                   grid: { display: false },
@@ -3579,14 +3635,26 @@
 
       if (hasChartJs) {
         try {
+          const counts = metrics.orderStatusCounts || {};
+          const comp = counts.completed || 0;
+          const proc = (counts.processing || 0) + (counts.confirmed || 0);
+          const pend = counts.pending || 0;
+          const isZeroOrders = metrics.totalOrders === 0;
+
           crmChartInstances.orders = new Chart(canvasOrders, {
             type: 'doughnut',
             data: {
-              labels: ['Completed Orders', 'Confirmed / Logistics', 'Pending Orders', 'Processing'],
+              labels: isZeroOrders
+                ? ['No Orders Placed Yet']
+                : ['Completed Orders', 'Processing / Verified', 'Pending Orders'],
               datasets: [{
-                data: [26, 163, 220, 3],
-                backgroundColor: ['#059669', '#0284C7', '#F59E0B', '#8B5CF6'],
-                hoverBackgroundColor: ['#047857', '#0369A1', '#D97706', '#7C3AED'],
+                data: isZeroOrders ? [1] : [comp, proc, pend],
+                backgroundColor: isZeroOrders
+                  ? ['#E2E8F0']
+                  : ['#059669', '#0284C7', '#F59E0B'],
+                hoverBackgroundColor: isZeroOrders
+                  ? ['#CBD5E1']
+                  : ['#047857', '#0369A1', '#D97706'],
                 borderWidth: 3,
                 borderColor: '#FFFFFF'
               }]
@@ -3600,7 +3668,13 @@
                 tooltip: {
                   backgroundColor: '#0F172A',
                   padding: 10,
-                  cornerRadius: 8
+                  cornerRadius: 8,
+                  callbacks: {
+                    label: function(ctx) {
+                      if (isZeroOrders) return ' No commercial orders placed yet';
+                      return ` ${ctx.label}: ${ctx.parsed} Orders`;
+                    }
+                  }
                 }
               }
             }
@@ -4512,42 +4586,54 @@
       `;
     }
 
-    const stateDist = (cachedCustomerAnalytics && cachedCustomerAnalytics.stateDistribution) || [
-      { state: 'Lagos', count: 340, percentage: 82.5, revenue: 350000000 },
-      { state: 'Enugu', count: 72, percentage: 17.5, revenue: 74810000 }
-    ];
+    const stateDist = (cachedCustomerAnalytics && (cachedCustomerAnalytics.stateDistribution || cachedCustomerAnalytics.geographicDistribution)) || [];
 
     const info = document.getElementById('customers-pagination-info');
-    if (info) info.textContent = 'Showing customer geographic distribution and revenue across Nigeria';
+    if (info) {
+      info.textContent = stateDist.length > 0
+        ? 'Showing customer geographic distribution and revenue across Nigeria'
+        : 'No customer geographic activity recorded yet';
+    }
 
-    tbody.innerHTML = stateDist.map(s => `
-      <tr>
-        <td>
-          <div style="font-weight: 800; font-size: 0.95rem; color: #0157A2;">${escapeHtml(s.state)} State</div>
-          <div style="font-size: 0.72rem; color: #64748B;">Hub Delivery Route</div>
-        </td>
-        <td style="text-align: center;">
-          <span style="font-weight: 700; font-size: 1rem; color: #0F172A;">${s.count} Clients</span>
-        </td>
-        <td style="text-align: center;">
-          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-            <div style="width: 80px; height: 8px; background: #E2E8F0; border-radius: 9999px; overflow: hidden;">
-              <div style="width: ${s.percentage || 10}%; height: 100%; background: #0157A2;"></div>
+    if (stateDist.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-cell">No customer transactions across Nigerian states recorded yet.</td></tr>';
+      return;
+    }
+
+    const totalOrdersInDist = stateDist.reduce((sum, s) => sum + (s.ordersCount || 0), 0) || 1;
+
+    tbody.innerHTML = stateDist.map(s => {
+      const orders = s.ordersCount || 0;
+      const share = ((orders / totalOrdersInDist) * 100).toFixed(1);
+      return `
+        <tr>
+          <td>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #0157A2;">${escapeHtml(s.state)} State</div>
+            <div style="font-size: 0.72rem; color: #64748B;">Hub Delivery Route</div>
+          </td>
+          <td style="text-align: center;">
+            <span style="font-weight: 700; font-size: 1rem; color: #0F172A;">${orders} Clients</span>
+          </td>
+          <td style="text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <div style="width: 80px; height: 8px; background: #E2E8F0; border-radius: 9999px; overflow: hidden;">
+                <div style="width: ${share}%; height: 100%; background: #0157A2;"></div>
+              </div>
+              <span style="font-weight: 700; font-size: 0.78rem; color: #334155;">${share}%</span>
             </div>
-            <span style="font-weight: 700; font-size: 0.78rem; color: #334155;">${s.percentage || 0}%</span>
-          </div>
-        </td>
-        <td style="text-align: center;">
-          <span style="font-weight: 700; color: #0157A2;">${s.ordersCount || s.count}</span>
-        </td>
-        <td style="text-align: right;">
-          <span style="font-weight: 800; color: #059669; font-size: 0.95rem;">${formatNaira(s.revenue || 0)}</span>
-        </td>
-        <td style="text-align: center;">
-          <span class="status-pill live" style="font-size: 0.72rem;">DIRECT FLEET &amp; GIG</span>
-        </td>
-      </tr>
-    `).join('');
+          </td>
+          <td style="text-align: center;">
+            <span style="font-weight: 700; color: #0157A2;">${orders}</span>
+          </td>
+          <td style="text-align: right;">
+            <span style="font-weight: 800; color: #059669; font-size: 0.95rem;">${formatNaira(s.revenue || 0)}</span>
+          </td>
+          <td style="text-align: center;">
+            <span class="status-pill live" style="font-size: 0.72rem;">DIRECT FLEET &amp; GIG</span>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
   window.adminViewCustomerDossier = async function (idOrEmail) {

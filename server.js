@@ -2572,6 +2572,13 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
       let totalRevenue = 0;
       let paidOrdersCount = 0;
       const stateStats = new Map();
+      const orderStatusCounts = {
+        completed: 0,
+        processing: 0,
+        pending: 0,
+        confirmed: 0,
+        cancelled: 0
+      };
 
       orders.forEach(o => {
         const email = (o.customer_email || 'guest@devicepro.ng').toLowerCase().trim();
@@ -2583,6 +2590,13 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
         if (isPaid) {
           totalRevenue += amount;
           paidOrdersCount++;
+        }
+
+        const rawStatus = (o.order_status || 'pending').toLowerCase();
+        if (orderStatusCounts[rawStatus] !== undefined) {
+          orderStatusCounts[rawStatus]++;
+        } else {
+          orderStatusCounts.pending++;
         }
 
         const st = o.delivery_state || 'Lagos';
@@ -2646,6 +2660,8 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
         console.warn('[CRM PRODUCT DEMAND ERROR]:', err.message);
       }
 
+      const stateDistArray = [...stateStats.values()].sort((a, b) => b.ordersCount - a.ordersCount);
+
       return res.json({
         success: true,
         summary: {
@@ -2659,14 +2675,16 @@ app.get('/api/admin/analytics/customers', requireAuth, requireRole('superadmin',
           totalEnquiries: enquiries.length,
           repeatBuyersCount,
           totalRevenue,
-          averageOrderValue: paidOrdersCount > 0 ? Math.round(totalRevenue / paidOrdersCount) : 0
+          averageOrderValue: paidOrdersCount > 0 ? Math.round(totalRevenue / paidOrdersCount) : 0,
+          orderStatusCounts
         },
         productDemandAnalytics: productDemand,
         guestBuyers: guestBuyers.sort((a, b) => b.totalSpent - a.totalSpent),
         topRegistered: enhancedRegistered.sort((a, b) => b.totalSpent - a.totalSpent),
         quoteLeads: quotes,
         enquiryLeads: enquiries,
-        geographicDistribution: [...stateStats.values()].sort((a, b) => b.ordersCount - a.ordersCount)
+        geographicDistribution: stateDistArray,
+        stateDistribution: stateDistArray
       });
     }
 
