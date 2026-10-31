@@ -526,6 +526,29 @@
   white-space: nowrap;
 }
 
+/* Mobile Column Labels - Hidden on Desktop */
+.mobile-col-label {
+  display: none;
+}
+
+.watt-input-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.watt-unit {
+  font-size: 0.75rem;
+  color: #64748B;
+  font-weight: 600;
+}
+
+.subtotal-energy-val {
+  font-weight: 700;
+  color: #061C35;
+  white-space: nowrap;
+}
+
 /* Custom Appliance Trigger */
 .add-custom-wrap {
   margin-top: 1.25rem;
@@ -1074,47 +1097,215 @@
     min-width: 100%;
   }
 
-  /* Reveal horizontal swipe indicator on mobile */
+  /* Hide horizontal scroll hint since rows are responsive cards */
   .table-scroll-hint {
-    display: flex;
+    display: none !important;
   }
 
-  /* Compact Table Cells */
-  .appliances-table th {
-    padding: 0.65rem 0.5rem;
-    font-size: 0.78rem;
+  /* Unconstrain table wrapper on mobile */
+  .appliances-table-wrap {
+    overflow-x: visible;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  /* Transform table into responsive cards */
+  .appliances-table {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .appliances-table thead {
+    display: none;
+  }
+
+  .appliances-table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    width: 100%;
+  }
+
+  /* Each appliance row is a clean multi-tier card container */
+  .appliances-table tr.app-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem 0.85rem;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 0.95rem 1rem;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    align-items: start;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .appliances-table tr.app-row:hover {
+    border-color: #CBD5E1;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
   }
 
   .appliances-table td {
-    padding: 0.65rem 0.5rem;
-    font-size: 0.8rem;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
   }
 
-  .app-watt-input {
-    width: 65px;
-    padding: 0.3rem 0.4rem;
-    font-size: 0.8rem;
+  /* Mobile field labels */
+  .mobile-col-label {
+    display: block !important;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+    margin-bottom: 0.3rem;
   }
 
-  .qty-step-btn {
-    width: 28px;
-    height: 28px;
+  /* Line 1: Appliance Meta Info (spans full width) */
+  .appliances-table td.app-info-td {
+    grid-column: 1 / -1;
+    border-bottom: 1px solid #F1F5F9 !important;
+    padding-bottom: 0.6rem !important;
   }
 
-  .qty-number {
-    width: 28px;
-    font-size: 0.85rem;
-  }
-
-  .hours-cell {
-    min-width: 110px;
+  .appliances-table td.app-info-td .app-meta-cell {
     gap: 0.25rem;
   }
 
-  .hours-input {
-    width: 44px;
-    padding: 0.15rem 0.3rem;
+  .appliances-table td.app-info-td .app-title {
+    font-size: 0.925rem;
+    font-weight: 700;
+    color: #0F172A;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .appliances-table td.app-info-td .app-notes {
     font-size: 0.75rem;
+    color: #64748B;
+    line-height: 1.35;
+  }
+
+  /* Line 2: Rated Watts (Col 1) and Quantity (Col 2) */
+  .appliances-table td.app-watts-td {
+    grid-column: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .appliances-table td.app-watts-td .watt-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .appliances-table td.app-watts-td .app-watt-input {
+    width: 75px;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+    text-align: right;
+  }
+
+  .appliances-table td.app-qty-td {
+    grid-column: 2 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    align-items: flex-end;
+  }
+
+  .appliances-table td.app-qty-td .qty-stepper {
+    border-radius: 8px;
+    border: 1.5px solid #CBD5E1;
+  }
+
+  .appliances-table td.app-qty-td .qty-step-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .appliances-table td.app-qty-td .qty-number {
+    width: 32px;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  /* Line 3 (Next Line): Daily Operating Hours on left, Daily Energy on right */
+  .appliances-table td.app-hours-td {
+    grid-column: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    border-top: 1px dashed #E2E8F0 !important;
+    padding-top: 0.65rem !important;
+  }
+
+  .appliances-table td.app-hours-td .hours-cell {
+    min-width: 0;
+    width: 100%;
+    gap: 0.35rem;
+  }
+
+  .appliances-table td.app-hours-td .hours-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    color: #475569;
+  }
+
+  .appliances-table td.app-hours-td .hours-lbl {
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .appliances-table td.app-hours-td .hours-input {
+    width: 44px;
+    padding: 0.2rem 0.3rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    border: 1px solid #CBD5E1;
+    border-radius: 6px;
+  }
+
+  .appliances-table td.app-subtotal-cell {
+    grid-column: 2 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    align-items: flex-end;
+    justify-content: flex-start;
+    border-top: 1px dashed #E2E8F0 !important;
+    padding-top: 0.65rem !important;
+  }
+
+  .appliances-table td.app-subtotal-cell .subtotal-energy-val {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem 0.75rem;
+    background: #F0F9FF;
+    border: 1px solid #BAE6FD;
+    border-radius: 8px;
+    color: #0284C7;
+    font-size: 0.95rem;
+    font-weight: 700;
+    white-space: nowrap;
   }
 
   .btn-add-custom {
@@ -1159,6 +1350,30 @@
 }
 
 @media (max-width: 480px) {
+  .appliances-table tr.app-row {
+    padding: 0.85rem 0.75rem;
+    gap: 0.65rem 0.6rem;
+  }
+
+  .appliances-table td.app-watts-td .app-watt-input {
+    width: 65px;
+  }
+
+  .appliances-table td.app-hours-td .hours-input {
+    width: 40px;
+    padding: 0.15rem 0.2rem;
+  }
+
+  .appliances-table td.app-hours-td .hours-row {
+    font-size: 0.68rem;
+    gap: 0.25rem;
+  }
+
+  .appliances-table td.app-subtotal-cell .subtotal-energy-val {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.55rem;
+  }
+
   .summary-metrics-grid {
     grid-template-columns: 1fr;
     gap: 0.65rem;

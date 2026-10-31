@@ -191,31 +191,37 @@
             <span class="app-notes">${escapeHtml(app.notes || app.category)}</span>
           </div>
         </td>
-        <td>
-          <input type="number" class="app-watt-input" min="1" max="15000" step="5" value="${app.watts}" data-index="${index}" data-field="watts" aria-label="Wattage for ${escapeHtml(app.name)}">
-          <span style="font-size: 0.75rem; color: #64748B;">W</span>
+        <td class="app-watts-td">
+          <span class="mobile-col-label">Rated Watts</span>
+          <div class="watt-input-wrap">
+            <input type="number" class="app-watt-input" min="1" max="15000" step="5" value="${app.watts}" data-index="${index}" data-field="watts" aria-label="Wattage for ${escapeHtml(app.name)}">
+            <span class="watt-unit">W</span>
+          </div>
         </td>
-        <td>
+        <td class="app-qty-td">
+          <span class="mobile-col-label">Quantity</span>
           <div class="qty-stepper">
             <button type="button" class="qty-step-btn" data-step="-1" data-index="${index}" aria-label="Decrease quantity">−</button>
             <span class="qty-number" id="qty-val-${index}">${app.qty}</span>
             <button type="button" class="qty-step-btn" data-step="1" data-index="${index}" aria-label="Increase quantity">+</button>
           </div>
         </td>
-        <td>
+        <td class="app-hours-td">
+          <span class="mobile-col-label">Daily Operating Hours</span>
           <div class="hours-cell">
             <div class="hours-row">
-              <span>Day (Sun):</span>
+              <span class="hours-lbl">Day (Sun):</span>
               <input type="number" class="hours-input" min="0" max="24" step="0.5" value="${app.hoursDay || 0}" data-index="${index}" data-field="hoursDay" aria-label="Day hours">
             </div>
             <div class="hours-row">
-              <span>Night (Bat):</span>
+              <span class="hours-lbl">Night (Bat):</span>
               <input type="number" class="hours-input" min="0" max="24" step="0.5" value="${app.hoursNight || 0}" data-index="${index}" data-field="hoursNight" aria-label="Night hours">
             </div>
           </div>
         </td>
         <td class="app-subtotal-cell">
-          <span id="subtotal-${index}">${dailyWh.toLocaleString()} Wh</span>
+          <span class="mobile-col-label">Daily Energy</span>
+          <span class="subtotal-energy-val" id="subtotal-${index}">${dailyWh.toLocaleString()} Wh</span>
         </td>
       `;
 
