@@ -1190,8 +1190,11 @@
       if (kpiOpenEnquiries) kpiOpenEnquiries.textContent = stats.enquiries || 0;
       if (kpiProducts) kpiProducts.textContent = stats.products || 48;
 
+      if (badgeOrders) badgeOrders.textContent = stats.orders || 0;
       if (badgeQuotes) badgeQuotes.textContent = stats.quotes || 0;
       if (badgeEnquiries) badgeEnquiries.textContent = stats.enquiries || 0;
+      const ordersTotalBadge = document.getElementById('orders-total-badge');
+      if (ordersTotalBadge) ordersTotalBadge.textContent = `${stats.orders || 0} TOTAL ORDERS`;
 
       // Stage 16: Support & Warranty KPIs
       try {
@@ -1320,8 +1323,10 @@
       const res = await apiFetch('/api/admin/orders?limit=100');
       const data = await res.json();
       if (data.success) {
-        cachedOrders = data.orders || [];
-        if (badgeOrders) badgeOrders.textContent = data.total || cachedOrders.length;
+        const totalCount = data.total != null ? data.total : cachedOrders.length;
+        if (badgeOrders) badgeOrders.textContent = totalCount;
+        const ordersTotalBadge = document.getElementById('orders-total-badge');
+        if (ordersTotalBadge) ordersTotalBadge.textContent = `${totalCount} TOTAL ORDERS`;
         renderOrdersTable();
       } else {
         if (tbody) tbody.innerHTML = `<tr><td colspan="8" class="empty-cell">Failed: ${data.error}</td></tr>`;

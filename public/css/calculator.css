@@ -197,14 +197,22 @@
 /* Two-Column App Workspace Layout */
 .calc-workspace-grid {
   display: grid;
-  grid-template-columns: 1fr 420px;
+  grid-template-columns: minmax(0, 1fr) 420px;
   gap: 2rem;
   align-items: start;
+  width: 100%;
+  max-width: 100%;
+}
+
+.calc-workspace-left {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
 }
 
 @media (max-width: 1100px) {
   .calc-workspace-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -216,6 +224,9 @@
   padding: 1.75rem;
   margin-bottom: 2rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .calc-section-title {
@@ -226,12 +237,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .calc-params-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.25rem;
+  width: 100%;
+  max-width: 100%;
 }
 
 .calc-field-group {
@@ -335,16 +350,44 @@
   pointer-events: none;
 }
 
+/* Mobile Table Horizontal Scroll Hint */
+.table-scroll-hint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #0157A2;
+  background: #EBF3FB;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 0.875rem;
+  border: 1px solid #BAE6FD;
+  user-select: none;
+}
+
+.table-scroll-hint svg {
+  color: #0284C7;
+  flex-shrink: 0;
+}
+
 /* Appliance List Table/Cards */
 .appliances-table-wrap {
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
   background: #FFFFFF;
+  display: block;
+  box-sizing: border-box;
 }
 
 .appliances-table {
   width: 100%;
+  min-width: 580px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.875rem;
@@ -931,18 +974,220 @@
   margin-top: 1.5rem;
 }
 
-/* Responsive adjustments */
+/* Comprehensive Mobile & Tablet Responsive Adjustments */
+@media (max-width: 1024px) {
+  .calc-workspace-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.75rem;
+  }
+
+  .calc-results-sidebar {
+    position: static;
+    top: auto;
+  }
+}
+
 @media (max-width: 768px) {
   .calc-hero {
-    padding: 2.5rem 0 3rem;
+    padding: 2.25rem 0 2.75rem;
   }
-  .appliances-table th, .appliances-table td {
-    padding: 0.75rem 0.5rem;
+
+  .calc-hero-title {
+    font-size: 1.85rem;
   }
-  .calc-switch-banner {
-    padding: 1.5rem;
+
+  .calc-hero-desc {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .calc-presets-section {
+    margin-top: -1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .calc-presets-card {
+    padding: 1.25rem 1rem;
+    border-radius: 12px;
+  }
+
+  .calc-presets-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.35rem;
+  }
+
+  .calc-presets-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .calc-section-card {
+    padding: 1.25rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .calc-section-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+    font-size: 1.125rem;
+  }
+
+  /* Single Column Full-Width Parameters: Eliminates Side-by-Side Cutoff */
+  .calc-params-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.1rem;
+  }
+
+  .calc-select, .calc-input {
+    font-size: 0.875rem;
+    padding: 0.7rem 0.8rem;
+  }
+
+  /* Appliance Filter Pills & Search */
+  .appliance-controls-bar {
+    gap: 0.75rem;
+  }
+
+  .appliance-filter-pills {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+    width: 100%;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .app-pill-btn {
+    white-space: nowrap;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .app-search-wrap {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  /* Reveal horizontal swipe indicator on mobile */
+  .table-scroll-hint {
+    display: flex;
+  }
+
+  /* Compact Table Cells */
+  .appliances-table th {
+    padding: 0.65rem 0.5rem;
+    font-size: 0.78rem;
+  }
+
+  .appliances-table td {
+    padding: 0.65rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .app-watt-input {
+    width: 65px;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .qty-step-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .qty-number {
+    width: 28px;
+    font-size: 0.85rem;
+  }
+
+  .hours-cell {
+    min-width: 110px;
+    gap: 0.25rem;
+  }
+
+  .hours-input {
+    width: 44px;
+    padding: 0.15rem 0.3rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-add-custom {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Form Row 2 on Mobile */
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+
+  .calc-switch-banner {
+    padding: 1.5rem 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .btn-switch-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .summary-metric-box {
+    padding: 0.75rem;
+  }
+
+  .metric-val {
+    font-size: 1.2rem;
+  }
+
+  .calc-summary-card {
+    padding: 1.25rem 1rem;
+    border-radius: 14px;
+  }
+
+  .summary-pkg-price {
+    font-size: 1.35rem;
+  }
+
+  .engineering-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .engineering-rules-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 
