@@ -348,7 +348,8 @@ body.devicepro-body {
 }
 
 .brand-logo-img {
-  height: 32px;
+  height: 50.4px;
+  max-width: 264px;
   width: auto;
   display: block;
 }
