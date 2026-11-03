@@ -4239,6 +4239,7 @@ app.get(['/contact', '/contact.html'], (req, res) => safeSendFile(res, 'public/c
 app.get(['/privacy-policy', '/privacy-policy.html'], (req, res) => safeSendFile(res, 'public/privacy-policy.html'));
 app.get(['/terms', '/terms.html'], (req, res) => safeSendFile(res, 'public/terms.html'));
 app.get(['/shipping-policy', '/shipping-policy.html'], (req, res) => safeSendFile(res, 'public/shipping-policy.html'));
+app.get(['/black-friday', '/black-friday.html'], (req, res) => safeSendFile(res, 'public/black-friday.html'));
 app.get('/', (req, res) => safeSendFile(res, 'public/index.html'));
 
 // Fallback to homepage for other unknown routes
