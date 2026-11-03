@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   
   <!-- Campaign Stylesheet -->
-  <link rel="stylesheet" href="/css/black-friday.css?v=5">
+  <link rel="stylesheet" href="/css/black-friday.css?v=7">
 </head>
 <body class="black-friday-page">
 
@@ -137,8 +137,8 @@
           </svg>
         </div>
 
-        <!-- Right Half: Crisp White with Torn-Edge Colored Photo Cards -->
-        <div class="bf-hero-right">
+        <!-- Right Half: Vivid Orange Promotional Showcase with Dual Powerstation + Solar Combos -->
+        <div class="bf-hero-right bf-hero-orange-showcase">
           
           <!-- Continuous Rotating Circular Stamp Badge on Seam -->
           <div class="bf-spinning-badge-anchor" onclick="document.getElementById('deals').scrollIntoView({behavior: 'smooth'})" title="Explore Black Friday Deals">
@@ -157,43 +157,69 @@
             </div>
           </div>
 
-          <!-- Torn Photo Cards (Orange & Yellow Angled Cards) -->
-          <div class="bf-hero-cutouts-wrap">
-            
-            <!-- Card 1: Coloar 1000 Pro in Electric Blue Torn Block -->
-            <div class="bf-torn-photo-card bf-torn-card-blue">
-              <span class="bf-card-badge-floating">TOP PICK</span>
-              <div class="bf-torn-card-inner">
-                <div class="bf-card-img-wrap">
-                  <img src="/images/products/ecoflow-power-station.png" alt="Coloar 1000 Pro Solar Generator" loading="eager">
+          <!-- Hero Orange Product Showcase (Itel 500W & Hicces 500W with Jinko 585W Panels) -->
+          <div class="bf-hero-showcase-stage">
+
+            <!-- Floating Promo Stickers Inspired by Reference -->
+            <div class="bf-hero-sticker-burst bf-sticker-top-deal">
+              <span class="burst-black">BLACK FRIDAY</span>
+              <span class="burst-red">DEAL</span>
+            </div>
+
+            <div class="bf-hero-sticker-seal bf-seal-top-right">
+              <div class="seal-inner">
+                <span class="seal-text-top">HOT</span>
+                <span class="seal-text-sub">COMBO</span>
+              </div>
+            </div>
+
+            <div class="bf-hero-sticker-tape bf-tape-bottom-left">
+              <span class="tape-tag">HOT COMBO</span>
+            </div>
+
+            <!-- Showcase Card 1: Itel 500W Power Tank + 1x 585W Solar Panel -->
+            <div class="bf-showcase-card bf-showcase-card-top" onclick="window.blackFridayApp && window.blackFridayApp.openModal('bf-itel-500w-combo')" role="button" tabindex="0" title="Order Itel 500W Combo Package">
+              <div class="bf-showcase-free-tag">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                FREE DELIVERY
+              </div>
+
+              <div class="bf-showcase-media-duo">
+                <div class="bf-media-unit bf-media-powerstation">
+                  <img src="/images/products/itel-500w-power-station.webp" alt="Itel 500W Portable Power Tank" loading="eager">
                 </div>
-                <div class="bf-card-meta">
-                  <span class="bf-card-brand">COLOAR SOLAR</span>
-                  <h3 class="bf-card-title">Coloar 1000 Pro</h3>
-                  <p style="font-size: 0.8125rem; opacity: 0.95; margin-bottom: 8px;">300W Output (1000Wh) + 1× 585W Panel</p>
-                  <div class="bf-card-price-row">
-                    <span class="bf-card-price">₦375,000</span>
-                    <span class="bf-card-strikethrough">₦535k</span>
-                  </div>
+                <div class="bf-media-unit bf-media-solarpanel">
+                  <img src="/images/products/jinko-solar-panel.png" alt="Jinko 585W Monocrystalline Solar Panel" loading="eager">
+                </div>
+              </div>
+
+              <div class="bf-showcase-info">
+                <h3 class="bf-showcase-title">ITEL 500W POWER TANK</h3>
+                <p class="bf-showcase-specs">(500W Output / 1000Wh) + 1× 585W Panel</p>
+                <div class="bf-showcase-price-box">
+                  <span class="bf-showcase-price">₦388,000</span>
+                  <span class="bf-showcase-badge-pill">FREE DELIVERY</span>
                 </div>
               </div>
             </div>
 
-            <!-- Card 2: Coloar 2000 in Yellow Torn Block -->
-            <div class="bf-torn-photo-card bf-torn-card-yellow">
-              <span class="bf-card-badge-floating" style="background:#0A0D14; color:#FFB703;">FLASH DEAL</span>
-              <div class="bf-torn-card-inner">
-                <div class="bf-card-img-wrap" style="background: rgba(0,0,0,0.06);">
-                  <img src="/images/products/ecoflow-power-station.png" alt="Coloar 2000 Heavy Duty Station" loading="eager">
+            <!-- Showcase Card 2: Hicces 500W Solar Kit + 1x 585W Solar Panel -->
+            <div class="bf-showcase-card bf-showcase-card-bottom" onclick="window.blackFridayApp && window.blackFridayApp.openModal('bf-hicces-500w-combo')" role="button" tabindex="0" title="Order Hicces 500W Combo Package">
+              <div class="bf-showcase-media-duo">
+                <div class="bf-media-unit bf-media-powerstation">
+                  <img src="/images/products/hicces-500w-power-station.jpg" alt="Hicces 500W ESS 5-in-1 Solar Kit" loading="eager">
                 </div>
-                <div class="bf-card-meta">
-                  <span class="bf-card-brand">COLOAR SOLAR</span>
-                  <h3 class="bf-card-title">Coloar 2000 Pro</h3>
-                  <p style="font-size: 0.8125rem; opacity: 0.9; margin-bottom: 8px;">1000W Output (2000Wh) + 2× 585W Panels</p>
-                  <div class="bf-card-price-row">
-                    <span class="bf-card-price">₦782,000</span>
-                    <span class="bf-card-strikethrough">₦1.10m</span>
-                  </div>
+                <div class="bf-media-unit bf-media-solarpanel">
+                  <img src="/images/products/jinko-solar-panel.png" alt="Jinko 585W Monocrystalline Solar Panel" loading="eager">
+                </div>
+              </div>
+
+              <div class="bf-showcase-info">
+                <h3 class="bf-showcase-title">HICCES 500W SOLAR KIT</h3>
+                <p class="bf-showcase-specs">(500W Output / 1000Wh) + 1× 585W Panel</p>
+                <div class="bf-showcase-price-box">
+                  <span class="bf-showcase-price">₦372,000</span>
+                  <span class="bf-showcase-badge-pill">FREE DELIVERY</span>
                 </div>
               </div>
             </div>
@@ -209,8 +235,8 @@
          4. DUAL ANIMATED MARQUEE TICKER TAPES
          ========================================================================= -->
     <section class="bf-marquee-section" aria-hidden="true">
-      <!-- Tape 1: Electric Royal Blue Ticker -->
-      <div class="bf-tape-blue">
+      <!-- Tape 1: Electric Mint Green Ticker -->
+      <div class="bf-tape-green">
         <div class="bf-tape-track">
           <div class="bf-tape-content">
             <span>★ BLACK FRIDAY SALES</span>
@@ -471,7 +497,7 @@
             "As a remote software engineer in Bodija, Ibadan, power cut was my biggest nightmare. The Hithium 2 kit with the 585W panel keeps my Starlink router, two 4K external monitors, and MacBook Pro running all day. Truly 0dB silent operation."
           </p>
           <div class="bf-reviewer-row">
-            <div class="bf-reviewer-avatar" style="background:#2563EB;">TA</div>
+            <div class="bf-reviewer-avatar" style="background:#059669;">TA</div>
             <div>
               <div class="bf-reviewer-name">Tolulope A.</div>
               <div class="bf-reviewer-location">Bodija, Ibadan</div>
@@ -609,6 +635,6 @@
   </aside>
 
   <!-- Client Script Engine -->
-  <script src="/js/black-friday.js?v=4"></script>
+  <script src="/js/black-friday.js?v=6"></script>
 </body>
 </html>

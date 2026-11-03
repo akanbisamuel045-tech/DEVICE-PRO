@@ -118,7 +118,7 @@
       marketValue: 850000,
       savings: 238000,
       savingsPct: '28%',
-      colorTheme: 'bg-blue-light',
+      colorTheme: 'bg-mint',
       image: '/images/products/ecoflow-power-station.png',
       badge: 'EV-GRADE CELLS',
       powers: 'Double-Door Fridge + 55" TV + Blender + Desktop PC',
