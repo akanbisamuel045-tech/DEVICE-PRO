@@ -66,10 +66,10 @@ a {
 }
 
 .brand-logo-img {
-  height: 28px;
-  max-height: 32px;
+  height: 68px;
+  max-height: 72px;
   width: auto;
-  max-width: 150px;
+  max-width: 340px;
   object-fit: contain;
   display: block;
 }
@@ -184,6 +184,24 @@ h4, .h4 {
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-normal);
   color: var(--color-d-text);
+}
+
+h5, .h5 {
+  font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+  color: var(--color-d-text);
+}
+
+h6, .h6 {
+  font-family: var(--font-family-display);
+  font-size: 1.05rem; /* Increased by 20% (from 0.875rem / 14px to 16.8px) */
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-normal);
+  color: var(--color-d-text);
+  margin-top: 0;
+  margin-bottom: 0.5rem;
 }
 
 /* Radiant Gradient Text (Solar Glow) */

@@ -28,9 +28,9 @@
 }
 
 .brand-logo-img {
-  height: 32px;
+  height: 68px;
   width: auto;
-  max-width: 160px;
+  max-width: 340px;
   object-fit: contain;
   display: block;
 }

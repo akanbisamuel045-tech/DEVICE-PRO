@@ -63,6 +63,16 @@ body.devicepro-body {
   overflow-x: hidden;
 }
 
+h6, .h6 {
+  font-family: var(--font-family-body, 'Inter', sans-serif);
+  font-size: 1.05rem; /* Increased by 20% (14px * 1.2 = 16.8px) */
+  font-weight: 600;
+  line-height: 1.4;
+  color: inherit;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
 /* Reduced Side Margins Layout Container */
 .layout-container {
   width: 100%;
@@ -348,8 +358,10 @@ body.devicepro-body {
 }
 
 .brand-logo-img {
-  height: 60.5px;
-  max-width: 316.8px;
+  height: 68px;
+  max-height: 72px;
+  max-width: 340px;
+  object-fit: contain;
   width: auto;
   display: block;
 }
