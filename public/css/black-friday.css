@@ -10,14 +10,16 @@
 :root {
   --bf-black: #0A0D14;
   --bf-black-card: #121620;
-  --bf-mint: #00FF87;
-  --bf-mint-dark: #00CC6A;
+  --bf-mint: #0066FF;
+  --bf-mint-dark: #004ecc;
+  --bf-blue-electric: #0066FF;
+  --bf-blue-glow: rgba(0, 102, 255, 0.45);
   --bf-yellow: #FFC400;
   --bf-gold: #FFB703;
   --bf-coral: #FF3366;
   --bf-crimson: #D90429;
   --bf-orange: #FB8500;
-  --bf-teal: #06D6A0;
+  --bf-teal: #0284C7;
   --bf-blue: #0157A2;
   --bf-white: #FFFFFF;
   --bf-gray-100: #F4F6FA;
@@ -87,18 +89,18 @@ body.black-friday-page {
 }
 
 .bf-back-link:hover {
-  color: var(--bf-mint);
+  color: var(--bf-yellow);
 }
 
 .bf-top-highlight {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0, 255, 135, 0.12);
-  color: var(--bf-mint);
+  background: rgba(0, 102, 255, 0.16);
+  color: #60A5FA;
   padding: 3px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(0, 255, 135, 0.3);
+  border: 1px solid rgba(96, 165, 250, 0.4);
   font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -155,15 +157,15 @@ body.black-friday-page {
 }
 
 .bf-logo-img {
-  height: 48px;
+  height: 68px;
   width: auto;
-  max-width: 240px;
+  max-width: 320px;
   object-fit: contain;
 }
 
 .bf-campaign-tag {
-  background: linear-gradient(135deg, var(--bf-mint), #05D574);
-  color: var(--bf-black);
+  background: linear-gradient(135deg, #0066FF, #0044CC);
+  color: #FFFFFF;
   font-size: 0.75rem;
   font-weight: 900;
   padding: 4px 10px;
@@ -172,7 +174,8 @@ body.black-friday-page {
   text-transform: uppercase;
   display: inline-block;
   transform: rotate(-3deg);
-  box-shadow: 0 4px 12px rgba(0, 255, 135, 0.3);
+  box-shadow: 0 4px 14px rgba(0, 102, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .bf-header-actions {
@@ -265,9 +268,9 @@ body.black-friday-page {
 .bf-eyebrow-dot {
   width: 8px;
   height: 8px;
-  background-color: var(--bf-mint);
+  background-color: #0066FF;
   border-radius: 50%;
-  box-shadow: 0 0 10px var(--bf-mint);
+  box-shadow: 0 0 10px #0066FF, 0 0 20px #38BDF8;
   animation: bf-pulse 1.8s infinite;
 }
 
@@ -277,7 +280,7 @@ body.black-friday-page {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* Main Display Title with Mint 3D Extrusion */
+/* Main Display Title with Electric Blue 3D Extrusion */
 .bf-hero-title {
   font-family: var(--bf-font-display);
   font-size: clamp(3.2rem, 6.8vw, 6.2rem);
@@ -294,8 +297,8 @@ body.black-friday-page {
 .bf-hero-title .title-line-sales {
   color: var(--bf-white);
   text-shadow: 
-    3px 3px 0px var(--bf-mint),
-    6px 6px 0px rgba(0, 255, 135, 0.45);
+    3px 3px 0px #0066FF,
+    6px 6px 0px rgba(0, 102, 255, 0.45);
   display: block;
 }
 
@@ -330,7 +333,7 @@ body.black-friday-page {
 }
 
 .bf-hero-desc strong {
-  color: var(--bf-mint);
+  color: #60A5FA;
   font-weight: 700;
 }
 
@@ -344,8 +347,8 @@ body.black-friday-page {
 }
 
 .btn-bf-primary {
-  background: linear-gradient(135deg, var(--bf-mint), #00D26A);
-  color: var(--bf-black);
+  background: linear-gradient(135deg, #0066FF, #004ecc);
+  color: #FFFFFF;
   text-decoration: none;
   font-family: var(--bf-font-display);
   font-weight: 900;
@@ -355,7 +358,7 @@ body.black-friday-page {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 10px 30px rgba(0, 255, 135, 0.35);
+  box-shadow: 0 10px 30px rgba(0, 102, 255, 0.4);
   transition: all 0.25s ease;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -365,7 +368,7 @@ body.black-friday-page {
 
 .btn-bf-primary:hover {
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 14px 40px rgba(0, 255, 135, 0.5);
+  box-shadow: 0 14px 40px rgba(0, 102, 255, 0.6);
 }
 
 .btn-bf-ghost {
@@ -459,8 +462,14 @@ body.black-friday-page {
   transform: translateY(-4px) rotate(0deg) !important;
 }
 
+.bf-torn-card-blue {
+  background: linear-gradient(135deg, #0066FF, #003db3);
+  color: var(--bf-white);
+  transform: rotate(-2deg);
+}
+
 .bf-torn-card-orange {
-  background: linear-gradient(135deg, #FB8500, #FF6F00);
+  background: linear-gradient(135deg, #0066FF, #003db3);
   color: var(--bf-white);
   transform: rotate(-2deg);
 }
@@ -475,8 +484,8 @@ body.black-friday-page {
   position: absolute;
   top: 14px;
   right: 14px;
-  background-color: var(--bf-mint);
-  color: var(--bf-black);
+  background-color: var(--bf-yellow);
+  color: #0A0D14;
   font-weight: 900;
   font-size: 0.75rem;
   padding: 5px 12px;
@@ -609,10 +618,11 @@ body.black-friday-page {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Tape 1: Electric Lime/Mint */
+/* Tape 1: Electric Royal Blue Ticker */
+.bf-tape-blue,
 .bf-tape-green {
-  background-color: var(--bf-mint);
-  color: var(--bf-black);
+  background-color: #0052FF;
+  color: #FFFFFF;
   padding: 12px 0;
   overflow: hidden;
   white-space: nowrap;
@@ -638,9 +648,10 @@ body.black-friday-page {
   letter-spacing: 0.05em;
 }
 
-.bf-tape-content span.outline {
+.bf-tape-blue .bf-tape-content span.outline,
+.bf-tape-green .bf-tape-content span.outline {
   color: transparent;
-  -webkit-text-stroke: 1.5px var(--bf-black);
+  -webkit-text-stroke: 1.5px #FFFFFF;
 }
 
 /* Tape 2: Golden Amber */
@@ -791,10 +802,10 @@ body.black-friday-page {
 
 .bg-crimson { background: linear-gradient(135deg, #E63946, #D90429); }
 .bg-amber   { background: linear-gradient(135deg, #FFB703, #FB8500); }
-.bg-teal    { background: linear-gradient(135deg, #06D6A0, #00B4D8); }
-.bg-navy    { background: linear-gradient(135deg, #0157A2, #002952); }
+.bg-teal    { background: linear-gradient(135deg, #0284C7, #0369A1); }
+.bg-navy    { background: linear-gradient(135deg, #0052CC, #002966); }
 .bg-purple  { background: linear-gradient(135deg, #7209B7, #3A0CA3); }
-.bg-mint    { background: linear-gradient(135deg, #00CC6A, #00994D); }
+.bg-mint, .bg-blue-light { background: linear-gradient(135deg, #2563EB, #1D4ED8); }
 
 .bf-card-badge-save {
   position: absolute;
@@ -919,7 +930,7 @@ body.black-friday-page {
 }
 
 .bf-card-specs-list li svg {
-  color: #10B981;
+  color: #0284C7;
   flex-shrink: 0;
 }
 
@@ -969,9 +980,9 @@ body.black-friday-page {
 
 .bf-delivery-included-tag {
   font-size: 0.6875rem;
-  color: #15803D;
+  color: #1D4ED8;
   font-weight: 800;
-  background: #DCFCE7;
+  background: #DBEAFE;
   padding: 2px 8px;
   border-radius: 4px;
 }
@@ -1135,7 +1146,7 @@ body.black-friday-page {
   font-family: var(--bf-font-display);
   font-size: clamp(2rem, 3.5vw, 2.75rem);
   font-weight: 900;
-  color: var(--bf-mint);
+  color: var(--bf-yellow);
   line-height: 1;
 }
 
@@ -1179,8 +1190,8 @@ body.black-friday-page {
 }
 
 .bf-flash-savings-pill {
-  background-color: var(--bf-mint);
-  color: var(--bf-black);
+  background-color: #0066FF;
+  color: #FFFFFF;
   font-weight: 900;
   font-size: 0.8125rem;
   padding: 6px 14px;
@@ -1308,9 +1319,9 @@ body.black-friday-page {
 }
 
 .bf-comparison-table td.col-solar {
-  color: #15803D;
+  color: #0369A1;
   font-weight: 700;
-  background-color: #F0FDF4;
+  background-color: #F0F9FF;
 }
 
 .bf-comparison-table td.col-gen {
@@ -1416,8 +1427,10 @@ body.black-friday-page {
 }
 
 .bf-footer-brand img {
-  height: 44px;
+  height: 64px;
   width: auto;
+  max-width: 300px;
+  object-fit: contain;
   margin-bottom: 18px;
 }
 
@@ -1453,7 +1466,7 @@ body.black-friday-page {
 }
 
 .bf-footer-col ul li a:hover {
-  color: var(--bf-mint);
+  color: var(--bf-yellow);
 }
 
 .bf-footer-bottom {
@@ -1570,7 +1583,7 @@ body.black-friday-page {
 
 .bf-modal-delivery-notice {
   font-size: 0.75rem;
-  color: #15803D;
+  color: #1D4ED8;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -1670,7 +1683,7 @@ body.black-friday-page {
 }
 
 .bf-mobile-cta-btn {
-  background-color: var(--bf-mint);
+  background-color: var(--bf-yellow);
   color: var(--bf-black);
   text-decoration: none;
   font-family: var(--bf-font-display);

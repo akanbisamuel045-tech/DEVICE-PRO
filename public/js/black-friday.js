@@ -13,124 +13,112 @@
     {
       id: 'bf-hicces-300',
       brand: 'Hicces',
-      model: 'Hicces 300W Portable Generator',
-      rating: '300W (Surge 600W)',
+      model: 'Hicces 300W Solar Power Station',
+      rating: '300W Output Pure Sine Wave',
       tier: 'under-1000',
-      battery: '296Wh Lithium-Ion Battery Pack',
+      battery: '1000Wh Battery Capacity',
       solar: '1 × 585W Tier-1 Monocrystalline Panel',
-      solarWatts: '585W Peak Solar Input',
-      baseCost: 324000,
-      deliveryFee: 30000,
-      finalPrice: 354000,
-      marketValue: 490000,
-      savings: 136000,
+      solarWatts: '585W Solar Array Included',
+      finalPrice: 324000,
+      marketValue: 450000,
+      savings: 126000,
       savingsPct: '28%',
       colorTheme: 'bg-teal',
       image: '/images/products/ecoflow-power-station.png',
-      badge: 'ENTRY STARTER',
-      powers: 'Laptops, Starlink, Phones, Lighting, LED TV, Clipper',
-      runtime: 'Powers Starlink + Laptop for 6–8 hours continuously'
+      badge: 'STARTER COMBO',
+      powers: 'Laptops, Starlink Router, Phones, Lighting, LED TV, Clippers',
+      runtime: 'Continuous day & night power for work essentials'
     },
     {
-      id: 'bf-hicces-800',
+      id: 'bf-hicces-500',
       brand: 'Hicces',
-      model: 'Hicces 800W Pro Power Station',
-      rating: '800W (Surge 1600W)',
+      model: 'Hicces 500W Solar Power Station',
+      rating: '500W Output Pure Sine Wave',
       tier: 'under-1000',
-      battery: '512Wh LiFePO4 Ultra-Durable Cells',
+      battery: '1000Wh Battery Capacity',
       solar: '1 × 585W Tier-1 Monocrystalline Panel',
-      solarWatts: '585W Peak Solar Input',
-      baseCost: 372000,
-      deliveryFee: 30000,
-      finalPrice: 402000,
-      marketValue: 560000,
-      savings: 158000,
+      solarWatts: '585W Solar Array Included',
+      finalPrice: 372000,
+      marketValue: 520000,
+      savings: 148000,
       savingsPct: '28%',
       colorTheme: 'bg-crimson',
       image: '/images/products/ecoflow-power-station.png',
-      badge: 'TOP VALUE',
+      badge: 'TOP VALUE COMBO',
       powers: 'TV + Decoder + Standing Fans + Workstations + Blender',
       runtime: 'Full workday power station for remote professionals'
     },
     {
       id: 'bf-coloar-1000-pro',
       brand: 'Coloar Solar',
-      model: 'Coloar 1000 Pro Solar Generator',
-      rating: '1000W Pure Sine Wave',
+      model: 'Coloar 1000 Pro Solar Power Station',
+      rating: '300W Output Pure Sine Wave',
       tier: 'under-1000',
-      battery: '768Wh LiFePO4 Fast-Charge Battery',
+      battery: '1000Wh LiFePO4 Battery Bank',
       solar: '1 × 585W Tier-1 Monocrystalline Panel',
-      solarWatts: '585W Peak Solar Input',
-      baseCost: 375000,
-      deliveryFee: 30000,
-      finalPrice: 405000,
-      marketValue: 575000,
-      savings: 170000,
+      solarWatts: '585W Solar Array Included',
+      finalPrice: 375000,
+      marketValue: 535000,
+      savings: 160000,
       savingsPct: '30%',
       colorTheme: 'bg-amber',
       image: '/images/products/ecoflow-power-station.png',
-      badge: 'BESTSELLER',
-      powers: 'Inverter Fridge (Small) + TV + 3 Fans + Laptops',
-      runtime: 'Runs household essentials effortlessly day and night'
+      badge: 'BESTSELLER COMBO',
+      powers: 'Fans, Laptops, LED TV, Soundbar, Smart Home',
+      runtime: 'Smooth quiet electricity with 1000Wh deep storage'
     },
     {
       id: 'bf-itel-500',
       brand: 'itel Energy',
       model: 'itel 500W PowerTank Station',
-      rating: '500W Pure Sine Wave',
+      rating: '500W Output Pure Sine Wave',
       tier: 'under-1000',
-      battery: '444Wh High-Capacity PowerTank',
+      battery: '1000Wh High-Capacity PowerTank',
       solar: '1 × 585W Tier-1 Monocrystalline Panel',
-      solarWatts: '585W Peak Solar Input',
-      baseCost: 388000,
-      deliveryFee: 30000,
-      finalPrice: 418000,
-      marketValue: 590000,
-      savings: 172000,
+      solarWatts: '585W Solar Array Included',
+      finalPrice: 388000,
+      marketValue: 550000,
+      savings: 162000,
       savingsPct: '29%',
       colorTheme: 'bg-navy',
       image: '/images/products/ecoflow-power-station.png',
-      badge: 'OFFICIAL ITEL',
+      badge: 'OFFICIAL ITEL COMBO',
       powers: '43" Smart TV + Decoder + 2 Standing Fans + Wi-Fi',
       runtime: 'Certified itel durability with 0dB silent operation'
     },
     {
       id: 'bf-coloar-1000-plus',
       brand: 'Coloar Solar',
-      model: 'Coloar 1000 Plus Extended Battery',
-      rating: '1000W (Surge 2000W)',
+      model: 'Coloar 1000 Plus Solar Power Station',
+      rating: '500W Output Pure Sine Wave',
       tier: 'under-1000',
-      battery: '960Wh LiFePO4 Extended Capacity',
+      battery: '1000Wh LiFePO4 Battery Bank',
       solar: '1 × 585W Tier-1 Monocrystalline Panel',
-      solarWatts: '585W Peak Solar Input',
-      baseCost: 392000,
-      deliveryFee: 30000,
-      finalPrice: 422000,
-      marketValue: 610000,
-      savings: 188000,
-      savingsPct: '31%',
+      solarWatts: '585W Solar Array Included',
+      finalPrice: 392000,
+      marketValue: 560000,
+      savings: 168000,
+      savingsPct: '30%',
       colorTheme: 'bg-purple',
       image: '/images/products/ecoflow-power-station.png',
-      badge: 'EXTRA RUNTIME',
-      powers: 'Home Entertainment + Lighting + Refrigerator + Laptops',
-      runtime: 'Up to 14 hours of continuous nighttime fan & TV power'
+      badge: 'EXTENDED RUNTIME',
+      powers: 'Home Entertainment + Lighting + 3 Standing Fans + Laptops',
+      runtime: 'All-night uninterrupted fan and lighting support'
     },
     {
       id: 'bf-hithium-2-single',
       brand: 'Hithium',
-      model: 'Hithium 2 (Compact 1-Panel Kit)',
-      rating: '1200W Pure Sine Wave Output',
+      model: 'Hithium 2 Solar Kit (1-Panel)',
+      rating: '1000W Output Pure Sine Wave',
       tier: 'over-1000',
-      battery: '1024Wh Tier-1 EV-Grade LiFePO4',
+      battery: '2000Wh EV-Grade LiFePO4 Capacity',
       solar: '1 × 585W Tier-1 Monocrystalline Panel',
       solarWatts: '585W High-Irradiance Solar Panel',
-      baseCost: 612000,
-      deliveryFee: 30000,
-      finalPrice: 642000,
-      marketValue: 890000,
-      savings: 248000,
+      finalPrice: 612000,
+      marketValue: 850000,
+      savings: 238000,
       savingsPct: '28%',
-      colorTheme: 'bg-mint',
+      colorTheme: 'bg-blue-light',
       image: '/images/products/ecoflow-power-station.png',
       badge: 'EV-GRADE CELLS',
       powers: 'Double-Door Fridge + 55" TV + Blender + Desktop PC',
@@ -139,39 +127,35 @@
     {
       id: 'bf-hithium-2-dual',
       brand: 'Hithium',
-      model: 'Hithium 2 (Dual Solar Rapid Recharge)',
-      rating: '1200W (Surge 2400W)',
+      model: 'Hithium 2 Solar Kit (Dual-Panel Rapid)',
+      rating: '1000W Output Pure Sine Wave',
       tier: 'over-1000',
-      battery: '1024Wh Tier-1 EV-Grade LiFePO4',
+      battery: '2000Wh EV-Grade LiFePO4 Capacity',
       solar: '2 × 585W Panels (1,170W Solar Array)',
       solarWatts: '1,170W Massive Dual Solar Array',
-      baseCost: 724000,
-      deliveryFee: 30000,
-      finalPrice: 754000,
-      marketValue: 1050000,
+      finalPrice: 724000,
+      marketValue: 1020000,
       savings: 296000,
-      savingsPct: '28%',
+      savingsPct: '29%',
       colorTheme: 'bg-amber',
       image: '/images/products/ecoflow-power-station.png',
-      badge: 'RAPID CHARGE',
-      powers: 'Full 3-Bedroom Flat Lighting + TV + Fridge + Freezer',
-      runtime: 'Charges 0 to 100% in under 90 minutes of Nigerian sun'
+      badge: 'RAPID CHARGE COMBO',
+      powers: 'Full Flat Lighting + TV + Fridge + Freezer + Workstations',
+      runtime: 'Charges in under 90 minutes with 1,170W dual solar input'
     },
     {
       id: 'bf-hicces-1000',
       brand: 'Hicces',
-      model: 'Hicces 1000W Max Station',
-      rating: '1000W Continuous Heavy Load',
+      model: 'Hicces 1000W Solar Power Station',
+      rating: '1000W Output Pure Sine Wave',
       tier: 'over-1000',
-      battery: '1024Wh LiFePO4 Battery Bank',
+      battery: '2000Wh Battery Capacity',
       solar: '2 × 585W Panels (1,170W Solar Array)',
       solarWatts: '1,170W Dual Solar Array Included',
-      baseCost: 754000,
-      deliveryFee: 30000,
-      finalPrice: 784000,
-      marketValue: 1100000,
-      savings: 316000,
-      savingsPct: '29%',
+      finalPrice: 754000,
+      marketValue: 1050000,
+      savings: 296000,
+      savingsPct: '28%',
       colorTheme: 'bg-teal',
       image: '/images/products/ecoflow-power-station.png',
       badge: 'HEAVY ESSENTIALS',
@@ -182,43 +166,39 @@
       id: 'bf-coloar-2000',
       brand: 'Coloar Solar',
       model: 'Coloar 2000 Heavy-Duty Power Station',
-      rating: '2000W Pure Sine Wave (Surge 4000W)',
+      rating: '1000W Output Pure Sine Wave',
       tier: 'over-1000',
-      battery: '2048Wh High-Capacity LiFePO4',
+      battery: '2000Wh High-Capacity LiFePO4',
       solar: '2 × 585W Panels (1,170W Solar Array)',
       solarWatts: '1,170W Dual Monocrystalline Array',
-      baseCost: 782000,
-      deliveryFee: 30000,
-      finalPrice: 812000,
-      marketValue: 1180000,
-      savings: 368000,
-      savingsPct: '31%',
+      finalPrice: 782000,
+      marketValue: 1100000,
+      savings: 318000,
+      savingsPct: '29%',
       colorTheme: 'bg-crimson',
       image: '/images/products/ecoflow-power-station.png',
       badge: '🔥 FLASH DEAL HERO',
-      powers: '1HP Inverter AC (Day) + Freezer + Microwave + Water Pump',
-      runtime: 'Replaces noisy 2.5kVA generator with 0dB silent energy'
+      powers: 'Freezer + TV + Fans + Laptops + Medical & Office Loads',
+      runtime: 'Replaces noisy generator with 0dB silent solar power'
     },
     {
       id: 'bf-coloar-3600',
       brand: 'Coloar Solar',
       model: 'Coloar 3600 Ultimate Solar Powerhouse',
-      rating: '3600W Industrial Capacity (Surge 7200W)',
+      rating: '1200W Output Pure Sine Wave',
       tier: 'over-1000',
-      battery: '3072Wh Expandable LiFePO4 Energy Storage',
+      battery: '3600Wh Expandable LiFePO4 Storage',
       solar: '3 × 585W Panels (1,755W Mega Solar Array)',
       solarWatts: '1,755W Triple Solar Array Included',
-      baseCost: 1136000,
-      deliveryFee: 30000,
-      finalPrice: 1166000,
-      marketValue: 1650000,
-      savings: 484000,
+      finalPrice: 1136000,
+      marketValue: 1600000,
+      savings: 464000,
       savingsPct: '29%',
       colorTheme: 'bg-navy',
       image: '/images/products/ecoflow-power-station.png',
-      badge: '👑 KING OF POWER',
-      powers: '1.5HP AC + Heavy Pumps + Full Duplex Office & Clinic',
-      runtime: 'Massive 3.6kW capacity handles virtually any household load'
+      badge: '👑 KING OF CAPACITY',
+      powers: 'Pumps, Refrigerators, Multiple Rooms & Clinic Workstations',
+      runtime: 'Massive 3600Wh energy storage for multi-day reliability'
     }
   ];
 
@@ -326,12 +306,15 @@
           <!-- Pricing Box -->
           <div class="bf-pricing-box">
             <div class="bf-price-row-top">
-              <span class="bf-price-label">Black Friday Promo</span>
+              <span class="bf-price-label">Complete Solar Combo Price</span>
               <span class="bf-price-strikethrough">${formatNgn(pkg.marketValue)}</span>
             </div>
             <div class="bf-price-final-row">
               <span class="bf-price-main">${formatNgn(pkg.finalPrice)}</span>
               <span class="bf-delivery-included-tag">Free Lagos &amp; Ibadan Freight</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #475569; margin-top: 6px; font-weight: 600;">
+              ⚡ All-in-One: Power Station + ${pkg.solar}
             </div>
           </div>
 
@@ -377,8 +360,14 @@
     if (!modal || !pkg) return;
     currentSelectedPackage = pkg;
 
-    document.getElementById('bf-modal-title').textContent = pkg.model;
-    document.getElementById('bf-modal-specs').textContent = `${pkg.rating} | ${pkg.battery} + ${pkg.solar}`;
+    document.getElementById('bf-modal-title').textContent = `${pkg.model} Solar Combo`;
+    document.getElementById('bf-modal-specs').innerHTML = `
+      <div><strong>Output:</strong> ${pkg.rating} &bull; <strong>Storage:</strong> ${pkg.battery}</div>
+      <div style="margin-top:4px;"><strong>Included Solar:</strong> ${pkg.solar}</div>
+      <div style="color:#0052FF; font-weight:800; margin-top:6px; font-size:0.75rem; text-transform:uppercase;">
+        ★ Complete Solar Combo Package (Sold as full bundle only)
+      </div>
+    `;
     document.getElementById('bf-modal-price').textContent = formatNgn(pkg.finalPrice);
 
     modal.classList.add('open');
@@ -394,13 +383,13 @@
   function sendWhatsAppOrder(pkg) {
     if (!pkg) return;
     const phone = '2348033882268';
-    const message = `Hello DEVICE PRO! I want to order the Black Friday Deal:
+    const message = `Hello DEVICE PRO! I want to order the Black Friday Solar Combo Deal:
 *${pkg.model}*
-- Inverter: ${pkg.rating}
-- Battery: ${pkg.battery}
-- Solar Array: ${pkg.solar}
-- Price: ${formatNgn(pkg.finalPrice)} (Free Doorstep Delivery Included)
-Please send payment invoice and arrange dispatch to my location (Lagos/Ibadan).`;
+- Output Rating: ${pkg.rating}
+- Battery Capacity: ${pkg.battery}
+- Solar Array Included: ${pkg.solar}
+- Total Combo Price: ${formatNgn(pkg.finalPrice)} (Complete Package with Free Lagos & Ibadan Delivery)
+Please confirm stock availability and send payment invoice for dispatch.`;
 
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
