@@ -1695,34 +1695,61 @@ body.black-friday-page {
 }
 
 /* =============================================================================
-   11. RESPONSIVE BREAKPOINTS
+   10. SCROLL-TRIGGERED FADE-IN & REVEAL ANIMATIONS
+   ============================================================================= */
+.bf-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.bf-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delay classes for cascading elements */
+.bf-delay-1 { transition-delay: 0.08s; }
+.bf-delay-2 { transition-delay: 0.16s; }
+.bf-delay-3 { transition-delay: 0.24s; }
+.bf-delay-4 { transition-delay: 0.32s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bf-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* =============================================================================
+   11. COMPREHENSIVE RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
    ============================================================================= */
 @media (max-width: 1024px) {
   .bf-hero-split-container {
     flex-direction: column;
   }
   .bf-hero-left {
-    padding: 60px 24px 80px;
+    padding: 60px 24px 70px;
   }
   .bf-hero-right {
-    padding: 60px 20px;
+    padding: 50px 20px 60px;
   }
   .bf-torn-seam-vertical {
     display: none;
   }
   .bf-spinning-badge-anchor {
-    left: 50%;
-    top: auto;
-    bottom: -60px;
-    transform: translateX(-50%);
+    display: none;
   }
   .bf-flash-deal-container {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 36px;
   }
   .bf-comparison-container {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 36px;
   }
   .bf-footer-inner {
     grid-template-columns: 1fr;
@@ -1731,28 +1758,376 @@ body.black-friday-page {
 }
 
 @media (max-width: 768px) {
+  /* Top Bar */
+  .bf-top-bar {
+    padding: 6px 0;
+  }
+  .bf-top-bar-inner {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+    padding: 0 12px;
+  }
+  .bf-back-link {
+    font-size: 0.75rem;
+  }
+  .bf-top-highlight {
+    font-size: 0.6875rem;
+    padding: 2px 10px;
+    width: auto;
+    text-align: center;
+  }
   .bf-top-contact {
     display: none;
   }
+
+  /* Nav Header */
+  .bf-nav-inner {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .bf-logo-wrap {
+    gap: 6px;
+  }
+  .bf-logo-img {
+    height: clamp(38px, 9vw, 54px);
+    max-width: 190px;
+  }
+  .bf-campaign-tag {
+    font-size: 0.5625rem;
+    padding: 2px 6px;
+    letter-spacing: 0.04em;
+  }
+  .btn-bf-jump {
+    display: none;
+  }
+  .btn-bf-whatsapp {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    gap: 6px;
+  }
+
+  /* Hero Section */
+  .bf-hero-section {
+    min-height: auto;
+  }
+  .bf-hero-left {
+    padding: 36px 14px 44px;
+  }
+  .bf-hero-eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
   .bf-hero-title {
-    font-size: 3rem;
+    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    line-height: 0.95;
+    margin-bottom: 14px;
   }
   .bf-special-tag {
-    position: relative;
-    top: 0;
-    left: 0;
+    position: static;
     transform: none;
-    margin-bottom: 16px;
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    margin-bottom: 14px;
     display: inline-flex;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  .bf-hero-desc {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    margin-bottom: 22px;
+  }
+  .bf-hero-cta-row {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .btn-bf-primary,
+  .btn-bf-ghost {
+    width: 100%;
+    justify-content: center;
+    padding: 13px 20px;
+    font-size: 0.9375rem;
+    text-align: center;
+  }
+  .bf-hero-badges {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding-top: 18px;
+  }
+  .bf-hero-right {
+    padding: 28px 12px 40px;
+  }
+  .bf-hero-cutouts-wrap {
+    max-width: 100%;
+    width: 100%;
+    gap: 16px;
+  }
+  .bf-torn-photo-card {
+    transform: none !important;
+    padding: 18px 14px;
+  }
+  .bf-torn-card-inner {
+    gap: 12px;
+  }
+  .bf-card-img-wrap {
+    width: 85px;
+    height: 80px;
+    flex-shrink: 0;
+  }
+  .bf-card-title {
+    font-size: 1.0625rem;
+  }
+  .bf-card-price {
+    font-size: 1.3125rem;
+  }
+
+  /* Marquee Ticker */
+  .bf-tape-content {
+    font-size: 0.875rem;
+    gap: 20px;
+    padding-right: 20px;
+  }
+
+  /* Catalog Section */
+  .bf-catalog-section {
+    padding: 50px 12px 60px;
+  }
+  .bf-section-title {
+    font-size: clamp(1.65rem, 6.5vw, 2.3rem);
+  }
+  .bf-section-subtitle {
+    font-size: 0.875rem;
+    padding: 0 4px;
+  }
+  .bf-filter-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    justify-content: flex-start;
+    padding: 0 4px 12px;
+    scrollbar-width: none;
+  }
+  .bf-filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .bf-filter-btn {
+    font-size: 0.75rem;
+    padding: 8px 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   .bf-products-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .bf-product-card {
+    border-radius: 14px;
+  }
+  .bf-card-hero {
+    height: 180px;
+    padding: 14px;
+  }
+  .bf-card-product-img {
+    max-height: 130px;
+  }
+  .bf-card-body {
+    padding: 16px;
+  }
+  .bf-card-name {
+    font-size: 1.1875rem;
+  }
+  .bf-card-specs-list {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    gap: 5px;
+  }
+  .bf-price-main {
+    font-size: 1.625rem;
+  }
+  .bf-card-actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .btn-card-whatsapp,
+  .btn-card-buy {
+    font-size: 0.75rem;
+    padding: 10px 8px;
+  }
+
+  /* Flash Deal Section */
+  .bf-flash-deal-section {
+    padding: 60px 14px 70px;
+  }
+  .bf-flash-title {
+    font-size: clamp(1.75rem, 7vw, 2.3rem);
+  }
+  .bf-flash-desc {
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+  .bf-countdown-box {
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 22px;
+  }
+  .bf-timer-unit {
+    min-width: 62px;
+    padding: 8px 8px;
+    border-radius: 8px;
+  }
+  .bf-timer-num {
+    font-size: 1.5rem;
+  }
+  .bf-timer-label {
+    font-size: 0.625rem;
+    margin-top: 4px;
+  }
+  .bf-timer-sep {
+    font-size: 1.25rem;
+    margin-top: -6px;
+  }
+  .bf-flash-price-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .bf-flash-price-main {
+    font-size: 2.25rem;
+  }
+  .bf-flash-savings-pill {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+  }
+  #btn-claim-flash-deal {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+  }
+  .bf-flash-torn-frame {
+    padding: 18px 12px;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  /* Comparison Section */
+  .bf-comparison-section {
+    padding: 50px 14px;
+  }
+  .bf-comparison-photo {
+    height: 220px;
+  }
+  .bf-comparison-content h2 {
+    font-size: 1.5rem;
+  }
+  .bf-comparison-content p {
+    font-size: 0.9375rem;
+  }
+  .bf-comparison-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .bf-comparison-table th,
+  .bf-comparison-table td {
+    padding: 10px 12px;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  /* Reviews Section */
+  .bf-reviews-section {
+    padding: 50px 14px 60px;
+  }
+  .bf-reviews-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .bf-review-card {
+    padding: 20px 16px;
+  }
+  .bf-review-text {
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  /* Footer & Sticky Mobile Bar */
+  .bf-footer {
+    padding: 50px 14px 100px;
+  }
+  .bf-footer-inner {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .bf-footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
   }
   .bf-mobile-bar {
     display: flex;
+    padding: 10px 14px;
   }
-  .bf-footer {
-    padding-bottom: 90px;
+
+  /* Quick Order Modal */
+  .bf-modal-backdrop {
+    padding: 10px;
+  }
+  .bf-modal-card {
+    max-width: 100%;
+    border-radius: 14px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .bf-modal-header {
+    padding: 14px 18px;
+  }
+  .bf-modal-title {
+    font-size: 1.0625rem;
+  }
+  .bf-modal-body {
+    padding: 16px;
+  }
+  .bf-modal-price {
+    font-size: 1.375rem;
+  }
+  .btn-modal-whatsapp,
+  .btn-modal-paystack {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bf-hero-left {
+    padding: 30px 12px 38px;
+  }
+  .bf-hero-title {
+    font-size: 2.35rem;
+  }
+  .bf-card-hero {
+    height: 165px;
+  }
+  .bf-card-product-img {
+    max-height: 115px;
+  }
+  .bf-timer-unit {
+    min-width: 54px;
+    padding: 6px 4px;
+  }
+  .bf-timer-num {
+    font-size: 1.35rem;
+  }
+  .bf-timer-sep {
+    font-size: 1.1rem;
   }
 }
 

@@ -333,6 +333,7 @@
     `).join('');
 
     bindProductActions();
+    observeNewCards();
   }
 
   // =========================================================================
@@ -471,10 +472,94 @@ Please confirm stock availability and send payment invoice for dispatch.`;
   }
 
   // =========================================================================
-  // 6. INITIALIZATION
+  // 6. SCROLL REVEAL & FADE-IN ENGINE
+  // =========================================================================
+  let scrollObserver = null;
+
+  function initScrollAnimations() {
+    const targetSelectors = [
+      '.bf-hero-left',
+      '.bf-hero-cutouts-wrap',
+      '.bf-marquee-section',
+      '.bf-catalog-section .bf-section-header',
+      '.bf-filter-tabs',
+      '.bf-flash-deal-container',
+      '.bf-comparison-media',
+      '.bf-comparison-content',
+      '.bf-reviews-section .bf-section-header',
+      '.bf-review-card',
+      '.bf-footer-inner'
+    ];
+
+    const elements = document.querySelectorAll(targetSelectors.join(', '));
+
+    // Fallback if IntersectionObserver is not supported
+    if (!('IntersectionObserver' in window)) {
+      elements.forEach(el => el.classList.add('is-revealed'));
+      return;
+    }
+
+    if (scrollObserver) {
+      scrollObserver.disconnect();
+    }
+
+    scrollObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      root: null,
+      threshold: 0.08,
+      rootMargin: '0px 0px -30px 0px'
+    });
+
+    elements.forEach(el => {
+      if (!el.classList.contains('bf-reveal')) {
+        el.classList.add('bf-reveal');
+      }
+      scrollObserver.observe(el);
+    });
+
+    // Check viewport immediately on page load / refresh
+    requestAnimationFrame(() => {
+      elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          el.classList.add('is-revealed');
+        }
+      });
+    });
+  }
+
+  function observeNewCards() {
+    const cards = document.querySelectorAll('.bf-product-card');
+    cards.forEach((card, index) => {
+      card.classList.add('bf-reveal');
+      card.style.transitionDelay = `${(index % 3) * 0.1}s`;
+
+      if (scrollObserver) {
+        scrollObserver.observe(card);
+      }
+
+      // If already within visible viewport:
+      const rect = card.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        setTimeout(() => {
+          card.classList.add('is-revealed');
+        }, (index % 3) * 80);
+      }
+    });
+  }
+
+  // =========================================================================
+  // 7. INITIALIZATION
   // =========================================================================
   document.addEventListener('DOMContentLoaded', () => {
     initCountdown();
+    initScrollAnimations();
     renderProducts('all');
     initFilterTabs();
     initModalEvents();
