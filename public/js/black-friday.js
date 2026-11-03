@@ -502,3 +502,4 @@ Please send payment invoice and arrange dispatch to my location (Lagos/Ibadan).`
   });
 
 })();
+
