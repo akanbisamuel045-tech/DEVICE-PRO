@@ -132,9 +132,9 @@ body.products-page-body {
 }
 
 .brand-logo-img {
-  height: 50.4px;
+  height: 60.5px;
   width: auto;
-  max-width: 264px;
+  max-width: 316.8px;
   object-fit: contain;
 }
 
@@ -1926,8 +1926,8 @@ dialog#search-dialog::backdrop {
     height: 64px;
   }
   .brand-logo-img {
-    height: 44px;
-    max-width: 180px;
+    height: 52.8px;
+    max-width: 216px;
   }
   .btn-get-quote-yellow {
     display: none;
