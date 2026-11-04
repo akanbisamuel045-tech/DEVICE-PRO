@@ -2450,48 +2450,72 @@ body.black-friday-page {
 
   /* Comparison Section Mobile */
   .bf-comparison-section {
-    padding: 44px 14px 50px;
+    padding: 36px 12px 44px;
     width: 100%;
     max-width: 100%;
     overflow: hidden;
   }
   .bf-comparison-photo {
-    height: 220px;
+    height: 180px;
+    border-radius: 10px;
   }
   .bf-comparison-content {
     width: 100%;
     max-width: 100%;
   }
   .bf-comparison-content h2 {
-    font-size: clamp(1.4rem, 5.5vw, 1.85rem);
-    line-height: 1.2;
+    font-size: clamp(1.25rem, 5vw, 1.5rem);
+    line-height: 1.25;
+    margin-bottom: 12px;
     word-break: break-word;
     overflow-wrap: break-word;
   }
   .bf-comparison-content p {
-    font-size: 0.9375rem;
-    line-height: 1.55;
+    font-size: 0.84375rem;
+    line-height: 1.5;
+    margin-bottom: 18px;
     word-break: break-word;
     overflow-wrap: break-word;
   }
   .bf-comparison-table-scroll {
     width: 100%;
     max-width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 10px;
-    margin-bottom: 22px;
+    overflow-x: hidden;
+    border-radius: 8px;
+    margin-bottom: 20px;
   }
   .bf-comparison-table {
     display: table;
     width: 100%;
-    min-width: 480px;
+    min-width: 0 !important;
+    table-layout: fixed;
   }
   .bf-comparison-table th,
   .bf-comparison-table td {
-    padding: 10px 12px;
+    padding: 7px 5px;
+    font-size: 0.65625rem;
+    line-height: 1.25;
+    white-space: normal;
+    word-break: break-word;
+  }
+  .bf-comparison-table th:first-child,
+  .bf-comparison-table td:first-child {
+    width: 32%;
+  }
+  .bf-comparison-table th:nth-child(2),
+  .bf-comparison-table td:nth-child(2) {
+    width: 35%;
+  }
+  .bf-comparison-table th:last-child,
+  .bf-comparison-table td:last-child {
+    width: 33%;
+  }
+  .bf-comparison-content .btn-bf-jump {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 12px;
     font-size: 0.8125rem;
-    white-space: nowrap;
   }
 
   /* Reviews Section */
