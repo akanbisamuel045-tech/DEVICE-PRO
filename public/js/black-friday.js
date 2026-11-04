@@ -24,7 +24,7 @@
       savings: 126000,
       savingsPct: '28%',
       colorTheme: 'bg-teal',
-      image: '/images/products/hicces-500w-power-station.jpg',
+      image: '/images/products/hicces-500w.jpg',
       badge: 'STARTER COMBO',
       powers: 'Laptops, Starlink Router, Phones, Lighting, LED TV, Clippers',
       runtime: 'Continuous day & night power for work essentials'
@@ -43,7 +43,7 @@
       savings: 148000,
       savingsPct: '28%',
       colorTheme: 'bg-crimson',
-      image: '/images/products/hicces-500w-power-station.jpg',
+      image: '/images/products/hicces-500w.jpg',
       badge: 'TOP VALUE COMBO',
       powers: 'TV + Decoder + Standing Fans + Workstations + Blender',
       runtime: 'Full workday power station for remote professionals'
@@ -62,7 +62,7 @@
       savings: 160000,
       savingsPct: '30%',
       colorTheme: 'bg-amber',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/colar-1000-pro.webp',
       badge: 'BESTSELLER COMBO',
       powers: 'Fans, Laptops, LED TV, Soundbar, Smart Home',
       runtime: 'Smooth quiet electricity with 1000Wh deep storage'
@@ -81,7 +81,7 @@
       savings: 162000,
       savingsPct: '29%',
       colorTheme: 'bg-navy',
-      image: '/images/products/itel-500w-power-station.webp',
+      image: '/images/products/itel-powertank-500w.webp',
       badge: 'OFFICIAL ITEL COMBO',
       powers: '43" Smart TV + Decoder + 2 Standing Fans + Wi-Fi',
       runtime: 'Certified itel durability with 0dB silent operation'
@@ -100,7 +100,7 @@
       savings: 168000,
       savingsPct: '30%',
       colorTheme: 'bg-purple',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/colar-1000.webp',
       badge: 'EXTENDED RUNTIME',
       powers: 'Home Entertainment + Lighting + 3 Standing Fans + Laptops',
       runtime: 'All-night uninterrupted fan and lighting support'
@@ -119,7 +119,7 @@
       savings: 238000,
       savingsPct: '28%',
       colorTheme: 'bg-mint',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/hithium-hero-ee2.png',
       badge: 'EV-GRADE CELLS',
       powers: 'Double-Door Fridge + 55" TV + Blender + Desktop PC',
       runtime: 'Over 4,000 battery cycles (10+ years lifetime)'
@@ -138,7 +138,7 @@
       savings: 296000,
       savingsPct: '29%',
       colorTheme: 'bg-amber',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/hithium-hero-ee2.png',
       badge: 'RAPID CHARGE COMBO',
       powers: 'Full Flat Lighting + TV + Fridge + Freezer + Workstations',
       runtime: 'Charges in under 90 minutes with 1,170W dual solar input'
@@ -157,7 +157,7 @@
       savings: 296000,
       savingsPct: '28%',
       colorTheme: 'bg-teal',
-      image: '/images/products/hicces-500w-power-station.jpg',
+      image: '/images/products/hicces-500w.jpg',
       badge: 'HEAVY ESSENTIALS',
       powers: 'Office Equipment, Deep Freezer, Sewing Machine, Sound',
       runtime: 'Reliable all-day power for SMEs and residential clinics'
@@ -176,7 +176,7 @@
       savings: 318000,
       savingsPct: '29%',
       colorTheme: 'bg-crimson',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/colar-2000.webp',
       badge: '🔥 FLASH DEAL HERO',
       powers: 'Freezer + TV + Fans + Laptops + Medical & Office Loads',
       runtime: 'Replaces noisy generator with 0dB silent solar power'
@@ -195,7 +195,7 @@
       savings: 464000,
       savingsPct: '29%',
       colorTheme: 'bg-navy',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/colar-3600.webp',
       badge: '👑 KING OF CAPACITY',
       powers: 'Pumps, Refrigerators, Multiple Rooms & Clinic Workstations',
       runtime: 'Massive 3600Wh energy storage for multi-day reliability'
