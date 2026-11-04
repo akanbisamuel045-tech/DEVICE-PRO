@@ -761,48 +761,58 @@ body.black-friday-page {
 /* Dual Product Visual Area: Power Station + Solar Panel */
 .bf-showcase-media-duo {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   gap: 16px;
-  height: 155px;
-  padding: 10px 10px 12px;
-  background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%);
+  height: 165px;
+  padding: 10px;
+  background: transparent;
   border-radius: 12px;
   margin-bottom: 14px;
-  border: 1px solid #E2E8F0;
+  border: none;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .bf-media-unit {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 }
 
 .bf-media-powerstation {
-  flex: 0 0 46%;
+  flex: 0 0 48%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bf-media-powerstation img {
   max-width: 100%;
-  max-height: 135px;
+  max-height: 145px;
   object-fit: contain;
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
+  margin: 0 auto;
+  display: block;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
 }
 
 .bf-media-solarpanel {
-  flex: 0 0 44%;
+  flex: 0 0 46%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transform: rotate(-3deg);
 }
 
 .bf-media-solarpanel img {
   max-width: 100%;
-  max-height: 140px;
+  max-height: 148px;
   object-fit: contain;
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.22));
+  margin: 0 auto;
+  display: block;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.25));
 }
 
 /* Showcase Card Info & Typography */
@@ -1142,10 +1152,12 @@ body.black-friday-page {
 }
 
 .bf-card-product-img {
-  max-height: 160px;
-  max-width: 80%;
+  max-height: 165px;
+  max-width: 84%;
   object-fit: contain;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.35));
+  margin: 0 auto;
+  display: block;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.35));
   transition: transform 0.3s ease;
   z-index: 2;
 }
@@ -2244,15 +2256,33 @@ body.black-friday-page {
     padding: 3px 8px;
   }
   .bf-showcase-media-duo {
-    height: 135px;
+    height: 140px;
     gap: 12px;
-    padding: 8px 10px;
+    padding: 6px;
     margin-bottom: 12px;
-    background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%);
-    border-radius: 10px;
+    background: transparent;
+    border: none;
+    align-items: center;
+    justify-content: center;
   }
   .bf-media-powerstation {
     flex: 0 0 48%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bf-media-powerstation img {
+    margin: 0 auto;
+    display: block;
+  }
+  .bf-media-solarpanel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bf-media-solarpanel img {
+    margin: 0 auto;
+    display: block;
   }
   .bf-media-powerstation img {
     max-height: 115px;
