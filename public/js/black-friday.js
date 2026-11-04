@@ -24,7 +24,7 @@
       savings: 126000,
       savingsPct: '28%',
       colorTheme: 'bg-teal',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/hicces-500w-power-station.jpg',
       badge: 'STARTER COMBO',
       powers: 'Laptops, Starlink Router, Phones, Lighting, LED TV, Clippers',
       runtime: 'Continuous day & night power for work essentials'
@@ -43,7 +43,7 @@
       savings: 148000,
       savingsPct: '28%',
       colorTheme: 'bg-crimson',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/hicces-500w-power-station.jpg',
       badge: 'TOP VALUE COMBO',
       powers: 'TV + Decoder + Standing Fans + Workstations + Blender',
       runtime: 'Full workday power station for remote professionals'
@@ -81,7 +81,7 @@
       savings: 162000,
       savingsPct: '29%',
       colorTheme: 'bg-navy',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/itel-500w-power-station.webp',
       badge: 'OFFICIAL ITEL COMBO',
       powers: '43" Smart TV + Decoder + 2 Standing Fans + Wi-Fi',
       runtime: 'Certified itel durability with 0dB silent operation'
@@ -157,7 +157,7 @@
       savings: 296000,
       savingsPct: '28%',
       colorTheme: 'bg-teal',
-      image: '/images/products/ecoflow-power-station.png',
+      image: '/images/products/hicces-500w-power-station.jpg',
       badge: 'HEAVY ESSENTIALS',
       powers: 'Office Equipment, Deep Freezer, Sewing Machine, Sound',
       runtime: 'Reliable all-day power for SMEs and residential clinics'
@@ -261,7 +261,7 @@
     grid.innerHTML = filtered.map(pkg => `
       <article class="bf-product-card" data-package-id="${pkg.id}">
         <!-- Top Visual Hero Block with Ripped Color Gradient -->
-        <div class="bf-card-hero ${pkg.colorTheme}">
+        <a href="/black-friday-detail.html?id=${pkg.id}" class="bf-card-hero ${pkg.colorTheme}" style="display:block; text-decoration:none;" title="View ${pkg.model} Full Specifications">
           <span class="bf-card-badge-save">SAVE ${pkg.savingsPct}</span>
           <span class="bf-card-badge-delivery">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.19M15 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3.19"/><path d="M23 13v3a2 2 0 0 1-2 2h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>
@@ -274,7 +274,7 @@
           <svg class="bf-card-torn-divider" viewBox="0 0 500 24" preserveAspectRatio="none">
             <path d="M0,0 L0,12 Q20,22 45,10 Q80,24 110,8 Q150,22 185,12 Q225,24 260,10 Q300,22 340,12 Q385,24 420,10 Q460,22 500,12 L500,24 L0,24 Z" />
           </svg>
-        </div>
+        </a>
 
         <!-- Card Body -->
         <div class="bf-card-body">
@@ -286,7 +286,11 @@
             </span>
           </div>
 
-          <h3 class="bf-card-name">${pkg.model}</h3>
+          <h3 class="bf-card-name">
+            <a href="/black-friday-detail.html?id=${pkg.id}" style="color:inherit; text-decoration:none;" title="View ${pkg.model} Full Specifications">
+              ${pkg.model}
+            </a>
+          </h3>
 
           <ul class="bf-card-specs-list">
             <li>
@@ -317,6 +321,12 @@
               ⚡ All-in-One: Power Station + ${pkg.solar}
             </div>
           </div>
+
+          <!-- View Full Details Link -->
+          <a href="/black-friday-detail.html?id=${pkg.id}" class="btn-card-view-details" style="display:flex; align-items:center; justify-content:center; gap:6px; width:100%; margin-bottom:10px; padding:9px 12px; background:#F8FAFC; border:1px solid #CBD5E1; border-radius:8px; color:#0F172A; font-weight:700; font-size:0.82rem; text-decoration:none; transition:all 0.2s ease;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0157A2" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            View Specs &amp; Details →
+          </a>
 
           <!-- Actions -->
           <div class="bf-card-actions">

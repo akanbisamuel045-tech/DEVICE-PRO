@@ -173,6 +173,10 @@
       const urlParams = new URLSearchParams(window.location.search);
       slug = urlParams.get('slug') || urlParams.get('id') || 'jinko-monocrystalline-solar-panel-550w';
     }
+    if (slug && slug.startsWith("bf-")) {
+      window.location.replace("/black-friday-detail.html?id=" + slug);
+      return slug;
+    }
     return slug;
   }
 
