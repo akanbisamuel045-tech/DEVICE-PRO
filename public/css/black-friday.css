@@ -503,6 +503,39 @@ body.black-friday-page {
   fill: #0A0D14;
 }
 
+/* Horizontal Mobile Paper Tear (Hidden on Desktop) */
+.bf-mobile-paper-tear {
+  display: none;
+  position: absolute;
+  bottom: -22px;
+  left: 0;
+  width: 100%;
+  height: 38px;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.bf-mobile-paper-tear svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mobile-tear-shadow {
+  fill: rgba(0, 0, 0, 0.4);
+  transform: translateY(3px);
+  filter: blur(4px);
+}
+
+.mobile-tear-white {
+  fill: #FFFFFF;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+
+.mobile-tear-fiber {
+  fill: #0A0D14;
+}
+
 /* Right Half — Vivid Orange Promotional Showcase */
 .bf-hero-right {
   flex: 1.05;
@@ -2066,12 +2099,15 @@ body.black-friday-page {
     gap: 6px;
   }
 
-  /* Hero Section */
+  /* Hero Section Mobile Optimizations */
   .bf-hero-section {
     min-height: auto;
+    overflow: hidden;
   }
   .bf-hero-left {
-    padding: 36px 14px 44px;
+    padding: 32px 16px 40px;
+    position: relative;
+    z-index: 10;
   }
   .bf-hero-eyebrow {
     font-size: 0.6875rem;
@@ -2081,42 +2117,55 @@ body.black-friday-page {
   .bf-hero-title-group {
     flex-direction: column;
     align-items: flex-start;
-    gap: 14px;
+    gap: 12px;
     width: 100%;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
   .bf-hero-title {
-    font-size: clamp(2.4rem, 11vw, 3.6rem);
+    font-size: clamp(2.3rem, 10.5vw, 3.4rem);
     line-height: 0.95;
     margin-bottom: 0;
   }
   .bf-free-delivery-sticker {
-    transform: rotate(-3deg);
+    transform: rotate(-1.5deg);
     width: 100%;
-    max-width: 380px;
-    padding: 12px 18px;
-    margin-bottom: 8px;
-    border-width: 3px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    margin-bottom: 4px;
+    border-width: 2.5px;
+    border-radius: 8px;
+  }
+  .bf-sticker-badge {
+    font-size: 0.6875rem;
+    padding: 2px 8px;
+    margin-bottom: 4px;
   }
   .bf-sticker-main {
-    font-size: 1.45rem;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+  .bf-sticker-sub {
+    font-size: 0.625rem;
+    margin-top: 3px;
   }
   .bf-hero-desc {
-    font-size: 0.9375rem;
-    line-height: 1.55;
-    margin-bottom: 22px;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
   }
   .bf-hero-cta-row {
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    margin-bottom: 24px;
+    margin-bottom: 22px;
   }
   .btn-bf-primary,
   .btn-bf-ghost {
     width: 100%;
+    box-sizing: border-box;
     justify-content: center;
-    padding: 13px 20px;
+    padding: 13px 18px;
     font-size: 0.9375rem;
     text-align: center;
   }
@@ -2124,48 +2173,101 @@ body.black-friday-page {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-    padding-top: 18px;
+    padding-top: 16px;
+    margin-bottom: 6px;
   }
+
+  /* Show Horizontal Paper Tear on Mobile */
+  .bf-mobile-paper-tear {
+    display: block;
+  }
+
+  /* Right Orange Showcase Mobile */
   .bf-hero-right {
-    padding: 36px 14px 44px;
+    padding: 44px 16px 40px;
+    position: relative;
+    z-index: 5;
   }
   .bf-hero-showcase-stage {
     max-width: 100%;
     width: 100%;
-    gap: 18px;
+    gap: 22px;
+    padding-top: 12px;
   }
   .bf-showcase-card {
     transform: none !important;
     margin-left: 0 !important;
-    padding: 18px 14px 16px;
+    margin-right: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box;
+    padding: 16px 14px 16px;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+  }
+  .bf-showcase-card-top {
+    transform: rotate(-0.8deg) !important;
+  }
+  .bf-showcase-card-bottom {
+    transform: rotate(0.8deg) !important;
+  }
+  .bf-showcase-free-tag {
+    top: 10px;
+    right: 10px;
+    font-size: 0.625rem;
+    padding: 3px 8px;
   }
   .bf-showcase-media-duo {
-    height: 120px;
-    gap: 10px;
+    height: 135px;
+    gap: 12px;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%);
+    border-radius: 10px;
+  }
+  .bf-media-powerstation {
+    flex: 0 0 48%;
   }
   .bf-media-powerstation img {
-    max-height: 100px;
+    max-height: 115px;
+  }
+  .bf-media-solarpanel {
+    flex: 0 0 46%;
+    transform: rotate(-2deg);
   }
   .bf-media-solarpanel img {
-    max-height: 105px;
+    max-height: 120px;
   }
   .bf-showcase-title {
     font-size: 1.0625rem;
   }
   .bf-showcase-specs {
     font-size: 0.75rem;
+    margin-bottom: 8px;
   }
   .bf-showcase-price-box {
-    padding: 6px 14px;
+    padding: 6px 16px;
     gap: 8px;
+    border-radius: 10px;
   }
   .bf-showcase-price {
-    font-size: 1.1875rem;
+    font-size: 1.25rem;
+  }
+  .bf-showcase-badge-pill {
+    font-size: 0.625rem;
+    padding: 2px 7px;
   }
   .bf-hero-sticker-burst {
-    transform: rotate(-6deg) scale(0.85);
-    top: -24px;
+    transform: rotate(-6deg) scale(0.9);
+    top: -22px;
     left: 8px;
+  }
+  .bf-hero-sticker-burst .burst-black {
+    font-size: 0.875rem;
+    padding: 4px 12px;
+  }
+  .bf-hero-sticker-burst .burst-red {
+    font-size: 1.0625rem;
+    padding: 2px 16px;
   }
   .bf-hero-sticker-seal {
     display: none;
