@@ -161,9 +161,9 @@ body.black-friday-page {
 }
 
 .bf-logo-img {
-  height: 68px;
+  height: 80px;
   width: auto;
-  max-width: 320px;
+  max-width: 360px;
   object-fit: contain;
 }
 
@@ -1586,15 +1586,23 @@ body.black-friday-page {
   margin-bottom: 28px;
 }
 
+.bf-comparison-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 30px;
+  border-radius: 12px;
+  border: 1px solid var(--bf-gray-200);
+  background-color: #FFFFFF;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
 .bf-comparison-table {
   width: 100%;
+  min-width: 540px;
   border-collapse: collapse;
   background-color: #FFFFFF;
-  border: 1px solid var(--bf-gray-200);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
-  margin-bottom: 30px;
+  margin-bottom: 0;
 }
 
 .bf-comparison-table th,
@@ -2092,8 +2100,8 @@ body.black-friday-page {
     gap: 6px;
   }
   .bf-logo-img {
-    height: clamp(38px, 9vw, 54px);
-    max-width: 190px;
+    height: clamp(52px, 13vw, 70px);
+    max-width: 250px;
   }
   .bf-campaign-tag {
     font-size: 0.5625rem;
@@ -2440,24 +2448,44 @@ body.black-friday-page {
     margin: 0 auto;
   }
 
-  /* Comparison Section */
+  /* Comparison Section Mobile */
   .bf-comparison-section {
-    padding: 50px 14px;
+    padding: 44px 14px 50px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
   .bf-comparison-photo {
     height: 220px;
   }
+  .bf-comparison-content {
+    width: 100%;
+    max-width: 100%;
+  }
   .bf-comparison-content h2 {
-    font-size: 1.5rem;
+    font-size: clamp(1.4rem, 5.5vw, 1.85rem);
+    line-height: 1.2;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
   .bf-comparison-content p {
     font-size: 0.9375rem;
+    line-height: 1.55;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
-  .bf-comparison-table {
-    display: block;
+  .bf-comparison-table-scroll {
     width: 100%;
+    max-width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    border-radius: 10px;
+    margin-bottom: 22px;
+  }
+  .bf-comparison-table {
+    display: table;
+    width: 100%;
+    min-width: 480px;
   }
   .bf-comparison-table th,
   .bf-comparison-table td {
