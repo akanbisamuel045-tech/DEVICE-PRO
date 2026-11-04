@@ -37,6 +37,12 @@
   padding: 0;
 }
 
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 html {
   scroll-behavior: smooth;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -46,9 +52,9 @@ html {
 }
 
 body.black-friday-page {
-  overflow-x: hidden;
   background-color: var(--bf-white);
   line-height: 1.5;
+  position: relative;
 }
 
 /* =============================================================================
@@ -230,12 +236,16 @@ body.black-friday-page {
   display: flex;
   align-items: stretch;
   overflow: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .bf-hero-split-container {
   width: 100%;
+  max-width: 100%;
   display: flex;
   position: relative;
+  overflow: hidden;
 }
 
 /* Left Half — Dark Graphic */
@@ -2187,6 +2197,15 @@ body.black-friday-page {
     padding: 44px 16px 40px;
     position: relative;
     z-index: 5;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+  }
+  .bf-hero-right::before {
+    top: -20%;
+    left: -10%;
+    width: 120%;
+    height: 140%;
   }
   .bf-hero-showcase-stage {
     max-width: 100%;
@@ -2276,7 +2295,21 @@ body.black-friday-page {
     display: none;
   }
 
-  /* Marquee Ticker */
+  /* Marquee Ticker Mobile */
+  .bf-marquee-section {
+    width: 100%;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+  .bf-tape-green,
+  .bf-tape-blue {
+    transform: rotate(-1deg);
+    padding: 9px 0;
+  }
+  .bf-tape-gold {
+    transform: rotate(0.8deg);
+    padding: 8px 0;
+  }
   .bf-tape-content {
     font-size: 0.875rem;
     gap: 20px;
