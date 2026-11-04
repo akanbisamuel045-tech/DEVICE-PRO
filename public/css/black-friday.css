@@ -465,23 +465,49 @@ body.black-friday-page {
   flex-shrink: 0;
 }
 
-/* The Torn Paper Seam (Vertical Ripped Edge) */
-.bf-torn-seam-vertical {
+/* =============================================================================
+   REALISTIC STREETWEAR RIPPED PAPER TEAR SEAM (CENTER SPLIT)
+   ============================================================================= */
+.bf-realistic-paper-tear {
   position: absolute;
   top: 0;
   bottom: 0;
-  right: -1px;
-  width: 52px;
-  z-index: 15;
+  right: -24px;
+  width: 58px;
+  z-index: 20;
   pointer-events: none;
-  fill: var(--bf-black);
+  overflow: visible;
+}
+
+.tear-layer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tear-shadow {
+  fill: rgba(0, 0, 0, 0.45);
+  transform: translateX(4px);
+  filter: blur(5px);
+}
+
+.tear-white-edge {
+  fill: #FFFFFF;
+  filter: drop-shadow(2px 0 3px rgba(0, 0, 0, 0.28));
+}
+
+.tear-rough-fiber {
+  fill: #0A0D14;
 }
 
 /* Right Half — Vivid Orange Promotional Showcase */
 .bf-hero-right {
-  flex: 0.95;
-  background: radial-gradient(circle at 65% 45%, #FF7A00 0%, #FF5400 45%, #E64500 100%);
-  padding: 50px 36px 60px;
+  flex: 1.05;
+  background: radial-gradient(circle at 70% 40%, #FF8500 0%, #FF5B00 50%, #E64200 100%);
+  padding: 40px 48px 50px 36px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -494,14 +520,14 @@ body.black-friday-page {
 .bf-hero-right::before {
   content: '';
   position: absolute;
-  top: -40%;
-  left: -20%;
-  width: 140%;
-  height: 180%;
+  top: -45%;
+  left: -25%;
+  width: 150%;
+  height: 190%;
   background: repeating-conic-gradient(
     from 0deg,
-    rgba(255, 255, 255, 0.14) 0deg 10deg,
-    transparent 10deg 20deg
+    rgba(255, 255, 255, 0.16) 0deg 8deg,
+    transparent 8deg 18deg
   );
   pointer-events: none;
   z-index: 1;
@@ -527,24 +553,24 @@ body.black-friday-page {
 .bf-hero-showcase-stage {
   position: relative;
   z-index: 10;
-  max-width: 470px;
+  max-width: 500px;
   margin: 0 auto;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 24px;
 }
 
 /* Floating Promotional Badges (Reference Style) */
 .bf-hero-sticker-burst {
   position: absolute;
-  top: -34px;
-  left: 20px;
-  z-index: 25;
+  top: -24px;
+  left: 12px;
+  z-index: 30;
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: rotate(-7deg);
+  transform: rotate(-6deg);
   filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
   pointer-events: none;
 }
@@ -554,9 +580,9 @@ body.black-friday-page {
   color: #FFFFFF;
   font-family: var(--bf-font-display);
   font-weight: 900;
-  font-size: 0.9375rem;
-  letter-spacing: 0.04em;
-  padding: 4px 14px;
+  font-size: 1.0625rem;
+  letter-spacing: 0.05em;
+  padding: 5px 16px;
   border-radius: 4px;
   text-transform: uppercase;
 }
@@ -566,27 +592,27 @@ body.black-friday-page {
   color: #FFFFFF;
   font-family: var(--bf-font-display);
   font-weight: 900;
-  font-size: 1.1875rem;
+  font-size: 1.3125rem;
   letter-spacing: 0.08em;
-  padding: 2px 20px;
-  margin-top: -3px;
+  padding: 3px 24px;
+  margin-top: -4px;
   border-radius: 4px;
   text-transform: uppercase;
-  border: 2px solid #FFFFFF;
+  border: 2.5px solid #FFFFFF;
 }
 
 .bf-hero-sticker-seal {
   position: absolute;
-  top: 140px;
-  right: -24px;
-  z-index: 25;
+  top: 148px;
+  right: -16px;
+  z-index: 30;
   pointer-events: none;
   transform: rotate(12deg);
 }
 
 .bf-hero-sticker-seal .seal-inner {
-  width: 78px;
-  height: 78px;
+  width: 82px;
+  height: 82px;
   background: radial-gradient(circle, #DC2626 40%, #B91C1C 100%);
   border: 3px dashed #FFFFFF;
   border-radius: 50%;
@@ -602,22 +628,22 @@ body.black-friday-page {
 }
 
 .seal-text-top {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   letter-spacing: 0.05em;
 }
 
 .seal-text-sub {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.08em;
 }
 
 .bf-hero-sticker-tape {
   position: absolute;
-  bottom: 40px;
-  left: -20px;
-  z-index: 25;
+  bottom: 24px;
+  left: -14px;
+  z-index: 30;
   pointer-events: none;
-  transform: rotate(-10deg);
+  transform: rotate(-9deg);
 }
 
 .bf-hero-sticker-tape .tape-tag {
@@ -625,12 +651,12 @@ body.black-friday-page {
   color: #FFFFFF;
   font-family: var(--bf-font-display);
   font-weight: 900;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   letter-spacing: 0.06em;
-  padding: 5px 16px;
+  padding: 6px 18px;
   border-radius: 4px;
   border: 2px solid #FFFFFF;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
   text-transform: uppercase;
   display: inline-block;
 }
@@ -639,27 +665,30 @@ body.black-friday-page {
 .bf-showcase-card {
   background: #FFFFFF;
   border-radius: 16px;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.24);
   padding: 24px 22px 20px;
   position: relative;
   cursor: pointer;
   transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 3px solid rgba(255, 255, 255, 0.85);
+  border: 3px solid rgba(255, 255, 255, 0.9);
 }
 
 .bf-showcase-card:hover {
   transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 26px 58px rgba(0, 0, 0, 0.32);
   border-color: #FFFFFF;
 }
 
 .bf-showcase-card-top {
   transform: rotate(-1.5deg);
+  width: 92%;
+  margin-right: auto;
 }
 
 .bf-showcase-card-bottom {
   transform: rotate(1.8deg);
-  margin-left: 20px;
+  width: 92%;
+  margin-left: auto;
 }
 
 .bf-showcase-card:hover {
@@ -692,7 +721,7 @@ body.black-friday-page {
   align-items: flex-end;
   justify-content: center;
   gap: 16px;
-  height: 145px;
+  height: 155px;
   padding: 10px 10px 12px;
   background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%);
   border-radius: 12px;
@@ -715,7 +744,7 @@ body.black-friday-page {
 
 .bf-media-powerstation img {
   max-width: 100%;
-  max-height: 125px;
+  max-height: 135px;
   object-fit: contain;
   filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
 }
@@ -728,7 +757,7 @@ body.black-friday-page {
 
 .bf-media-solarpanel img {
   max-width: 100%;
-  max-height: 130px;
+  max-height: 140px;
   object-fit: contain;
   filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.22));
 }
@@ -1965,7 +1994,8 @@ body.black-friday-page {
   .bf-hero-right {
     padding: 50px 20px 60px;
   }
-  .bf-torn-seam-vertical {
+  .bf-torn-seam-vertical,
+  .bf-realistic-paper-tear {
     display: none;
   }
   .bf-spinning-badge-anchor {

@@ -22,7 +22,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@800;900&family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
   
   <!-- Campaign Stylesheet -->
-  <link rel="stylesheet" href="/css/black-friday.css?v=7">
+  <link rel="stylesheet" href="/css/black-friday.css?v=8">
 </head>
 <body class="black-friday-page">
 
@@ -131,31 +131,25 @@
             </div>
           </div>
 
-          <!-- Vertical Jagged Ripped Edge Seam (SVG) -->
-          <svg class="bf-torn-seam-vertical" viewBox="0 0 52 1000" preserveAspectRatio="none">
-            <path d="M0,0 L35,0 Q45,50 30,100 T48,200 Q25,280 44,360 T22,460 Q50,540 32,620 T46,720 Q24,800 48,880 T30,960 L38,1000 L0,1000 Z" />
-          </svg>
+          <!-- Realistic White Ripped Paper Tear Edge (Streetwear Graphic Seam) -->
+          <div class="bf-realistic-paper-tear" aria-hidden="true">
+            <!-- Drop Shadow Layer -->
+            <svg class="tear-layer tear-shadow" viewBox="0 0 65 1000" preserveAspectRatio="none">
+              <path d="M0,0 L26,0 Q36,45 22,90 T32,180 Q44,250 20,320 T34,420 Q15,500 30,570 T18,670 Q38,740 22,820 T34,910 Q18,960 28,1000 L0,1000 Z" />
+            </svg>
+            <!-- Realistic White Paper Body with Rough Fibrous Silhouette -->
+            <svg class="tear-layer tear-white-edge" viewBox="0 0 65 1000" preserveAspectRatio="none">
+              <path d="M0,0 L36,0 C31,25 43,48 27,70 C41,92 25,115 39,138 C23,162 46,185 29,210 C45,235 24,260 41,285 C21,312 43,338 26,365 C42,392 22,420 39,448 C19,475 43,502 25,530 C44,558 21,585 40,615 C20,642 43,670 24,698 C41,725 23,755 43,782 C21,810 40,838 24,868 C43,895 23,925 39,955 C21,980 32,1000 32,1000 L0,1000 Z" />
+            </svg>
+            <!-- Inner Soft Paper Fiber Layer -->
+            <svg class="tear-layer tear-rough-fiber" viewBox="0 0 65 1000" preserveAspectRatio="none">
+              <path d="M0,0 L32,0 C27,25 39,48 23,70 C37,92 21,115 35,138 C19,162 42,185 25,210 C41,235 20,260 37,285 C17,312 39,338 22,365 C38,392 18,420 35,448 C15,475 39,502 21,530 C40,558 17,585 36,615 C16,642 39,670 20,698 C37,725 19,755 39,782 C17,810 36,838 20,868 C39,895 19,925 35,955 C17,980 28,1000 28,1000 L0,1000 Z" />
+            </svg>
+          </div>
         </div>
 
         <!-- Right Half: Vivid Orange Promotional Showcase with Dual Powerstation + Solar Combos -->
         <div class="bf-hero-right bf-hero-orange-showcase">
-          
-          <!-- Continuous Rotating Circular Stamp Badge on Seam -->
-          <div class="bf-spinning-badge-anchor" onclick="document.getElementById('deals').scrollIntoView({behavior: 'smooth'})" title="Explore Black Friday Deals">
-            <div class="bf-spinning-badge">
-              <svg class="bf-rotating-svg" viewBox="0 0 120 120">
-                <path id="badge-circle-path" d="M 60, 60 m -42, 0 a 42,42 0 1,1 84,0 a 42,42 0 1,1 -84,0" fill="transparent"/>
-                <text font-family="'Space Grotesk', sans-serif" font-size="10.5" font-weight="900" fill="#0A0D14" letter-spacing="2.8">
-                  <textPath href="#badge-circle-path" startOffset="0%">
-                    • DEVICE PRO • BLACK FRIDAY SALE • 2026
-                  </textPath>
-                </text>
-              </svg>
-              <div class="bf-badge-center-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              </div>
-            </div>
-          </div>
 
           <!-- Hero Orange Product Showcase (Itel 500W & Hicces 500W with Jinko 585W Panels) -->
           <div class="bf-hero-showcase-stage">
