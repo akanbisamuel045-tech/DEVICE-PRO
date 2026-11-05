@@ -2083,28 +2083,9 @@ body.black-friday-page {
 }
 
 @media (max-width: 768px) {
-  /* Top Bar */
+  /* Top Bar / Announcement Section */
   .bf-top-bar {
-    padding: 6px 0;
-  }
-  .bf-top-bar-inner {
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    text-align: center;
-    padding: 0 12px;
-  }
-  .bf-back-link {
-    font-size: 0.75rem;
-  }
-  .bf-top-highlight {
-    font-size: 0.6875rem;
-    padding: 2px 10px;
-    width: auto;
-    text-align: center;
-  }
-  .bf-top-contact {
-    display: none;
+    display: none !important;
   }
 
   /* Nav Header */
