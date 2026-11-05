@@ -242,6 +242,8 @@ body.bf-detail-page {
   max-width: 88%;
   max-height: 88%;
   object-fit: contain;
+  margin: 0 auto;
+  display: block;
   filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.6));
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -334,6 +336,8 @@ body.bf-detail-page {
   max-width: 80%;
   max-height: 80%;
   object-fit: contain;
+  margin: 0 auto;
+  display: block;
 }
 
 .bf-thumb-btn span {

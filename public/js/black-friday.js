@@ -261,7 +261,7 @@
     grid.innerHTML = filtered.map(pkg => `
       <article class="bf-product-card" data-package-id="${pkg.id}">
         <!-- Top Visual Hero Block with Ripped Color Gradient -->
-        <a href="/black-friday-detail.html?id=${pkg.id}" class="bf-card-hero ${pkg.colorTheme}" style="display:block; text-decoration:none;" title="View ${pkg.model} Full Specifications">
+        <a href="/black-friday-detail.html?id=${pkg.id}" class="bf-card-hero ${pkg.colorTheme}" style="display:flex; align-items:center; justify-content:center; text-decoration:none;" title="View ${pkg.model} Full Specifications">
           <span class="bf-card-badge-save">SAVE ${pkg.savingsPct}</span>
           <span class="bf-card-badge-delivery">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.19M15 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3.19"/><path d="M23 13v3a2 2 0 0 1-2 2h-2"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg>

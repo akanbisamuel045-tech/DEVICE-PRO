@@ -761,7 +761,7 @@ body.black-friday-page {
 /* Dual Product Visual Area: Power Station + Solar Panel */
 .bf-showcase-media-duo {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   gap: 16px;
   height: 155px;
@@ -776,25 +776,36 @@ body.black-friday-page {
 
 .bf-media-unit {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 .bf-media-powerstation {
-  flex: 0 0 46%;
+  flex: 0 0 48%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .bf-media-powerstation img {
   max-width: 100%;
   max-height: 135px;
   object-fit: contain;
+  margin: 0 auto;
+  display: block;
   filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
 }
 
 .bf-media-solarpanel {
   flex: 0 0 44%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   transform: rotate(-3deg);
 }
 
@@ -802,6 +813,8 @@ body.black-friday-page {
   max-width: 100%;
   max-height: 140px;
   object-fit: contain;
+  margin: 0 auto;
+  display: block;
   filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.22));
 }
 
@@ -1145,6 +1158,8 @@ body.black-friday-page {
   max-height: 160px;
   max-width: 80%;
   object-fit: contain;
+  margin: 0 auto;
+  display: block;
   filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.35));
   transition: transform 0.3s ease;
   z-index: 2;
