@@ -24,7 +24,7 @@
       savings: 126000,
       savingsPct: '28%',
       colorTheme: 'bg-teal',
-      image: '/images/products/hicces-500w.jpg',
+      image: '/images/products/hicces-500w.png',
       badge: 'STARTER COMBO',
       powers: 'Laptops, Starlink Router, Phones, Lighting, LED TV, Clippers',
       runtime: 'Continuous day & night power for work essentials'
@@ -43,7 +43,7 @@
       savings: 148000,
       savingsPct: '28%',
       colorTheme: 'bg-crimson',
-      image: '/images/products/hicces-500w.jpg',
+      image: '/images/products/hicces-500w.png',
       badge: 'TOP VALUE COMBO',
       powers: 'TV + Decoder + Standing Fans + Workstations + Blender',
       runtime: 'Full workday power station for remote professionals'
@@ -157,7 +157,7 @@
       savings: 296000,
       savingsPct: '28%',
       colorTheme: 'bg-teal',
-      image: '/images/products/hicces-500w.jpg',
+      image: '/images/products/hicces-500w.png',
       badge: 'HEAVY ESSENTIALS',
       powers: 'Office Equipment, Deep Freezer, Sewing Machine, Sound',
       runtime: 'Reliable all-day power for SMEs and residential clinics'

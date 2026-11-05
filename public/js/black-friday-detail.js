@@ -93,8 +93,8 @@
       powersShort: 'TV + Decoder + Standing Fans + Workstations + Blender',
       warranty: '1-Year Full Warranty & Guaranteed Spare Parts Backup',
       images: [
-        { label: 'Full Combo', src: '/images/products/hicces-500w.jpg', desc: 'Hicces 500W Station + 585W Panel' },
-        { label: 'Front Display', src: '/images/products/hicces-500w.jpg', desc: 'Digital LCD Readout & AC Ports' },
+        { label: 'Full Combo', src: '/images/products/hicces-500w.png', desc: 'Hicces 500W Station + 585W Panel' },
+        { label: 'Front Display', src: '/images/products/hicces-500w.png', desc: 'Digital LCD Readout & AC Ports' },
         { label: '585W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'Monocrystalline Solar Panel' },
         { label: 'Cables & Accessories', src: '/images/products/mc4-solar-cable.png', desc: 'Heavy-Duty MC4 Extension Cables' }
       ],
@@ -157,8 +157,8 @@
       powersShort: 'Laptops, Starlink Router, Phones, Lighting, LED TV, Clippers',
       warranty: '1-Year Official Warranty & Lagos Technical Support',
       images: [
-        { label: 'Full Combo', src: '/images/products/hicces-500w.jpg', desc: 'Hicces 300W Station + 585W Panel' },
-        { label: 'Front Panel', src: '/images/products/hicces-500w.jpg', desc: 'Control Display & Outlets' },
+        { label: 'Full Combo', src: '/images/products/hicces-500w.png', desc: 'Hicces 300W Station + 585W Panel' },
+        { label: 'Front Panel', src: '/images/products/hicces-500w.png', desc: 'Control Display & Outlets' },
         { label: '585W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'Monocrystalline Solar Panel' },
         { label: 'Cables & Accessories', src: '/images/products/mc4-solar-cable.png', desc: 'Connecting Cables & Charger' }
       ],
@@ -406,8 +406,8 @@
       powersShort: 'Office Equipment, Deep Freezer, Sewing Machine, Sound',
       warranty: '1-Year Official Warranty & Lagos Spare Parts Guarantee',
       images: [
-        { label: 'Full Combo', src: '/images/products/hicces-500w.jpg', desc: 'Hicces 1000W + 2× 585W Panels' },
-        { label: 'Station Front', src: '/images/products/hicces-500w.jpg', desc: '1000W Inverter Outlets & Screen' },
+        { label: 'Full Combo', src: '/images/products/hicces-500w.png', desc: 'Hicces 1000W + 2× 585W Panels' },
+        { label: 'Station Front', src: '/images/products/hicces-500w.png', desc: '1000W Inverter Outlets & Screen' },
         { label: 'Dual Panels', src: '/images/products/jinko-solar-panel.png', desc: '2× 585W Monocrystalline Panels' },
         { label: 'Solar Cables', src: '/images/products/mc4-solar-cable.png', desc: 'Parallel MC4 Extension Cable' }
       ],
