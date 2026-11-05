@@ -764,8 +764,8 @@ body.black-friday-page {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  height: 155px;
-  padding: 10px 10px 12px;
+  height: 195px;
+  padding: 10px 12px 14px;
   background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%);
   border-radius: 12px;
   margin-bottom: 14px;
@@ -792,11 +792,11 @@ body.black-friday-page {
 
 .bf-media-powerstation img {
   max-width: 100%;
-  max-height: 135px;
+  max-height: 170px;
   object-fit: contain;
   margin: 0 auto;
   display: block;
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.18));
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.22));
 }
 
 .bf-media-solarpanel {
@@ -811,11 +811,11 @@ body.black-friday-page {
 
 .bf-media-solarpanel img {
   max-width: 100%;
-  max-height: 140px;
+  max-height: 175px;
   object-fit: contain;
   margin: 0 auto;
   display: block;
-  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.22));
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.25));
 }
 
 /* Showcase Card Info & Typography */
@@ -1105,11 +1105,11 @@ body.black-friday-page {
 /* Card Visual Header with Jagged/Torn Color Block */
 .bf-card-hero {
   position: relative;
-  height: 220px;
+  height: 260px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 16px 16px 24px;
   overflow: hidden;
 }
 
@@ -1155,12 +1155,13 @@ body.black-friday-page {
 }
 
 .bf-card-product-img {
-  max-height: 160px;
-  max-width: 80%;
+  max-height: 215px;
+  max-width: 90%;
+  width: auto;
   object-fit: contain;
   margin: 0 auto;
   display: block;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.35));
+  filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.4));
   transition: transform 0.3s ease;
   z-index: 2;
 }
@@ -2259,9 +2260,9 @@ body.black-friday-page {
     padding: 3px 8px;
   }
   .bf-showcase-media-duo {
-    height: 135px;
+    height: 165px;
     gap: 12px;
-    padding: 8px 10px;
+    padding: 10px;
     margin-bottom: 12px;
     background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%);
     border-radius: 10px;
@@ -2270,14 +2271,14 @@ body.black-friday-page {
     flex: 0 0 48%;
   }
   .bf-media-powerstation img {
-    max-height: 115px;
+    max-height: 145px;
   }
   .bf-media-solarpanel {
     flex: 0 0 46%;
     transform: rotate(-2deg);
   }
   .bf-media-solarpanel img {
-    max-height: 120px;
+    max-height: 150px;
   }
   .bf-showcase-title {
     font-size: 1.0625rem;
@@ -2377,11 +2378,12 @@ body.black-friday-page {
     border-radius: 14px;
   }
   .bf-card-hero {
-    height: 180px;
-    padding: 14px;
+    height: 225px;
+    padding: 14px 14px 22px;
   }
   .bf-card-product-img {
-    max-height: 130px;
+    max-height: 185px;
+    max-width: 90%;
   }
   .bf-card-body {
     padding: 16px;
@@ -2604,10 +2606,12 @@ body.black-friday-page {
     font-size: 2.35rem;
   }
   .bf-card-hero {
-    height: 165px;
+    height: 205px;
+    padding: 12px 12px 20px;
   }
   .bf-card-product-img {
-    max-height: 115px;
+    max-height: 170px;
+    max-width: 92%;
   }
   .bf-timer-unit {
     min-width: 54px;
