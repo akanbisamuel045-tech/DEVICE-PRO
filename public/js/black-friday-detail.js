@@ -26,8 +26,8 @@
       powersShort: '43" Smart TV + Decoder + 2 Standing Fans + Starlink + Laptops',
       warranty: '1-Year Official Manufacturer Warranty & Local Repair Support',
       images: [
-        { label: 'Full Combo', src: '/images/products/itel-powertank-500w-transparent.png', desc: 'itel 500W PowerTank + 585W Panel' },
-        { label: 'Front & Screen', src: '/images/products/itel-powertank-500w-transparent.png', desc: 'Front Display & Dual AC Sockets' },
+        { label: 'Full Combo', src: '/images/products/itel-powertank-500w.webp', desc: 'itel 500W PowerTank + 585W Panel' },
+        { label: 'Front & Screen', src: '/images/products/itel-powertank-500w.webp', desc: 'Front Display & Dual AC Sockets' },
         { label: '585W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'Tier-1 High-Efficiency Monocrystalline Panel' },
         { label: 'Solar Cables & Kit', src: '/images/products/mc4-solar-cable.png', desc: 'MC4 Solar Extension Cables & AC Charger' }
       ],
@@ -93,8 +93,8 @@
       powersShort: 'TV + Decoder + Standing Fans + Workstations + Blender',
       warranty: '1-Year Full Warranty & Guaranteed Spare Parts Backup',
       images: [
-        { label: 'Full Combo', src: '/images/products/hicces-500w-transparent.png', desc: 'Hicces 500W Station + 585W Panel' },
-        { label: 'Front Display', src: '/images/products/hicces-500w-transparent.png', desc: 'Digital LCD Readout & AC Ports' },
+        { label: 'Full Combo', src: '/images/products/hicces-500w.jpg', desc: 'Hicces 500W Station + 585W Panel' },
+        { label: 'Front Display', src: '/images/products/hicces-500w.jpg', desc: 'Digital LCD Readout & AC Ports' },
         { label: '585W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'Monocrystalline Solar Panel' },
         { label: 'Cables & Accessories', src: '/images/products/mc4-solar-cable.png', desc: 'Heavy-Duty MC4 Extension Cables' }
       ],
@@ -157,8 +157,8 @@
       powersShort: 'Laptops, Starlink Router, Phones, Lighting, LED TV, Clippers',
       warranty: '1-Year Official Warranty & Lagos Technical Support',
       images: [
-        { label: 'Full Combo', src: '/images/products/hicces-500w-transparent.png', desc: 'Hicces 300W Station + 585W Panel' },
-        { label: 'Front Panel', src: '/images/products/hicces-500w-transparent.png', desc: 'Control Display & Outlets' },
+        { label: 'Full Combo', src: '/images/products/hicces-500w.jpg', desc: 'Hicces 300W Station + 585W Panel' },
+        { label: 'Front Panel', src: '/images/products/hicces-500w.jpg', desc: 'Control Display & Outlets' },
         { label: '585W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'Monocrystalline Solar Panel' },
         { label: 'Cables & Accessories', src: '/images/products/mc4-solar-cable.png', desc: 'Connecting Cables & Charger' }
       ],
@@ -209,8 +209,8 @@
       powersShort: 'Fans, Laptops, LED TV, Soundbar, Smart Home',
       warranty: '1-Year Replacement Warranty & Free Lagos Delivery',
       images: [
-        { label: 'Full Combo', src: '/images/products/colar-1000-pro-transparent.png', desc: 'Coloar 1000 Pro + 585W Panel' },
-        { label: 'Station Unit', src: '/images/products/colar-1000-pro-transparent.png', desc: 'Front LCD Screen & Multi-Ports' },
+        { label: 'Full Combo', src: '/images/products/colar-1000-pro.webp', desc: 'Coloar 1000 Pro + 585W Panel' },
+        { label: 'Station Unit', src: '/images/products/colar-1000-pro.webp', desc: 'Front LCD Screen & Multi-Ports' },
         { label: '585W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'High-Efficiency Monocrystalline Panel' },
         { label: 'Cables & Accessories', src: '/images/products/mc4-solar-cable.png', desc: 'Solar Connection & AC Wall Cord' }
       ],
@@ -260,8 +260,8 @@
       powersShort: 'Home Entertainment + Lighting + 3 Standing Fans + Laptops',
       warranty: '1-Year Official Warranty & Local Service Backup',
       images: [
-        { label: 'Full Combo', src: '/images/products/colar-1000-transparent.png', desc: 'Coloar 1000 Plus + 585W Panel' },
-        { label: 'Station Unit', src: '/images/products/colar-1000-transparent.png', desc: 'Heavy-Duty Chasis & Ports' },
+        { label: 'Full Combo', src: '/images/products/colar-1000.webp', desc: 'Coloar 1000 Plus + 585W Panel' },
+        { label: 'Station Unit', src: '/images/products/colar-1000.webp', desc: 'Heavy-Duty Chasis & Ports' },
         { label: '585W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'Monocrystalline Solar Panel' },
         { label: 'Cables & Accessories', src: '/images/products/mc4-solar-cable.png', desc: 'Solar Cables & Charger' }
       ],
@@ -308,8 +308,8 @@
       powersShort: 'Double-Door Fridge + 55" TV + Blender + Desktop PC',
       warranty: '2-Year Official Hithium Warranty & Nationwide Support',
       images: [
-        { label: 'Full Combo', src: '/images/products/hithium-hero-ee2-transparent.png', desc: 'Hithium 2 Kit + 585W Panel' },
-        { label: 'HeroEE 1 Alt Angle', src: '/images/products/hithium-hero-ee1-transparent.png', desc: '2000Wh Station & AC Ports' },
+        { label: 'Full Combo', src: '/images/products/hithium-hero-ee2.png', desc: 'Hithium 2 Kit + 585W Panel' },
+        { label: 'HeroEE 1 Alt Angle', src: '/images/products/hithium-hero-ee1.webp', desc: '2000Wh Station & AC Ports' },
         { label: '585W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'High-Yield Monocrystalline Panel' },
         { label: 'Cables & Accessories', src: '/images/products/mc4-solar-cable.png', desc: 'High-Current Cables & Charger' }
       ],
@@ -358,8 +358,8 @@
       powersShort: 'Full Flat Lighting + TV + Fridge + Freezer + Workstations',
       warranty: '2-Year Official Hithium Warranty & Free Lagos/Ibadan Delivery',
       images: [
-        { label: 'Full Combo', src: '/images/products/hithium-hero-ee2-transparent.png', desc: 'Hithium 2 + Dual 585W Panels' },
-        { label: 'HeroEE 2 Alt Angle', src: '/images/products/hithium-hero-ee2-transparent.png', desc: '2000Wh Powerhouse' },
+        { label: 'Full Combo', src: '/images/products/hithium-hero-ee2.png', desc: 'Hithium 2 + Dual 585W Panels' },
+        { label: 'HeroEE 2 Alt Angle', src: '/images/products/hithium-hero-ee2.jpg', desc: '2000Wh Powerhouse' },
         { label: 'Dual Solar Panels', src: '/images/products/jinko-solar-panel.png', desc: '2× 585W Monocrystalline Panels' },
         { label: 'MC4 Y-Branch Cables', desc: 'Parallel PV Branch Connectors & Cable' }
       ],
@@ -406,8 +406,8 @@
       powersShort: 'Office Equipment, Deep Freezer, Sewing Machine, Sound',
       warranty: '1-Year Official Warranty & Lagos Spare Parts Guarantee',
       images: [
-        { label: 'Full Combo', src: '/images/products/hicces-500w-transparent.png', desc: 'Hicces 1000W + 2× 585W Panels' },
-        { label: 'Station Front', src: '/images/products/hicces-500w-transparent.png', desc: '1000W Inverter Outlets & Screen' },
+        { label: 'Full Combo', src: '/images/products/hicces-500w.jpg', desc: 'Hicces 1000W + 2× 585W Panels' },
+        { label: 'Station Front', src: '/images/products/hicces-500w.jpg', desc: '1000W Inverter Outlets & Screen' },
         { label: 'Dual Panels', src: '/images/products/jinko-solar-panel.png', desc: '2× 585W Monocrystalline Panels' },
         { label: 'Solar Cables', src: '/images/products/mc4-solar-cable.png', desc: 'Parallel MC4 Extension Cable' }
       ],
@@ -453,8 +453,8 @@
       powersShort: 'Freezer + TV + Fans + Laptops + Medical & Office Loads',
       warranty: '1-Year Full Warranty & Guaranteed Lagos Delivery',
       images: [
-        { label: 'Full Combo', src: '/images/products/colar-2000-transparent.png', desc: 'Coloar 2000 + Dual 585W Panels' },
-        { label: 'Power Unit', src: '/images/products/colar-2000-transparent.png', desc: 'Heavy-Duty 2000Wh Chasis' },
+        { label: 'Full Combo', src: '/images/products/colar-2000.webp', desc: 'Coloar 2000 + Dual 585W Panels' },
+        { label: 'Power Unit', src: '/images/products/colar-2000.webp', desc: 'Heavy-Duty 2000Wh Chasis' },
         { label: 'Dual Panels', src: '/images/products/jinko-solar-panel.png', desc: '2× 585W High-Yield Panels' },
         { label: 'Cables & Kit', src: '/images/products/mc4-solar-cable.png', desc: 'Solar Branch Connectors & Wires' }
       ],
@@ -500,8 +500,8 @@
       powersShort: 'Pumps, Refrigerators, Multiple Rooms & Clinic Workstations',
       warranty: '2-Year Official Warranty & Free Doorstep White-Glove Delivery',
       images: [
-        { label: 'Full Combo', src: '/images/products/colar-3600-transparent.png', desc: 'Coloar 3600 + Triple 585W Panels' },
-        { label: 'Station Unit', src: '/images/products/colar-3600-transparent.png', desc: '3600Wh Mega Power Unit' },
+        { label: 'Full Combo', src: '/images/products/colar-3600.webp', desc: 'Coloar 3600 + Triple 585W Panels' },
+        { label: 'Station Unit', src: '/images/products/colar-3600.webp', desc: '3600Wh Mega Power Unit' },
         { label: 'Triple Solar Panels', src: '/images/products/jinko-solar-panel.png', desc: '3× 585W Monocrystalline Panels' },
         { label: 'Solar Cables Kit', src: '/images/products/mc4-solar-cable.png', desc: 'Triple Branch Connectors & Heavy Duty Wires' }
       ],
