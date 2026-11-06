@@ -11,6 +11,26 @@
   // =========================================================================
   const BLACK_FRIDAY_PACKAGES = [
     {
+      id: 'bf-lucan-500',
+      brand: 'LUCAN',
+      model: 'Lucan 500W Solar Power Station',
+      rating: '500W Output Pure Sine Wave',
+      tier: 'under-1000',
+      battery: '1000Wh Lithium Energy Bank',
+      solar: '1 × 450W Tier-1 Monocrystalline Panel',
+      solarWatts: '450W Solar Array Included',
+      finalPrice: 362000,
+      marketValue: 500000,
+      savings: 138000,
+      savingsPct: '28%',
+      colorTheme: 'bg-amber',
+      image: '/images/products/lucan-500w-powerstation.jpg',
+      badge: 'NEW ARRIVAL',
+      powers: 'Standing Fans, 43" LED TV, Decoder, Workstations, Starlink, Lighting',
+      runtime: 'Reliable all-day power with rapid MPPT solar replenishment'
+    },
+
+    {
       id: 'bf-hicces-300',
       brand: 'Hicces',
       model: 'Hicces 300W Solar Power Station',

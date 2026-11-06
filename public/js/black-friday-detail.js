@@ -8,6 +8,66 @@
 
   // 1. COMPREHENSIVE DATA DICTIONARY FOR THE 10 SOLAR COMBO PACKAGES
   const BF_PACKAGES = {
+    'bf-lucan-500': {
+      id: 'bf-lucan-500',
+      brand: 'LUCAN',
+      model: 'Lucan 500W Power Station',
+      fullTitle: 'Lucan 500W Solar Power Station + 450W Monocrystalline Panel Combo',
+      tagline: '500W Pure Sine Wave AC Output with 1,000Wh High-Capacity Lithium Battery Bank & Tier-1 450W Monocrystalline Solar Panel',
+      finalPrice: 362000,
+      marketValue: 500000,
+      savings: 138000,
+      savingsPct: '28%',
+      rating: '4.9',
+      reviewsCount: 38,
+      stockCount: 5,
+      badge: 'OFFICIAL LUCAN COMBO',
+      solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+      powersShort: '43" Smart TV + Decoder + Standing Fans + Laptops + Lighting',
+      warranty: '1-Year Official Manufacturer Warranty & Local Repair Support',
+      images: [
+        { label: 'Front Panel', src: '/images/products/lucan-500w-powerstation.jpg', desc: 'Lucan 500W Front Panel & Circular Display' },
+        { label: 'Rear Ports & Specs', src: '/images/products/lucan-500w-powerstation1.jpg', desc: 'Lucan 500W Solar PV Input, AC Input, DC Output & Specs' },
+        { label: '450W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'Tier-1 450W High-Efficiency Monocrystalline Panel' },
+        { label: 'Solar Cables & Kit', src: '/images/products/mc4-solar-cable.png', desc: 'MC4 Solar Extension Cables & AC Charger' }
+      ],
+      description: `
+        The <strong>Lucan 500W Solar Power Station (LU25004000ESS)</strong> delivers high-efficiency, zero-noise portable power designed for Nigerian homes, apartments, and modern workstations. With a clean <strong>500W pure sine wave inverter</strong>, it runs TVs, decoders, laptops, sound systems, and standing fans safely with zero buzzing or voltage fluctuations.
+        <br><br>
+        Equipped with an internal <strong>1,000Wh deep-cycle lithium storage system</strong>, dual cooling fans, and dedicated PV/solar charging ports, it charges rapidly under direct sunlight through the included Tier-1 <strong>450W Monocrystalline solar panel</strong>. Featuring standard AC and DC outputs plus USB fast-charge ports.
+      `,
+      specs: [
+        { key: 'Model Number', val: 'LU25004000ESS Solar All-In-One Powerpack' },
+        { key: 'Inverter Technology', val: 'Pure Sine Wave Inverter (Safe for laptops, TVs & sensitive electronics)' },
+        { key: 'Continuous Power Output', val: '500 Watts' },
+        { key: 'Surge / Peak Capacity', val: '1,000 Watts' },
+        { key: 'Battery Capacity', val: '1,000Wh Lithium Energy Bank' },
+        { key: 'Battery Lifespan', val: '2,500+ Deep Cycles to 80% Capacity' },
+        { key: 'Bundled Solar Panel', val: '1 × 450W Tier-1 Monocrystalline Solar Panel Included' },
+        { key: 'Solar PV Input', val: 'High-Efficiency MPPT Solar Controller (PV Input + / -)' },
+        { key: 'AC Inputs & Outputs', val: 'Standard 220V–240V AC Sockets' },
+        { key: 'DC & USB Ports', val: 'Fast-Charging USB-A, USB-C & 12V DC Output' },
+        { key: 'Cooling & Safety', val: 'Dual Temperature-Controlled Silent Fans, Overload, Short-Circuit & Surge Protection' },
+        { key: 'Delivery Guarantee', val: '100% Free Doorstep Delivery across Lagos State & Ibadan' },
+        { key: 'Warranty Coverage', val: '1-Year Official Warranty with Dedicated Tech Support' }
+      ],
+      appliances: [
+        { name: 'Standing / Orbit Fans (50W)', runtime: '16 – 20 Hours' },
+        { name: '43" LED / Smart TV + Decoder (80W)', runtime: '10 – 12 Hours' },
+        { name: 'Workstation Laptops (60W)', runtime: '14+ Full Laptop Recharges' },
+        { name: 'Starlink Internet Router (40W)', runtime: '20 – 24 Hours' },
+        { name: 'Home LED Lighting (20W)', runtime: '40+ Hours continuous' },
+        { name: 'Smartphones & Tablets (15W)', runtime: '55+ Mobile Recharges' }
+      ],
+      packageIncludes: [
+        '1 × Lucan 500W Solar Power Station (LU25004000ESS)',
+        '1 × 450W Tier-1 High-Yield Monocrystalline Solar Panel',
+        '1 × 10m Heavy-Duty MC4 Solar Connection Cables with Pre-crimped Terminals',
+        '1 × 220V AC Mains Wall Fast-Charger',
+        '1 × Official User Manual & Warranty Documentation'
+      ]
+    },
+
     'bf-itel-500': {
       id: 'bf-itel-500',
       brand: 'itel Energy',
@@ -600,6 +660,19 @@
     // Badges & Stock
     const dealBadge = document.getElementById('bf-badge-deal');
     if (dealBadge) dealBadge.textContent = pkg.badge;
+
+    const solarBadgeEl = document.getElementById('bf-gallery-solar-badge');
+    if (solarBadgeEl) {
+      if (pkg.solarIncluded && pkg.solarIncluded.includes('450W')) {
+        solarBadgeEl.textContent = '450W PANEL INCLUDED';
+      } else if (pkg.solarIncluded && pkg.solarIncluded.includes('2 ×')) {
+        solarBadgeEl.textContent = '2 × 585W PANELS INCLUDED';
+      } else if (pkg.solarIncluded && pkg.solarIncluded.includes('3 ×')) {
+        solarBadgeEl.textContent = '3 × 585W PANELS INCLUDED';
+      } else {
+        solarBadgeEl.textContent = '585W PANEL INCLUDED';
+      }
+    }
 
     const stockEl = document.getElementById('bf-stock-text');
     if (stockEl) stockEl.textContent = `High Demand: Only ${pkg.stockCount} units remaining in Lagos warehouse`;
