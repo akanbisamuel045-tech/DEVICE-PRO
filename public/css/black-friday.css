@@ -366,7 +366,7 @@ body.black-friday-page {
 
 .bf-sticker-main {
   font-family: var(--bf-font-display);
-  font-size: clamp(1.4rem, 2.3vw, 2.2rem);
+  font-size: clamp(1.15rem, 1.9vw, 1.8rem);
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
@@ -382,6 +382,17 @@ body.black-friday-page {
   text-transform: uppercase;
   color: #1A1400;
   opacity: 0.9;
+}
+
+.bf-sticker-terms {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: #1A1400;
+  opacity: 0.85;
+  margin-top: 2px;
+  line-height: 1.25;
+  text-transform: none;
 }
 
 .bf-hero-desc {
@@ -2163,6 +2174,12 @@ body.black-friday-page {
   .bf-sticker-sub {
     font-size: 0.625rem;
     margin-top: 3px;
+  }
+  .bf-sticker-terms {
+    font-size: 0.52rem;
+    margin-top: 2px;
+    line-height: 1.2;
+    text-transform: none;
   }
   .bf-hero-desc {
     font-size: 0.875rem;
