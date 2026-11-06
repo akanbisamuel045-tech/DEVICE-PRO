@@ -51,20 +51,88 @@
         { key: 'Delivery Guarantee', val: '100% Free Doorstep Delivery across Lagos State & Ibadan' },
         { key: 'Warranty Coverage', val: '1-Year Official Warranty with Dedicated Tech Support' }
       ],
-      appliances: [
-        { name: 'Standing / Orbit Fans (50W)', runtime: '16 – 20 Hours' },
-        { name: '43" LED / Smart TV + Decoder (80W)', runtime: '10 – 12 Hours' },
-        { name: 'Workstation Laptops (60W)', runtime: '14+ Full Laptop Recharges' },
-        { name: 'Starlink Internet Router (40W)', runtime: '20 – 24 Hours' },
-        { name: 'Home LED Lighting (20W)', runtime: '40+ Hours continuous' },
-        { name: 'Smartphones & Tablets (15W)', runtime: '55+ Mobile Recharges' }
+      runtimes: [
+        { appliance: 'Standard 16" Standing / Orbit Fan (50W)', power: '50W', duration: '16 – 20 Hours' },
+        { appliance: '43" LED / Smart TV + Decoder (80W)', power: '80W', duration: '10 – 12 Hours' },
+        { appliance: 'Workstation Laptops (60W)', power: '60W', duration: '14+ Full Laptop Recharges' },
+        { appliance: 'Starlink Internet Router (40W)', power: '40W', duration: '20 – 24 Hours' },
+        { appliance: '5× LED Home Lighting (20W total)', power: '20W', duration: '40+ Hours continuous' },
+        { appliance: 'Smartphones & Tablets (Fast Charge)', power: '15W', duration: '55+ Recharges' },
+        { appliance: 'Barbing Hair Clippers & Grooming', power: '15W', duration: '40+ Hours' }
       ],
-      packageIncludes: [
-        '1 × Lucan 500W Solar Power Station (LU25004000ESS)',
-        '1 × 450W Tier-1 High-Yield Monocrystalline Solar Panel',
-        '1 × 10m Heavy-Duty MC4 Solar Connection Cables with Pre-crimped Terminals',
-        '1 × 220V AC Mains Wall Fast-Charger',
-        '1 × Official User Manual & Warranty Documentation'
+      boxItems: [
+        { title: 'Lucan 500W Solar Power Station', desc: 'LU25004000ESS with 1,000Wh Lithium battery & LCD display' },
+        { title: '1× 450W Monocrystalline Panel', desc: 'Tier-1 high irradiance 450W solar panel' },
+        { title: '10M Heavy-Duty MC4 Solar Cable', desc: 'Weatherproof pre-crimped solar connecting cables' },
+        { title: '220V AC Mains Wall Fast Charger', desc: 'Direct wall outlet rapid charging adapter' },
+        { title: 'Official User Manual & Warranty', desc: '1-Year Lagos warranty card & documentation' }
+      ]
+    },
+
+    'bf-itel-500-450w': {
+      id: 'bf-itel-500-450w',
+      brand: 'itel Energy',
+      model: 'itel 500W PowerTank (450W Solar Combo)',
+      fullTitle: 'itel 500W PowerTank Solar Station + 450W Monocrystalline Panel Combo',
+      tagline: '500W Pure Sine Wave AC Output with 1,000Wh High-Capacity PowerTank & Tier-1 450W Monocrystalline Solar Panel',
+      finalPrice: 391000,
+      marketValue: 520000,
+      savings: 129000,
+      savingsPct: '25%',
+      rating: '4.9',
+      reviewsCount: 54,
+      stockCount: 4,
+      badge: 'OFFICIAL ITEL COMBO',
+      solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+      powersShort: '43" Smart TV + Decoder + 2 Standing Fans + Starlink + Laptops',
+      warranty: '1-Year Official Manufacturer Warranty & Local Repair Support',
+      images: [
+        { label: 'Full Combo', src: '/images/products/itel-powertank-500w.webp', desc: 'itel 500W PowerTank + 450W Panel' },
+        { label: 'Front & Screen', src: '/images/products/itel-powertank-500w.webp', desc: 'Front Display & Dual AC Sockets' },
+        { label: '450W Solar Panel', src: '/images/products/jinko-solar-panel.png', desc: 'Tier-1 450W High-Efficiency Monocrystalline Panel' },
+        { label: 'Solar Cables & Kit', src: '/images/products/mc4-solar-cable.png', desc: 'MC4 Solar Extension Cables & AC Charger' }
+      ],
+      description: `
+        The <strong>itel 500W PowerTank Solar Station</strong> is engineered specifically to eliminate fuel expenses and power outages for Nigerian homes, apartments, and remote workstations. Delivering a crisp <strong>500W pure sine wave output</strong> (with 1,000W peak surge), it powers sensitive modern electronics without the buzz, fluctuation, or component wear common with basic inverters.
+        <br><br>
+        Equipped with an internal <strong>1,000Wh deep-cycle battery bank</strong>, this all-in-one power station operates in complete <strong>0dB silence</strong>, providing clean indoor electricity with zero fumes or ventilation hazards. Bundled with a Tier-1 <strong>450W Monocrystalline solar panel</strong>, the unit charges directly from Nigerian sunlight via its built-in MPPT solar charge controller.
+      `,
+      specs: [
+        { key: 'Inverter Technology', val: 'Pure Sine Wave Inverter (Safe for laptops, TVs & motors)' },
+        { key: 'Continuous Power Output', val: '500 Watts' },
+        { key: 'Peak Surge Power', val: '1,000 Watts (Handles motor startup surge)' },
+        { key: 'Battery Energy Capacity', val: '1,000 Watt-hours (1,000Wh)' },
+        { key: 'Battery Chemistry', val: 'Automotive Grade LiFePO4 / Lithium-ion Cells' },
+        { key: 'Battery Cycle Life', val: '4,000+ Recharge Cycles to 80% Capacity (10+ Years)' },
+        { key: 'Solar PV Array Included', val: '1 × 450W Tier-1 High-Efficiency Monocrystalline Panel' },
+        { key: 'Solar Charge Controller', val: 'Built-in Intelligent MPPT (Max Power Point Tracking)' },
+        { key: 'Solar Charging Time', val: '2.2 – 3 Hours in clear sunlight' },
+        { key: 'AC Wall Charging Time', val: '1.5 Hours (0 to 80% Fast Recharge)' },
+        { key: 'AC Output Sockets', val: '2× 220V–240V 50Hz UK Standard 3-Pin Outlets' },
+        { key: 'USB-C Power Delivery', val: '1× 100W PD 3.0 Fast-Charge (Direct MacBook / Laptop)' },
+        { key: 'USB-A Outputs', val: '2× 18W QC 3.0 High-Speed Ports' },
+        { key: '12V DC Outlets', val: '1× 12V/10A Car Cigarette Socket + 2× DC5521 12V/5A' },
+        { key: 'Operating Noise', val: '0 dB (Completely Silent Indoor Operation)' },
+        { key: 'Cooling System', val: 'Smart Temperature-Controlled Dual Silent Fans' },
+        { key: 'Net Weight', val: 'Approx. 10.8 kg (Integrated Top Carry Handle)' },
+        { key: 'Safety Protections', val: 'Overcharge, Deep Discharge, Short Circuit, Thermal Overheat & Surge BMS' }
+      ],
+      runtimes: [
+        { appliance: '5× LED Home Lighting (10W total)', power: '10W', duration: '20+ Hours' },
+        { appliance: '43" Smart LED TV + DStv/Decoder', power: '65W', duration: '12–14 Hours' },
+        { appliance: 'Starlink Gen 2/3 Dish + Wi-Fi Router', power: '40W', duration: '20–24 Hours' },
+        { appliance: 'Workstation Laptop (USB-C / AC)', power: '60W', duration: '12–15 Full Charges' },
+        { appliance: 'Standard 16" Standing / Orbit Fan', power: '50W', duration: '15–18 Hours' },
+        { appliance: 'Smartphones & Tablets (Fast Charge)', power: '15W', duration: '50+ Recharges' },
+        { appliance: 'Barbing Hair Clippers & Grooming', power: '15W', duration: '40+ Hours' }
+      ],
+      boxItems: [
+        { title: 'itel 500W Power Station', desc: '1,000Wh portable unit with LCD display' },
+        { title: '1× 450W Monocrystalline Panel', desc: 'Tier-1 high irradiance solar panel' },
+        { title: '5M Heavy-Duty MC4 Solar Cable', desc: 'Weatherproof pre-crimped solar connecting cable' },
+        { title: '220V AC Mains Wall Fast Charger', desc: 'Direct wall outlet rapid charging adapter' },
+        { title: '12V Car Cigarette Lighter Cable', desc: 'On-the-go vehicle charging cord' },
+        { title: 'Official Warranty & User Guide', desc: '1-Year Lagos warranty card & setup manual' }
       ]
     },
 
@@ -616,8 +684,12 @@
       return lastPart;
     }
 
-    // Default to itel 500W
-    return 'bf-itel-500';
+    if (window.location.pathname.includes('itel-450w') || window.location.pathname.includes('itel-500w')) {
+      return 'bf-itel-500-450w';
+    }
+
+    // Default to itel 500W (450W combo)
+    return 'bf-itel-500-450w';
   }
 
   // 2. RENDER PRODUCT DETAIL
@@ -676,6 +748,60 @@
 
     const stockEl = document.getElementById('bf-stock-text');
     if (stockEl) stockEl.textContent = `High Demand: Only ${pkg.stockCount} units remaining in Lagos warehouse`;
+
+    // Variant Selector (itel 450W vs 585W combo)
+    const switchContainer = document.getElementById('bf-panel-switch-container');
+    if (switchContainer) {
+      if (pkgId === 'bf-itel-500' || pkgId === 'bf-itel-500-450w') {
+        switchContainer.innerHTML = `
+          <div class="bf-panel-switch-wrap">
+            <span class="bf-panel-switch-label">Select Solar Panel Combo:</span>
+            <div class="bf-panel-switch-options">
+              <a href="/black-friday-detail.html?id=bf-itel-500-450w" class="bf-panel-switch-btn ${pkgId === 'bf-itel-500-450w' ? 'active' : ''}">
+                <span class="bf-switch-badge">⚡ HERO SPECIAL</span>
+                <span class="bf-switch-watts">450W Solar Panel Combo</span>
+                <span class="bf-switch-price">₦391,000</span>
+              </a>
+              <a href="/black-friday-detail.html?id=bf-itel-500" class="bf-panel-switch-btn ${pkgId === 'bf-itel-500' ? 'active' : ''}">
+                <span class="bf-switch-badge">MAX SOLAR</span>
+                <span class="bf-switch-watts">585W Solar Panel Combo</span>
+                <span class="bf-switch-price">₦418,000</span>
+              </a>
+            </div>
+          </div>
+        `;
+        switchContainer.style.display = 'block';
+      } else {
+        switchContainer.innerHTML = '';
+        switchContainer.style.display = 'none';
+      }
+    }
+
+    // Dynamic Solar Array references in Overview tab
+    const is450W = pkg.solarIncluded && pkg.solarIncluded.includes('450W');
+    const is2x585W = pkg.solarIncluded && pkg.solarIncluded.includes('2 ×');
+    const is3x585W = pkg.solarIncluded && pkg.solarIncluded.includes('3 ×');
+    const panelWattsLabel = is450W ? '450W' : (is2x585W ? '2 × 585W' : (is3x585W ? '3 × 585W' : '585W'));
+
+    const solarBullet = document.getElementById('bf-detail-solar-watt-bullet');
+    if (solarBullet) {
+      solarBullet.textContent = panelWattsLabel;
+    }
+
+    const partnerTitle = document.getElementById('bf-detail-solar-partner-title');
+    if (partnerTitle) {
+      partnerTitle.textContent = `Bundled with Tier-1 ${panelWattsLabel} Solar Array`;
+    }
+
+    const partnerDesc = document.getElementById('bf-detail-solar-partner-desc');
+    if (partnerDesc) {
+      partnerDesc.textContent = `Every combo package comes complete with authentic Tier-1 ${panelWattsLabel} Monocrystalline solar panel engineered for ultra-high conversion efficiency even under cloudy Nigerian skies.`;
+    }
+
+    const partnerImg = document.getElementById('bf-detail-solar-partner-img');
+    if (partnerImg) {
+      partnerImg.alt = `${panelWattsLabel} Solar Panel`;
+    }
 
     // Quick Specs Grid
     const quickSpecsGrid = document.getElementById('bf-quick-specs-grid');

@@ -1205,3 +1205,99 @@ body.bf-detail-page {
   }
 }
 
+
+/* ==========================================================================
+   SOLAR PANEL BUNDLE SWITCHER (itel 450W vs 585W)
+   ========================================================================== */
+.bf-panel-switch-wrap {
+  margin-bottom: 1.25rem;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.bf-panel-switch-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.bf-panel-switch-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.bf-panel-switch-btn {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border: 2px solid #CBD5E1;
+  border-radius: 10px;
+  background: #FFFFFF;
+  text-decoration: none;
+  color: #0F172A;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.bf-panel-switch-btn:hover {
+  border-color: #0157A2;
+  box-shadow: 0 4px 12px rgba(1, 87, 162, 0.1);
+  transform: translateY(-1px);
+}
+
+.bf-panel-switch-btn.active {
+  border-color: #00B050;
+  background: #F0FDF4;
+  box-shadow: 0 4px 14px rgba(0, 176, 80, 0.18);
+}
+
+.bf-switch-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #E2E8F0;
+  color: #334155;
+  margin-bottom: 4px;
+  letter-spacing: 0.03em;
+}
+
+.bf-panel-switch-btn.active .bf-switch-badge {
+  background: #00B050;
+  color: #FFFFFF;
+}
+
+.bf-switch-watts {
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #0F172A;
+}
+
+.bf-switch-price {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #0157A2;
+  margin-top: 5px;
+  font-family: var(--bf-font-display, sans-serif);
+}
+
+.bf-panel-switch-btn.active .bf-switch-price {
+  color: #047857;
+}
+
+@media (max-width: 480px) {
+  .bf-panel-switch-options {
+    grid-template-columns: 1fr;
+  }
+}

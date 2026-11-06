@@ -67,6 +67,18 @@
       "destination": "/black-friday.html"
     },
     {
+      "source": "/black-friday-detail",
+      "destination": "/black-friday-detail.html"
+    },
+    {
+      "source": "/black-friday-itel-500w",
+      "destination": "/black-friday-itel-500w.html"
+    },
+    {
+      "source": "/black-friday-itel-450w",
+      "destination": "/black-friday-itel-500w.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api"
     }

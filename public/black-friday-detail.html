@@ -121,6 +121,9 @@
         <h1 class="bf-product-title" id="bf-detail-title">itel 500W PowerTank Solar Station Combo</h1>
         <p class="bf-product-tagline" id="bf-detail-tagline">Complete all-in-one solar kit with 500W pure sine wave inverter, 1000Wh battery and 585W solar panel.</p>
 
+        <!-- Solar Panel Bundle Selector (Active for itel) -->
+        <div id="bf-panel-switch-container"></div>
+
         <!-- Pricing Card -->
         <div class="bf-price-card">
           <div class="bf-price-header">
@@ -228,7 +231,7 @@
               <li class="bf-feature-bullet">
                 <span class="bf-feature-bullet-icon">✓</span>
                 <div>
-                  <strong>Zero Fuel Costs Forever:</strong> Say goodbye to ₦1,000+/L petrol lines. Recharges every day using pure Nigerian sunlight through the included Tier-1 585W monocrystalline solar panel.
+                  <strong>Zero Fuel Costs Forever:</strong> Say goodbye to ₦1,000+/L petrol lines. Recharges every day using pure Nigerian sunlight through the included Tier-1 <span id="bf-detail-solar-watt-bullet">585W</span> monocrystalline solar panel.
                 </div>
               </li>
               <li class="bf-feature-bullet">
@@ -249,9 +252,9 @@
           <!-- Solar Panel Partner Box -->
           <div class="bf-solar-partner-box">
             <div>
-              <h4>Bundled with Tier-1 585W Solar Array</h4>
-              <p>Every combo package comes complete with authentic Tier-1 Monocrystalline solar panel(s) engineered for ultra-high conversion efficiency even under cloudy Nigerian skies.</p>
-              <img src="/images/products/jinko-solar-panel.png" alt="585W Solar Panel" class="bf-solar-partner-img">
+              <h4 id="bf-detail-solar-partner-title">Bundled with Tier-1 585W Solar Array</h4>
+              <p id="bf-detail-solar-partner-desc">Every combo package comes complete with authentic Tier-1 Monocrystalline solar panel(s) engineered for ultra-high conversion efficiency even under cloudy Nigerian skies.</p>
+              <img src="/images/products/jinko-solar-panel.png" alt="Solar Panel" class="bf-solar-partner-img" id="bf-detail-solar-partner-img">
             </div>
             <div style="font-size:0.75rem; color:#A0AEC0; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px;">
               ⚡ Dual Recharging: Charges via Sunlight (Solar MPPT) or via regular 220V NEPA / Generator wall socket.

@@ -4241,6 +4241,7 @@ app.get(['/terms', '/terms.html'], (req, res) => safeSendFile(res, 'public/terms
 app.get(['/shipping-policy', '/shipping-policy.html'], (req, res) => safeSendFile(res, 'public/shipping-policy.html'));
 app.get(['/black-friday', '/black-friday.html'], (req, res) => safeSendFile(res, 'public/black-friday.html'));
 app.get(['/black-friday-detail', '/black-friday-detail.html', '/black-friday/:id'], (req, res) => safeSendFile(res, 'public/black-friday-detail.html'));
+app.get(['/black-friday-itel-500w', '/black-friday-itel-450w', '/black-friday-itel-500w.html'], (req, res) => safeSendFile(res, 'public/black-friday-itel-500w.html'));
 app.get('/', (req, res) => safeSendFile(res, 'public/index.html'));
 
 // Fallback to homepage for other unknown routes
