@@ -29,6 +29,8 @@ body.products-page-body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  zoom: 1;
+  font-weight: 600;
 }
 
 /* =============================================================================
@@ -117,6 +119,7 @@ body.products-page-body {
 }
 
 .products-header-inner {
+  min-height: 96px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -132,10 +135,10 @@ body.products-page-body {
 }
 
 .brand-logo-img {
-  height: 68px;
+  height: 82px;
   width: auto;
-  max-height: 72px;
-  max-width: 340px;
+  max-height: 86px;
+  max-width: 408px;
   object-fit: contain;
 }
 
@@ -148,7 +151,7 @@ body.products-page-body {
 .p-nav-link {
   color: var(--p-text);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   padding: 8px 4px;
   position: relative;
@@ -232,7 +235,7 @@ body.products-page-body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .btn-get-quote-yellow {
@@ -272,7 +275,7 @@ body.products-page-body {
 .products-hero-banner {
   position: relative;
   background-color: var(--p-navy-deep);
-  background-image: 
+  background-image:
     linear-gradient(90deg, #061C35 0%, rgba(6, 28, 53, 0.95) 38%, rgba(6, 28, 53, 0.65) 68%, rgba(6, 28, 53, 0.2) 100%),
     url('../images/hero-solar-technician.jpg');
   background-position: right center;
@@ -612,12 +615,12 @@ body.products-page-body {
   transition: all 0.2s ease;
 }
 
-.custom-checkbox input[type="checkbox"]:checked ~ .checkbox-box {
+.custom-checkbox input[type="checkbox"]:checked~.checkbox-box {
   background-color: var(--p-yellow);
   border-color: var(--p-yellow);
 }
 
-.custom-checkbox input[type="checkbox"]:checked ~ .checkbox-box::after {
+.custom-checkbox input[type="checkbox"]:checked~.checkbox-box::after {
   content: '';
   display: block;
   width: 4px;
@@ -679,7 +682,7 @@ body.products-page-body {
   border-radius: 50%;
   background: var(--p-yellow);
   border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
   transition: transform 0.15s ease;
 }
@@ -694,7 +697,7 @@ body.products-page-body {
   border-radius: 50%;
   background: var(--p-yellow);
   border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   cursor: pointer;
 }
 
@@ -1075,7 +1078,9 @@ body.products-page-body {
 }
 
 @keyframes p-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* =============================================================================
@@ -1248,7 +1253,7 @@ body.products-page-body {
   top: 0;
   bottom: 0;
   width: 58%;
-  background-image: 
+  background-image:
     linear-gradient(90deg, #061C35 0%, #061C35 24%, rgba(6, 28, 53, 0.82) 55%, rgba(6, 28, 53, 0.2) 100%),
     url('../images/cta-house-night.jpg');
   background-position: center right;
@@ -1825,7 +1830,7 @@ dialog#search-dialog::backdrop {
   border-radius: 6px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   font-size: 0.84375rem;
-  font-weight: 500;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1834,8 +1839,15 @@ dialog#search-dialog::backdrop {
 }
 
 @keyframes p-toast-in {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =============================================================================
@@ -1847,13 +1859,16 @@ dialog#search-dialog::backdrop {
   .products-grid-view {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .footer-grid-columns {
     grid-template-columns: repeat(3, 1fr);
   }
+
   .buying-guide-card {
     grid-template-columns: 1fr;
     gap: 28px;
   }
+
   .guide-steps-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -1864,21 +1879,27 @@ dialog#search-dialog::backdrop {
   .products-nav {
     display: none;
   }
+
   .mobile-nav-toggle {
     display: flex;
   }
+
   .catalogue-grid-container {
     grid-template-columns: 1fr;
   }
+
   .filters-sidebar {
     display: none;
   }
+
   .mobile-filter-drawer-btn {
     display: inline-flex;
   }
+
   .consultation-cta-banner {
     padding: 56px 0;
   }
+
   .consultation-bg-image-overlay {
     width: 100%;
     opacity: 0.18;
@@ -1890,25 +1911,32 @@ dialog#search-dialog::backdrop {
   .top-info-bar .info-item:first-child {
     display: none;
   }
+
   .products-hero-banner {
     padding: 40px 0 48px;
   }
+
   .hero-trust-indicators {
     gap: 16px;
   }
+
   .trust-indicator-card {
     width: 100%;
   }
+
   .products-grid-view {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
+
   .footer-grid-columns {
     grid-template-columns: 1fr 1fr;
   }
+
   .buying-guide-card {
     padding: 24px;
   }
+
   .guide-steps-grid {
     grid-template-columns: 1fr;
   }
@@ -1919,51 +1947,66 @@ dialog#search-dialog::backdrop {
   .top-info-right {
     gap: 10px;
   }
+
   .top-info-right .info-separator,
   .top-info-right .info-item:nth-child(3) {
     display: none;
   }
+
   .products-header-inner {
-    height: 70px;
+    min-height: 96px;
+    min-height: 80px;
+    height: 80px;
   }
+
   .brand-logo-img {
-    height: 56px;
-    max-height: 60px;
-    max-width: 250px;
+    height: 67px;
+    max-height: 72px;
+    max-width: 300px;
   }
+
   .btn-get-quote-yellow {
     display: none;
   }
+
   .products-hero-title {
     font-size: 1.875rem;
   }
+
   .footer-grid-columns {
     grid-template-columns: 1fr;
   }
+
   .footer-bottom-bar {
     flex-direction: column;
     align-items: flex-start;
   }
+
   .products-grid-view {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
+
   .product-card {
     padding: 12px 10px;
     border-radius: 8px;
   }
+
   .card-image-wrap {
     height: 120px;
     margin: 4px 0 10px;
   }
+
   .category-badge-pill {
     font-size: 0.625rem;
     padding: 2px 7px;
   }
+
   .card-brand {
     font-size: 0.6875rem;
     margin-bottom: 2px;
   }
+
   .card-title {
     font-size: 0.8125rem;
     min-height: 32px;
@@ -1974,6 +2017,7 @@ dialog#search-dialog::backdrop {
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
   .card-specs {
     font-size: 0.6875rem;
     min-height: 16px;
@@ -1982,22 +2026,27 @@ dialog#search-dialog::backdrop {
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   .card-bottom-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 2px;
     margin-bottom: 10px;
   }
+
   .card-price {
     font-size: 0.9375rem;
   }
+
   .stock-indicator {
     font-size: 0.6875rem;
   }
+
   .card-actions-row {
     grid-template-columns: 1fr;
     gap: 6px;
   }
+
   .btn-card-details,
   .btn-card-cart {
     padding: 7px 8px;

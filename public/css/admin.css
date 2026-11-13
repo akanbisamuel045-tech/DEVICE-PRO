@@ -69,6 +69,8 @@ body.admin-body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  zoom: 1;
+  font-weight: 600;
 }
 
 /* Custom Clean Scrollbars */

@@ -8,6 +8,8 @@
    ============================================================================= */
 .solutions-page-body {
   background-color: #FFFFFF;
+  zoom: 1;
+  font-weight: 600;
 }
 
 .solutions-hero-banner {

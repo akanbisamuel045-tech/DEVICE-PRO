@@ -125,11 +125,11 @@
   --font-size-4xl: clamp(2.75rem, 6.5vw, 4.75rem);/* 44px - 76px - Cinematic Hero H1 */
 
   /* Weights */
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-extrabold: 800;
+  --font-weight-regular: 600;
+  --font-weight-medium: 600;
+  --font-weight-semibold: 700;
+  --font-weight-bold: 800;
+  --font-weight-extrabold: 900;
 
   /* Line Heights */
   --line-height-tight: 1.12;
@@ -207,13 +207,18 @@
   --z-index-toast: 500;
 }
 
-/* Global scale: 90% across all viewports (Desktop, Tablet, Mobile) */
+/* Global scale: 100% and Base Font Size +10% (16.5px) */
+html {
+  font-size: 16.5px;
+}
 body {
-  zoom: 0.9;
+  zoom: 1;
+  font-weight: 600;
 }
 
 @media (max-width: 767px) {
   body {
-    zoom: 0.9;
+    zoom: 1;
+  font-weight: 600;
   }
 }

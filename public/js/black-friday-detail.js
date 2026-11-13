@@ -1,5 +1,5 @@
 /**
- * DEVICE PRO — Black Friday 2026 Product Detail Controller
+ * GENUSS — Black Friday 2026 Product Detail Controller
  * Comprehensive Specification Matrix, Multi-Angle Gallery, Appliance Runtime Engine & Checkout
  */
 
@@ -263,7 +263,7 @@
         { title: 'MC4 Solar Extension Cable (5M)', desc: 'Pre-crimped weatherproof solar cable' },
         { title: 'AC Wall Charging Cable', desc: '220V wall adapter' },
         { title: 'Car Charging Adapter', desc: '12V DC vehicular charging cable' },
-        { title: 'Warranty Card & Manual', desc: '1-Year DEVICE PRO warranty' }
+        { title: 'Warranty Card & Manual', desc: '1-Year GENUSS warranty' }
       ]
     },
 
@@ -315,7 +315,7 @@
         { title: '1× 585W Solar Panel', desc: 'Monocrystalline high-yield PV panel' },
         { title: 'MC4 Solar Cable (5M)', desc: 'Pre-crimped weather-resistant cable' },
         { title: 'Wall AC Fast Charger', desc: '220V mains charger' },
-        { title: 'User Manual & Warranty', desc: '1-Year DEVICE PRO warranty' }
+        { title: 'User Manual & Warranty', desc: '1-Year GENUSS warranty' }
       ]
     },
 
@@ -366,7 +366,7 @@
         { title: '1× 585W Solar Panel', desc: 'Tier-1 high efficiency monocrystalline' },
         { title: 'MC4 Solar Cables', desc: 'Heavy-duty 5m extension wire' },
         { title: 'AC Wall Adapter', desc: 'Mains fast charger' },
-        { title: 'Warranty & Manual', desc: '1-Year DEVICE PRO warranty' }
+        { title: 'Warranty & Manual', desc: '1-Year GENUSS warranty' }
       ]
     },
 
@@ -414,7 +414,7 @@
         { title: '1× 585W Solar Panel', desc: 'Monocrystalline panel' },
         { title: 'MC4 Solar Cable Kit', desc: 'Heavy-duty 5m wire' },
         { title: 'AC Wall Charger', desc: 'Rapid mains adapter' },
-        { title: 'Warranty & Manual', desc: '1-Year DEVICE PRO warranty' }
+        { title: 'Warranty & Manual', desc: '1-Year GENUSS warranty' }
       ]
     },
 
@@ -606,7 +606,7 @@
         { title: 'Coloar 2000 Station', desc: '2,000Wh solar powerhouse' },
         { title: '2× 585W Solar Panels', desc: '1,170W high efficiency solar array' },
         { title: 'MC4 Y-Branch Cables', desc: 'Parallel solar wiring kit' },
-        { title: 'AC Fast Charger & Manual', desc: '1-Year DEVICE PRO warranty' }
+        { title: 'AC Fast Charger & Manual', desc: '1-Year GENUSS warranty' }
       ]
     },
 
@@ -699,7 +699,7 @@
     if (!pkg) return;
 
     // Update Page Head Title & Meta
-    document.title = `${pkg.model} — Black Friday Solar Combo | DEVICE PRO`;
+    document.title = `${pkg.model} — Black Friday Solar Combo | GENUSS`;
 
     // Breadcrumb
     const breadcrumbCurrent = document.getElementById('bf-breadcrumb-current');
@@ -933,7 +933,7 @@
   // 3. WHATSAPP DISPATCH HELPER
   function setupWhatsAppButtons(pkg) {
     const text = encodeURIComponent(
-      `Hello DEVICE PRO! 👋\n\nI want to order the Black Friday Combo Deal:\n` +
+      `Hello GENUSS! 👋\n\nI want to order the Black Friday Combo Deal:\n` +
       `📦 *Package:* ${pkg.fullTitle}\n` +
       `💰 *Combo Total:* ${formatNgn(pkg.finalPrice)} (Discounted from ${formatNgn(pkg.marketValue)})\n` +
       `☀️ *Included Solar:* ${pkg.solarIncluded}\n` +

@@ -5,6 +5,8 @@
 .projects-page-body {
   background-color: var(--color-surface, #F4F8FC);
   color: var(--color-night-navy, #0A121F);
+  zoom: 1;
+  font-weight: 600;
 }
 
 .projects-hero-banner {

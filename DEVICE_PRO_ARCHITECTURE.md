@@ -522,14 +522,12 @@ design review. Maintain contrast ratios consistent with WCAG 2.2 AA.
 
 ### 7.3 Typography
 
--   Use a highly legible modern sans serif typeface with suitable
-    language support.
--   Use a small, consistent type scale.
--   Headings should be direct, descriptive, and not excessively
-    oversized.
+-   Use a highly legible modern sans serif typeface (Inter / Sora / Cabinet Grotesk).
+-   Root font size baseline established at 16.5px (increased by 10% from 15px baseline).
+-   Bold text architecture: base text set to bold weight (`font-weight: 600`), headings scaled to `700` - `900` for high-impact visibility and contrast.
+-   Use a consistent, responsive rem-based type scale.
+-   Headings should be direct, descriptive, and authoritative.
 -   Body text should have comfortable line height and line length.
--   Avoid using font size alone to express hierarchy; use spacing,
-    weight, and semantic headings too.
 -   Keep H1 unique and descriptive on each public page.
 
 ### 7.4 Layout and spacing

@@ -1,5 +1,5 @@
 /**
- * DEVICE PRO — Black Friday 2026 Product Detail Stylesheet
+ * GENUSS — Black Friday 2026 Product Detail Stylesheet
  * High-Converting Urban Streetwear & Clean Solar Tech Aesthetics
  */
 
@@ -106,9 +106,11 @@ body.bf-detail-page {
 }
 
 .bf-nav-logo {
-  height: 52px;
+  height: 50px;
   width: auto;
   display: block;
+  border-radius: 6px;
+  object-fit: contain;
 }
 
 .bf-back-link {

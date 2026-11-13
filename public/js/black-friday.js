@@ -1,5 +1,5 @@
 /**
- * DEVICE PRO — Black Friday 2026 Interactive Engine
+ * GENUSS — Black Friday 2026 Interactive Engine
  * Handles Countdown Timer, Wattage Filtering, Quick Order Modal, and WhatsApp Dispatch
  */
 
@@ -414,7 +414,7 @@
   function sendWhatsAppOrder(pkg) {
     if (!pkg) return;
     const phone = '2348033882268';
-    const message = `Hello DEVICE PRO! I want to order the Black Friday Solar Combo Deal:
+    const message = `Hello GENUSS! I want to order the Black Friday Solar Combo Deal:
 *${pkg.model}*
 - Output Rating: ${pkg.rating}
 - Battery Capacity: ${pkg.battery}

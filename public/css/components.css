@@ -16,7 +16,7 @@
 
 html {
   font-family: var(--font-family-body);
-  font-size: 15px; /* Clean crisp typographic baseline */
+  font-size: 16.5px; /* Clean crisp typographic baseline (+10%) */
   line-height: var(--line-height-normal);
   color: var(--color-d-text);
   background-color: var(--color-ink-000);
@@ -33,12 +33,14 @@ body {
   flex-direction: column;
   background-color: var(--color-ink-000);
   color: var(--color-d-text);
-  zoom: 0.9;
+  zoom: 1;
+  font-weight: 600;
 }
 
 @media (max-width: 767px) {
   body {
-    zoom: 0.9;
+    zoom: 1;
+  font-weight: 600;
   }
 }
 
@@ -66,10 +68,10 @@ a {
 }
 
 .brand-logo-img {
-  height: 68px;
-  max-height: 72px;
+  height: 82px;
+  max-height: 86px;
   width: auto;
-  max-width: 340px;
+  max-width: 408px;
   object-fit: contain;
   display: block;
 }
@@ -230,12 +232,14 @@ p, .text-body {
   font-size: var(--font-size-base);
   line-height: var(--line-height-relaxed);
   color: var(--color-d-text-muted);
+  font-weight: 600;
 }
 
 .text-lead {
   font-size: var(--font-size-md);
   line-height: var(--line-height-relaxed);
   color: var(--color-d-text-muted);
+  font-weight: 600;
 }
 
 /* Ensure crisp contrast on light surfaces */

@@ -8,6 +8,8 @@
   color: #1F2937;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
+  zoom: 1;
+  font-weight: 600;
 }
 
 /* =========================================================================

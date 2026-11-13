@@ -3,6 +3,11 @@
  * Responsive, accessible, and aligned with DEVICE PRO Design Tokens
  */
 
+body.profile-page-body {
+  zoom: 1;
+  font-weight: 600;
+}
+
 .profile-page-wrapper {
   background-color: #F8FAFC;
   min-height: calc(100vh - 80px);
