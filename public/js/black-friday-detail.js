@@ -665,10 +665,475 @@
     }
   };
 
+
   // Helper: Format Naira
   function formatNgn(num) {
     return '₦' + Number(num).toLocaleString('en-NG');
   }
+
+  // Active product state reference (used by WhatsApp and Online Checkout Modal)
+  let currentActivePkg = null;
+
+  // =========================================================================
+  // SOLAR PANEL COMBO VARIANTS MATRIX (450W vs 585W across all products)
+  // =========================================================================
+  const PANEL_VARIANTS = {
+    'bf-lucan-500': {
+      defaultVariant: '450w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ HERO SPECIAL',
+          wattsLabel: '450W Solar Panel Combo',
+          displayPrice: '₦362,000',
+          finalPrice: 362000,
+          marketValue: 500000,
+          savings: 138000,
+          savingsPct: '28%',
+          fullTitle: 'Lucan 500W Solar Power Station + 450W Monocrystalline Panel Combo',
+          solarBadge: '450W PANEL INCLUDED',
+          solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '450W',
+          boxTitle: '1× 450W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR',
+          wattsLabel: '585W Solar Panel Combo',
+          displayPrice: '₦389,000',
+          finalPrice: 389000,
+          marketValue: 530000,
+          savings: 141000,
+          savingsPct: '27%',
+          fullTitle: 'Lucan 500W Solar Power Station + 585W Monocrystalline Panel Combo',
+          solarBadge: '585W PANEL INCLUDED',
+          solarIncluded: '1 × 585W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '585W',
+          boxTitle: '1× 585W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        }
+      }
+    },
+
+    'bf-itel-500-450w': {
+      defaultVariant: '450w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ HERO SPECIAL',
+          wattsLabel: '450W Solar Panel Combo',
+          displayPrice: '₦391,000',
+          finalPrice: 391000,
+          marketValue: 520000,
+          savings: 129000,
+          savingsPct: '25%',
+          fullTitle: 'itel 500W PowerTank Solar Station + 450W Monocrystalline Panel Combo',
+          solarBadge: '450W PANEL INCLUDED',
+          solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '450W',
+          boxTitle: '1× 450W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR',
+          wattsLabel: '585W Solar Panel Combo',
+          displayPrice: '₦418,000',
+          finalPrice: 418000,
+          marketValue: 550000,
+          savings: 132000,
+          savingsPct: '24%',
+          fullTitle: 'itel 500W PowerTank Solar Station + 585W Monocrystalline Panel Combo',
+          solarBadge: '585W PANEL INCLUDED',
+          solarIncluded: '1 × 585W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '585W',
+          boxTitle: '1× 585W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        }
+      }
+    },
+
+    'bf-itel-500': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ HERO SPECIAL',
+          wattsLabel: '450W Solar Panel Combo',
+          displayPrice: '₦391,000',
+          finalPrice: 391000,
+          marketValue: 520000,
+          savings: 129000,
+          savingsPct: '25%',
+          fullTitle: 'itel 500W PowerTank Solar Station + 450W Monocrystalline Panel Combo',
+          solarBadge: '450W PANEL INCLUDED',
+          solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '450W',
+          boxTitle: '1× 450W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR',
+          wattsLabel: '585W Solar Panel Combo',
+          displayPrice: '₦418,000',
+          finalPrice: 418000,
+          marketValue: 550000,
+          savings: 132000,
+          savingsPct: '24%',
+          fullTitle: 'itel 500W PowerTank Solar Station + 585W Monocrystalline Panel Combo',
+          solarBadge: '585W PANEL INCLUDED',
+          solarIncluded: '1 × 585W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '585W',
+          boxTitle: '1× 585W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        }
+      }
+    },
+
+    'bf-hicces-300': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ BUDGET SPECIAL',
+          wattsLabel: '450W Solar Panel Combo',
+          displayPrice: '₦327,000',
+          finalPrice: 327000,
+          marketValue: 420000,
+          savings: 93000,
+          savingsPct: '22%',
+          fullTitle: 'Hicces 300W Solar Power Station + 450W Monocrystalline Panel Combo',
+          solarBadge: '450W PANEL INCLUDED',
+          solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '450W',
+          boxTitle: '1× 450W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR',
+          wattsLabel: '585W Solar Panel Combo',
+          displayPrice: '₦354,000',
+          finalPrice: 354000,
+          marketValue: 450000,
+          savings: 96000,
+          savingsPct: '21%',
+          fullTitle: 'Hicces 300W Solar Power Station + 585W Monocrystalline Panel Combo',
+          solarBadge: '585W PANEL INCLUDED',
+          solarIncluded: '1 × 585W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '585W',
+          boxTitle: '1× 585W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        }
+      }
+    },
+
+    'bf-hicces-500': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ VALUE COMBO',
+          wattsLabel: '450W Solar Panel Combo',
+          displayPrice: '₦375,000',
+          finalPrice: 375000,
+          marketValue: 490000,
+          savings: 115000,
+          savingsPct: '23%',
+          fullTitle: 'Hicces 500W Solar Power Station + 450W Monocrystalline Panel Combo',
+          solarBadge: '450W PANEL INCLUDED',
+          solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '450W',
+          boxTitle: '1× 450W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR',
+          wattsLabel: '585W Solar Panel Combo',
+          displayPrice: '₦402,000',
+          finalPrice: 402000,
+          marketValue: 520000,
+          savings: 118000,
+          savingsPct: '23%',
+          fullTitle: 'Hicces 500W Solar Power Station + 585W Monocrystalline Panel Combo',
+          solarBadge: '585W PANEL INCLUDED',
+          solarIncluded: '1 × 585W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '585W',
+          boxTitle: '1× 585W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        }
+      }
+    },
+
+    'bf-coloar-1000-pro': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ BESTSELLER CHOICE',
+          wattsLabel: '450W Solar Panel Combo',
+          displayPrice: '₦378,000',
+          finalPrice: 378000,
+          marketValue: 505000,
+          savings: 127000,
+          savingsPct: '25%',
+          fullTitle: 'Coloar 1000 Pro 300W Solar Station + 450W Monocrystalline Panel Combo',
+          solarBadge: '450W PANEL INCLUDED',
+          solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '450W',
+          boxTitle: '1× 450W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR',
+          wattsLabel: '585W Solar Panel Combo',
+          displayPrice: '₦405,000',
+          finalPrice: 405000,
+          marketValue: 535000,
+          savings: 130000,
+          savingsPct: '24%',
+          fullTitle: 'Coloar 1000 Pro 300W Solar Station + 585W Monocrystalline Panel Combo',
+          solarBadge: '585W PANEL INCLUDED',
+          solarIncluded: '1 × 585W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '585W',
+          boxTitle: '1× 585W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        }
+      }
+    },
+
+    'bf-coloar-1000-plus': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ EXTENDED RUNTIME',
+          wattsLabel: '450W Solar Panel Combo',
+          displayPrice: '₦395,000',
+          finalPrice: 395000,
+          marketValue: 525000,
+          savings: 130000,
+          savingsPct: '25%',
+          fullTitle: 'Coloar 1000 Plus 500W Solar Station + 450W Monocrystalline Panel Combo',
+          solarBadge: '450W PANEL INCLUDED',
+          solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '450W',
+          boxTitle: '1× 450W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR',
+          wattsLabel: '585W Solar Panel Combo',
+          displayPrice: '₦422,000',
+          finalPrice: 422000,
+          marketValue: 560000,
+          savings: 138000,
+          savingsPct: '25%',
+          fullTitle: 'Coloar 1000 Plus 500W Solar Station + 585W Monocrystalline Panel Combo',
+          solarBadge: '585W PANEL INCLUDED',
+          solarIncluded: '1 × 585W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '585W',
+          boxTitle: '1× 585W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        }
+      }
+    },
+
+    'bf-hithium-2-single': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ EV-GRADE',
+          wattsLabel: '450W Solar Panel Combo',
+          displayPrice: '₦615,000',
+          finalPrice: 615000,
+          marketValue: 820000,
+          savings: 205000,
+          savingsPct: '25%',
+          fullTitle: 'Hithium 2 1000W Solar Kit + 1× 450W Monocrystalline Panel Combo',
+          solarBadge: '450W PANEL INCLUDED',
+          solarIncluded: '1 × 450W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '450W',
+          boxTitle: '1× 450W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR',
+          wattsLabel: '585W Solar Panel Combo',
+          displayPrice: '₦642,000',
+          finalPrice: 642000,
+          marketValue: 850000,
+          savings: 208000,
+          savingsPct: '24%',
+          fullTitle: 'Hithium 2 1000W Solar Kit + 1× 585W Monocrystalline Panel Combo',
+          solarBadge: '585W PANEL INCLUDED',
+          solarIncluded: '1 × 585W Tier-1 Monocrystalline Solar Panel Included',
+          panelWattsShort: '585W',
+          boxTitle: '1× 585W Monocrystalline Panel',
+          boxDesc: 'Tier-1 high irradiance solar panel'
+        }
+      }
+    },
+
+    'bf-hithium-2-dual': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ 900W ARRAY',
+          wattsLabel: '2 × 450W Solar Panel Combo',
+          displayPrice: '₦700,000',
+          finalPrice: 700000,
+          marketValue: 960000,
+          savings: 260000,
+          savingsPct: '27%',
+          fullTitle: 'Hithium 2 1000W Rapid Kit + 2× 450W Panels (900W Array)',
+          solarBadge: '2 × 450W PANELS INCLUDED',
+          solarIncluded: '2 × 450W Panels (900W Dual Solar Array)',
+          panelWattsShort: '2 × 450W',
+          boxTitle: '2× 450W Monocrystalline Panels',
+          boxDesc: 'Tier-1 high irradiance solar panels'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR (1,170W)',
+          wattsLabel: '2 × 585W Solar Panel Combo',
+          displayPrice: '₦754,000',
+          finalPrice: 754000,
+          marketValue: 1020000,
+          savings: 266000,
+          savingsPct: '26%',
+          fullTitle: 'Hithium 2 1000W Rapid Kit + 2× 585W Panels (1,170W Array)',
+          solarBadge: '2 × 585W PANELS INCLUDED',
+          solarIncluded: '2 × 585W Panels (1,170W Dual Solar Array)',
+          panelWattsShort: '2 × 585W',
+          boxTitle: '2× 585W Monocrystalline Panels',
+          boxDesc: 'Tier-1 high irradiance solar panels'
+        }
+      }
+    },
+
+    'bf-hicces-1000': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ 900W ARRAY',
+          wattsLabel: '2 × 450W Solar Panel Combo',
+          displayPrice: '₦730,000',
+          finalPrice: 730000,
+          marketValue: 990000,
+          savings: 260000,
+          savingsPct: '26%',
+          fullTitle: 'Hicces 1000W Heavy-Duty Station + 2× 450W Panels (900W Array)',
+          solarBadge: '2 × 450W PANELS INCLUDED',
+          solarIncluded: '2 × 450W Panels (900W Combined Solar Array)',
+          panelWattsShort: '2 × 450W',
+          boxTitle: '2× 450W Monocrystalline Panels',
+          boxDesc: 'Tier-1 high irradiance solar panels'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR (1,170W)',
+          wattsLabel: '2 × 585W Solar Panel Combo',
+          displayPrice: '₦784,000',
+          finalPrice: 784000,
+          marketValue: 1050000,
+          savings: 266000,
+          savingsPct: '25%',
+          fullTitle: 'Hicces 1000W Heavy-Duty Station + 2× 585W Panels (1,170W Array)',
+          solarBadge: '2 × 585W PANELS INCLUDED',
+          solarIncluded: '2 × 585W Panels (1,170W Combined Solar Array)',
+          panelWattsShort: '2 × 585W',
+          boxTitle: '2× 585W Monocrystalline Panels',
+          boxDesc: 'Tier-1 high irradiance solar panels'
+        }
+      }
+    },
+
+    'bf-coloar-2000': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ 900W ARRAY',
+          wattsLabel: '2 × 450W Solar Panel Combo',
+          displayPrice: '₦758,000',
+          finalPrice: 758000,
+          marketValue: 1040000,
+          savings: 282000,
+          savingsPct: '27%',
+          fullTitle: 'Coloar 2000 1000W Solar Station + 2× 450W Panels (900W Array)',
+          solarBadge: '2 × 450W PANELS INCLUDED',
+          solarIncluded: '2 × 450W Panels (900W Dual Monocrystalline Array)',
+          panelWattsShort: '2 × 450W',
+          boxTitle: '2× 450W Monocrystalline Panels',
+          boxDesc: 'Tier-1 high irradiance solar panels'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR (1,170W)',
+          wattsLabel: '2 × 585W Solar Panel Combo',
+          displayPrice: '₦812,000',
+          finalPrice: 812000,
+          marketValue: 1100000,
+          savings: 288000,
+          savingsPct: '26%',
+          fullTitle: 'Coloar 2000 1000W Solar Station + 2× 585W Panels (1,170W Array)',
+          solarBadge: '2 × 585W PANELS INCLUDED',
+          solarIncluded: '2 × 585W Panels (1,170W Dual Monocrystalline Array)',
+          panelWattsShort: '2 × 585W',
+          boxTitle: '2× 585W Monocrystalline Panels',
+          boxDesc: 'Tier-1 high irradiance solar panels'
+        }
+      }
+    },
+
+    'bf-coloar-3600': {
+      defaultVariant: '585w',
+      options: {
+        '450w': {
+          key: '450w',
+          badge: '⚡ 1,350W ARRAY',
+          wattsLabel: '3 × 450W Solar Panel Combo',
+          displayPrice: '₦1,085,000',
+          finalPrice: 1085000,
+          marketValue: 1510000,
+          savings: 425000,
+          savingsPct: '28%',
+          fullTitle: 'Coloar 3600 1200W Station + 3× 450W Panels (1,350W Mega Array)',
+          solarBadge: '3 × 450W PANELS INCLUDED',
+          solarIncluded: '3 × 450W Panels (1,350W Triple Monocrystalline Array)',
+          panelWattsShort: '3 × 450W',
+          boxTitle: '3× 450W Monocrystalline Panels',
+          boxDesc: 'Tier-1 high irradiance solar panels'
+        },
+        '585w': {
+          key: '585w',
+          badge: 'MAX SOLAR (1,755W)',
+          wattsLabel: '3 × 585W Solar Panel Combo',
+          displayPrice: '₦1,166,000',
+          finalPrice: 1166000,
+          marketValue: 1600000,
+          savings: 434000,
+          savingsPct: '27%',
+          fullTitle: 'Coloar 3600 1200W Station + 3× 585W Panels (1,755W Mega Array)',
+          solarBadge: '3 × 585W PANELS INCLUDED',
+          solarIncluded: '3 × 585W Panels (1,755W Triple Mega Solar Array)',
+          panelWattsShort: '3 × 585W',
+          boxTitle: '3× 585W Monocrystalline Panels',
+          boxDesc: 'Tier-1 high irradiance solar panels'
+        }
+      }
+    }
+  };
 
   // Determine current package ID from URL (?id=... or /black-friday/...)
   function getSelectedPackageId() {
@@ -697,6 +1162,9 @@
     const pkgId = getSelectedPackageId();
     const pkg = BF_PACKAGES[pkgId];
     if (!pkg) return;
+
+    // Set initial active package
+    currentActivePkg = { ...pkg };
 
     // Update Page Head Title & Meta
     document.title = `${pkg.model} — Black Friday Solar Combo | GENUSS`;
@@ -733,75 +1201,8 @@
     const dealBadge = document.getElementById('bf-badge-deal');
     if (dealBadge) dealBadge.textContent = pkg.badge;
 
-    const solarBadgeEl = document.getElementById('bf-gallery-solar-badge');
-    if (solarBadgeEl) {
-      if (pkg.solarIncluded && pkg.solarIncluded.includes('450W')) {
-        solarBadgeEl.textContent = '450W PANEL INCLUDED';
-      } else if (pkg.solarIncluded && pkg.solarIncluded.includes('2 ×')) {
-        solarBadgeEl.textContent = '2 × 585W PANELS INCLUDED';
-      } else if (pkg.solarIncluded && pkg.solarIncluded.includes('3 ×')) {
-        solarBadgeEl.textContent = '3 × 585W PANELS INCLUDED';
-      } else {
-        solarBadgeEl.textContent = '585W PANEL INCLUDED';
-      }
-    }
-
     const stockEl = document.getElementById('bf-stock-text');
     if (stockEl) stockEl.textContent = `High Demand: Only ${pkg.stockCount} units remaining in Lagos warehouse`;
-
-    // Variant Selector (itel 450W vs 585W combo)
-    const switchContainer = document.getElementById('bf-panel-switch-container');
-    if (switchContainer) {
-      if (pkgId === 'bf-itel-500' || pkgId === 'bf-itel-500-450w') {
-        switchContainer.innerHTML = `
-          <div class="bf-panel-switch-wrap">
-            <span class="bf-panel-switch-label">Select Solar Panel Combo:</span>
-            <div class="bf-panel-switch-options">
-              <a href="/black-friday-detail.html?id=bf-itel-500-450w" class="bf-panel-switch-btn ${pkgId === 'bf-itel-500-450w' ? 'active' : ''}">
-                <span class="bf-switch-badge">⚡ HERO SPECIAL</span>
-                <span class="bf-switch-watts">450W Solar Panel Combo</span>
-                <span class="bf-switch-price">₦391,000</span>
-              </a>
-              <a href="/black-friday-detail.html?id=bf-itel-500" class="bf-panel-switch-btn ${pkgId === 'bf-itel-500' ? 'active' : ''}">
-                <span class="bf-switch-badge">MAX SOLAR</span>
-                <span class="bf-switch-watts">585W Solar Panel Combo</span>
-                <span class="bf-switch-price">₦418,000</span>
-              </a>
-            </div>
-          </div>
-        `;
-        switchContainer.style.display = 'block';
-      } else {
-        switchContainer.innerHTML = '';
-        switchContainer.style.display = 'none';
-      }
-    }
-
-    // Dynamic Solar Array references in Overview tab
-    const is450W = pkg.solarIncluded && pkg.solarIncluded.includes('450W');
-    const is2x585W = pkg.solarIncluded && pkg.solarIncluded.includes('2 ×');
-    const is3x585W = pkg.solarIncluded && pkg.solarIncluded.includes('3 ×');
-    const panelWattsLabel = is450W ? '450W' : (is2x585W ? '2 × 585W' : (is3x585W ? '3 × 585W' : '585W'));
-
-    const solarBullet = document.getElementById('bf-detail-solar-watt-bullet');
-    if (solarBullet) {
-      solarBullet.textContent = panelWattsLabel;
-    }
-
-    const partnerTitle = document.getElementById('bf-detail-solar-partner-title');
-    if (partnerTitle) {
-      partnerTitle.textContent = `Bundled with Tier-1 ${panelWattsLabel} Solar Array`;
-    }
-
-    const partnerDesc = document.getElementById('bf-detail-solar-partner-desc');
-    if (partnerDesc) {
-      partnerDesc.textContent = `Every combo package comes complete with authentic Tier-1 ${panelWattsLabel} Monocrystalline solar panel engineered for ultra-high conversion efficiency even under cloudy Nigerian skies.`;
-    }
-
-    const partnerImg = document.getElementById('bf-detail-solar-partner-img');
-    if (partnerImg) {
-      partnerImg.alt = `${panelWattsLabel} Solar Panel`;
-    }
 
     // Quick Specs Grid
     const quickSpecsGrid = document.getElementById('bf-quick-specs-grid');
@@ -815,9 +1216,9 @@
           <div class="bf-spec-label">Battery Capacity</div>
           <div class="bf-spec-val">${pkg.specs[3]?.val || '1,000Wh'}</div>
         </div>
-        <div class="bf-quick-spec-item">
+        <div class="bf-quick-spec-item" id="bf-quick-spec-solar-item">
           <div class="bf-spec-label">Included Solar Array</div>
-          <div class="bf-spec-val">${pkg.solarIncluded}</div>
+          <div class="bf-spec-val" id="bf-quick-spec-solar-val">${pkg.solarIncluded}</div>
         </div>
         <div class="bf-quick-spec-item">
           <div class="bf-spec-label">Doorstep Delivery</div>
@@ -836,7 +1237,7 @@
       thumbsContainer.innerHTML = pkg.images.map((img, idx) => `
         <button type="button" class="bf-thumb-btn ${idx === 0 ? 'active' : ''}" data-thumb-index="${idx}">
           <img src="${img.src}" alt="${img.desc}" loading="lazy">
-          <span>${img.label}</span>
+          <span class="bf-thumb-label">${img.label}</span>
         </button>
       `).join('');
 
@@ -882,29 +1283,18 @@
       specsBody.innerHTML = pkg.specs.map(s => `
         <tr>
           <td class="spec-key">${s.key}</td>
-          <td class="spec-val">${s.val}</td>
+          <td class="spec-val" ${s.key === 'Solar PV Array Included' ? 'id="bf-spec-val-solar-array"' : ''}>${s.val}</td>
         </tr>
       `).join('');
     }
 
     // What's in the Box Tab
-    const boxContainer = document.getElementById('bf-box-container');
-    if (boxContainer && pkg.boxItems) {
-      boxContainer.innerHTML = pkg.boxItems.map(item => `
-        <div class="bf-box-item">
-          <div class="bf-box-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-          </div>
-          <h4 class="bf-box-title">${item.title}</h4>
-          <p class="bf-box-desc">${item.desc}</p>
-        </div>
-      `).join('');
-    }
+    renderBoxItems(pkg.boxItems);
 
     // Cross-sell Other Combos
     const otherGrid = document.getElementById('bf-other-combos-grid');
     if (otherGrid) {
-      const otherKeys = Object.keys(BF_PACKAGES).filter(k => k !== pkgId).slice(0, 3);
+      const otherKeys = Object.keys(BF_PACKAGES).filter(k => k !== pkgId && k !== 'bf-itel-500-450w').slice(0, 3);
       otherGrid.innerHTML = otherKeys.map(k => {
         const otherPkg = BF_PACKAGES[k];
         return `
@@ -925,9 +1315,187 @@
       }).join('');
     }
 
-    // Wire Up WhatsApp Actions
-    setupWhatsAppButtons(pkg);
-    setupOrderOnlineButtons(pkg);
+    // =========================================================================
+    // RENDER INTERACTIVE SOLAR PANEL BUNDLE SELECTOR FOR ALL PRODUCTS
+    // =========================================================================
+    const variantGroup = PANEL_VARIANTS[pkgId];
+    const switchContainer = document.getElementById('bf-panel-switch-container');
+
+    if (variantGroup && switchContainer) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlPanel = urlParams.get('panel');
+      const initialKey = (urlPanel === '450w' || urlPanel === '585w') ? urlPanel : variantGroup.defaultVariant;
+
+      const opt450 = variantGroup.options['450w'];
+      const opt585 = variantGroup.options['585w'];
+
+      switchContainer.innerHTML = `
+        <div class="bf-panel-switch-wrap">
+          <span class="bf-panel-switch-label">Select Solar Panel Combo:</span>
+          <div class="bf-panel-switch-options" role="radiogroup" aria-label="Select Solar Panel Combo">
+            <button type="button" class="bf-panel-switch-btn ${initialKey === '450w' ? 'active' : ''}" data-panel-key="450w" role="radio" aria-checked="${initialKey === '450w'}">
+              <span class="bf-switch-badge">${opt450.badge}</span>
+              <span class="bf-switch-watts">${opt450.wattsLabel}</span>
+              <span class="bf-switch-price">${opt450.displayPrice}</span>
+            </button>
+            <button type="button" class="bf-panel-switch-btn ${initialKey === '585w' ? 'active' : ''}" data-panel-key="585w" role="radio" aria-checked="${initialKey === '585w'}">
+              <span class="bf-switch-badge">${opt585.badge}</span>
+              <span class="bf-switch-watts">${opt585.wattsLabel}</span>
+              <span class="bf-switch-price">${opt585.displayPrice}</span>
+            </button>
+          </div>
+        </div>
+      `;
+      switchContainer.style.display = 'block';
+
+      // Attach event listeners to variant buttons
+      switchContainer.querySelectorAll('.bf-panel-switch-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.getAttribute('data-panel-key');
+          applyPanelVariant(pkg, variantGroup, key, true);
+        });
+      });
+
+      // Apply initial variant state
+      applyPanelVariant(pkg, variantGroup, initialKey, false);
+    } else {
+      setupWhatsAppButtons(pkg);
+    }
+
+    // Online modal listener initialization (once)
+    initOrderOnlineModal();
+  }
+
+  // Helper to re-render What's in the Box
+  function renderBoxItems(items) {
+    const boxContainer = document.getElementById('bf-box-container');
+    if (boxContainer && items) {
+      boxContainer.innerHTML = items.map(item => `
+        <div class="bf-box-item">
+          <div class="bf-box-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          </div>
+          <h4 class="bf-box-title">${item.title}</h4>
+          <p class="bf-box-desc">${item.desc}</p>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Apply Variant Changes Across All Product Details Page Elements
+  function applyPanelVariant(pkg, variantGroup, variantKey, updateUrl) {
+    const variant = variantGroup.options[variantKey];
+    if (!variant) return;
+
+    // Update active button styling
+    const switchContainer = document.getElementById('bf-panel-switch-container');
+    if (switchContainer) {
+      switchContainer.querySelectorAll('.bf-panel-switch-btn').forEach(btn => {
+        const isCurrent = btn.getAttribute('data-panel-key') === variantKey;
+        btn.classList.toggle('active', isCurrent);
+        btn.setAttribute('aria-checked', isCurrent ? 'true' : 'false');
+      });
+    }
+
+    // Title & Tagline
+    const titleEl = document.getElementById('bf-detail-title');
+    if (titleEl) titleEl.textContent = variant.fullTitle;
+
+    const taglineEl = document.getElementById('bf-detail-tagline');
+    if (taglineEl && pkg.tagline) {
+      taglineEl.textContent = pkg.tagline
+        .replace(/585W/g, variant.panelWattsShort)
+        .replace(/450W/g, variant.panelWattsShort);
+    }
+
+    // Pricing
+    const finalPriceEl = document.getElementById('bf-detail-final-price');
+    if (finalPriceEl) finalPriceEl.textContent = formatNgn(variant.finalPrice);
+
+    const regPriceEl = document.getElementById('bf-detail-regular-price');
+    if (regPriceEl) regPriceEl.textContent = formatNgn(variant.marketValue);
+
+    const savingsChipEl = document.getElementById('bf-detail-savings-chip');
+    if (savingsChipEl) savingsChipEl.textContent = `SAVE ${formatNgn(variant.savings)} (${variant.savingsPct} OFF)`;
+
+    // Mobile sticky bottom bar price
+    const mobilePriceEl = document.getElementById('bf-mobile-price');
+    if (mobilePriceEl) mobilePriceEl.textContent = formatNgn(variant.finalPrice);
+
+    // Gallery Floating Solar Badge
+    const solarBadgeEl = document.getElementById('bf-gallery-solar-badge');
+    if (solarBadgeEl) {
+      solarBadgeEl.textContent = variant.solarBadge;
+    }
+
+    // Quick specs solar item
+    const quickSolarVal = document.getElementById('bf-quick-spec-solar-val');
+    if (quickSolarVal) {
+      quickSolarVal.textContent = variant.solarIncluded;
+    }
+
+    // Full specs solar array row
+    const specSolarVal = document.getElementById('bf-spec-val-solar-array');
+    if (specSolarVal) {
+      specSolarVal.textContent = variant.solarIncluded;
+    }
+
+    // Overview Tab elements
+    const solarBullet = document.getElementById('bf-detail-solar-watt-bullet');
+    if (solarBullet) solarBullet.textContent = variant.panelWattsShort;
+
+    const partnerTitle = document.getElementById('bf-detail-solar-partner-title');
+    if (partnerTitle) partnerTitle.textContent = `Bundled with Tier-1 ${variant.panelWattsShort} Solar Array`;
+
+    const partnerDesc = document.getElementById('bf-detail-solar-partner-desc');
+    if (partnerDesc) {
+      partnerDesc.textContent = `Every combo package comes complete with authentic Tier-1 ${variant.panelWattsShort} Monocrystalline solar panel engineered for ultra-high conversion efficiency even under cloudy Nigerian skies.`;
+    }
+
+    const partnerImg = document.getElementById('bf-detail-solar-partner-img');
+    if (partnerImg) partnerImg.alt = `${variant.panelWattsShort} Solar Panel`;
+
+    // What's in the Box Tab items
+    if (pkg.boxItems) {
+      const updatedBoxItems = pkg.boxItems.map(item => {
+        if (item.title.toLowerCase().includes('panel')) {
+          return { title: variant.boxTitle, desc: variant.boxDesc };
+        }
+        return item;
+      });
+      renderBoxItems(updatedBoxItems);
+    }
+
+    // Update gallery thumbnail label specifically for the solar panel thumbnail
+    const thumbButtons = document.querySelectorAll('.bf-thumb-btn');
+    thumbButtons.forEach(btn => {
+      const img = btn.querySelector('img');
+      const label = btn.querySelector('.bf-thumb-label');
+      if (img && label && img.src.includes('solar-panel')) {
+        label.textContent = `${variant.panelWattsShort} Solar Panel`;
+      }
+    });
+
+    // Update active package object
+    currentActivePkg = {
+      ...pkg,
+      fullTitle: variant.fullTitle,
+      finalPrice: variant.finalPrice,
+      marketValue: variant.marketValue,
+      savings: variant.savings,
+      savingsPct: variant.savingsPct,
+      solarIncluded: variant.solarIncluded
+    };
+
+    // Re-wire WhatsApp links
+    setupWhatsAppButtons(currentActivePkg);
+
+    // Update URL query string without reloading page
+    if (updateUrl && window.history && window.history.replaceState) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('panel', variantKey);
+      window.history.replaceState({}, '', url.toString());
+    }
   }
 
   // 3. WHATSAPP DISPATCH HELPER
@@ -952,8 +1520,12 @@
     if (mobileWaBtn) mobileWaBtn.href = waUrl;
   }
 
-  // 4. ONLINE ORDER MODAL
-  function setupOrderOnlineButtons(pkg) {
+  // 4. ONLINE ORDER MODAL INITIALIZATION (Attached Once)
+  let modalInitialized = false;
+  function initOrderOnlineModal() {
+    if (modalInitialized) return;
+    modalInitialized = true;
+
     const buyBtn = document.getElementById('bf-btn-buy-online');
     const mobileBuyBtn = document.getElementById('bf-mobile-buy');
     const modal = document.getElementById('bf-checkout-modal');
@@ -962,8 +1534,10 @@
     if (!modal) return;
 
     function openModal() {
-      document.getElementById('bf-modal-product-name').textContent = pkg.fullTitle;
-      document.getElementById('bf-modal-product-price').textContent = formatNgn(pkg.finalPrice);
+      const active = currentActivePkg || BF_PACKAGES[getSelectedPackageId()];
+      if (!active) return;
+      document.getElementById('bf-modal-product-name').textContent = active.fullTitle;
+      document.getElementById('bf-modal-product-price').textContent = formatNgn(active.finalPrice);
       modal.showModal();
     }
 
@@ -976,6 +1550,7 @@
     if (checkoutForm) {
       checkoutForm.onsubmit = function (e) {
         e.preventDefault();
+        const active = currentActivePkg || BF_PACKAGES[getSelectedPackageId()];
         const fullName = document.getElementById('bf-cust-name').value;
         const phone = document.getElementById('bf-cust-phone').value;
         const address = document.getElementById('bf-cust-address').value;
@@ -984,8 +1559,8 @@
         // WhatsApp direct fulfillment backup
         const waMsg = encodeURIComponent(
           `⚡ *NEW BLACK FRIDAY ORDER SUBMITTED*\n\n` +
-          `📦 *Product:* ${pkg.fullTitle}\n` +
-          `💵 *Total:* ${formatNgn(pkg.finalPrice)} (Free Delivery Included)\n` +
+          `📦 *Product:* ${active.fullTitle}\n` +
+          `💵 *Total:* ${formatNgn(active.finalPrice)} (Free Delivery Included)\n` +
           `👤 *Customer:* ${fullName}\n` +
           `📞 *Phone:* ${phone}\n` +
           `📍 *Delivery Address:* ${address}, ${city}\n\n` +
@@ -1022,4 +1597,3 @@
   });
 
 })();
-

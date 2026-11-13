@@ -1247,6 +1247,11 @@ body.bf-detail-page {
   transition: all 0.2s ease;
   cursor: pointer;
   position: relative;
+  text-align: left;
+  font-family: inherit;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .bf-panel-switch-btn:hover {
