@@ -2627,3 +2627,70 @@ body.black-friday-page {
   }
 }
 
+
+/* ==========================================================================
+   FOOTER SOCIAL MEDIA LINKS
+   ========================================================================== */
+.bf-footer-social-wrap {
+  margin-top: 18px;
+}
+
+.bf-footer-social-title {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+  margin-bottom: 10px;
+}
+
+.bf-footer-social-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bf-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 9999px;
+  color: #E2E8F0;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bf-social-link svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.bf-social-link:hover {
+  transform: translateY(-2px);
+  color: #FFFFFF;
+}
+
+.bf-social-link.bf-social-tiktok:hover {
+  background: #010101;
+  border-color: #00f2fe;
+  box-shadow: 0 4px 14px rgba(0, 242, 254, 0.35);
+}
+
+.bf-social-link.bf-social-youtube:hover {
+  background: #CC0000;
+  border-color: #FF0000;
+  box-shadow: 0 4px 14px rgba(204, 0, 0, 0.4);
+}
+
+.bf-social-link.bf-social-facebook:hover {
+  background: #1877F2;
+  border-color: #1877F2;
+  box-shadow: 0 4px 14px rgba(24, 119, 242, 0.4);
+}
