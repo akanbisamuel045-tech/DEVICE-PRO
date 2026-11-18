@@ -311,30 +311,32 @@
       });
     });
 
-    // Render Related Gadgets (Dark Card Styling matching /gadget)
+    // Render Related Gadgets (Minimalist White Editorial Card Styling matching /gadget)
     const relatedGrid = document.getElementById('gd-related-grid');
     if (relatedGrid) {
       const related = Catalog.getRelated(product, 4);
-      const CART_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>';
+      const CART_SVG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>';
       relatedGrid.innerHTML = related.map(item => {
-        const discount = Catalog.getDiscountPct(item.price, item.originalPrice);
         const detailUrl = `/gadget/${encodeURIComponent(item.slug)}`;
         return `
-          <article class="gd-card">
-            <div class="gd-card-stage">
-              ${discount > 0 ? `<span class="gd-discount-tag">-${discount}%</span>` : ''}
+          <article class="gd-editorial-card">
+            <div class="gd-ed-stage">
+              <span class="gd-ed-tag">${item.brand}</span>
+              <button type="button" class="gd-ed-cart-btn" data-rel-add="${item.slug}" title="Add to Cart" aria-label="Add ${item.name} to cart">
+                ${CART_SVG}
+              </button>
               <a href="${detailUrl}" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;" aria-label="View ${item.name}">
                 <img src="${item.image}" alt="${item.name}" loading="lazy">
               </a>
-              <button type="button" class="gd-card-quick-add" data-rel-add="${item.slug}" title="Add to Cart" aria-label="Add ${item.name} to cart">
-                ${CART_SVG}
-              </button>
             </div>
-            <span class="gd-card-brand">${item.brand}</span>
-            <h3 class="gd-card-title"><a href="${detailUrl}">${item.name}</a></h3>
-            <div class="gd-card-price-row">
-              <span class="gd-card-price">${Catalog.formatNaira(item.price)}</span>
-              ${item.originalPrice > item.price ? `<span class="gd-card-old-price">${Catalog.formatNaira(item.originalPrice)}</span>` : ''}
+            <div class="gd-ed-price-row">
+              <span class="gd-ed-price">${Catalog.formatNaira(item.price)}</span>
+              ${item.originalPrice > item.price ? `<span class="gd-ed-old-price">${Catalog.formatNaira(item.originalPrice)}</span>` : ''}
+            </div>
+            <h3 class="gd-ed-title"><a href="${detailUrl}">${item.name}</a></h3>
+            <div class="gd-ed-rating">
+              <span class="gd-ed-stars" aria-hidden="true">★★★★★</span>
+              <span>${item.rating.toFixed(1)} (${item.reviewCount})</span>
             </div>
           </article>
         `;
