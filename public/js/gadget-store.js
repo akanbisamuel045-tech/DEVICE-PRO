@@ -389,8 +389,8 @@
 
       if (list.length === 0) {
         explorerGridEl.innerHTML = `
-          <div style="grid-column:1/-1; text-align:center; padding:36px 16px; color:#94A3B8;">
-            <p style="margin:0 0 12px; color:#FFFFFF; font-size:1rem;">No matching gadgets found.</p>
+          <div style="grid-column:1/-1; text-align:center; padding:36px 16px; color:#475569;">
+            <p style="margin:0 0 12px; color:#061C35; font-size:1rem;">No matching gadgets found.</p>
             <button type="button" class="gd-btn-hero" id="gd-empty-reset">Show All 28 Gadgets</button>
           </div>
         `;
