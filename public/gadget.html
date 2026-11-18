@@ -1,164 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gadgets &amp; Tech Store | DEVICE PRO Nigeria — Phones, Laptops, Logitech, Monitors &amp; Printers</title>
-  <meta name="description"
-    content="Shop factory-sealed smartphones, laptops, powerbanks, Bluetooth speakers, 4K monitors, wireless printers, and official Logitech keyboards &amp; mice at DEVICE PRO Nigeria. Unified Paystack checkout.">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg">
-
-  <!-- Google Fonts: Inter -->
+  <title>Gadgets &amp; Tech Store | DEVICE PRO Nigeria</title>
+  <meta name="description" content="Shop original smartphones, laptops, Logitech keyboards & mice, powerbanks, Bluetooth speakers, 4K monitors, wireless printers and accessories with instant Paystack & Bank Transfer checkout.">
+  <meta property="og:title" content="Gadgets & Tech Store | DEVICE PRO Nigeria">
+  <meta property="og:description" content="Factory-sealed smartphones, laptops, Logitech peripherals, powerbanks, speakers, monitors & printers — instant checkout.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://device-pro.vercel.app/gadget">
+  <meta property="og:image" content="https://device-pro.vercel.app/images/gadgets/phone-flagship-titanium.jpg">
+  <link rel="icon" type="image/png" href="/images/dp-icon-transparent.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
-
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="/css/tokens.css?v=18">
-  <link rel="stylesheet" href="/css/components.css?v=32">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/gadget.css?v=5">
 </head>
-
-<body class="devicepro-body gadget-page-body">
-
-  <a href="#gadget-main" class="skip-to-content">Skip to main content</a>
+<body class="nuvio-gadget-body">
+  <a href="#main-content" class="skip-to-content">Skip to content</a>
 
   <!-- =========================================================================
-       1. TWO-ROW WHITE EDITORIAL HEADER (CENTERED LOGO + UTILITY SEARCH ROW)
+       1. TWO-ROW ULTRA-CLEAN WHITE HEADER (EXACT REFERENCE DESIGN)
        ========================================================================= -->
-  <header class="gd-header" role="banner">
-    <!-- Row 1: Left Links | Centered Brand Logo | Right Account & Cart -->
-    <div class="gd-header-row1">
-      <div class="gd-container gd-row1-inner">
-        <nav class="gd-top-left-links" aria-label="Primary Site Links">
-          <a href="/" class="gd-top-link">Solar Home</a>
-          <a href="/products" class="gd-top-link">Solar Store</a>
-          <a href="/packages" class="gd-top-link">Packages</a>
-          <a href="/contact" class="gd-top-link">Support</a>
-        </nav>
+  <header class="nv-header">
+    <!-- Row 1: Top Links | Centered Brand Wordmark | Account & Cart -->
+    <div class="nv-header-top">
+      <div class="nv-container">
+        <div class="nv-top-inner">
+          <nav class="nv-top-links" aria-label="Primary navigation">
+            <a href="/" class="nv-top-link">Home</a>
+            <a href="/gadget" class="nv-top-link" style="color:#111111; font-weight:700;">Gadgets</a>
+            <a href="#nv-explorer-section" class="nv-top-link">Shop All</a>
+            <a href="/products" class="nv-top-link">Solar Store</a>
+            <a href="/contact" class="nv-top-link">Contact</a>
+          </nav>
 
-        <a href="/gadget" class="gd-center-brand" aria-label="DEVICE PRO Gadgets Store">
-          <img src="/images/logo.svg" alt="DEVICE PRO" class="gd-center-logo">
-        </a>
-
-        <div class="gd-top-right-actions">
-          <a href="/login?redirect=/profile" class="gd-account-pill" data-user-profile-btn aria-label="My Account">
-            <span class="gd-avatar-dot" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </span>
-            <span>Account</span>
+          <a href="/gadget" class="nv-brand-center" aria-label="DEVICE PRO Gadgets Home">
+            <span class="nv-brand-mark">D</span>
+            <span>devicepro<span class="accent-dot">.</span></span>
           </a>
 
-          <button type="button" class="gd-cart-pill" data-trigger-cart aria-label="Shopping Cart">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            <span class="gd-cart-label">Cart</span>
-            <span class="cart-badge" aria-label="0 items in cart">0</span>
-          </button>
+          <div class="nv-top-right">
+            <a href="/login" class="nv-user-btn" aria-label="Account">
+              <span class="nv-avatar-circle" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </span>
+              <span class="nv-label">Account</span>
+            </a>
 
-          <button type="button" class="gd-mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
+            <button type="button" class="nv-cart-btn" data-trigger-cart aria-label="Open Cart">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              <span class="nv-label">Cart</span>
+              <span class="cart-badge">0</span>
+            </button>
+
+            <button type="button" class="nv-mobile-toggle" id="mobile-menu-btn" aria-label="Open Menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Row 2: All Category Dropdown + Search Pill + Quick Filter Pills -->
-    <div class="gd-header-row2">
-      <div class="gd-container gd-row2-inner">
-        <div class="gd-cat-drop-wrap">
-          <button type="button" class="gd-cat-drop-btn" id="gd-cat-drop-toggle" aria-expanded="false">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-              <rect x="3" y="3" width="7" height="7"></rect>
-              <rect x="14" y="3" width="7" height="7"></rect>
-              <rect x="14" y="14" width="7" height="7"></rect>
-              <rect x="3" y="14" width="7" height="7"></rect>
-            </svg>
-            <span>All Category</span>
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </button>
-          <div class="gd-cat-dropdown" id="gd-cat-dropdown" role="menu"></div>
-        </div>
+    <!-- Row 2: All Category Dropdown + Search Bar + Quick Action Pills -->
+    <div class="nv-header-bar">
+      <div class="nv-container">
+        <div class="nv-bar-inner">
+          <div class="nv-cat-wrap">
+            <button type="button" class="nv-cat-btn" id="nv-cat-drop-toggle" aria-expanded="false" aria-haspopup="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>All Category</span>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="nv-cat-menu" id="nv-cat-menu" role="menu">
+              <!-- Populated by gadget-store.js -->
+            </div>
+          </div>
 
-        <form id="gd-header-search-form" class="gd-header-search" role="search" aria-label="Search gadgets">
-          <input type="search" id="gd-header-search-input"
-            placeholder="Search for any products, Logitech, iPhone, laptops, printers..." autocomplete="off">
-          <button type="submit" aria-label="Search">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </button>
-        </form>
+          <form class="nv-search-form" id="nv-header-search-form" role="search">
+            <input type="search" id="nv-header-search-input" placeholder="Search phones, laptops, Logitech, speakers, printers..." aria-label="Search gadgets">
+            <button type="submit" aria-label="Search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+          </form>
 
-        <div class="gd-quick-nav-pills">
-          <button type="button" class="gd-nav-pill" data-jump-cat="logitech">Logitech</button>
-          <button type="button" class="gd-nav-pill" data-jump-cat="laptops">Laptops</button>
-          <a href="#gd-deals-section" class="gd-nav-pill accent">Hot Deals</a>
-          <a href="/checkout" class="gd-nav-pill">Checkout</a>
+          <div class="nv-bar-pills">
+            <button type="button" class="nv-bar-pill" data-jump-cat="logitech">Logitech</button>
+            <button type="button" class="nv-bar-pill" data-jump-cat="laptops">Laptops</button>
+            <button type="button" class="nv-bar-pill orange-pill" data-jump-sort="discount">Hot Deals</button>
+            <a href="/checkout" class="nv-bar-pill">Checkout</a>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
-  <main id="gadget-main">
-
+  <main id="main-content">
     <!-- =======================================================================
-         2. ASYMMETRIC HERO SPLIT (LEFT VERTICAL PROMO + RIGHT WIDE FLAGSHIP)
+         2. HERO SPLIT (LEFT CRIMSON VERTICAL CARD + RIGHT BLACK/BLUE FLAGSHIP)
          ======================================================================= -->
-    <section class="gd-hero-wrap" aria-label="Featured Tech Showcase">
-      <div class="gd-container">
-        <div class="gd-hero-split">
-          <!-- Left Tall Promo Card -->
-          <a href="/gadget/anker-prime-27650mah-250w-powerbank" class="gd-hero-left-card">
+    <section class="nv-hero-section" aria-label="Featured Tech Promotions">
+      <div class="nv-container">
+        <div class="nv-hero-grid">
+          <!-- Left Deep Crimson Vertical Promo Card -->
+          <a href="/gadget/oraimo-traveler-40000mah-65w-powerbank" class="nv-hero-crimson">
             <div>
-              <div class="gd-left-kicker">Power &amp; Audio Flash</div>
-              <h2 class="gd-left-pct">Up to <span>25%</span> Off</h2>
-              <p class="gd-left-sub">250W PD Powerbanks, JBL Speakers &amp; ANC Audio</p>
+              <div class="nv-crimson-kicker">Wireless &amp; Power</div>
+              <div class="nv-crimson-pct">Up to <span>40%</span> Off</div>
+              <div class="nv-crimson-sub">Powerbanks, audio &amp; fast-charge essentials</div>
             </div>
-            <img src="/images/gadgets/powerbank-pd-digital.jpg" alt="Anker Prime 250W PD Powerbank">
+            <img src="/images/gadgets/powerbank-pd-digital.jpg" alt="High Capacity Fast Charging Powerbank">
           </a>
 
-          <!-- Right Wide Flagship Hero Banner -->
-          <div class="gd-hero-right-banner">
-            <div class="gd-hero-ribbon" aria-hidden="true">
-              <small>Top Deal</small>
-              <strong>-20%</strong>
-              <small>Sealed</small>
+          <!-- Right Wide Black + Neon Cobalt Blue Flagship Banner -->
+          <div class="nv-hero-flagship">
+            <div class="nv-ribbon-seal" aria-label="Best Seller 40% Off">
+              <small>BEST</small>
+              <strong>40%</strong>
+              <small>OFF</small>
             </div>
 
             <div>
-              <span class="gd-hero-eyebrow">★ DEVICE PRO Flagship Tech • Lagos</span>
-              <h1 class="gd-hero-title">iPhone 16<br>Pro Max &amp; Tech</h1>
-              <p class="gd-hero-desc">
-                Discover 100% factory-sealed smartphones, pro laptops, Logitech MX gear, 4K monitors, and wireless
-                printers with unified Paystack checkout.
+              <h1 class="nv-flagship-title">iPhone 16 Pro Max</h1>
+              <p class="nv-flagship-sub">
+                Grade 5 Titanium build, A18 Pro chip &amp; 5x Telephoto camera. Factory sealed with verified warranty and instant checkout.
               </p>
-              <a href="/gadget/apple-iphone-16-pro-max" class="gd-pill-cta">
+              <a href="/gadget/apple-iphone-16-pro-max-256gb" class="nv-pill-btn">
                 <span>Shop Now</span>
-                <span class="gd-cta-circle" aria-hidden="true">→</span>
+                <span class="nv-circle-arrow">→</span>
               </a>
             </div>
 
-            <div>
-              <img src="/images/gadgets/hero-gadgets-showcase.jpg"
-                alt="DEVICE PRO Flagship Tech & Gadgets Ecosystem" class="gd-hero-stage-img">
+            <div class="nv-flagship-visual">
+              <img src="/images/gadgets/phone-flagship-titanium.jpg" alt="iPhone 16 Pro Max Flagship Smartphone">
             </div>
           </div>
         </div>
@@ -166,154 +140,161 @@
     </section>
 
     <!-- =======================================================================
-         3. SHOP BY CATEGORY (4 CLEAN ROUNDED CARDS + < / > ARROWS)
+         3. SHOP BY CATEGORY (4 CLEAN #F7F7F7 CARDS + < / BLACK > ARROWS)
          ======================================================================= -->
-    <section class="gd-section" id="gd-category-section" aria-label="Shop by Category">
-      <div class="gd-container">
-        <div class="gd-sec-head">
-          <h2 class="gd-sec-title">Shop by Category</h2>
-          <div class="gd-carousel-arrows">
-            <button type="button" class="gd-nav-circle" id="gd-cat-prev" aria-label="Previous categories">‹</button>
-            <button type="button" class="gd-nav-circle dark" id="gd-cat-next" aria-label="Next categories">›</button>
+    <section class="nv-section" aria-label="Shop by Category">
+      <div class="nv-container">
+        <div class="nv-sec-head">
+          <h2 class="nv-sec-title">Shop by Category</h2>
+          <div class="nv-arrows">
+            <button type="button" class="nv-arrow-circle" id="nv-cat-prev" aria-label="Previous categories">‹</button>
+            <button type="button" class="nv-arrow-circle black" id="nv-cat-next" aria-label="Next categories">›</button>
           </div>
         </div>
-        <div class="gd-cat-strip" id="gd-cat-strip">
-          <!-- Populated dynamically by gadget-store.js -->
+
+        <div class="nv-cat-strip" id="nv-cat-strip">
+          <!-- Populated by gadget-store.js -->
         </div>
       </div>
     </section>
 
     <!-- =======================================================================
-         4. CHECK OUT TODAY'S GREAT DEAL (4 CARDS + LIVE COUNTDOWN + 4 CARDS)
+         4. CHECK OUT TODAY'S GREAT DEAL (ROW 1 + VIOLET COUNTDOWN + ROW 2)
          ======================================================================= -->
-    <section class="gd-section" id="gd-deals-section" aria-label="Check Out Today's Great Deal">
-      <div class="gd-container">
-        <div class="gd-sec-head">
-          <h2 class="gd-sec-title">Check Out Today's Great Deal</h2>
-          <button type="button" class="gd-see-all" data-jump-cat="all">See All →</button>
+    <section class="nv-section" id="nv-deals-section" aria-label="Today's Great Deals">
+      <div class="nv-container">
+        <div class="nv-sec-head">
+          <h2 class="nv-sec-title">Check Out Today's Great Deal</h2>
+          <button type="button" class="nv-see-all" data-jump-sort="discount">See All →</button>
         </div>
 
-        <!-- Top Row: 4 Minimalist Editorial Cards -->
-        <div class="gd-four-grid" id="gd-deals-row1"></div>
+        <!-- Row 1: 4 Minimalist Cards (2nd card features highlighted orange cart icon) -->
+        <div class="nv-four-grid" id="nv-deals-row1">
+          <!-- Populated by gadget-store.js -->
+        </div>
 
-        <!-- Full-Width Live Countdown Promo Banner -->
-        <div class="gd-countdown-banner">
+        <!-- Mid-Page Deep Violet/Indigo Countdown Banner -->
+        <div class="nv-countdown-banner">
           <div>
-            <h2 class="gd-cd-title">
-              Grab <span class="gd-cd-highlight">25% Off</span><br>
-              Smart Device Collection
+            <h2 class="nv-cd-title">
+              Grab <span class="nv-cd-pill">50% Off</span><br>Smart Device Collection
             </h2>
-            <p class="gd-cd-desc">
-              Save big on official Logitech MX workspaces, Sony WH-1000XM5 noise-canceling headphones, and high-speed
-              laptop powerbanks — Same-Day Lagos dispatch.
+            <p class="nv-cd-sub">
+              Limited-time drop across ANC headphones, Logitech MX desk gear, laptops, Bluetooth speakers &amp; fast-charging hubs.
             </p>
-            <button type="button" class="gd-pill-cta" data-jump-sort="discount">
-              <span>Explore All Deals</span>
-              <span class="gd-cta-circle" aria-hidden="true">→</span>
+            <button type="button" class="nv-pill-btn" data-jump-sort="discount">
+              <span>Shop Now</span>
+              <span class="nv-circle-arrow">→</span>
             </button>
 
-            <div class="gd-timer-box-wrap" aria-label="Deal countdown timer">
-              <span class="gd-timer-label">Ends In:</span>
-              <div class="gd-timer-digits">
-                <div class="gd-timer-unit"><strong id="gd-cd-days">02</strong><span>Days</span></div>
-                <span class="gd-timer-sep">:</span>
-                <div class="gd-timer-unit"><strong id="gd-cd-hours">14</strong><span>Hrs</span></div>
-                <span class="gd-timer-sep">:</span>
-                <div class="gd-timer-unit"><strong id="gd-cd-mins">36</strong><span>Mins</span></div>
-                <span class="gd-timer-sep">:</span>
-                <div class="gd-timer-unit"><strong id="gd-cd-secs">45</strong><span>Secs</span></div>
+            <div class="nv-timer-panel" aria-label="Flash sale countdown timer">
+              <div class="nv-timer-kicker">Offer ends in:</div>
+              <div class="nv-timer-row">
+                <div class="nv-timer-cell">
+                  <strong id="nv-cd-days">02</strong>
+                  <span>Days</span>
+                </div>
+                <span class="nv-timer-colon">:</span>
+                <div class="nv-timer-cell">
+                  <strong id="nv-cd-hours">14</strong>
+                  <span>Hours</span>
+                </div>
+                <span class="nv-timer-colon">:</span>
+                <div class="nv-timer-cell">
+                  <strong id="nv-cd-mins">36</strong>
+                  <span>Mins</span>
+                </div>
+                <span class="nv-timer-colon">:</span>
+                <div class="nv-timer-cell">
+                  <strong id="nv-cd-secs">45</strong>
+                  <span>Secs</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="gd-cd-visual">
-            <img src="/images/gadgets/audio-headphones-anc.jpg" alt="Smart Device Collection ANC Headphones">
+          <div class="nv-cd-img-wrap">
+            <img src="/images/gadgets/audio-headphones-anc.jpg" alt="Smart Audio & Device Collection">
           </div>
         </div>
 
-        <!-- Bottom Row: 4 Minimalist Editorial Cards -->
-        <div class="gd-four-grid" id="gd-deals-row2"></div>
+        <!-- Row 2: 4 More Great Deal Cards -->
+        <div class="nv-four-grid" id="nv-deals-row2">
+          <!-- Populated by gadget-store.js -->
+        </div>
       </div>
     </section>
 
     <!-- =======================================================================
-         5. DISCOVER COOL INNOVATIONS (SYMMETRICAL FLOATING MOSAIC + SEARCH)
+         5. DISCOVER COOL INNOVATIONS (SYMMETRICAL MOSAIC + CENTER SEARCH)
          ======================================================================= -->
-    <section class="gd-discover-section" aria-label="Discover Cool Innovations">
-      <div class="gd-container">
-        <div class="gd-discover-grid">
-          <!-- Left Mosaic -->
-          <div class="gd-mosaic-col" aria-hidden="true">
-            <div class="gd-mosaic-tile faded"><img src="/images/gadgets/phone-flagship-titanium.jpg" alt=""></div>
-            <div class="gd-mosaic-tile"><img src="/images/gadgets/logitech-mx-mouse.jpg" alt=""></div>
-            <div class="gd-mosaic-tile"><img src="/images/gadgets/speaker-bluetooth-navy.jpg" alt=""></div>
-            <div class="gd-mosaic-tile"><img src="/images/gadgets/laptop-ultrabook-silver.jpg" alt=""></div>
-            <div class="gd-mosaic-tile"><img src="/images/gadgets/powerbank-pd-digital.jpg" alt=""></div>
-            <div class="gd-mosaic-tile faded"><img src="/images/gadgets/accessories-gan-hub.jpg" alt=""></div>
+    <section class="nv-discover-section" aria-label="Discover Tech Innovations">
+      <div class="nv-container">
+        <div class="nv-discover-grid">
+          <div class="nv-mosaic" aria-hidden="true">
+            <div class="nv-mosaic-box soft"><img src="/images/gadgets/logitech-mx-mouse.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box"><img src="/images/gadgets/phone-flagship-titanium.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box"><img src="/images/gadgets/speaker-bluetooth-navy.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box"><img src="/images/gadgets/powerbank-pd-digital.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box"><img src="/images/gadgets/audio-headphones-anc.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box soft"><img src="/images/gadgets/accessories-gan-hub.jpg" alt="" loading="lazy"></div>
           </div>
 
-          <!-- Center Search Hub -->
-          <div class="gd-discover-center">
-            <h2 class="gd-discover-title">Discover Cool Innovations with DEVICE PRO!</h2>
-            <p class="gd-discover-sub">
-              Search our curated catalogue of phones, laptops, Logitech keyboards &amp; mice, 4K monitors, wireless
-              printers, and fast-charge powerbanks.
+          <div class="nv-discover-center">
+            <h2 class="nv-discover-title">Discover Cool Innovations with DevicePro!</h2>
+            <p class="nv-discover-sub">
+              Search smartphones, ultrabooks, Logitech keyboards &amp; mice, 4K monitors, wireless printers, speakers and GaN chargers — all in one store.
             </p>
-            <form id="gd-discover-search-form" class="gd-discover-search" role="search">
-              <input type="search" id="gd-discover-search-input"
-                placeholder="Try 'Logitech MX', '4K Monitor', 'Epson Printer'..." autocomplete="off">
+            <form class="nv-discover-search" id="nv-discover-search-form" role="search">
+              <input type="search" id="nv-discover-search-input" placeholder="Search MacBook, Logitech MX, JBL, Printer..." aria-label="Discover gadgets">
               <button type="submit" aria-label="Search innovations">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               </button>
             </form>
           </div>
 
-          <!-- Right Mosaic -->
-          <div class="gd-mosaic-col" aria-hidden="true">
-            <div class="gd-mosaic-tile"><img src="/images/gadgets/monitor-4k-ultrasharp.jpg" alt=""></div>
-            <div class="gd-mosaic-tile faded"><img src="/images/gadgets/printer-wireless-mfp.jpg" alt=""></div>
-            <div class="gd-mosaic-tile"><img src="/images/gadgets/logitech-mx-keyboard.jpg" alt=""></div>
-            <div class="gd-mosaic-tile"><img src="/images/gadgets/audio-headphones-anc.jpg" alt=""></div>
-            <div class="gd-mosaic-tile faded"><img src="/images/gadgets/phone-pro-obsidian.jpg" alt=""></div>
-            <div class="gd-mosaic-tile"><img src="/images/gadgets/laptop-business-pro.jpg" alt=""></div>
+          <div class="nv-mosaic" aria-hidden="true">
+            <div class="nv-mosaic-box"><img src="/images/gadgets/laptop-ultrabook-silver.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box soft"><img src="/images/gadgets/monitor-4k-ultrasharp.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box"><img src="/images/gadgets/logitech-mx-keyboard.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box"><img src="/images/gadgets/printer-wireless-mfp.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box soft"><img src="/images/gadgets/laptop-business-pro.jpg" alt="" loading="lazy"></div>
+            <div class="nv-mosaic-box"><img src="/images/gadgets/phone-pro-obsidian.jpg" alt="" loading="lazy"></div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- =======================================================================
-         6. NEW ARRIVAL PRODUCTS (DARK BACKDROP + OVERLAPPING FLOATING WHITE CARD)
+         6. NEW ARRIVAL PRODUCTS (DARK WARM BACKDROP + FLOATING WHITE SHOWCASE)
          ======================================================================= -->
-    <section class="gd-arrivals-section" id="gd-arrivals-section" aria-label="New Arrival Products">
-      <div class="gd-container">
-        <div class="gd-arrivals-backdrop">
+    <section class="nv-arrivals-section" aria-label="New Arrival Products">
+      <div class="nv-container">
+        <div class="nv-arrivals-bg">
           <h2>New Arrival Products</h2>
-          <p>Freshly landed sealed flagships, M3 ultrabooks, and pro Logitech workspace essentials.</p>
+          <p>Freshly stocked flagship laptops, wireless desk peripherals, studio headphones &amp; creator displays.</p>
         </div>
 
-        <div class="gd-arrivals-float-card">
-          <div class="gd-arrivals-grid" id="gd-arrivals-grid">
-            <!-- 3 large editorial cards rendered by gadget-store.js -->
+        <div class="nv-arrivals-float">
+          <div class="nv-arrivals-grid" id="nv-arrivals-grid">
+            <!-- Populated by gadget-store.js (3 cards per slide) -->
           </div>
 
-          <div class="gd-arrivals-footer">
-            <button type="button" class="gd-pill-cta gold-cta" data-jump-cat="all">
+          <div class="nv-arrivals-foot">
+            <button type="button" class="nv-pill-btn solid-orange" data-jump-cat="all">
               <span>Explore All</span>
-              <span class="gd-cta-circle" aria-hidden="true">→</span>
+              <span class="nv-circle-arrow">→</span>
             </button>
 
             <div style="display:flex; align-items:center; gap:14px;">
-              <div class="gd-arrivals-dots" id="gd-arrivals-dots">
-                <button type="button" class="gd-arr-dot active" data-arr-page="0" aria-label="Page 1"></button>
-                <button type="button" class="gd-arr-dot" data-arr-page="1" aria-label="Page 2"></button>
-                <button type="button" class="gd-arr-dot" data-arr-page="2" aria-label="Page 3"></button>
+              <div class="nv-dots" aria-label="Carousel pages">
+                <button type="button" class="nv-dot active" data-arr-page="0" aria-label="Slide 1"></button>
+                <button type="button" class="nv-dot" data-arr-page="1" aria-label="Slide 2"></button>
+                <button type="button" class="nv-dot" data-arr-page="2" aria-label="Slide 3"></button>
               </div>
-              <div class="gd-carousel-arrows">
-                <button type="button" class="gd-nav-circle" id="gd-arr-prev" aria-label="Previous arrivals">‹</button>
-                <button type="button" class="gd-nav-circle dark" id="gd-arr-next" aria-label="Next arrivals">›</button>
+              <div class="nv-arrows">
+                <button type="button" class="nv-arrow-circle" id="nv-arr-prev" aria-label="Previous arrivals">‹</button>
+                <button type="button" class="nv-arrow-circle black" id="nv-arr-next" aria-label="Next arrivals">›</button>
               </div>
             </div>
           </div>
@@ -322,29 +303,28 @@
     </section>
 
     <!-- =======================================================================
-         7. FULL-WIDTH ESSENTIALS SALE BANNER
+         7. TECH ESSENTIALS BANNER (JET BLACK + ELECTRIC BLUE + YELLOW/RED SALE)
          ======================================================================= -->
-    <section class="gd-section" style="padding-top:8px;" aria-label="Tech Essentials Sale">
-      <div class="gd-container">
-        <div class="gd-essentials-banner">
+    <section class="nv-essentials-wrap" aria-label="Tech Essentials Sale">
+      <div class="nv-container">
+        <div class="nv-essentials-banner">
           <div>
-            <span class="gd-ess-tag">DEVICE PRO OFFICIAL TECH</span>
-            <h2 class="gd-ess-title">Great deals on all your tech essentials!</h2>
-            <p class="gd-ess-sub">
-              Build a zero-compromise home or corporate desk with Dell UltraSharp 4K displays, Logitech MX Keys S, and
-              12W solar-friendly Epson EcoTank printers.
+            <span class="nv-ess-kicker">★ HOT TECH ESSENTIALS</span>
+            <h2 class="nv-ess-title">Great deals on all your tech essentials!</h2>
+            <p class="nv-ess-sub">
+              Upgrade your workstation with Logitech MX keyboards, precision mice, 4K USB-C monitors &amp; wireless office printers.
             </p>
-            <button type="button" class="gd-pill-cta" data-jump-cat="logitech">
-              <span>Shop Desk Essentials</span>
-              <span class="gd-cta-circle" aria-hidden="true">→</span>
+            <button type="button" class="nv-pill-btn" data-jump-cat="logitech">
+              <span>Shop Tech Gear</span>
+              <span class="nv-circle-arrow">→</span>
             </button>
           </div>
 
-          <div class="gd-ess-right">
-            <img src="/images/gadgets/logitech-mx-keyboard.jpg" alt="Logitech MX Keys S & Tech Essentials">
-            <div class="gd-sale-burst" aria-hidden="true">
-              <strong>MEGA SALE</strong>
-              <span>Up to 25% Off</span>
+          <div class="nv-ess-right">
+            <img src="/images/gadgets/logitech-mx-keyboard.jpg" alt="Logitech Tech Essentials Sale">
+            <div class="nv-sale-ribbon">
+              <strong>BIGGEST SALE</strong>
+              <span>50% OFF</span>
             </div>
           </div>
         </div>
@@ -352,38 +332,36 @@
     </section>
 
     <!-- =======================================================================
-         8. EXPLORE BEST SELLING PRODUCTS (EXACT 2-ROW BENTO GRID)
+         8. EXPLORE BEST SELLING PRODUCTS (2-ROW BENTO: BLUE MEGA + ORANGE DEAL)
          ======================================================================= -->
-    <section class="gd-section" id="gd-bestselling-section" aria-label="Explore Best Selling Products">
-      <div class="gd-container">
-        <div class="gd-bestseller-bento">
-          <!-- Row 1: Mega Sale Vertical Card + Wide Light Gray Intro Banner -->
-          <div class="gd-bs-row1">
-            <a href="/gadget/samsung-galaxy-s25-ultra-5g" class="gd-mega-sale-card">
+    <section class="nv-section" id="nv-bestselling-section" aria-label="Explore Best Selling Products">
+      <div class="nv-container">
+        <div class="nv-bs-bento">
+          <!-- Row 1: Vibrant Sky-Blue MEGA SALE Card + Soft Gray Intro Banner -->
+          <div class="nv-bs-row1">
+            <a href="/gadget/samsung-galaxy-s25-ultra-5g" class="nv-mega-blue-card">
               <div>
-                <div class="gd-left-kicker">DEVICE PRO EXCLUSIVE</div>
-                <h3>MEGA<br><span>SALE</span></h3>
-                <p style="font-size:0.76rem; color:#1E3A5F; font-weight:700; margin:0;">Save up to ₦260,000 on 5G Flagships</p>
+                <h3>MEGA<br>SALE</h3>
+                <div class="mega-pct">UP TO 70% OFF DEALS</div>
               </div>
-              <img src="/images/gadgets/phone-flagship-titanium.jpg" alt="Samsung Galaxy S25 Ultra Mega Sale">
+              <img src="/images/gadgets/phone-flagship-titanium.jpg" alt="Mega Sale Smartphones">
             </a>
 
-            <div class="gd-bs-intro-banner">
+            <div class="nv-bs-intro">
               <div>
                 <h2>Explore Best Selling Products</h2>
                 <p>
-                  Our most trusted devices chosen daily by Nigerian engineers, creators, and executives — factory
-                  sealed with verified warranty and unified Paystack checkout.
+                  Our highest-rated smartphones, laptops, powerbanks &amp; accessories — factory sealed with direct Paystack &amp; Bank Transfer checkout.
                 </p>
-                <button type="button" class="gd-see-all" data-jump-cat="all" style="font-size:0.86rem;">See All →</button>
+                <button type="button" class="nv-see-all" data-jump-cat="all">See All →</button>
               </div>
               <img src="/images/gadgets/laptop-ultrabook-silver.jpg" alt="Best Selling Laptops & Tech">
             </div>
           </div>
 
-          <!-- Row 2: Solar Gold Promo Card + 3 Editorial Product Cards -->
-          <div class="gd-bs-row2" id="gd-bestselling-row2">
-            <!-- Populated by gadget-store.js (Gold Promo Card + 3 Best Sellers) -->
+          <!-- Row 2: Vibrant Tangerine Orange Promo Card + 3 Best Selling Cards -->
+          <div class="nv-bs-row2" id="nv-bestselling-row2">
+            <!-- Populated by gadget-store.js -->
           </div>
         </div>
       </div>
@@ -392,17 +370,17 @@
     <!-- =======================================================================
          9. INTERACTIVE FULL CATALOGUE EXPLORER (ALL 28 GADGETS + FILTERS)
          ======================================================================= -->
-    <section class="gd-explorer-section" id="gd-explorer-section" aria-label="Full Gadget Catalogue Explorer">
-      <div class="gd-container">
-        <div class="gd-explorer-box">
-          <div class="gd-explorer-top">
+    <section class="nv-explorer-section" id="nv-explorer-section" aria-label="Full Gadget Catalogue">
+      <div class="nv-container">
+        <div class="nv-explorer-box">
+          <div class="nv-explorer-top">
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <h2 class="gd-sec-title" id="gd-explorer-title">Browse All Gadgets</h2>
-              <span class="gd-badge gd-badge-gold" id="gd-explorer-count">28 items</span>
+              <h2 class="nv-sec-title" id="nv-explorer-title">Browse All Gadgets</h2>
+              <span class="nv-count-badge" id="nv-explorer-count">28 items</span>
             </div>
 
-            <div class="gd-explorer-controls">
-              <select id="gd-price-select" class="gd-select" aria-label="Filter by price">
+            <div class="nv-explorer-controls">
+              <select id="nv-price-select" class="nv-select" aria-label="Filter by price">
                 <option value="all">All Prices</option>
                 <option value="under-150k">Under ₦150,000</option>
                 <option value="150k-400k">₦150,000 – ₦400,000</option>
@@ -410,7 +388,7 @@
                 <option value="over-1m">Above ₦1,000,000</option>
               </select>
 
-              <select id="gd-sort-select" class="gd-select" aria-label="Sort products">
+              <select id="nv-sort-select" class="nv-select" aria-label="Sort products">
                 <option value="featured">Sort: Featured</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
@@ -418,13 +396,13 @@
                 <option value="discount">Biggest Savings</option>
               </select>
 
-              <button type="button" class="gd-brand-chip" id="gd-reset-filters-btn"
+              <button type="button" class="nv-brand-chip" id="nv-reset-filters-btn"
                 style="display:none; border-color:#DC2626; color:#DC2626;">✕ Reset</button>
             </div>
           </div>
 
-          <div class="gd-brand-row" id="gd-brand-row"></div>
-          <div class="gd-four-grid" id="gd-explorer-grid"></div>
+          <div class="nv-brand-row" id="nv-brand-row"></div>
+          <div class="nv-four-grid" id="nv-explorer-grid"></div>
         </div>
       </div>
     </section>
@@ -432,131 +410,139 @@
     <!-- =======================================================================
          10. TRUSTED PARTNERS WORLDWIDE
          ======================================================================= -->
-    <section class="gd-partners-section" aria-label="Trusted Partners Worldwide">
-      <div class="gd-container">
-        <h2 class="gd-partners-title">Trusted Partners Worldwide</h2>
-        <p class="gd-partners-sub">We supply genuine factory-sealed hardware directly from the world's leading tech brands.</p>
-        <div class="gd-partners-grid" id="gd-partners-grid">
-          <button type="button" class="gd-partner-tile" data-partner-brand="Apple"> Apple</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="Logitech">logitech</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="Samsung">SAMSUNG</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="Dell">DELL</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="HP">HP</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="Sony">SONY</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="Anker">ANKER</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="JBL">JBL</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="LG">LG</button>
-          <button type="button" class="gd-partner-tile" data-partner-brand="Epson">EPSON</button>
+    <section class="nv-partners-section" aria-label="Trusted Partners Worldwide">
+      <div class="nv-container">
+        <h2 class="nv-partners-title">Trusted Partners Worldwide</h2>
+        <p class="nv-partners-sub">Original factory-sealed hardware supplied directly from the world's most trusted tech brands.</p>
+        <div class="nv-partners-row">
+          <button type="button" class="nv-partner-btn" data-partner-brand="Apple"> Apple</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="Logitech">logitech</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="Samsung">SAMSUNG</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="Dell">DELL</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="HP">HP</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="Sony">SONY</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="Anker">ANKER</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="JBL">JBL</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="LG">LG</button>
+          <button type="button" class="nv-partner-btn" data-partner-brand="Epson">EPSON</button>
         </div>
       </div>
     </section>
-
   </main>
 
   <!-- =========================================================================
-       11. 5-COLUMN DARK NAVY ENTERPRISE FOOTER (MATCHING REFERENCE)
+       11. MATTE BLACK (#111111) 5-COLUMN FOOTER (EXACT REFERENCE FOOTER)
        ========================================================================= -->
-  <footer class="gd-footer" role="contentinfo">
-    <div class="gd-container">
-      <div class="gd-footer-top">
+  <footer class="nv-footer">
+    <div class="nv-container">
+      <div class="nv-footer-top">
         <div>
-          <span class="gd-footer-brand-pill">
-            <img src="/images/logo.svg" alt="DEVICE PRO" style="height:30px; width:auto;">
-          </span>
-          <p class="gd-footer-bio">
-            Your trusted Nigerian destination for Tier-1 solar systems and factory-sealed gadgets. Showroom: No 13
-            Adepele Street, Computer Village, Ikeja, Lagos.
+          <a href="/gadget" class="nv-footer-brand">
+            <span class="nv-brand-mark">D</span>
+            <span>devicepro<span style="color:#FF6B00;">.</span></span>
+          </a>
+          <p class="nv-footer-bio">
+            Your destination for authentic smartphones, laptops, Logitech desk setups, speakers, printers, monitors &amp; fast-charging gear — backed by nationwide delivery and unified checkout.
           </p>
+          <div class="nv-socials">
+            <a href="https://wa.me/2348033882268" target="_blank" rel="noopener" class="nv-social-sq active" aria-label="WhatsApp">WA</a>
+            <a href="/contact" class="nv-social-sq" aria-label="Instagram">IG</a>
+            <a href="/contact" class="nv-social-sq" aria-label="X Twitter">X</a>
+            <a href="/contact" class="nv-social-sq" aria-label="Facebook">FB</a>
+          </div>
         </div>
 
         <div>
-          <h3 class="gd-footer-nl-title">Newsletter</h3>
-          <p class="gd-footer-nl-sub">Sign up for exclusive gadget drops, Logitech deals, and Lagos flash sales.</p>
-          <form class="gd-footer-nl-form" id="gd-newsletter-form">
-            <input type="email" id="gd-newsletter-email" placeholder="Enter your email address" required aria-label="Email address">
+          <h3 class="nv-nl-title">Newsletter</h3>
+          <p class="nv-nl-sub">Get instant alerts on weekly flash drops, new arrivals &amp; exclusive gadget coupons.</p>
+          <form class="nv-nl-form" id="nv-newsletter-form">
+            <input type="email" id="nv-newsletter-email" placeholder="Enter your email address" required>
             <button type="submit" aria-label="Subscribe">→</button>
           </form>
         </div>
       </div>
 
-      <div class="gd-footer-cols">
-        <div class="gd-footer-col">
-          <h4>Gadgets</h4>
+      <div class="nv-footer-cols">
+        <div class="nv-footer-col">
+          <h4>Shop Gadgets</h4>
           <ul>
-            <li><a href="#gd-explorer-section" data-jump-cat="smartphones">Smartphones</a></li>
-            <li><a href="#gd-explorer-section" data-jump-cat="laptops">Laptops</a></li>
-            <li><a href="#gd-explorer-section" data-jump-cat="powerbanks">PD Powerbanks</a></li>
-            <li><a href="#gd-explorer-section" data-jump-cat="speakers">Bluetooth Speakers</a></li>
-            <li><a href="#gd-explorer-section" data-jump-cat="audio">ANC Headphones</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="smartphones">Smartphones</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="laptops">Laptops &amp; Ultrabooks</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="logitech">Logitech Gear</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="powerbanks">Powerbanks</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="speakers">Bluetooth Speakers</a></li>
           </ul>
         </div>
-        <div class="gd-footer-col">
-          <h4>Workspace &amp; Office</h4>
+
+        <div class="nv-footer-col">
+          <h4>Office &amp; Audio</h4>
           <ul>
-            <li><a href="#gd-explorer-section" data-jump-cat="logitech">Logitech Mice &amp; Keyboards</a></li>
-            <li><a href="#gd-explorer-section" data-jump-cat="monitors">4K &amp; Gaming Monitors</a></li>
-            <li><a href="#gd-explorer-section" data-jump-cat="printers">Wireless Printers</a></li>
-            <li><a href="#gd-explorer-section" data-jump-cat="accessories">GaN Chargers &amp; Hubs</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="monitors">4K &amp; Gaming Monitors</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="printers">Wireless Printers</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="audio">ANC Headphones</a></li>
+            <li><a href="#nv-explorer-section" data-jump-cat="accessories">GaN Chargers &amp; SSDs</a></li>
           </ul>
         </div>
-        <div class="gd-footer-col">
-          <h4>Solar Division</h4>
-          <ul>
-            <li><a href="/">Solar Homepage</a></li>
-            <li><a href="/products">Solar Equipment</a></li>
-            <li><a href="/packages">Turnkey Packages</a></li>
-            <li><a href="/calculator">Solar Sizing Calculator</a></li>
-            <li><a href="/projects">Projects</a></li>
-          </ul>
-        </div>
-        <div class="gd-footer-col">
+
+        <div class="nv-footer-col">
           <h4>Customer Care</h4>
           <ul>
-            <li><a href="/checkout">Unified Secure Checkout</a></li>
-            <li><a href="/tracking">Track Your Order</a></li>
-            <li><a href="/profile">My Profile</a></li>
-            <li><a href="/shipping-policy">Delivery Policy</a></li>
-            <li><a href="/terms">Terms &amp; Warranty</a></li>
+            <li><a href="/checkout">Unified Checkout</a></li>
+            <li><a href="/login">My Account &amp; Orders</a></li>
+            <li><a href="/contact">Warranty &amp; Returns</a></li>
+            <li><a href="https://wa.me/2348033882268" target="_blank" rel="noopener">WhatsApp Support</a></li>
           </ul>
         </div>
-        <div class="gd-footer-col">
-          <h4>Contact Showroom</h4>
+
+        <div class="nv-footer-col">
+          <h4>DevicePro Ecosystem</h4>
           <ul>
+            <li><a href="/">Solar Home Solutions</a></li>
+            <li><a href="/products">Solar Equipment Store</a></li>
+            <li><a href="/packages">Solar Packages</a></li>
+            <li><a href="/calculator">Solar Load Calculator</a></li>
+          </ul>
+        </div>
+
+        <div class="nv-footer-col">
+          <h4>Storefront Office</h4>
+          <ul>
+            <li><a href="/contact">No 13 Adepele Street, Computer Village, Ikeja, Lagos</a></li>
             <li><a href="tel:+2348033882268">+234 803 388 2268</a></li>
             <li><a href="mailto:deviceprosales@gmail.com">deviceprosales@gmail.com</a></li>
-            <li><a href="/contact">Computer Village, Ikeja</a></li>
-            <li><a href="/about">About DEVICE PRO</a></li>
           </ul>
         </div>
       </div>
 
-      <div class="gd-footer-bottom">
-        <div class="gd-pay-badges">
-          <span class="gd-pay-chip">Paystack</span>
-          <span class="gd-pay-chip">VISA</span>
-          <span class="gd-pay-chip">Mastercard</span>
-          <span class="gd-pay-chip">Verve</span>
-          <span class="gd-pay-chip">Bank Transfer</span>
+      <div class="nv-footer-bottom">
+        <div class="nv-pay-row">
+          <span class="nv-pay-tag">Paystack</span>
+          <span class="nv-pay-tag">VISA</span>
+          <span class="nv-pay-tag">Mastercard</span>
+          <span class="nv-pay-tag">Verve</span>
+          <span class="nv-pay-tag">Bank Transfer</span>
         </div>
-        <span>© 2026 DEVICE PRO Nigeria Limited. All rights reserved.</span>
-        <span>Nigeria (NGN ₦)</span>
+        <div>© 2026 DEVICE PRO Gadgets Nigeria. All rights reserved.</div>
+        <div>Nigeria (NGN ₦)</div>
       </div>
     </div>
   </footer>
 
   <!-- =========================================================================
-       UNIVERSAL SHOPPING CART DRAWER (SHARED WITH MAIN /checkout)
+       SHARED CART DRAWER, MOBILE NAV DRAWER & TOASTS (LINKED TO /checkout)
        ========================================================================= -->
-  <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+
+  <aside class="drawer" id="cart-drawer" aria-hidden="true" aria-labelledby="cart-drawer-title" role="dialog" aria-modal="true">
     <div class="drawer-header">
-      <h2 id="cart-drawer-title">Your Cart</h2>
+      <h2 id="cart-drawer-title">Your Shopping Cart</h2>
       <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart">✕</button>
     </div>
     <div class="drawer-body" id="cart-drawer-body">
       <div class="cart-empty-state">
-        <p class="empty-title">Your cart is currently empty</p>
-        <p class="empty-desc">Explore flagship gadgets, Logitech gear, and solar equipment.</p>
-        <button type="button" class="btn-browse-equip" data-close-drawer>Continue Shopping →</button>
+        <div class="empty-title">Your cart is empty</div>
+        <div class="empty-desc">Add smartphones, laptops, Logitech gear or solar hardware to check out seamlessly.</div>
+        <button type="button" class="btn-browse-equip" data-close-drawer>Keep Browsing</button>
       </div>
     </div>
     <div class="drawer-footer">
@@ -564,42 +550,35 @@
         <span>Subtotal</span>
         <span id="cart-subtotal-val">₦0</span>
       </div>
-      <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" disabled>Proceed to Checkout</button>
+      <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" disabled>
+        Proceed to Checkout →
+      </button>
     </div>
   </aside>
 
-  <div id="modal-backdrop" class="modal-backdrop"></div>
-
-  <!-- Mobile Navigation Drawer -->
-  <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
+  <aside class="drawer" id="mobile-nav-drawer" aria-hidden="true" aria-label="Mobile Navigation" role="dialog" aria-modal="true">
     <div class="drawer-header">
-      <img src="/images/logo.svg" alt="DEVICE PRO" style="height:34px;" id="mobile-nav-title">
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close menu">✕</button>
+      <h2>Menu</h2>
+      <button type="button" class="modal-close-btn" id="mobile-nav-close" aria-label="Close menu">✕</button>
     </div>
-    <div class="drawer-body">
-      <div style="display:flex; flex-direction:column; gap:14px;">
-        <a href="/" class="nav-link" data-close-drawer>Solar Home</a>
-        <a href="/gadget" class="nav-link active" data-close-drawer>Gadgets &amp; Tech</a>
-        <a href="/products" class="nav-link" data-close-drawer>Solar Products</a>
-        <a href="/packages" class="nav-link" data-close-drawer>Solar Packages</a>
-        <a href="/calculator" class="nav-link" data-close-drawer>Solar Calculator</a>
-        <a href="/contact" class="nav-link" data-close-drawer>Contact</a>
-        <hr style="border:none; border-top:1px solid #E2E8F0; margin:6px 0;">
-        <a href="/checkout" class="gd-pill-cta gold-cta" style="justify-content:center;" data-close-drawer>
-          <span>Go to Checkout</span>
-          <span class="gd-cta-circle">→</span>
-        </a>
-      </div>
+    <div class="drawer-body" style="display:flex; flex-direction:column; gap:10px;">
+      <a href="/gadget" style="padding:10px 12px; border-radius:8px; background:#FFF3EB; color:#FF6B00; font-weight:700;">Gadgets Storefront</a>
+      <a href="#nv-explorer-section" data-mobile-close style="padding:10px 12px; border-radius:8px; background:#F7F7F7; font-weight:600;">Browse All 28 Gadgets</a>
+      <a href="/checkout" style="padding:10px 12px; border-radius:8px; background:#FF6B00; color:#FFFFFF; font-weight:700; text-align:center;">Proceed to Checkout →</a>
+      <hr style="border:none; border-top:1px solid #EBEBEB; margin:6px 0;">
+      <a href="/" style="padding:8px 12px; font-weight:600; color:#525252;">Main Solar Home</a>
+      <a href="/products" style="padding:8px 12px; font-weight:600; color:#525252;">Solar Equipment</a>
+      <a href="/calculator" style="padding:8px 12px; font-weight:600; color:#525252;">Solar Calculator</a>
+      <a href="/login" style="padding:8px 12px; font-weight:600; color:#525252;">Account Login</a>
+      <a href="/contact" style="padding:8px 12px; font-weight:600; color:#525252;">Contact Support</a>
     </div>
-  </nav>
+  </aside>
 
-  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+  <div class="toast-container" id="toast-container"></div>
 
-  <!-- Scripts -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/gadget-catalog.js?v=1"></script>
-  <script src="/js/gadget-store.js?v=4"></script>
-  <script src="/js/main.js?v=28"></script>
+  <script src="/js/gadget-store.js?v=5"></script>
 </body>
-
 </html>

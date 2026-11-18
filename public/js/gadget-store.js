@@ -1,7 +1,8 @@
 /**
- * DEVICE PRO — Modern White Editorial Gadget Storefront Controller (/gadget)
- * Powers Category Dropdown, Dual Search Forms, Shop by Category Carousel,
- * Today's Great Deals (2x4 + Live Countdown), New Arrivals 3-Card Carousel,
+ * DEVICE PRO — Gadget Storefront Controller (/gadget)
+ * Exact White + Tangerine Orange + Matte Black Reference Architecture.
+ * Powers Category Dropdown, Dual Search, Shop by Category Carousel,
+ * Today's Great Deal (2x4 + Live Countdown), New Arrivals 3-Card Carousel,
  * Best Selling Bento, Full 28-Product Explorer, Partner Filters & DeviceProCart.
  */
 
@@ -11,8 +12,6 @@
   document.addEventListener('DOMContentLoaded', () => {
     const Catalog = window.DeviceProGadgets;
     if (!Catalog) return;
-
-    const allGadgets = Catalog.getAll();
 
     const state = {
       category: 'all',
@@ -41,7 +40,7 @@
       accessories: '/images/gadgets/accessories-gan-hub.jpg'
     };
 
-    const CART_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>';
+    const CART_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>';
 
     function addToSharedCart(slug) {
       const g = Catalog.getBySlug(slug);
@@ -63,26 +62,27 @@
       }
     }
 
-    function buildEditorialCard(item) {
+    function buildProductCard(item, highlightCartBtn) {
       const url = `/gadget/${encodeURIComponent(item.slug)}`;
+      const activeClass = highlightCartBtn ? ' active' : '';
       return `
-        <article class="gd-editorial-card">
-          <div class="gd-ed-stage">
-            <span class="gd-ed-tag">${item.brand}</span>
-            <button type="button" class="gd-ed-cart-btn" data-add-slug="${item.slug}" title="Add to Cart" aria-label="Add ${item.name} to cart">
+        <article class="nv-prod-card">
+          <div class="nv-prod-stage">
+            <span class="nv-prod-cat-tag">${item.brand}</span>
+            <button type="button" class="nv-prod-cart-icon${activeClass}" data-add-slug="${item.slug}" title="Add to Cart" aria-label="Add ${item.name} to cart">
               ${CART_ICON}
             </button>
             <a href="${url}" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;" aria-label="View ${item.name}">
               <img src="${item.image}" alt="${item.name}" loading="lazy">
             </a>
           </div>
-          <div class="gd-ed-price-row">
-            <span class="gd-ed-price">${Catalog.formatNaira(item.price)}</span>
-            ${item.originalPrice > item.price ? `<span class="gd-ed-old-price">${Catalog.formatNaira(item.originalPrice)}</span>` : ''}
+          <div class="nv-prod-prices">
+            <span class="nv-prod-price">${Catalog.formatNaira(item.price)}</span>
+            ${item.originalPrice > item.price ? `<span class="nv-prod-old">${Catalog.formatNaira(item.originalPrice)}</span>` : ''}
           </div>
-          <h3 class="gd-ed-title"><a href="${url}">${item.name}</a></h3>
-          <div class="gd-ed-rating">
-            <span class="gd-ed-stars" aria-hidden="true">★★★★★</span>
+          <h3 class="nv-prod-title"><a href="${url}">${item.name}</a></h3>
+          <div class="nv-prod-rating">
+            <span class="nv-stars" aria-hidden="true">★★★★★</span>
             <span>${item.rating.toFixed(1)} (${item.reviewCount})</span>
           </div>
         </article>
@@ -103,15 +103,15 @@
     // =========================================================================
     // 1. ALL CATEGORY DROPDOWN
     // =========================================================================
-    const dropBtn = document.getElementById('gd-cat-drop-toggle');
-    const dropMenu = document.getElementById('gd-cat-dropdown');
+    const dropBtn = document.getElementById('nv-cat-drop-toggle');
+    const dropMenu = document.getElementById('nv-cat-menu');
 
     if (dropMenu) {
       const cats = Catalog.getCategoriesWithCounts();
       dropMenu.innerHTML = cats.map(c => `
-        <button type="button" class="gd-drop-item" data-drop-cat="${c.id}">
+        <button type="button" class="nv-cat-menu-item" data-drop-cat="${c.id}">
           <span>${c.label}</span>
-          <span class="gd-drop-count">${c.count}</span>
+          <span class="nv-cat-menu-count">${c.count}</span>
         </button>
       `).join('');
 
@@ -131,7 +131,7 @@
         dropBtn.setAttribute('aria-expanded', String(isOpen));
       });
       document.addEventListener('click', (e) => {
-        if (!dropMenu.contains(e.target) && e.target !== dropBtn) {
+        if (!dropMenu.contains(e.target) && !dropBtn.contains(e.target)) {
           dropMenu.classList.remove('open');
           dropBtn.setAttribute('aria-expanded', 'false');
         }
@@ -139,19 +139,19 @@
     }
 
     // =========================================================================
-    // 2. SHOP BY CATEGORY CAROUSEL (4 ROUNDED CARDS + < / > ARROWS)
+    // 2. SHOP BY CATEGORY CAROUSEL (4 CLEAN #F7F7F7 CARDS + < / BLACK > ARROWS)
     // =========================================================================
-    const catStrip = document.getElementById('gd-cat-strip');
+    const catStrip = document.getElementById('nv-cat-strip');
     if (catStrip) {
       const cats = Catalog.getCategoriesWithCounts().filter(c => c.id !== 'all');
       catStrip.innerHTML = cats.map(c => `
-        <button type="button" class="gd-cat-card" data-cat-card="${c.id}">
-          <div class="gd-cat-card-top">
-            <div style="text-align:left;">
-              <span class="gd-cat-card-name">${c.label}</span>
-              <span class="gd-cat-card-count">${c.count} ${c.count === 1 ? 'product' : 'products'}</span>
+        <button type="button" class="nv-cat-card" data-cat-card="${c.id}">
+          <div class="nv-cat-card-top">
+            <div>
+              <span class="nv-cat-name">${c.label}</span>
+              <span class="nv-cat-count">${c.count} ${c.count === 1 ? 'product' : 'products'}</span>
             </div>
-            <span class="gd-cat-card-link">See All →</span>
+            <span class="nv-cat-link">See All →</span>
           </div>
           <img src="${CAT_IMAGES[c.id] || '/images/gadgets/logitech-mx-mouse.jpg'}" alt="${c.label}" loading="lazy">
         </button>
@@ -163,17 +163,17 @@
         });
       });
 
-      const prevBtn = document.getElementById('gd-cat-prev');
-      const nextBtn = document.getElementById('gd-cat-next');
-      if (prevBtn) prevBtn.addEventListener('click', () => catStrip.scrollBy({ left: -340, behavior: 'smooth' }));
-      if (nextBtn) nextBtn.addEventListener('click', () => catStrip.scrollBy({ left: 340, behavior: 'smooth' }));
+      const prevBtn = document.getElementById('nv-cat-prev');
+      const nextBtn = document.getElementById('nv-cat-next');
+      if (prevBtn) prevBtn.addEventListener('click', () => catStrip.scrollBy({ left: -320, behavior: 'smooth' }));
+      if (nextBtn) nextBtn.addEventListener('click', () => catStrip.scrollBy({ left: 320, behavior: 'smooth' }));
     }
 
     // =========================================================================
     // 3. CHECK OUT TODAY'S GREAT DEAL (ROW 1 + LIVE COUNTDOWN + ROW 2)
     // =========================================================================
-    const row1El = document.getElementById('gd-deals-row1');
-    const row2El = document.getElementById('gd-deals-row2');
+    const row1El = document.getElementById('nv-deals-row1');
+    const row2El = document.getElementById('nv-deals-row2');
 
     if (row1El) {
       const slugs1 = [
@@ -182,7 +182,11 @@
         'apple-airpods-pro-2-usbc',
         'jbl-charge-5-portable-bluetooth-speaker'
       ];
-      row1El.innerHTML = slugs1.map(s => Catalog.getBySlug(s)).filter(Boolean).map(buildEditorialCard).join('');
+      row1El.innerHTML = slugs1
+        .map(s => Catalog.getBySlug(s))
+        .filter(Boolean)
+        .map((item, idx) => buildProductCard(item, idx === 1))
+        .join('');
       wireAddButtons(row1El);
     }
 
@@ -193,29 +197,29 @@
         'dell-ultrasharp-27-4k-usbc-hub-monitor',
         'hp-laserjet-pro-mfp-4103fdw-wireless-printer'
       ];
-      row2El.innerHTML = slugs2.map(s => Catalog.getBySlug(s)).filter(Boolean).map(buildEditorialCard).join('');
+      row2El.innerHTML = slugs2
+        .map(s => Catalog.getBySlug(s))
+        .filter(Boolean)
+        .map(item => buildProductCard(item, false))
+        .join('');
       wireAddButtons(row2El);
     }
 
-    // Live Ticking Countdown Timer (Persists a 2d 14h rolling promo window)
-    const daysEl = document.getElementById('gd-cd-days');
-    const hoursEl = document.getElementById('gd-cd-hours');
-    const minsEl = document.getElementById('gd-cd-mins');
-    const secsEl = document.getElementById('gd-cd-secs');
+    // Live Countdown Timer
+    const daysEl = document.getElementById('nv-cd-days');
+    const hoursEl = document.getElementById('nv-cd-hours');
+    const minsEl = document.getElementById('nv-cd-mins');
+    const secsEl = document.getElementById('nv-cd-secs');
 
     if (daysEl && hoursEl && minsEl && secsEl) {
       const targetTime = Date.now() + ((2 * 24 * 3600) + (14 * 3600) + (36 * 60) + 45) * 1000;
       const pad = n => String(Math.max(0, n)).padStart(2, '0');
       function updateTimer() {
         const diff = Math.max(0, Math.floor((targetTime - Date.now()) / 1000));
-        const d = Math.floor(diff / 86400);
-        const h = Math.floor((diff % 86400) / 3600);
-        const m = Math.floor((diff % 3600) / 60);
-        const s = diff % 60;
-        daysEl.textContent = pad(d);
-        hoursEl.textContent = pad(h);
-        minsEl.textContent = pad(m);
-        secsEl.textContent = pad(s);
+        daysEl.textContent = pad(Math.floor(diff / 86400));
+        hoursEl.textContent = pad(Math.floor((diff % 86400) / 3600));
+        minsEl.textContent = pad(Math.floor((diff % 3600) / 60));
+        secsEl.textContent = pad(diff % 60);
       }
       updateTimer();
       setInterval(updateTimer, 1000);
@@ -224,7 +228,7 @@
     // =========================================================================
     // 4. NEW ARRIVAL PRODUCTS (3-CARD OVERLAPPING CAROUSEL)
     // =========================================================================
-    const arrivalsGrid = document.getElementById('gd-arrivals-grid');
+    const arrivalsGrid = document.getElementById('nv-arrivals-grid');
     const arrivalDots = document.querySelectorAll('[data-arr-page]');
     const arrivalPool = [
       'sony-wh-1000xm5-wireless-anc-headphones',
@@ -244,7 +248,7 @@
       state.arrivalPage = (state.arrivalPage + totalPages) % totalPages;
       const start = state.arrivalPage * 3;
       const slice = arrivalPool.slice(start, start + 3);
-      arrivalsGrid.innerHTML = slice.map(buildEditorialCard).join('');
+      arrivalsGrid.innerHTML = slice.map(item => buildProductCard(item, false)).join('');
       wireAddButtons(arrivalsGrid);
       arrivalDots.forEach((d, idx) => d.classList.toggle('active', idx === state.arrivalPage));
     }
@@ -256,50 +260,54 @@
       });
     });
 
-    const arrPrev = document.getElementById('gd-arr-prev');
-    const arrNext = document.getElementById('gd-arr-next');
+    const arrPrev = document.getElementById('nv-arr-prev');
+    const arrNext = document.getElementById('nv-arr-next');
     if (arrPrev) arrPrev.addEventListener('click', () => { state.arrivalPage -= 1; renderArrivals(); });
     if (arrNext) arrNext.addEventListener('click', () => { state.arrivalPage += 1; renderArrivals(); });
     renderArrivals();
 
     // =========================================================================
-    // 5. EXPLORE BEST SELLING PRODUCTS (ROW 2: GOLD PROMO + 3 EDITORIAL CARDS)
+    // 5. EXPLORE BEST SELLING PRODUCTS (ROW 2: ORANGE PROMO + 3 PRODUCT CARDS)
     // =========================================================================
-    const bsRow2 = document.getElementById('gd-bestselling-row2');
+    const bsRow2 = document.getElementById('nv-bestselling-row2');
     if (bsRow2) {
       const bsSlugs = [
         'oraimo-traveler-40000mah-65w-powerbank',
         'logitech-pebble-2-combo-keyboard-mouse',
         'ugreen-revodok-pro-9in1-usbc-docking-hub'
       ];
-      const goldCard = `
-        <a href="/gadget/sony-srs-xg300-x-series-bluetooth-speaker" class="gd-gold-promo-card">
+      const orangePromoCard = `
+        <a href="/gadget/sony-srs-xg300-x-series-bluetooth-speaker" class="nv-orange-promo-card">
           <div>
-            <small>Audio &amp; Bass Deals</small>
-            <h3>Save Up To 20% Off</h3>
+            <small>Audio &amp; Wireless Deals</small>
+            <h3>Save Up To 30% Off</h3>
           </div>
           <img src="/images/gadgets/speaker-bluetooth-navy.jpg" alt="Bluetooth Speakers Deal">
         </a>
       `;
-      const cardsHtml = bsSlugs.map(s => Catalog.getBySlug(s)).filter(Boolean).map(buildEditorialCard).join('');
-      bsRow2.innerHTML = goldCard + cardsHtml;
+      const cardsHtml = bsSlugs
+        .map(s => Catalog.getBySlug(s))
+        .filter(Boolean)
+        .map(item => buildProductCard(item, false))
+        .join('');
+      bsRow2.innerHTML = orangePromoCard + cardsHtml;
       wireAddButtons(bsRow2);
     }
 
     // =========================================================================
     // 6. FULL CATALOGUE EXPLORER (28 PRODUCTS + SEARCH + BRAND + PRICE + SORT)
     // =========================================================================
-    const explorerTitleEl = document.getElementById('gd-explorer-title');
-    const explorerCountEl = document.getElementById('gd-explorer-count');
-    const explorerGridEl = document.getElementById('gd-explorer-grid');
-    const brandRowEl = document.getElementById('gd-brand-row');
-    const priceSelect = document.getElementById('gd-price-select');
-    const sortSelect = document.getElementById('gd-sort-select');
-    const resetBtn = document.getElementById('gd-reset-filters-btn');
-    const headerSearchForm = document.getElementById('gd-header-search-form');
-    const headerSearchInput = document.getElementById('gd-header-search-input');
-    const discoverSearchForm = document.getElementById('gd-discover-search-form');
-    const discoverSearchInput = document.getElementById('gd-discover-search-input');
+    const explorerTitleEl = document.getElementById('nv-explorer-title');
+    const explorerCountEl = document.getElementById('nv-explorer-count');
+    const explorerGridEl = document.getElementById('nv-explorer-grid');
+    const brandRowEl = document.getElementById('nv-brand-row');
+    const priceSelect = document.getElementById('nv-price-select');
+    const sortSelect = document.getElementById('nv-sort-select');
+    const resetBtn = document.getElementById('nv-reset-filters-btn');
+    const headerSearchForm = document.getElementById('nv-header-search-form');
+    const headerSearchInput = document.getElementById('nv-header-search-input');
+    const discoverSearchForm = document.getElementById('nv-discover-search-form');
+    const discoverSearchInput = document.getElementById('nv-discover-search-input');
 
     if (headerSearchInput && state.search) headerSearchInput.value = state.search;
     if (sortSelect && state.sort) sortSelect.value = state.sort;
@@ -308,9 +316,9 @@
       if (!brandRowEl) return;
       const brands = Catalog.getBrands();
       brandRowEl.innerHTML = [
-        `<button type="button" class="gd-brand-chip ${state.brand === 'all' ? 'active' : ''}" data-brand="all">All Brands</button>`,
+        `<button type="button" class="nv-brand-chip ${state.brand === 'all' ? 'active' : ''}" data-brand="all">All Brands</button>`,
         ...brands.map(b => `
-          <button type="button" class="gd-brand-chip ${state.brand === b.name ? 'active' : ''}" data-brand="${b.name}">
+          <button type="button" class="nv-brand-chip ${state.brand === b.name ? 'active' : ''}" data-brand="${b.name}">
             ${b.name} (${b.count})
           </button>
         `)
@@ -366,17 +374,20 @@
 
       if (list.length === 0) {
         explorerGridEl.innerHTML = `
-          <div style="grid-column:1/-1; text-align:center; padding:36px 16px; color:#475569;">
-            <p style="margin:0 0 14px; color:#061C35; font-size:1rem;">No matching gadgets found.</p>
-            <button type="button" class="gd-pill-cta gold-cta" id="gd-empty-reset"><span>Show All 28 Gadgets</span><span class="gd-cta-circle">→</span></button>
+          <div style="grid-column:1/-1; text-align:center; padding:38px 16px; color:#6B7280;">
+            <p style="margin:0 0 14px; color:#111111; font-size:0.95rem; font-weight:600;">No matching gadgets found.</p>
+            <button type="button" class="nv-pill-btn solid-orange" id="nv-empty-reset">
+              <span>Show All 28 Gadgets</span>
+              <span class="nv-circle-arrow">→</span>
+            </button>
           </div>
         `;
-        const er = document.getElementById('gd-empty-reset');
+        const er = document.getElementById('nv-empty-reset');
         if (er) er.addEventListener('click', resetAllFilters);
         return;
       }
 
-      explorerGridEl.innerHTML = list.map(buildEditorialCard).join('');
+      explorerGridEl.innerHTML = list.map(item => buildProductCard(item, false)).join('');
       wireAddButtons(explorerGridEl);
     }
 
@@ -402,7 +413,7 @@
       if (sortSelect) sortSelect.value = state.sort;
       renderBrands();
       renderExplorer();
-      const target = document.getElementById('gd-explorer-section');
+      const target = document.getElementById('nv-explorer-section');
       if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -447,23 +458,66 @@
     });
 
     // Newsletter Feedback
-    const nlForm = document.getElementById('gd-newsletter-form');
+    const nlForm = document.getElementById('nv-newsletter-form');
     if (nlForm) {
       nlForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const input = document.getElementById('gd-newsletter-email');
+        const input = document.getElementById('nv-newsletter-email');
         if (input) input.value = '';
         if (window.DeviceProCart && typeof window.DeviceProCart.showToast === 'function') {
-          window.DeviceProCart.showToast('Subscribed to DEVICE PRO Tech Drop Alerts!');
+          window.DeviceProCart.showToast('Subscribed to DevicePro Tech Drop Alerts!');
         }
       });
     }
+
+    // Mobile Nav Drawer + Backdrop Wiring
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileDrawer = document.getElementById('mobile-nav-drawer');
+    const mobileCloseBtn = document.getElementById('mobile-nav-close');
+    const backdrop = document.getElementById('modal-backdrop');
+
+    function closeMobileNav() {
+      if (mobileDrawer) {
+        mobileDrawer.classList.remove('open');
+        mobileDrawer.setAttribute('aria-hidden', 'true');
+      }
+      if (backdrop && !document.getElementById('cart-drawer')?.classList.contains('open')) {
+        backdrop.classList.remove('open');
+      }
+      document.body.style.overflow = '';
+    }
+
+    if (mobileMenuBtn && mobileDrawer) {
+      mobileMenuBtn.addEventListener('click', () => {
+        mobileDrawer.classList.add('open');
+        mobileDrawer.setAttribute('aria-hidden', 'false');
+        if (backdrop) backdrop.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    }
+    if (mobileCloseBtn) mobileCloseBtn.addEventListener('click', closeMobileNav);
+    if (backdrop) {
+      backdrop.addEventListener('click', () => {
+        closeMobileNav();
+        if (window.DeviceProCart) window.DeviceProCart.closeDrawer();
+      });
+    }
+    document.querySelectorAll('[data-mobile-close]').forEach(link => {
+      link.addEventListener('click', closeMobileNav);
+    });
+
+    // Lucide icon refresh helper for cart.js
+    window.refreshLucideIcons = function () {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    };
 
     renderBrands();
     renderExplorer();
 
     if (urlParams.get('category') || urlParams.get('q') || urlParams.get('brand')) {
-      const target = document.getElementById('gd-explorer-section');
+      const target = document.getElementById('nv-explorer-section');
       if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250);
     }
   });

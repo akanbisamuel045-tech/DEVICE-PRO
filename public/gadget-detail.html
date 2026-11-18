@@ -1,364 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gadget Details | DEVICE PRO Nigeria</title>
-  <meta name="description"
-    content="Explore full technical specifications, warranty coverage, and unified Paystack checkout for genuine gadgets at DEVICE PRO Nigeria.">
-
-  <link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg">
+  <title>Product Details | DEVICE PRO Gadgets Nigeria</title>
+  <meta name="description" content="Explore technical specifications, configuration options, warranty details, and direct Paystack / Bank Transfer checkout for genuine gadgets at DEVICE PRO.">
+  <link rel="icon" type="image/png" href="/images/dp-icon-transparent.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
-
-  <link rel="stylesheet" href="/css/tokens.css?v=18">
-  <link rel="stylesheet" href="/css/components.css?v=32">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/gadget.css?v=5">
 </head>
+<body class="nuvio-gadget-body gadget-detail-body">
+  <a href="#main-content" class="skip-to-content">Skip to content</a>
 
-<body class="devicepro-body gadget-page-body gadget-detail-body">
+  <!-- =========================================================================
+       MATCHING TWO-ROW CLEAN WHITE HEADER
+       ========================================================================= -->
+  <header class="nv-header">
+    <div class="nv-header-top">
+      <div class="nv-container">
+        <div class="nv-top-inner">
+          <nav class="nv-top-links" aria-label="Primary navigation">
+            <a href="/" class="nv-top-link">Home</a>
+            <a href="/gadget" class="nv-top-link" style="color:#FF6B00; font-weight:700;">← All Gadgets</a>
+            <a href="/products" class="nv-top-link">Solar Store</a>
+            <a href="/contact" class="nv-top-link">Contact</a>
+          </nav>
 
-  <a href="#gd-detail-main" class="skip-to-content">Skip to product details</a>
-
-  <!-- Two-Row White Editorial Header (Matches /gadget Storefront) -->
-  <header class="gd-header" role="banner">
-    <div class="gd-header-row1">
-      <div class="gd-container gd-row1-inner">
-        <nav class="gd-top-left-links" aria-label="Primary Site Links">
-          <a href="/" class="gd-top-link">Solar Home</a>
-          <a href="/products" class="gd-top-link">Solar Store</a>
-          <a href="/packages" class="gd-top-link">Packages</a>
-          <a href="/contact" class="gd-top-link">Support</a>
-        </nav>
-
-        <a href="/gadget" class="gd-center-brand" aria-label="DEVICE PRO Gadgets Store">
-          <img src="/images/logo.svg" alt="DEVICE PRO" class="gd-center-logo">
-        </a>
-
-        <div class="gd-top-right-actions">
-          <a href="/login?redirect=/profile" class="gd-account-pill" data-user-profile-btn aria-label="My Account">
-            <span class="gd-avatar-dot" aria-hidden="true">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-            </span>
-            <span>Account</span>
+          <a href="/gadget" class="nv-brand-center" aria-label="DEVICE PRO Gadgets Home">
+            <span class="nv-brand-mark">D</span>
+            <span>devicepro<span class="accent-dot">.</span></span>
           </a>
 
-          <button type="button" class="gd-cart-pill" data-trigger-cart aria-label="Shopping Cart">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
-            <span class="gd-cart-label">Cart</span>
-            <span class="cart-badge" aria-label="0 items in cart">0</span>
-          </button>
+          <div class="nv-top-right">
+            <a href="/login" class="nv-user-btn" aria-label="Account">
+              <span class="nv-avatar-circle" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </span>
+              <span class="nv-label">Account</span>
+            </a>
 
-          <button type="button" class="gd-mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
-            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
-          </button>
+            <button type="button" class="nv-cart-btn" data-trigger-cart aria-label="Open Cart">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              <span class="nv-label">Cart</span>
+              <span class="cart-badge">0</span>
+            </button>
+
+            <button type="button" class="nv-mobile-toggle" id="mobile-menu-btn" aria-label="Open Menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="gd-header-row2">
-      <div class="gd-container gd-row2-inner">
-        <a href="/gadget" class="gd-cat-drop-btn" style="text-decoration:none;">← Back to Gadget Store</a>
+    <div class="nv-header-bar">
+      <div class="nv-container">
+        <div class="nv-bar-inner">
+          <a href="/gadget" class="nv-cat-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span>Back to Store</span>
+          </a>
 
-        <form action="/gadget" method="get" class="gd-header-search" role="search">
-          <input type="search" name="q" placeholder="Search for any products, Logitech, iPhone, laptops..." autocomplete="off">
-          <button type="submit" aria-label="Search">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </button>
-        </form>
+          <form class="nv-search-form" action="/gadget" method="get" role="search">
+            <input type="search" name="q" placeholder="Search phones, laptops, Logitech, speakers, printers..." aria-label="Search gadgets">
+            <button type="submit" aria-label="Search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+          </form>
 
-        <div class="gd-quick-nav-pills">
-          <a href="/gadget?category=logitech" class="gd-nav-pill">Logitech</a>
-          <a href="/gadget?category=laptops" class="gd-nav-pill">Laptops</a>
-          <a href="/gadget#gd-deals-section" class="gd-nav-pill accent">Hot Deals</a>
-          <a href="/checkout" class="gd-nav-pill">Checkout</a>
+          <div class="nv-bar-pills">
+            <a href="/gadget?category=smartphones" class="nv-bar-pill">Phones</a>
+            <a href="/gadget?category=logitech" class="nv-bar-pill">Logitech</a>
+            <a href="/gadget?sort=discount" class="nv-bar-pill orange-pill">Hot Deals</a>
+            <a href="/checkout" class="nv-bar-pill">Checkout</a>
+          </div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Main Product Detail Stage -->
-  <main id="gd-detail-main" class="gd-detail-main">
-    <div class="gd-container">
-      <nav class="gd-breadcrumbs" aria-label="Breadcrumb">
-        <a href="/">Home</a>
-        <span>/</span>
+  <main id="main-content" class="nv-detail-main">
+    <div class="nv-container">
+      <!-- Breadcrumbs -->
+      <nav class="nv-breadcrumbs" aria-label="Breadcrumb">
         <a href="/gadget">Gadgets</a>
         <span>/</span>
-        <a href="/gadget" id="gd-bc-cat">Category</a>
+        <a href="/gadget" id="nv-bc-cat">Category</a>
         <span>/</span>
-        <span id="gd-bc-name" style="color:#061C35; font-weight:700;">Product</span>
+        <span id="nv-bc-name" style="color:#111111; font-weight:600;">Loading...</span>
       </nav>
 
-      <section class="gd-detail-stage" aria-label="Product Overview and Purchase">
-        <div class="gd-gallery-col">
-          <div class="gd-gallery-main">
-            <span class="gd-badge gd-badge-gold" id="gd-gallery-badge"
-              style="position:absolute; top:14px; left:14px; z-index:2;">Official Genuine</span>
-            <img src="/images/gadgets/logitech-mx-mouse.jpg" alt="Product" id="gd-gallery-main-img">
+      <!-- Main Product Stage -->
+      <section class="nv-detail-stage" aria-label="Product overview and purchase options">
+        <!-- Left: Gallery -->
+        <div class="nv-gallery-col">
+          <div class="nv-gallery-main">
+            <span class="nv-pill-tag orange" id="nv-gallery-badge" style="position:absolute; top:14px; left:14px;">Genuine Sealed</span>
+            <img id="nv-gallery-main-img" src="/images/gadgets/phone-flagship-titanium.jpg" alt="Product image">
           </div>
-          <div class="gd-gallery-thumbs" id="gd-gallery-thumbs"></div>
+          <div class="nv-gallery-thumbs" id="nv-gallery-thumbs"></div>
         </div>
 
+        <!-- Right: Info & Checkout Actions -->
         <div>
-          <div class="gd-detail-top-tags">
-            <span class="gd-detail-brand-pill" id="gd-detail-brand">Brand</span>
-            <span class="gd-badge gd-badge-navy" id="gd-detail-cat">Category</span>
-            <span class="gd-badge gd-badge-green" id="gd-detail-stock-text">In Stock</span>
+          <div class="nv-tag-row">
+            <span class="nv-pill-tag" id="nv-detail-brand">Brand</span>
+            <span class="nv-pill-tag orange" id="nv-detail-cat">Category</span>
+            <span class="nv-pill-tag green" id="nv-detail-stock-text">In Stock</span>
           </div>
 
-          <h1 class="gd-detail-title" id="gd-detail-title">Loading Gadget...</h1>
+          <h1 class="nv-detail-title" id="nv-detail-title">Loading product...</h1>
 
-          <div class="gd-detail-rating-row">
-            <span class="gd-detail-stars" aria-hidden="true">★★★★★</span>
-            <span id="gd-detail-rating-text">4.9 (Verified Reviews)</span>
-            <span>•</span>
-            <span style="color:#0157A2; font-weight:800;">Factory Sealed OEM</span>
+          <div class="nv-detail-rating">
+            <span class="nv-stars" aria-hidden="true">★★★★★</span>
+            <span id="nv-detail-rating-text">4.9 (120 verified reviews)</span>
           </div>
 
-          <div class="gd-detail-price-card">
-            <div class="gd-detail-price-main">
-              <span class="gd-detail-price-val" id="gd-detail-price-val">₦0</span>
-              <span class="gd-detail-price-old" id="gd-detail-price-old" style="display:none;">₦0</span>
-              <span class="gd-detail-save-pill" id="gd-detail-save-pill" style="display:none;">Save ₦0</span>
+          <!-- Pricing Box -->
+          <div class="nv-price-box">
+            <div class="nv-price-main">
+              <span class="nv-price-now" id="nv-detail-price-val">₦0</span>
+              <span class="nv-price-old" id="nv-detail-price-old" style="display:none;"></span>
+              <span class="nv-save-tag" id="nv-detail-save-pill" style="display:none;"></span>
             </div>
-            <div class="gd-detail-checkout-note">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span>Linked directly to DEVICE PRO Main Checkout (Paystack &amp; Direct Transfer)</span>
+            <div class="nv-checkout-note">
+              ✓ Instant Paystack Card &amp; Direct Bank Transfer via unified DEVICE PRO Checkout
             </div>
           </div>
 
-          <div class="gd-variant-block" id="gd-variant-block">
-            <span class="gd-variant-label">Select Configuration / Edition:</span>
-            <div class="gd-variant-options" id="gd-variant-options"></div>
+          <!-- Configuration / Variants -->
+          <div class="nv-variant-block" id="nv-variant-block">
+            <label class="nv-variant-label">Select Configuration / Variant</label>
+            <div class="nv-variant-options" id="nv-variant-options"></div>
           </div>
 
-          <div class="gd-purchase-controls">
-            <button type="button" class="gd-btn-buy-now" id="gd-btn-buy-now">
-              Buy Now — Proceed to Checkout
+          <!-- Purchase Controls -->
+          <div class="nv-buy-controls">
+            <button type="button" class="nv-btn-buy" id="nv-btn-buy-now">
+              <span>Buy Now — Proceed to Checkout</span>
             </button>
 
-            <div class="gd-qty-and-add">
-              <div class="gd-qty-stepper" aria-label="Quantity selector">
-                <button type="button" class="gd-qty-btn" id="gd-qty-minus" aria-label="Decrease quantity">−</button>
-                <span class="gd-qty-val" id="gd-qty-val">1</span>
-                <button type="button" class="gd-qty-btn" id="gd-qty-plus" aria-label="Increase quantity">+</button>
+            <div class="nv-qty-row">
+              <div class="nv-qty-stepper" aria-label="Quantity selector">
+                <button type="button" class="nv-qty-btn" id="nv-qty-minus" aria-label="Decrease quantity">−</button>
+                <span id="nv-qty-val" style="font-weight:800; font-size:0.95rem;">1</span>
+                <button type="button" class="nv-qty-btn" id="nv-qty-plus" aria-label="Increase quantity">+</button>
               </div>
-              <button type="button" class="gd-btn-cart-primary" id="gd-btn-add-cart">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+
+              <button type="button" class="nv-btn-add" id="nv-btn-add-cart">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                 <span>Add to Cart</span>
               </button>
             </div>
 
-            <a href="https://wa.me/2348033882268" target="_blank" rel="noopener noreferrer"
-              class="gd-btn-whatsapp" id="gd-btn-whatsapp">
-              Order / Ask Specialist on WhatsApp →
+            <a href="https://wa.me/2348033882268" target="_blank" rel="noopener" class="nv-btn-wa" id="nv-btn-whatsapp">
+              <span>Order / Ask Expert on WhatsApp</span>
             </a>
           </div>
 
-          <div class="gd-detail-guarantees">
-            <div class="gd-guarantee-item">
-              <svg class="gd-guarantee-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-              <div>
-                <strong>Official Warranty</strong>
-                <span id="gd-detail-warranty-text">1-Year Official Warranty</span>
-              </div>
+          <!-- Guarantees -->
+          <div class="nv-guarantees">
+            <div>
+              <strong>Warranty Coverage</strong>
+              <span id="nv-detail-warranty-text">1 Year Official Warranty</span>
             </div>
-            <div class="gd-guarantee-item">
-              <svg class="gd-guarantee-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-              <div>
-                <strong>Express Dispatch</strong>
-                <span>Same-day Lagos / 24–72h Nationwide</span>
-              </div>
+            <div>
+              <strong>Fast Dispatch</strong>
+              <span>Same-day Lagos, 24–48h Nationwide</span>
             </div>
-            <div class="gd-guarantee-item">
-              <svg class="gd-guarantee-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-              <div>
-                <strong>Ikeja Showroom</strong>
-                <span>13 Adepele St, Computer Village</span>
-              </div>
+            <div>
+              <strong>100% Authentic</strong>
+              <span>Factory-sealed original hardware</span>
             </div>
-            <div class="gd-guarantee-item">
-              <svg class="gd-guarantee-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-              <div>
-                <strong>256-Bit SSL Checkout</strong>
-                <span>Paystack Cards, USSD &amp; Transfer</span>
-              </div>
+            <div>
+              <strong>Unified Checkout</strong>
+              <span>Combine gadgets &amp; solar in one cart</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- Tabbed Overview, Specifications & Box Contents -->
-      <section class="gd-tabs-card" aria-label="Technical Specifications">
-        <div class="gd-tabs-nav" role="tablist">
-          <button type="button" class="gd-tab-btn active" data-tab="gd-tab-overview" role="tab">Overview &amp; Highlights</button>
-          <button type="button" class="gd-tab-btn" data-tab="gd-tab-specs" role="tab">Technical Specifications</button>
-          <button type="button" class="gd-tab-btn" data-tab="gd-tab-box" role="tab">What's in the Box</button>
+      <!-- Tabs: Overview, Specs, In the Box -->
+      <section class="nv-tabs-card" aria-label="Product specifications and details">
+        <div class="nv-tabs-nav" role="tablist">
+          <button type="button" class="nv-tab-btn active" data-tab="nv-tab-overview" role="tab" aria-selected="true">Overview &amp; Highlights</button>
+          <button type="button" class="nv-tab-btn" data-tab="nv-tab-specs" role="tab" aria-selected="false">Full Technical Specs</button>
+          <button type="button" class="nv-tab-btn" data-tab="nv-tab-box" role="tab" aria-selected="false">What's in the Box</button>
         </div>
 
-        <div id="gd-tab-overview" class="gd-tab-pane active" role="tabpanel">
-          <p class="gd-overview-text" id="gd-overview-desc"></p>
-          <div class="gd-highlights-grid" id="gd-highlights-grid"></div>
+        <div class="nv-tab-pane active" id="nv-tab-overview" role="tabpanel">
+          <p class="nv-overview-text" id="nv-overview-desc"></p>
+          <div class="nv-highlights-grid" id="nv-highlights-grid"></div>
         </div>
 
-        <div id="gd-tab-specs" class="gd-tab-pane" role="tabpanel">
-          <table class="gd-spec-table"><tbody id="gd-spec-tbody"></tbody></table>
+        <div class="nv-tab-pane" id="nv-tab-specs" role="tabpanel">
+          <table class="nv-spec-table">
+            <tbody id="nv-spec-tbody"></tbody>
+          </table>
         </div>
 
-        <div id="gd-tab-box" class="gd-tab-pane" role="tabpanel">
-          <div class="gd-box-grid" id="gd-box-grid"></div>
+        <div class="nv-tab-pane" id="nv-tab-box" role="tabpanel">
+          <div class="nv-box-grid" id="nv-box-grid"></div>
         </div>
       </section>
 
       <!-- Related Gadgets -->
       <section aria-label="Related Gadgets">
-        <div class="gd-sec-head">
-          <h2 class="gd-sec-title">Frequently Bought Together &amp; Similar Tech</h2>
-          <a href="/gadget" class="gd-see-all">See All →</a>
+        <div class="nv-sec-head">
+          <h2 class="nv-sec-title">You May Also Like</h2>
+          <a href="/gadget" class="nv-see-all">Browse All Gadgets →</a>
         </div>
-        <div class="gd-four-grid" id="gd-related-grid"></div>
+        <div class="nv-four-grid" id="nv-related-grid"></div>
       </section>
     </div>
   </main>
 
-  <!-- Sticky Mobile Bottom Buy Bar -->
-  <div class="gd-mobile-sticky-bar">
+  <!-- Mobile Sticky Checkout Bar -->
+  <div class="nv-mobile-bar">
     <div>
-      <div class="gd-mobile-sticky-price" id="gd-mobile-sticky-price">₦0</div>
-      <div class="gd-mobile-sticky-sub">Free Lagos Delivery • Paystack</div>
+      <div style="font-size:0.68rem; color:#6B7280;">Total</div>
+      <div id="nv-mobile-sticky-price" style="font-size:1.05rem; font-weight:800; color:#111111;">₦0</div>
     </div>
-    <button type="button" class="gd-mobile-sticky-cta" id="gd-mobile-sticky-buy">Buy Now → Checkout</button>
+    <button type="button" class="nv-btn-buy" id="nv-mobile-sticky-buy" style="width:auto; padding:10px 20px;">
+      Buy Now →
+    </button>
   </div>
 
-  <!-- 5-Column Dark Navy Enterprise Footer -->
-  <footer class="gd-footer" role="contentinfo">
-    <div class="gd-container">
-      <div class="gd-footer-cols" style="padding-top:0;">
-        <div class="gd-footer-col">
-          <h4>Gadgets</h4>
-          <ul>
-            <li><a href="/gadget?category=smartphones">Smartphones</a></li>
-            <li><a href="/gadget?category=laptops">Laptops</a></li>
-            <li><a href="/gadget?category=powerbanks">Powerbanks</a></li>
-            <li><a href="/gadget?category=speakers">Bluetooth Speakers</a></li>
-          </ul>
+  <!-- Matte Black Footer -->
+  <footer class="nv-footer">
+    <div class="nv-container">
+      <div class="nv-footer-bottom" style="padding-top:0;">
+        <a href="/gadget" class="nv-footer-brand" style="margin:0;">
+          <span class="nv-brand-mark">D</span>
+          <span>devicepro<span style="color:#FF6B00;">.</span></span>
+        </a>
+        <div class="nv-pay-row">
+          <span class="nv-pay-tag">Paystack</span>
+          <span class="nv-pay-tag">VISA</span>
+          <span class="nv-pay-tag">Mastercard</span>
+          <span class="nv-pay-tag">Bank Transfer</span>
         </div>
-        <div class="gd-footer-col">
-          <h4>Workspace</h4>
-          <ul>
-            <li><a href="/gadget?category=logitech">Logitech Gear</a></li>
-            <li><a href="/gadget?category=monitors">4K Monitors</a></li>
-            <li><a href="/gadget?category=printers">Wireless Printers</a></li>
-            <li><a href="/gadget?category=accessories">GaN Chargers &amp; Hubs</a></li>
-          </ul>
-        </div>
-        <div class="gd-footer-col">
-          <h4>Solar Division</h4>
-          <ul>
-            <li><a href="/">Solar Homepage</a></li>
-            <li><a href="/products">Solar Products</a></li>
-            <li><a href="/packages">Solar Packages</a></li>
-            <li><a href="/calculator">Solar Calculator</a></li>
-          </ul>
-        </div>
-        <div class="gd-footer-col">
-          <h4>Customer Care</h4>
-          <ul>
-            <li><a href="/checkout">Unified Secure Checkout</a></li>
-            <li><a href="/tracking">Track Order</a></li>
-            <li><a href="/profile">My Profile</a></li>
-          </ul>
-        </div>
-        <div class="gd-footer-col">
-          <h4>Showroom</h4>
-          <ul>
-            <li><a href="tel:+2348033882268">+234 803 388 2268</a></li>
-            <li><a href="mailto:deviceprosales@gmail.com">deviceprosales@gmail.com</a></li>
-            <li><a href="/contact">Computer Village, Ikeja</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="gd-footer-bottom">
-        <div class="gd-pay-badges">
-          <span class="gd-pay-chip">Paystack</span>
-          <span class="gd-pay-chip">VISA</span>
-          <span class="gd-pay-chip">Mastercard</span>
-          <span class="gd-pay-chip">Bank Transfer</span>
-        </div>
-        <span>© 2026 DEVICE PRO Nigeria Limited. All rights reserved.</span>
-        <span>Nigeria (NGN ₦)</span>
+        <div>© 2026 DEVICE PRO Gadgets Nigeria.</div>
       </div>
     </div>
   </footer>
 
-  <!-- Universal Cart Drawer -->
-  <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
+  <!-- Shared Cart Drawer, Mobile Drawer & Toasts -->
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+
+  <aside class="drawer" id="cart-drawer" aria-hidden="true" aria-labelledby="cart-drawer-title" role="dialog" aria-modal="true">
     <div class="drawer-header">
-      <h2 id="cart-drawer-title">Your Cart</h2>
+      <h2 id="cart-drawer-title">Your Shopping Cart</h2>
       <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart">✕</button>
     </div>
-    <div class="drawer-body" id="cart-drawer-body">
-      <div class="cart-empty-state">
-        <p class="empty-title">Your cart is currently empty</p>
-        <p class="empty-desc">Add gadgets or solar equipment to proceed to checkout.</p>
-        <button type="button" class="btn-browse-equip" data-close-drawer>Continue Shopping →</button>
-      </div>
-    </div>
+    <div class="drawer-body" id="cart-drawer-body"></div>
     <div class="drawer-footer">
       <div class="cart-subtotal-row">
         <span>Subtotal</span>
         <span id="cart-subtotal-val">₦0</span>
       </div>
-      <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" disabled>Proceed to Checkout</button>
+      <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" disabled>
+        Proceed to Checkout →
+      </button>
     </div>
   </aside>
 
-  <div id="modal-backdrop" class="modal-backdrop"></div>
-
-  <!-- Mobile Navigation Drawer -->
-  <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
+  <aside class="drawer" id="mobile-nav-drawer" aria-hidden="true" aria-label="Mobile Navigation" role="dialog" aria-modal="true">
     <div class="drawer-header">
-      <img src="/images/logo.svg" alt="DEVICE PRO" style="height:34px;" id="mobile-nav-title">
-      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close menu">✕</button>
+      <h2>Menu</h2>
+      <button type="button" class="modal-close-btn" id="mobile-nav-close" aria-label="Close menu">✕</button>
     </div>
-    <div class="drawer-body">
-      <div style="display:flex; flex-direction:column; gap:14px;">
-        <a href="/" class="nav-link" data-close-drawer>Solar Home</a>
-        <a href="/gadget" class="nav-link active" data-close-drawer>Gadgets &amp; Tech</a>
-        <a href="/products" class="nav-link" data-close-drawer>Solar Products</a>
-        <a href="/packages" class="nav-link" data-close-drawer>Solar Packages</a>
-        <a href="/calculator" class="nav-link" data-close-drawer>Solar Calculator</a>
-        <a href="/checkout" class="gd-pill-cta gold-cta" style="justify-content:center;" data-close-drawer>
-          <span>Go to Checkout</span><span class="gd-cta-circle">→</span>
-        </a>
-      </div>
+    <div class="drawer-body" style="display:flex; flex-direction:column; gap:10px;">
+      <a href="/gadget" style="padding:10px 12px; border-radius:8px; background:#FFF3EB; color:#FF6B00; font-weight:700;">← All Gadgets</a>
+      <a href="/checkout" style="padding:10px 12px; border-radius:8px; background:#FF6B00; color:#FFFFFF; font-weight:700; text-align:center;">Proceed to Checkout →</a>
+      <a href="/" style="padding:8px 12px; font-weight:600; color:#525252;">Main Solar Home</a>
+      <a href="/products" style="padding:8px 12px; font-weight:600; color:#525252;">Solar Equipment</a>
+      <a href="/login" style="padding:8px 12px; font-weight:600; color:#525252;">Account Login</a>
+      <a href="/contact" style="padding:8px 12px; font-weight:600; color:#525252;">Contact Support</a>
     </div>
-  </nav>
+  </aside>
 
-  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+  <div class="toast-container" id="toast-container"></div>
 
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/gadget-catalog.js?v=1"></script>
-  <script src="/js/gadget-detail.js?v=3"></script>
-  <script src="/js/main.js?v=28"></script>
+  <script src="/js/gadget-detail.js?v=5"></script>
 </body>
-
 </html>
