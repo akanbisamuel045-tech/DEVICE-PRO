@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Details | DEVICE PRO Gadgets Nigeria</title>
   <meta name="description" content="Explore technical specifications, configuration options, warranty details, and direct Paystack / Bank Transfer checkout for genuine gadgets at DEVICE PRO.">
-  <link rel="icon" type="image/png" href="/images/dp-icon-transparent.png">
+  <link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/gadget.css?v=5">
+  <link rel="stylesheet" href="/css/gadget.css?v=6">
 </head>
 <body class="nuvio-gadget-body gadget-detail-body">
   <a href="#main-content" class="skip-to-content">Skip to content</a>
@@ -23,14 +23,14 @@
         <div class="nv-top-inner">
           <nav class="nv-top-links" aria-label="Primary navigation">
             <a href="/" class="nv-top-link">Home</a>
-            <a href="/gadget" class="nv-top-link" style="color:#FF6B00; font-weight:700;">← All Gadgets</a>
+            <a href="/gadget" class="nv-top-link">Gadgets</a>
+            <a href="/gadget/shop" class="nv-top-link" style="color:#FF6B00; font-weight:700;">Shop All</a>
             <a href="/products" class="nv-top-link">Solar Store</a>
             <a href="/contact" class="nv-top-link">Contact</a>
           </nav>
 
           <a href="/gadget" class="nv-brand-center" aria-label="DEVICE PRO Gadgets Home">
-            <span class="nv-brand-mark">D</span>
-            <span>devicepro<span class="accent-dot">.</span></span>
+            <img src="/images/logo.svg" alt="DEVICE PRO" class="nv-brand-logo">
           </a>
 
           <div class="nv-top-right">
@@ -58,12 +58,12 @@
     <div class="nv-header-bar">
       <div class="nv-container">
         <div class="nv-bar-inner">
-          <a href="/gadget" class="nv-cat-btn">
+          <a href="/gadget/shop" class="nv-cat-btn">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            <span>Back to Store</span>
+            <span>All Gadgets</span>
           </a>
 
-          <form class="nv-search-form" action="/gadget" method="get" role="search">
+          <form class="nv-search-form" action="/gadget/shop" method="get" role="search">
             <input type="search" name="q" placeholder="Search phones, laptops, Logitech, speakers, printers..." aria-label="Search gadgets">
             <button type="submit" aria-label="Search">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
@@ -71,9 +71,9 @@
           </form>
 
           <div class="nv-bar-pills">
-            <a href="/gadget?category=smartphones" class="nv-bar-pill">Phones</a>
-            <a href="/gadget?category=logitech" class="nv-bar-pill">Logitech</a>
-            <a href="/gadget?sort=discount" class="nv-bar-pill orange-pill">Hot Deals</a>
+            <a href="/gadget/shop?category=smartphones" class="nv-bar-pill">Phones</a>
+            <a href="/gadget/shop?category=logitech" class="nv-bar-pill">Logitech</a>
+            <a href="/gadget/shop?sort=discount" class="nv-bar-pill orange-pill">Hot Deals</a>
             <a href="/checkout" class="nv-bar-pill">Checkout</a>
           </div>
         </div>
@@ -210,7 +210,7 @@
       <section aria-label="Related Gadgets">
         <div class="nv-sec-head">
           <h2 class="nv-sec-title">You May Also Like</h2>
-          <a href="/gadget" class="nv-see-all">Browse All Gadgets →</a>
+          <a href="/gadget/shop" class="nv-see-all">Browse All 28 Gadgets →</a>
         </div>
         <div class="nv-four-grid" id="nv-related-grid"></div>
       </section>
@@ -232,9 +232,8 @@
   <footer class="nv-footer">
     <div class="nv-container">
       <div class="nv-footer-bottom" style="padding-top:0;">
-        <a href="/gadget" class="nv-footer-brand" style="margin:0;">
-          <span class="nv-brand-mark">D</span>
-          <span>devicepro<span style="color:#FF6B00;">.</span></span>
+        <a href="/gadget" class="nv-footer-logo-wrap" style="margin:0;" aria-label="DEVICE PRO Gadgets Home">
+          <img src="/images/logo.svg" alt="DEVICE PRO">
         </a>
         <div class="nv-pay-row">
           <span class="nv-pay-tag">Paystack</span>

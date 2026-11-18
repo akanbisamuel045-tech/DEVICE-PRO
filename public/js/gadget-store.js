@@ -1,9 +1,8 @@
 /**
- * DEVICE PRO — Gadget Storefront Controller (/gadget)
- * Exact White + Tangerine Orange + Matte Black Reference Architecture.
- * Powers Category Dropdown, Dual Search, Shop by Category Carousel,
+ * DEVICE PRO — Gadget Storefront Landing Controller (/gadget)
+ * Powers Category Dropdown, Dual Search -> /gadget/shop, Shop by Category Carousel,
  * Today's Great Deal (2x4 + Live Countdown), New Arrivals 3-Card Carousel,
- * Best Selling Bento, Full 28-Product Explorer, Partner Filters & DeviceProCart.
+ * Best Selling Bento, 4-Item Browse All Gadgets Preview (-> /gadget/shop) & DeviceProCart.
  */
 
 (function () {
@@ -14,19 +13,8 @@
     if (!Catalog) return;
 
     const state = {
-      category: 'all',
-      brand: 'all',
-      search: '',
-      priceRange: 'all',
-      sort: 'featured',
       arrivalPage: 0
     };
-
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('category')) state.category = urlParams.get('category');
-    if (urlParams.get('brand')) state.brand = urlParams.get('brand');
-    if (urlParams.get('q')) state.search = urlParams.get('q');
-    if (urlParams.get('sort')) state.sort = urlParams.get('sort');
 
     const CAT_IMAGES = {
       smartphones: '/images/gadgets/phone-flagship-titanium.jpg',
@@ -100,8 +88,17 @@
       });
     }
 
+    function goToShop(paramsObj) {
+      const qs = new URLSearchParams();
+      Object.entries(paramsObj || {}).forEach(([k, v]) => {
+        if (v && v !== 'all') qs.set(k, v);
+      });
+      const qStr = qs.toString();
+      window.location.href = qStr ? `/gadget/shop?${qStr}` : '/gadget/shop';
+    }
+
     // =========================================================================
-    // 1. ALL CATEGORY DROPDOWN
+    // 1. ALL CATEGORY DROPDOWN (-> /gadget/shop)
     // =========================================================================
     const dropBtn = document.getElementById('nv-cat-drop-toggle');
     const dropMenu = document.getElementById('nv-cat-menu');
@@ -109,19 +106,11 @@
     if (dropMenu) {
       const cats = Catalog.getCategoriesWithCounts();
       dropMenu.innerHTML = cats.map(c => `
-        <button type="button" class="nv-cat-menu-item" data-drop-cat="${c.id}">
+        <a href="${c.id === 'all' ? '/gadget/shop' : `/gadget/shop?category=${encodeURIComponent(c.id)}`}" class="nv-cat-menu-item">
           <span>${c.label}</span>
           <span class="nv-cat-menu-count">${c.count}</span>
-        </button>
+        </a>
       `).join('');
-
-      dropMenu.querySelectorAll('[data-drop-cat]').forEach(item => {
-        item.addEventListener('click', () => {
-          jumpToExplorer({ category: item.getAttribute('data-drop-cat'), brand: 'all' });
-          dropMenu.classList.remove('open');
-          if (dropBtn) dropBtn.setAttribute('aria-expanded', 'false');
-        });
-      });
     }
 
     if (dropBtn && dropMenu) {
@@ -139,13 +128,13 @@
     }
 
     // =========================================================================
-    // 2. SHOP BY CATEGORY CAROUSEL (4 CLEAN #F7F7F7 CARDS + < / BLACK > ARROWS)
+    // 2. SHOP BY CATEGORY CAROUSEL (-> /gadget/shop?category=...)
     // =========================================================================
     const catStrip = document.getElementById('nv-cat-strip');
     if (catStrip) {
       const cats = Catalog.getCategoriesWithCounts().filter(c => c.id !== 'all');
       catStrip.innerHTML = cats.map(c => `
-        <button type="button" class="nv-cat-card" data-cat-card="${c.id}">
+        <a href="/gadget/shop?category=${encodeURIComponent(c.id)}" class="nv-cat-card">
           <div class="nv-cat-card-top">
             <div>
               <span class="nv-cat-name">${c.label}</span>
@@ -154,14 +143,8 @@
             <span class="nv-cat-link">See All →</span>
           </div>
           <img src="${CAT_IMAGES[c.id] || '/images/gadgets/logitech-mx-mouse.jpg'}" alt="${c.label}" loading="lazy">
-        </button>
+        </a>
       `).join('');
-
-      catStrip.querySelectorAll('[data-cat-card]').forEach(card => {
-        card.addEventListener('click', () => {
-          jumpToExplorer({ category: card.getAttribute('data-cat-card'), brand: 'all' });
-        });
-      });
 
       const prevBtn = document.getElementById('nv-cat-prev');
       const nextBtn = document.getElementById('nv-cat-next');
@@ -295,167 +278,45 @@
     }
 
     // =========================================================================
-    // 6. FULL CATALOGUE EXPLORER (28 PRODUCTS + SEARCH + BRAND + PRICE + SORT)
+    // 6. BROWSE ALL GADGETS PREVIEW (STRICTLY 4 ITEMS -> /gadget/shop)
     // =========================================================================
-    const explorerTitleEl = document.getElementById('nv-explorer-title');
-    const explorerCountEl = document.getElementById('nv-explorer-count');
-    const explorerGridEl = document.getElementById('nv-explorer-grid');
-    const brandRowEl = document.getElementById('nv-brand-row');
-    const priceSelect = document.getElementById('nv-price-select');
-    const sortSelect = document.getElementById('nv-sort-select');
-    const resetBtn = document.getElementById('nv-reset-filters-btn');
+    const previewGrid = document.getElementById('nv-explorer-preview-grid');
+    if (previewGrid) {
+      const previewSlugs = [
+        'apple-iphone-16-pro-max-256gb',
+        'logitech-mx-keys-s-wireless-keyboard',
+        'anker-737-powercore-24000mah-140w',
+        'epson-ecotank-l3250-wifi-all-in-one-printer'
+      ];
+      const previewItems = previewSlugs
+        .map(s => Catalog.getBySlug(s))
+        .filter(Boolean)
+        .slice(0, 4);
+
+      previewGrid.innerHTML = previewItems.map(item => buildProductCard(item, false)).join('');
+      wireAddButtons(previewGrid);
+    }
+
+    // =========================================================================
+    // 7. SEARCH FORMS -> DIRECT TO /gadget/shop?q=...
+    // =========================================================================
     const headerSearchForm = document.getElementById('nv-header-search-form');
     const headerSearchInput = document.getElementById('nv-header-search-input');
     const discoverSearchForm = document.getElementById('nv-discover-search-form');
     const discoverSearchInput = document.getElementById('nv-discover-search-input');
 
-    if (headerSearchInput && state.search) headerSearchInput.value = state.search;
-    if (sortSelect && state.sort) sortSelect.value = state.sort;
-
-    function renderBrands() {
-      if (!brandRowEl) return;
-      const brands = Catalog.getBrands();
-      brandRowEl.innerHTML = [
-        `<button type="button" class="nv-brand-chip ${state.brand === 'all' ? 'active' : ''}" data-brand="all">All Brands</button>`,
-        ...brands.map(b => `
-          <button type="button" class="nv-brand-chip ${state.brand === b.name ? 'active' : ''}" data-brand="${b.name}">
-            ${b.name} (${b.count})
-          </button>
-        `)
-      ].join('');
-
-      brandRowEl.querySelectorAll('[data-brand]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          state.brand = btn.getAttribute('data-brand');
-          renderBrands();
-          renderExplorer();
-        });
-      });
-    }
-
-    function renderExplorer() {
-      if (!explorerGridEl) return;
-      let list = Catalog.getAll();
-
-      if (state.category !== 'all') list = list.filter(g => g.category === state.category);
-      if (state.brand !== 'all') list = list.filter(g => g.brand.toLowerCase() === state.brand.toLowerCase());
-      if (state.search.trim()) {
-        const q = state.search.trim().toLowerCase();
-        list = list.filter(g =>
-          g.name.toLowerCase().includes(q) ||
-          g.brand.toLowerCase().includes(q) ||
-          g.categoryLabel.toLowerCase().includes(q) ||
-          g.shortSpec.toLowerCase().includes(q)
-        );
-      }
-      if (state.priceRange !== 'all') {
-        if (state.priceRange === 'under-150k') list = list.filter(g => g.price < 150000);
-        else if (state.priceRange === '150k-400k') list = list.filter(g => g.price >= 150000 && g.price <= 400000);
-        else if (state.priceRange === '400k-1m') list = list.filter(g => g.price > 400000 && g.price <= 1000000);
-        else if (state.priceRange === 'over-1m') list = list.filter(g => g.price > 1000000);
-      }
-
-      if (state.sort === 'price-asc') list.sort((a, b) => a.price - b.price);
-      else if (state.sort === 'price-desc') list.sort((a, b) => b.price - a.price);
-      else if (state.sort === 'rating') list.sort((a, b) => b.rating - a.rating);
-      else if (state.sort === 'discount') list.sort((a, b) => Catalog.getDiscountPct(b.price, b.originalPrice) - Catalog.getDiscountPct(a.price, a.originalPrice));
-
-      const catObj = Catalog.CATEGORIES.find(c => c.id === state.category);
-      if (explorerTitleEl) {
-        let label = catObj && state.category !== 'all' ? catObj.label : 'Browse All Gadgets';
-        if (state.brand !== 'all') label += ` • ${state.brand}`;
-        if (state.search.trim()) label = `Results for "${state.search.trim()}"`;
-        explorerTitleEl.textContent = label;
-      }
-      if (explorerCountEl) explorerCountEl.textContent = `${list.length} ${list.length === 1 ? 'item' : 'items'}`;
-
-      const hasActive = state.category !== 'all' || state.brand !== 'all' || state.search.trim() !== '' || state.priceRange !== 'all';
-      if (resetBtn) resetBtn.style.display = hasActive ? 'inline-flex' : 'none';
-
-      if (list.length === 0) {
-        explorerGridEl.innerHTML = `
-          <div style="grid-column:1/-1; text-align:center; padding:38px 16px; color:#6B7280;">
-            <p style="margin:0 0 14px; color:#111111; font-size:0.95rem; font-weight:600;">No matching gadgets found.</p>
-            <button type="button" class="nv-pill-btn solid-orange" id="nv-empty-reset">
-              <span>Show All 28 Gadgets</span>
-              <span class="nv-circle-arrow">→</span>
-            </button>
-          </div>
-        `;
-        const er = document.getElementById('nv-empty-reset');
-        if (er) er.addEventListener('click', resetAllFilters);
-        return;
-      }
-
-      explorerGridEl.innerHTML = list.map(item => buildProductCard(item, false)).join('');
-      wireAddButtons(explorerGridEl);
-    }
-
-    function resetAllFilters() {
-      state.category = 'all';
-      state.brand = 'all';
-      state.search = '';
-      state.priceRange = 'all';
-      state.sort = 'featured';
-      if (headerSearchInput) headerSearchInput.value = '';
-      if (discoverSearchInput) discoverSearchInput.value = '';
-      if (priceSelect) priceSelect.value = 'all';
-      if (sortSelect) sortSelect.value = 'featured';
-      renderBrands();
-      renderExplorer();
-    }
-
-    function jumpToExplorer(updates) {
-      if (updates.category !== undefined) state.category = updates.category;
-      if (updates.brand !== undefined) state.brand = updates.brand;
-      if (updates.search !== undefined) state.search = updates.search;
-      if (updates.sort !== undefined) state.sort = updates.sort;
-      if (sortSelect) sortSelect.value = state.sort;
-      renderBrands();
-      renderExplorer();
-      const target = document.getElementById('nv-explorer-section');
-      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // Wire Search Forms
     if (headerSearchForm) {
       headerSearchForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        jumpToExplorer({ search: headerSearchInput ? headerSearchInput.value : '', category: 'all', brand: 'all' });
+        goToShop({ q: (headerSearchInput?.value || '').trim() });
       });
     }
     if (discoverSearchForm) {
       discoverSearchForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const q = discoverSearchInput ? discoverSearchInput.value : '';
-        if (headerSearchInput) headerSearchInput.value = q;
-        jumpToExplorer({ search: q, category: 'all', brand: 'all' });
+        goToShop({ q: (discoverSearchInput?.value || '').trim() });
       });
     }
-
-    if (priceSelect) priceSelect.addEventListener('change', () => { state.priceRange = priceSelect.value; renderExplorer(); });
-    if (sortSelect) sortSelect.addEventListener('change', () => { state.sort = sortSelect.value; renderExplorer(); });
-    if (resetBtn) resetBtn.addEventListener('click', resetAllFilters);
-
-    document.querySelectorAll('[data-jump-cat]').forEach(el => {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        jumpToExplorer({ category: el.getAttribute('data-jump-cat'), brand: 'all', search: '' });
-      });
-    });
-
-    document.querySelectorAll('[data-jump-sort]').forEach(el => {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
-        jumpToExplorer({ category: 'all', brand: 'all', sort: el.getAttribute('data-jump-sort') });
-      });
-    });
-
-    document.querySelectorAll('[data-partner-brand]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        jumpToExplorer({ category: 'all', brand: btn.getAttribute('data-partner-brand'), search: '' });
-      });
-    });
 
     // Newsletter Feedback
     const nlForm = document.getElementById('nv-newsletter-form');
@@ -465,7 +326,7 @@
         const input = document.getElementById('nv-newsletter-email');
         if (input) input.value = '';
         if (window.DeviceProCart && typeof window.DeviceProCart.showToast === 'function') {
-          window.DeviceProCart.showToast('Subscribed to DevicePro Tech Drop Alerts!');
+          window.DeviceProCart.showToast('Subscribed to DEVICE PRO Tech Drop Alerts!');
         }
       });
     }
@@ -502,23 +363,11 @@
         if (window.DeviceProCart) window.DeviceProCart.closeDrawer();
       });
     }
-    document.querySelectorAll('[data-mobile-close]').forEach(link => {
-      link.addEventListener('click', closeMobileNav);
-    });
 
-    // Lucide icon refresh helper for cart.js
     window.refreshLucideIcons = function () {
       if (window.lucide && typeof window.lucide.createIcons === 'function') {
         window.lucide.createIcons();
       }
     };
-
-    renderBrands();
-    renderExplorer();
-
-    if (urlParams.get('category') || urlParams.get('q') || urlParams.get('brand')) {
-      const target = document.getElementById('nv-explorer-section');
-      if (target) setTimeout(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }), 250);
-    }
   });
 })();

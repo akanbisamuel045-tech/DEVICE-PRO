@@ -9,35 +9,33 @@
   <meta property="og:description" content="Factory-sealed smartphones, laptops, Logitech peripherals, powerbanks, speakers, monitors & printers — instant checkout.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://device-pro.vercel.app/gadget">
-  <meta property="og:image" content="https://device-pro.vercel.app/images/gadgets/phone-flagship-titanium.jpg">
-  <link rel="icon" type="image/png" href="/images/dp-icon-transparent.png">
+  <meta property="og:image" content="https://device-pro.vercel.app/images/gadgets/logitech-mx-keyboard.jpg">
+  <link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/gadget.css?v=5">
+  <link rel="stylesheet" href="/css/gadget.css?v=6">
 </head>
 <body class="nuvio-gadget-body">
   <a href="#main-content" class="skip-to-content">Skip to content</a>
 
   <!-- =========================================================================
-       1. TWO-ROW ULTRA-CLEAN WHITE HEADER (EXACT REFERENCE DESIGN)
+       1. TWO-ROW ULTRA-CLEAN WHITE HEADER (ORIGINAL DEVICE PRO LOGO)
        ========================================================================= -->
   <header class="nv-header">
-    <!-- Row 1: Top Links | Centered Brand Wordmark | Account & Cart -->
     <div class="nv-header-top">
       <div class="nv-container">
         <div class="nv-top-inner">
           <nav class="nv-top-links" aria-label="Primary navigation">
             <a href="/" class="nv-top-link">Home</a>
             <a href="/gadget" class="nv-top-link" style="color:#111111; font-weight:700;">Gadgets</a>
-            <a href="#nv-explorer-section" class="nv-top-link">Shop All</a>
+            <a href="/gadget/shop" class="nv-top-link">Shop All</a>
             <a href="/products" class="nv-top-link">Solar Store</a>
             <a href="/contact" class="nv-top-link">Contact</a>
           </nav>
 
           <a href="/gadget" class="nv-brand-center" aria-label="DEVICE PRO Gadgets Home">
-            <span class="nv-brand-mark">D</span>
-            <span>devicepro<span class="accent-dot">.</span></span>
+            <img src="/images/logo.svg" alt="DEVICE PRO" class="nv-brand-logo">
           </a>
 
           <div class="nv-top-right">
@@ -62,7 +60,6 @@
       </div>
     </div>
 
-    <!-- Row 2: All Category Dropdown + Search Bar + Quick Action Pills -->
     <div class="nv-header-bar">
       <div class="nv-container">
         <div class="nv-bar-inner">
@@ -85,9 +82,9 @@
           </form>
 
           <div class="nv-bar-pills">
-            <button type="button" class="nv-bar-pill" data-jump-cat="logitech">Logitech</button>
-            <button type="button" class="nv-bar-pill" data-jump-cat="laptops">Laptops</button>
-            <button type="button" class="nv-bar-pill orange-pill" data-jump-sort="discount">Hot Deals</button>
+            <a href="/gadget/shop?category=logitech" class="nv-bar-pill">Logitech</a>
+            <a href="/gadget/shop?category=laptops" class="nv-bar-pill">Laptops</a>
+            <a href="/gadget/shop?sort=discount" class="nv-bar-pill orange-pill">Hot Deals</a>
             <a href="/checkout" class="nv-bar-pill">Checkout</a>
           </div>
         </div>
@@ -97,42 +94,62 @@
 
   <main id="main-content">
     <!-- =======================================================================
-         2. HERO SPLIT (LEFT CRIMSON VERTICAL CARD + RIGHT BLACK/BLUE FLAGSHIP)
+         2. FULL-WIDTH HERO BANNER — LOGITECH KEYBOARD & MOUSE DISCOUNT OFFER
          ======================================================================= -->
-    <section class="nv-hero-section" aria-label="Featured Tech Promotions">
+    <section class="nv-hero-section" aria-label="Featured Logitech Keyboard and Mouse Offer">
       <div class="nv-container">
         <div class="nv-hero-grid">
-          <!-- Left Deep Crimson Vertical Promo Card -->
-          <a href="/gadget/oraimo-traveler-40000mah-65w-powerbank" class="nv-hero-crimson">
-            <div>
-              <div class="nv-crimson-kicker">Wireless &amp; Power</div>
-              <div class="nv-crimson-pct">Up to <span>40%</span> Off</div>
-              <div class="nv-crimson-sub">Powerbanks, audio &amp; fast-charge essentials</div>
-            </div>
-            <img src="/images/gadgets/powerbank-pd-digital.jpg" alt="High Capacity Fast Charging Powerbank">
-          </a>
-
-          <!-- Right Wide Black + Neon Cobalt Blue Flagship Banner -->
           <div class="nv-hero-flagship">
-            <div class="nv-ribbon-seal" aria-label="Best Seller 40% Off">
-              <small>BEST</small>
-              <strong>40%</strong>
+            <div class="nv-ribbon-seal" aria-label="Discount Offer Up to 30% Off">
+              <small>SAVE UP TO</small>
+              <strong>30%</strong>
               <small>OFF</small>
             </div>
 
             <div>
-              <h1 class="nv-flagship-title">iPhone 16 Pro Max</h1>
-              <p class="nv-flagship-sub">
-                Grade 5 Titanium build, A18 Pro chip &amp; 5x Telephoto camera. Factory sealed with verified warranty and instant checkout.
+              <div class="nv-hero-kicker">★ Logitech Official Workspace Deal</div>
+              <h1 class="nv-flagship-title">Logitech MX Keyboard &amp; Mouse</h1>
+              <p class="nv-flagship-sub" style="max-width:440px;">
+                Smart illuminated MX Keys S &amp; 8,000 DPI Quiet-Click MX Master 3S wireless precision. Factory sealed with Logi Bolt + Bluetooth multi-device switching &amp; instant checkout.
               </p>
-              <a href="/gadget/apple-iphone-16-pro-max-256gb" class="nv-pill-btn">
-                <span>Shop Now</span>
-                <span class="nv-circle-arrow">→</span>
-              </a>
+
+              <div class="nv-hero-price-row">
+                <span class="nv-hero-price-now">From ₦92,000</span>
+                <span class="nv-hero-price-old">₦110,000</span>
+                <span class="nv-hero-save-badge">Save up to ₦30,000</span>
+              </div>
+
+              <div class="nv-hero-actions">
+                <a href="/gadget/shop?category=logitech" class="nv-pill-btn">
+                  <span>Shop Logitech Deals</span>
+                  <span class="nv-circle-arrow">→</span>
+                </a>
+                <a href="/gadget/logitech-mx-keys-s-wireless-keyboard" class="nv-hero-secondary-link">
+                  View MX Keys S
+                </a>
+                <a href="/gadget/logitech-mx-master-3s-wireless-mouse" class="nv-hero-secondary-link">
+                  View MX Master 3S
+                </a>
+              </div>
             </div>
 
             <div class="nv-flagship-visual">
-              <img src="/images/gadgets/phone-flagship-titanium.jpg" alt="iPhone 16 Pro Max Flagship Smartphone">
+              <div class="nv-hero-dual-media">
+                <a href="/gadget/logitech-mx-keys-s-wireless-keyboard" class="nv-hero-media-tile">
+                  <img src="/images/gadgets/logitech-mx-keyboard.jpg" alt="Logitech MX Keys S Wireless Illuminated Keyboard">
+                  <div class="nv-hero-media-caption">
+                    Logitech MX Keys S
+                    <span>₦185,000 · Save ₦30,000</span>
+                  </div>
+                </a>
+                <a href="/gadget/logitech-mx-master-3s-wireless-mouse" class="nv-hero-media-tile">
+                  <img src="/images/gadgets/logitech-mx-mouse.jpg" alt="Logitech MX Master 3S Wireless Performance Mouse">
+                  <div class="nv-hero-media-caption">
+                    MX Master 3S Mouse
+                    <span>₦168,000 · Save ₦27,000</span>
+                  </div>
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -165,15 +182,13 @@
       <div class="nv-container">
         <div class="nv-sec-head">
           <h2 class="nv-sec-title">Check Out Today's Great Deal</h2>
-          <button type="button" class="nv-see-all" data-jump-sort="discount">See All →</button>
+          <a href="/gadget/shop?sort=discount" class="nv-see-all">See All →</a>
         </div>
 
-        <!-- Row 1: 4 Minimalist Cards (2nd card features highlighted orange cart icon) -->
         <div class="nv-four-grid" id="nv-deals-row1">
           <!-- Populated by gadget-store.js -->
         </div>
 
-        <!-- Mid-Page Deep Violet/Indigo Countdown Banner -->
         <div class="nv-countdown-banner">
           <div>
             <h2 class="nv-cd-title">
@@ -182,10 +197,10 @@
             <p class="nv-cd-sub">
               Limited-time drop across ANC headphones, Logitech MX desk gear, laptops, Bluetooth speakers &amp; fast-charging hubs.
             </p>
-            <button type="button" class="nv-pill-btn" data-jump-sort="discount">
+            <a href="/gadget/shop?sort=discount" class="nv-pill-btn">
               <span>Shop Now</span>
               <span class="nv-circle-arrow">→</span>
-            </button>
+            </a>
 
             <div class="nv-timer-panel" aria-label="Flash sale countdown timer">
               <div class="nv-timer-kicker">Offer ends in:</div>
@@ -218,7 +233,6 @@
           </div>
         </div>
 
-        <!-- Row 2: 4 More Great Deal Cards -->
         <div class="nv-four-grid" id="nv-deals-row2">
           <!-- Populated by gadget-store.js -->
         </div>
@@ -241,7 +255,7 @@
           </div>
 
           <div class="nv-discover-center">
-            <h2 class="nv-discover-title">Discover Cool Innovations with DevicePro!</h2>
+            <h2 class="nv-discover-title">Discover Cool Innovations with DEVICE PRO!</h2>
             <p class="nv-discover-sub">
               Search smartphones, ultrabooks, Logitech keyboards &amp; mice, 4K monitors, wireless printers, speakers and GaN chargers — all in one store.
             </p>
@@ -281,10 +295,10 @@
           </div>
 
           <div class="nv-arrivals-foot">
-            <button type="button" class="nv-pill-btn solid-orange" data-jump-cat="all">
+            <a href="/gadget/shop" class="nv-pill-btn solid-orange">
               <span>Explore All</span>
               <span class="nv-circle-arrow">→</span>
-            </button>
+            </a>
 
             <div style="display:flex; align-items:center; gap:14px;">
               <div class="nv-dots" aria-label="Carousel pages">
@@ -314,10 +328,10 @@
             <p class="nv-ess-sub">
               Upgrade your workstation with Logitech MX keyboards, precision mice, 4K USB-C monitors &amp; wireless office printers.
             </p>
-            <button type="button" class="nv-pill-btn" data-jump-cat="logitech">
+            <a href="/gadget/shop?category=logitech" class="nv-pill-btn">
               <span>Shop Tech Gear</span>
               <span class="nv-circle-arrow">→</span>
-            </button>
+            </a>
           </div>
 
           <div class="nv-ess-right">
@@ -337,7 +351,6 @@
     <section class="nv-section" id="nv-bestselling-section" aria-label="Explore Best Selling Products">
       <div class="nv-container">
         <div class="nv-bs-bento">
-          <!-- Row 1: Vibrant Sky-Blue MEGA SALE Card + Soft Gray Intro Banner -->
           <div class="nv-bs-row1">
             <a href="/gadget/samsung-galaxy-s25-ultra-5g" class="nv-mega-blue-card">
               <div>
@@ -353,13 +366,12 @@
                 <p>
                   Our highest-rated smartphones, laptops, powerbanks &amp; accessories — factory sealed with direct Paystack &amp; Bank Transfer checkout.
                 </p>
-                <button type="button" class="nv-see-all" data-jump-cat="all">See All →</button>
+                <a href="/gadget/shop" class="nv-see-all">See All →</a>
               </div>
               <img src="/images/gadgets/laptop-ultrabook-silver.jpg" alt="Best Selling Laptops & Tech">
             </div>
           </div>
 
-          <!-- Row 2: Vibrant Tangerine Orange Promo Card + 3 Best Selling Cards -->
           <div class="nv-bs-row2" id="nv-bestselling-row2">
             <!-- Populated by gadget-store.js -->
           </div>
@@ -368,78 +380,147 @@
     </section>
 
     <!-- =======================================================================
-         9. INTERACTIVE FULL CATALOGUE EXPLORER (ALL 28 GADGETS + FILTERS)
+         9. BROWSE ALL GADGETS PREVIEW (4 FEATURED ITEMS -> /gadget/shop)
          ======================================================================= -->
-    <section class="nv-explorer-section" id="nv-explorer-section" aria-label="Full Gadget Catalogue">
+    <section class="nv-explorer-section" id="nv-explorer-section" aria-label="Browse All Gadgets Preview">
       <div class="nv-container">
         <div class="nv-explorer-box">
           <div class="nv-explorer-top">
             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-              <h2 class="nv-sec-title" id="nv-explorer-title">Browse All Gadgets</h2>
-              <span class="nv-count-badge" id="nv-explorer-count">28 items</span>
+              <h2 class="nv-sec-title">Browse All Gadgets</h2>
+              <span class="nv-count-badge">4 of 28 featured</span>
             </div>
 
-            <div class="nv-explorer-controls">
-              <select id="nv-price-select" class="nv-select" aria-label="Filter by price">
-                <option value="all">All Prices</option>
-                <option value="under-150k">Under ₦150,000</option>
-                <option value="150k-400k">₦150,000 – ₦400,000</option>
-                <option value="400k-1m">₦400,000 – ₦1,000,000</option>
-                <option value="over-1m">Above ₦1,000,000</option>
-              </select>
-
-              <select id="nv-sort-select" class="nv-select" aria-label="Sort products">
-                <option value="featured">Sort: Featured</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="rating">Top Rated</option>
-                <option value="discount">Biggest Savings</option>
-              </select>
-
-              <button type="button" class="nv-brand-chip" id="nv-reset-filters-btn"
-                style="display:none; border-color:#DC2626; color:#DC2626;">✕ Reset</button>
-            </div>
+            <a href="/gadget/shop" class="nv-see-all" style="font-size:0.86rem;">
+              View All 28 Products →
+            </a>
           </div>
 
-          <div class="nv-brand-row" id="nv-brand-row"></div>
-          <div class="nv-four-grid" id="nv-explorer-grid"></div>
+          <!-- Strictly 4 Featured Items Preview -->
+          <div class="nv-four-grid" id="nv-explorer-preview-grid">
+            <!-- Populated by gadget-store.js (4 items only) -->
+          </div>
+
+          <div class="nv-explorer-foot-cta">
+            <p class="nv-explorer-foot-note">
+              Looking for more? Filter all 28 original gadgets by category, brand, or price range on our full product listing page.
+            </p>
+            <a href="/gadget/shop" class="nv-pill-btn solid-orange">
+              <span>Browse Full Catalogue (28 Items)</span>
+              <span class="nv-circle-arrow">→</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- =======================================================================
-         10. TRUSTED PARTNERS WORLDWIDE
+         10. TRUSTED PARTNERS WORLDWIDE (WITH OFFICIAL BRAND LOGOS)
          ======================================================================= -->
     <section class="nv-partners-section" aria-label="Trusted Partners Worldwide">
       <div class="nv-container">
         <h2 class="nv-partners-title">Trusted Partners Worldwide</h2>
         <p class="nv-partners-sub">Original factory-sealed hardware supplied directly from the world's most trusted tech brands.</p>
+
         <div class="nv-partners-row">
-          <button type="button" class="nv-partner-btn" data-partner-brand="Apple"> Apple</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="Logitech">logitech</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="Samsung">SAMSUNG</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="Dell">DELL</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="HP">HP</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="Sony">SONY</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="Anker">ANKER</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="JBL">JBL</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="LG">LG</button>
-          <button type="button" class="nv-partner-btn" data-partner-brand="Epson">EPSON</button>
+          <!-- Apple -->
+          <a href="/gadget/shop?brand=Apple" class="nv-partner-btn" aria-label="Shop Apple products">
+            <svg viewBox="0 0 110 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Apple">
+              <path d="M22.2 17.8c0-3.2 2.6-4.8 2.7-4.9-1.5-2.2-3.8-2.5-4.6-2.5-1.9-.2-3.8 1.2-4.8 1.2-1 0-2.5-1.1-4.1-1.1-2.1 0-4.1 1.2-5.2 3.1-2.2 3.9-.6 9.6 1.6 12.7 1.1 1.5 2.3 3.2 4 3.2 1.6-.1 2.2-1 4.2-1 1.9 0 2.5 1 4.2 1 1.7 0 2.8-1.6 3.9-3.1 1.2-1.8 1.7-3.5 1.8-3.6-.1-.1-3.7-1.4-3.7-5zM19.1 8.5c.9-1.1 1.5-2.6 1.3-4.1-1.3.1-2.9.9-3.8 1.9-.8.9-1.5 2.5-1.3 4 1.4.1 2.9-.7 3.8-1.8z" fill="#111111"/>
+              <text x="34" y="24" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="18" font-weight="700" fill="#111111" letter-spacing="-0.4">Apple</text>
+            </svg>
+          </a>
+
+          <!-- Logitech -->
+          <a href="/gadget/shop?brand=Logitech" class="nv-partner-btn" aria-label="Shop Logitech products">
+            <svg viewBox="0 0 132 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logitech">
+              <circle cx="14" cy="17" r="10" fill="none" stroke="#00B8FC" stroke-width="3.2"/>
+              <circle cx="14" cy="17" r="3.4" fill="#111111"/>
+              <text x="30" y="23.5" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="19" font-weight="800" fill="#111111" letter-spacing="-0.6">logitech</text>
+            </svg>
+          </a>
+
+          <!-- Samsung -->
+          <a href="/gadget/shop?brand=Samsung" class="nv-partner-btn" aria-label="Shop Samsung products">
+            <svg viewBox="0 0 136 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Samsung">
+              <ellipse cx="68" cy="17" rx="60" ry="13.5" fill="#1428A0" transform="rotate(-4 68 17)"/>
+              <text x="68" y="22" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="900" fill="#FFFFFF" letter-spacing="2.2">SAMSUNG</text>
+            </svg>
+          </a>
+
+          <!-- Dell -->
+          <a href="/gadget/shop?brand=Dell" class="nv-partner-btn" aria-label="Shop Dell products">
+            <svg viewBox="0 0 100 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dell">
+              <circle cx="18" cy="17" r="13.5" fill="none" stroke="#007DB8" stroke-width="2.4"/>
+              <text x="18" y="21.5" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="11.5" font-weight="900" fill="#007DB8">D</text>
+              <text x="39" y="23.5" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="900" fill="#007DB8" letter-spacing="0.8">DELL</text>
+            </svg>
+          </a>
+
+          <!-- HP -->
+          <a href="/gadget/shop?brand=HP" class="nv-partner-btn" aria-label="Shop HP products">
+            <svg viewBox="0 0 92 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="HP">
+              <circle cx="46" cy="17" r="15" fill="#0096D6"/>
+              <text x="46" y="23.5" text-anchor="middle" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="18" font-weight="900" font-style="italic" fill="#FFFFFF" letter-spacing="-0.5">hp</text>
+            </svg>
+          </a>
+
+          <!-- Sony -->
+          <a href="/gadget/shop?brand=Sony" class="nv-partner-btn" aria-label="Shop Sony products">
+            <svg viewBox="0 0 116 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sony">
+              <text x="58" y="24" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="700" fill="#111111" letter-spacing="3.5">SONY</text>
+            </svg>
+          </a>
+
+          <!-- Anker -->
+          <a href="/gadget/shop?brand=Anker" class="nv-partner-btn" aria-label="Shop Anker products">
+            <svg viewBox="0 0 124 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Anker">
+              <polygon points="18,6 10,28 15,28 19,16 23,28 28,28" fill="#00A9E0"/>
+              <polygon points="18,17 15,22 21,22" fill="#FFFFFF"/>
+              <text x="32" y="24" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="18.5" font-weight="900" fill="#00A9E0" letter-spacing="1.6">NKER</text>
+            </svg>
+          </a>
+
+          <!-- JBL -->
+          <a href="/gadget/shop?brand=JBL" class="nv-partner-btn" aria-label="Shop JBL products">
+            <svg viewBox="0 0 96 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="JBL">
+              <rect x="18" y="3" width="60" height="28" rx="6" fill="#FF3300"/>
+              <polygon points="48,6.5 45.5,11.5 50.5,11.5" fill="#FFFFFF"/>
+              <text x="48" y="26.5" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="900" fill="#FFFFFF" letter-spacing="1.2">JBL</text>
+            </svg>
+          </a>
+
+          <!-- LG -->
+          <a href="/gadget/shop?brand=LG" class="nv-partner-btn" aria-label="Shop LG products">
+            <svg viewBox="0 0 94 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LG">
+              <circle cx="24" cy="17" r="13.5" fill="#A50034"/>
+              <path d="M24 9.5v11.5h6.5" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"/>
+              <circle cx="19.5" cy="13.5" r="1.6" fill="#FFFFFF"/>
+              <path d="M31.5 17a7.5 7.5 0 1 1-7.5-7.5" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+              <text x="45" y="24" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="20" font-weight="800" fill="#4B5563" letter-spacing="0.5">LG</text>
+            </svg>
+          </a>
+
+          <!-- Epson -->
+          <a href="/gadget/shop?brand=Epson" class="nv-partner-btn" aria-label="Shop Epson products">
+            <svg viewBox="0 0 124 34" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Epson">
+              <text x="62" y="24" text-anchor="middle" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="20" font-weight="900" fill="#003399" letter-spacing="2.2">EPSON</text>
+            </svg>
+          </a>
         </div>
       </div>
     </section>
   </main>
 
   <!-- =========================================================================
-       11. MATTE BLACK (#111111) 5-COLUMN FOOTER (EXACT REFERENCE FOOTER)
+       11. MATTE BLACK (#111111) 5-COLUMN FOOTER (ORIGINAL DEVICE PRO LOGO)
        ========================================================================= -->
   <footer class="nv-footer">
     <div class="nv-container">
       <div class="nv-footer-top">
         <div>
-          <a href="/gadget" class="nv-footer-brand">
-            <span class="nv-brand-mark">D</span>
-            <span>devicepro<span style="color:#FF6B00;">.</span></span>
+          <a href="/gadget" class="nv-footer-logo-wrap" aria-label="DEVICE PRO Gadgets Home">
+            <img src="/images/logo.svg" alt="DEVICE PRO">
           </a>
           <p class="nv-footer-bio">
             Your destination for authentic smartphones, laptops, Logitech desk setups, speakers, printers, monitors &amp; fast-charging gear — backed by nationwide delivery and unified checkout.
@@ -466,21 +547,22 @@
         <div class="nv-footer-col">
           <h4>Shop Gadgets</h4>
           <ul>
-            <li><a href="#nv-explorer-section" data-jump-cat="smartphones">Smartphones</a></li>
-            <li><a href="#nv-explorer-section" data-jump-cat="laptops">Laptops &amp; Ultrabooks</a></li>
-            <li><a href="#nv-explorer-section" data-jump-cat="logitech">Logitech Gear</a></li>
-            <li><a href="#nv-explorer-section" data-jump-cat="powerbanks">Powerbanks</a></li>
-            <li><a href="#nv-explorer-section" data-jump-cat="speakers">Bluetooth Speakers</a></li>
+            <li><a href="/gadget/shop?category=smartphones">Smartphones</a></li>
+            <li><a href="/gadget/shop?category=laptops">Laptops &amp; Ultrabooks</a></li>
+            <li><a href="/gadget/shop?category=logitech">Logitech Gear</a></li>
+            <li><a href="/gadget/shop?category=powerbanks">Powerbanks</a></li>
+            <li><a href="/gadget/shop?category=speakers">Bluetooth Speakers</a></li>
           </ul>
         </div>
 
         <div class="nv-footer-col">
           <h4>Office &amp; Audio</h4>
           <ul>
-            <li><a href="#nv-explorer-section" data-jump-cat="monitors">4K &amp; Gaming Monitors</a></li>
-            <li><a href="#nv-explorer-section" data-jump-cat="printers">Wireless Printers</a></li>
-            <li><a href="#nv-explorer-section" data-jump-cat="audio">ANC Headphones</a></li>
-            <li><a href="#nv-explorer-section" data-jump-cat="accessories">GaN Chargers &amp; SSDs</a></li>
+            <li><a href="/gadget/shop?category=monitors">4K &amp; Gaming Monitors</a></li>
+            <li><a href="/gadget/shop?category=printers">Wireless Printers</a></li>
+            <li><a href="/gadget/shop?category=audio">ANC Headphones</a></li>
+            <li><a href="/gadget/shop?category=accessories">GaN Chargers &amp; SSDs</a></li>
+            <li><a href="/gadget/shop">All 28 Gadgets →</a></li>
           </ul>
         </div>
 
@@ -563,7 +645,7 @@
     </div>
     <div class="drawer-body" style="display:flex; flex-direction:column; gap:10px;">
       <a href="/gadget" style="padding:10px 12px; border-radius:8px; background:#FFF3EB; color:#FF6B00; font-weight:700;">Gadgets Storefront</a>
-      <a href="#nv-explorer-section" data-mobile-close style="padding:10px 12px; border-radius:8px; background:#F7F7F7; font-weight:600;">Browse All 28 Gadgets</a>
+      <a href="/gadget/shop" style="padding:10px 12px; border-radius:8px; background:#F7F7F7; font-weight:600;">Browse All 28 Gadgets →</a>
       <a href="/checkout" style="padding:10px 12px; border-radius:8px; background:#FF6B00; color:#FFFFFF; font-weight:700; text-align:center;">Proceed to Checkout →</a>
       <hr style="border:none; border-top:1px solid #EBEBEB; margin:6px 0;">
       <a href="/" style="padding:8px 12px; font-weight:600; color:#525252;">Main Solar Home</a>
@@ -579,6 +661,6 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/gadget-catalog.js?v=1"></script>
-  <script src="/js/gadget-store.js?v=5"></script>
+  <script src="/js/gadget-store.js?v=6"></script>
 </body>
 </html>

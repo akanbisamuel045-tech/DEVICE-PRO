@@ -139,6 +139,28 @@ button {
   color: var(--ink-black);
 }
 
+.nv-brand-logo {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.nv-footer-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  background: #FFFFFF;
+  padding: 6px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.nv-footer-logo-wrap img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
 .nv-brand-mark {
   width: 24px;
   height: 24px;
@@ -385,7 +407,7 @@ button {
 }
 
 /* =============================================================================
-   2. HERO SPLIT (LEFT DEEP CRIMSON VERTICAL + RIGHT BLACK/ELECTRIC-BLUE FLAGSHIP)
+   2. FULL-WIDTH HERO BANNER (LOGITECH KEYBOARD & MOUSE DISCOUNT SHOWCASE)
    ============================================================================= */
 .nv-hero-section {
   padding: 16px 0 32px;
@@ -393,80 +415,140 @@ button {
 
 .nv-hero-grid {
   display: grid;
-  grid-template-columns: 245px 1fr;
+  grid-template-columns: 1fr;
   gap: 14px;
 }
 
-/* Left Vertical Crimson/Burgundy Promo Card (Exact Match to Image!) */
-.nv-hero-crimson {
-  border-radius: var(--radius-md);
-  background:
-    radial-gradient(circle at 50% 72%, rgba(255, 138, 0, 0.42) 0%, transparent 56%),
-    linear-gradient(175deg, #6E100C 0%, #4A0808 58%, #290303 100%);
-  padding: 22px 18px 16px;
-  color: #FFFFFF;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.22s ease;
-}
-
-.nv-hero-crimson:hover {
-  transform: translateY(-3px);
-}
-
-.nv-crimson-kicker {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 6px;
-}
-
-.nv-crimson-pct {
-  font-size: 1.5rem;
-  font-weight: 800;
-  line-height: 1.15;
-  margin-bottom: 6px;
-}
-
-.nv-crimson-pct span {
-  color: #FF8C1A;
-}
-
-.nv-crimson-sub {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.72);
-  margin-bottom: 12px;
-}
-
-.nv-hero-crimson img {
-  width: 100%;
-  height: 165px;
-  object-fit: contain;
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 12px;
-  padding: 10px;
-}
-
-/* Right Wide Black + Neon Cobalt Blue Flagship Banner (Exact Match to Image!) */
+/* Full-Width Black + Neon Cobalt Blue Flagship Banner */
 .nv-hero-flagship {
   border-radius: var(--radius-md);
   background:
     radial-gradient(circle at 72% 48%, rgba(0, 128, 255, 0.62) 0%, transparent 48%),
     radial-gradient(circle at 52% 88%, rgba(0, 72, 255, 0.35) 0%, transparent 45%),
     linear-gradient(115deg, #020408 0%, #061021 55%, #031B3E 100%);
-  padding: 36px 40px;
+  padding: 38px 46px;
   color: #FFFFFF;
   display: grid;
-  grid-template-columns: 0.95fr 1.05fr;
+  grid-template-columns: 1fr 1.05fr;
   align-items: center;
-  gap: 20px;
+  gap: 28px;
   position: relative;
   overflow: hidden;
-  min-height: 325px;
+  min-height: 350px;
+}
+
+.nv-hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 107, 0, 0.18);
+  border: 1px solid rgba(255, 107, 0, 0.45);
+  color: #FF8C3A;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+}
+
+.nv-hero-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.nv-hero-price-now {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.nv-hero-price-old {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.52);
+  text-decoration: line-through;
+}
+
+.nv-hero-save-badge {
+  background: var(--accent-orange);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.nv-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nv-hero-secondary-link {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition: all 0.18s ease;
+}
+
+.nv-hero-secondary-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.nv-hero-dual-media {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 14px;
+  align-items: center;
+  width: 100%;
+  padding-right: 46px;
+}
+
+.nv-hero-media-tile {
+  background: rgba(255, 255, 255, 0.97);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.48);
+  transition: transform 0.25s ease;
+}
+
+.nv-hero-media-tile:hover {
+  transform: translateY(-4px);
+}
+
+.nv-hero-media-tile img {
+  width: 100%;
+  height: 185px;
+  object-fit: contain;
+}
+
+.nv-hero-media-caption {
+  margin-top: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #111111;
+  text-align: center;
+}
+
+.nv-hero-media-caption span {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent-orange);
 }
 
 /* Red & Gold Award Ribbon Seal (Top-Right Exact Match!) */
@@ -1471,30 +1553,114 @@ button {
 }
 
 .nv-partners-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .nv-partner-btn {
   background: var(--bg-tile);
   border: 1px solid #EFEFEF;
   border-radius: 12px;
-  padding: 13px 22px;
-  font-size: 0.88rem;
-  font-weight: 800;
+  padding: 14px 16px;
+  min-height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   color: var(--ink-black);
   cursor: pointer;
   transition: all 0.18s ease;
 }
 
+.nv-partner-btn svg {
+  max-width: 112px;
+  max-height: 32px;
+  width: auto;
+  height: auto;
+  display: block;
+}
+
 .nv-partner-btn:hover {
   background: #FFFFFF;
   border-color: var(--accent-orange);
-  color: var(--accent-orange);
   transform: translateY(-2px);
   box-shadow: var(--shadow-soft);
+}
+
+/* Dedicated Product Listing Page (/gadget/shop) & Preview Footer CTA */
+.nv-explorer-foot-cta {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.nv-explorer-foot-note {
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.nv-shop-hero {
+  padding: 24px 0 18px;
+  border-bottom: 1px solid var(--border-light);
+  background: #FAFAFA;
+}
+
+.nv-shop-hero-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.nv-shop-title {
+  font-size: clamp(1.5rem, 2.5vw, 2.05rem);
+  font-weight: 800;
+  color: var(--ink-black);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.nv-shop-sub {
+  font-size: 0.84rem;
+  color: var(--ink-muted);
+}
+
+.nv-cat-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.nv-cat-pill {
+  background: #FFFFFF;
+  border: 1px solid var(--border-med);
+  color: #374151;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.nv-cat-pill:hover {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+.nv-cat-pill.active {
+  background: var(--accent-orange);
+  border-color: var(--accent-orange);
+  color: #FFFFFF;
 }
 
 /* =============================================================================
@@ -2397,6 +2563,12 @@ button {
   .nv-arrivals-float {
     max-width: 100%;
   }
+  .nv-hero-dual-media {
+    padding-right: 0;
+  }
+  .nv-partners-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 600px) {
@@ -2408,10 +2580,24 @@ button {
   .nv-cat-btn span {
     display: none;
   }
+  .nv-brand-logo {
+    height: 28px;
+  }
   .nv-hero-flagship,
   .nv-countdown-banner,
   .nv-essentials-banner {
     padding: 22px 18px;
+  }
+  .nv-hero-dual-media {
+    padding-right: 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .nv-hero-media-tile img {
+    height: 120px;
+  }
+  .nv-partners-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .nv-ribbon-seal {
     width: 62px;

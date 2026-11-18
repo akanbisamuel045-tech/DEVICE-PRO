@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Gadgets &amp; Tech Catalogue | DEVICE PRO Nigeria</title>
+  <meta name="description" content="Browse all 28 original smartphones, laptops, Logitech keyboards & mice, powerbanks, Bluetooth speakers, 4K monitors, wireless printers and accessories at DEVICE PRO.">
+  <meta property="og:title" content="All Gadgets & Tech Catalogue | DEVICE PRO Nigeria">
+  <meta property="og:description" content="Filter all 28 factory-sealed gadgets by category, brand, or price range with instant Paystack & Bank Transfer checkout.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://device-pro.vercel.app/gadget/shop">
+  <link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/gadget.css?v=6">
+</head>
+<body class="nuvio-gadget-body">
+  <a href="#main-content" class="skip-to-content">Skip to content</a>
+
+  <!-- =========================================================================
+       MATCHING TWO-ROW CLEAN WHITE HEADER (ORIGINAL DEVICE PRO LOGO)
+       ========================================================================= -->
+  <header class="nv-header">
+    <div class="nv-header-top">
+      <div class="nv-container">
+        <div class="nv-top-inner">
+          <nav class="nv-top-links" aria-label="Primary navigation">
+            <a href="/" class="nv-top-link">Home</a>
+            <a href="/gadget" class="nv-top-link">Gadgets</a>
+            <a href="/gadget/shop" class="nv-top-link" style="color:#FF6B00; font-weight:700;">Shop All</a>
+            <a href="/products" class="nv-top-link">Solar Store</a>
+            <a href="/contact" class="nv-top-link">Contact</a>
+          </nav>
+
+          <a href="/gadget" class="nv-brand-center" aria-label="DEVICE PRO Gadgets Home">
+            <img src="/images/logo.svg" alt="DEVICE PRO" class="nv-brand-logo">
+          </a>
+
+          <div class="nv-top-right">
+            <a href="/login" class="nv-user-btn" aria-label="Account">
+              <span class="nv-avatar-circle" aria-hidden="true">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </span>
+              <span class="nv-label">Account</span>
+            </a>
+
+            <button type="button" class="nv-cart-btn" data-trigger-cart aria-label="Open Cart">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+              <span class="nv-label">Cart</span>
+              <span class="cart-badge">0</span>
+            </button>
+
+            <button type="button" class="nv-mobile-toggle" id="mobile-menu-btn" aria-label="Open Menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nv-header-bar">
+      <div class="nv-container">
+        <div class="nv-bar-inner">
+          <a href="/gadget" class="nv-cat-btn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span>Gadgets Home</span>
+          </a>
+
+          <form class="nv-search-form" id="nv-shop-search-form" role="search">
+            <input type="search" id="nv-shop-search-input" placeholder="Search phones, laptops, Logitech, speakers, printers..." aria-label="Search all gadgets">
+            <button type="submit" aria-label="Search">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+          </form>
+
+          <div class="nv-bar-pills">
+            <button type="button" class="nv-bar-pill" data-quick-cat="logitech">Logitech</button>
+            <button type="button" class="nv-bar-pill" data-quick-cat="laptops">Laptops</button>
+            <button type="button" class="nv-bar-pill orange-pill" data-quick-sort="discount">Hot Deals</button>
+            <a href="/checkout" class="nv-bar-pill">Checkout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Listing Header Band -->
+    <section class="nv-shop-hero" aria-label="Catalogue Header">
+      <div class="nv-container">
+        <nav class="nv-breadcrumbs" aria-label="Breadcrumb" style="margin-bottom:10px;">
+          <a href="/gadget">Gadgets</a>
+          <span>/</span>
+          <span style="color:#111111; font-weight:600;" id="nv-shop-bc-label">All Products</span>
+        </nav>
+
+        <div class="nv-shop-hero-inner">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <h1 class="nv-shop-title" id="nv-shop-title">All Gadgets &amp; Tech</h1>
+              <span class="nv-count-badge" id="nv-shop-count">28 items</span>
+            </div>
+            <p class="nv-shop-sub">Factory-sealed original tech with warranty &amp; unified Paystack / Bank Transfer checkout.</p>
+          </div>
+
+          <div class="nv-explorer-controls">
+            <select id="nv-shop-price" class="nv-select" aria-label="Filter by price">
+              <option value="all">All Prices</option>
+              <option value="under-150k">Under ₦150,000</option>
+              <option value="150k-400k">₦150,000 – ₦400,000</option>
+              <option value="400k-1m">₦400,000 – ₦1,000,000</option>
+              <option value="over-1m">Above ₦1,000,000</option>
+            </select>
+
+            <select id="nv-shop-sort" class="nv-select" aria-label="Sort products">
+              <option value="featured">Sort: Featured</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+              <option value="rating">Top Rated</option>
+              <option value="discount">Biggest Savings</option>
+            </select>
+
+            <button type="button" class="nv-brand-chip" id="nv-shop-reset"
+              style="display:none; border-color:#DC2626; color:#DC2626;">✕ Reset Filters</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Full Filterable Product Grid -->
+    <section class="nv-section" style="padding-top:22px; padding-bottom:54px;" aria-label="Product Listing">
+      <div class="nv-container">
+        <!-- Category Filter Pills -->
+        <div class="nv-cat-pills" id="nv-shop-cat-pills" role="tablist" aria-label="Filter by category"></div>
+
+        <!-- Brand Filter Chips -->
+        <div class="nv-brand-row" id="nv-shop-brand-row" aria-label="Filter by brand"></div>
+
+        <!-- Product Cards Grid -->
+        <div class="nv-four-grid" id="nv-shop-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Matte Black Footer (Original DEVICE PRO Logo) -->
+  <footer class="nv-footer">
+    <div class="nv-container">
+      <div class="nv-footer-bottom" style="padding-top:0;">
+        <a href="/gadget" class="nv-footer-logo-wrap" style="margin:0;" aria-label="DEVICE PRO Gadgets Home">
+          <img src="/images/logo.svg" alt="DEVICE PRO">
+        </a>
+        <div class="nv-pay-row">
+          <span class="nv-pay-tag">Paystack</span>
+          <span class="nv-pay-tag">VISA</span>
+          <span class="nv-pay-tag">Mastercard</span>
+          <span class="nv-pay-tag">Bank Transfer</span>
+        </div>
+        <div>© 2026 DEVICE PRO Gadgets Nigeria.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Shared Cart Drawer, Mobile Drawer & Toasts -->
+  <div class="modal-backdrop" id="modal-backdrop"></div>
+
+  <aside class="drawer" id="cart-drawer" aria-hidden="true" aria-labelledby="cart-drawer-title" role="dialog" aria-modal="true">
+    <div class="drawer-header">
+      <h2 id="cart-drawer-title">Your Shopping Cart</h2>
+      <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close cart">✕</button>
+    </div>
+    <div class="drawer-body" id="cart-drawer-body"></div>
+    <div class="drawer-footer">
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span>
+        <span id="cart-subtotal-val">₦0</span>
+      </div>
+      <button type="button" class="btn-checkout-submit" id="btn-cart-checkout" disabled>
+        Proceed to Checkout →
+      </button>
+    </div>
+  </aside>
+
+  <aside class="drawer" id="mobile-nav-drawer" aria-hidden="true" aria-label="Mobile Navigation" role="dialog" aria-modal="true">
+    <div class="drawer-header">
+      <h2>Menu</h2>
+      <button type="button" class="modal-close-btn" id="mobile-nav-close" aria-label="Close menu">✕</button>
+    </div>
+    <div class="drawer-body" style="display:flex; flex-direction:column; gap:10px;">
+      <a href="/gadget" style="padding:10px 12px; border-radius:8px; background:#F7F7F7; font-weight:600;">← Gadgets Home</a>
+      <a href="/gadget/shop" style="padding:10px 12px; border-radius:8px; background:#FFF3EB; color:#FF6B00; font-weight:700;">All 28 Gadgets</a>
+      <a href="/checkout" style="padding:10px 12px; border-radius:8px; background:#FF6B00; color:#FFFFFF; font-weight:700; text-align:center;">Proceed to Checkout →</a>
+      <hr style="border:none; border-top:1px solid #EBEBEB; margin:6px 0;">
+      <a href="/" style="padding:8px 12px; font-weight:600; color:#525252;">Main Solar Home</a>
+      <a href="/products" style="padding:8px 12px; font-weight:600; color:#525252;">Solar Equipment</a>
+      <a href="/login" style="padding:8px 12px; font-weight:600; color:#525252;">Account Login</a>
+      <a href="/contact" style="padding:8px 12px; font-weight:600; color:#525252;">Contact Support</a>
+    </div>
+  </aside>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <script src="/js/cart.js?v=3"></script>
+  <script src="/js/gadget-catalog.js?v=1"></script>
+  <script src="/js/gadget-shop.js?v=1"></script>
+</body>
+</html>

@@ -53,7 +53,7 @@
     const bcName = document.getElementById('nv-bc-name');
     if (bcCat) {
       bcCat.textContent = product.categoryLabel;
-      bcCat.href = `/gadget?category=${encodeURIComponent(product.category)}`;
+      bcCat.href = `/gadget/shop?category=${encodeURIComponent(product.category)}`;
     }
     if (bcName) bcName.textContent = product.name;
 

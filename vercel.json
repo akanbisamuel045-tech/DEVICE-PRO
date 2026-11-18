@@ -87,6 +87,18 @@
       "destination": "/gadget.html"
     },
     {
+      "source": "/gadget/shop",
+      "destination": "/gadget-shop.html"
+    },
+    {
+      "source": "/gadgets/shop",
+      "destination": "/gadget-shop.html"
+    },
+    {
+      "source": "/gadget-shop",
+      "destination": "/gadget-shop.html"
+    },
+    {
       "source": "/gadget-detail",
       "destination": "/gadget-detail.html"
     },
