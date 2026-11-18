@@ -1516,3 +1516,29 @@ body.calculator-page-body {
   }
 }
 
+
+@media (max-width: 600px) {
+  .products-header-actions .header-circle-btn {
+    width: 34px;
+    height: 34px;
+  }
+  .products-header-actions .mobile-nav-toggle,
+  .products-header-actions .mobile-menu-trigger {
+    width: 34px;
+    height: 34px;
+    padding: 4px;
+  }
+}
+
+@media (max-width: 380px) {
+  .products-header-actions .header-circle-btn {
+    width: 31px;
+    height: 31px;
+  }
+  .products-header-actions .mobile-nav-toggle,
+  .products-header-actions .mobile-menu-trigger {
+    width: 31px;
+    height: 31px;
+    padding: 3px;
+  }
+}

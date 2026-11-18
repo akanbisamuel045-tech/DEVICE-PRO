@@ -79,6 +79,26 @@
       "destination": "/black-friday-itel-500w.html"
     },
     {
+      "source": "/gadget",
+      "destination": "/gadget.html"
+    },
+    {
+      "source": "/gadgets",
+      "destination": "/gadget.html"
+    },
+    {
+      "source": "/gadget-detail",
+      "destination": "/gadget-detail.html"
+    },
+    {
+      "source": "/gadget/:slug",
+      "destination": "/gadget-detail.html"
+    },
+    {
+      "source": "/gadgets/:slug",
+      "destination": "/gadget-detail.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api"
     }

@@ -59,6 +59,24 @@ body.black-friday-page {
   position: relative;
 }
 
+@media (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 390px) {
+  html {
+    font-size: 12.5px;
+  }
+}
+
 /* =============================================================================
    1. CAMPAIGN TOP BAR & NAVIGATION
    ============================================================================= */

@@ -4089,6 +4089,7 @@ async function generateSitemapXml() {
     { loc: '/', priority: '1.0', changefreq: 'daily' },
     { loc: '/solutions', priority: '0.9', changefreq: 'weekly' },
     { loc: '/products', priority: '0.9', changefreq: 'daily' },
+    { loc: '/gadget', priority: '0.9', changefreq: 'daily' },
     { loc: '/packages', priority: '0.9', changefreq: 'weekly' },
     { loc: '/projects', priority: '0.8', changefreq: 'weekly' },
     { loc: '/calculator', priority: '0.8', changefreq: 'monthly' },
@@ -4242,6 +4243,8 @@ app.get(['/shipping-policy', '/shipping-policy.html'], (req, res) => safeSendFil
 app.get(['/black-friday', '/black-friday.html'], (req, res) => safeSendFile(res, 'public/black-friday.html'));
 app.get(['/black-friday-detail', '/black-friday-detail.html', '/black-friday/:id'], (req, res) => safeSendFile(res, 'public/black-friday-detail.html'));
 app.get(['/black-friday-itel-500w', '/black-friday-itel-450w', '/black-friday-itel-500w.html'], (req, res) => safeSendFile(res, 'public/black-friday-itel-500w.html'));
+app.get(['/gadget', '/gadget.html', '/gadgets', '/gadgets.html'], (req, res) => safeSendFile(res, 'public/gadget.html'));
+app.get(['/gadget-detail', '/gadget-detail.html', '/gadget/:slug', '/gadgets/:slug'], (req, res) => safeSendFile(res, 'public/gadget-detail.html'));
 app.get('/', (req, res) => safeSendFile(res, 'public/index.html'));
 
 // Fallback to homepage for other unknown routes

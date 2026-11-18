@@ -373,15 +373,52 @@ h6, .h6 {
   height: 96px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 992px) {
   .homepage-body .products-header-inner {
-    height: 80px;
+    height: 74px;
+    min-height: 74px;
   }
   .brand-logo-img,
   .homepage-body .brand-logo-img {
-    height: 67px;
-    max-height: 72px;
-    max-width: 300px;
+    height: 54px;
+    max-height: 58px;
+    max-width: 225px;
+  }
+}
+
+@media (max-width: 768px) {
+  .homepage-body .products-header-inner {
+    height: 66px;
+    min-height: 66px;
+  }
+  .brand-logo-img,
+  .homepage-body .brand-logo-img {
+    height: 44px;
+    max-height: 46px;
+    max-width: 185px;
+  }
+}
+
+@media (max-width: 600px) {
+  .homepage-body .products-header-inner {
+    height: 60px;
+    min-height: 60px;
+    gap: 8px;
+  }
+  .brand-logo-img,
+  .homepage-body .brand-logo-img {
+    height: 36px;
+    max-height: 38px;
+    max-width: 150px;
+  }
+}
+
+@media (max-width: 380px) {
+  .brand-logo-img,
+  .homepage-body .brand-logo-img {
+    height: 32px;
+    max-height: 34px;
+    max-width: 132px;
   }
 }
 
@@ -1763,23 +1800,7 @@ dialog::backdrop {
 }
 
 @media (max-width: 768px) {
-  .homepage-body .products-header-inner {
-  height: 96px;
-}
-
-@media (max-width: 600px) {
-  .homepage-body .products-header-inner {
-    height: 80px;
-  }
-  .brand-logo-img,
-  .homepage-body .brand-logo-img {
-    height: 67px;
-    max-height: 72px;
-    max-width: 300px;
-  }
-}
-
-.header-nav {
+  .header-nav {
     display: none;
   }
 
@@ -2348,5 +2369,64 @@ dialog::backdrop {
     min-width: 280px;
     flex: 0 0 280px;
     scroll-snap-align: start;
+  }
+}
+
+
+/* Mobile Viewport Scale & Hero Refinements (Prevents Over-Zoomed Feel) */
+@media (max-width: 600px) {
+  .layout-container {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .hero-solara-section {
+    min-height: auto;
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+    background-position: 72% center;
+  }
+  .sunfold-pill-badge {
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    margin-bottom: 1rem;
+    gap: 6px;
+  }
+  .hero-solara-title {
+    font-size: 1.95rem;
+    line-height: 1.15;
+    margin-bottom: 0.9rem;
+  }
+  .hero-solara-desc {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+  }
+  .hero-solara-btn {
+    padding: 6px 8px 6px 18px;
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+  .btn-circle-arrow {
+    width: 30px;
+    height: 30px;
+  }
+  .hero-solara-metrics {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 1rem 1.75rem;
+    margin-top: 2rem;
+    padding-top: 1.25rem;
+  }
+  .hero-metric-val {
+    font-size: 1.55rem;
+  }
+  .hero-metric-lbl {
+    font-size: 0.78rem;
+  }
+  .pkg-home-card,
+  .home-product-card {
+    min-width: 240px;
+    flex: 0 0 240px;
   }
 }
