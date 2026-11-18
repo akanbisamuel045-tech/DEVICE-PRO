@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gadgets &amp; Tech Store | DEVICE PRO Nigeria — Phones, Laptops, Logitech, Monitors &amp; Printers</title>
   <meta name="description"
-    content="Shop genuine factory-sealed smartphones, laptops, high-capacity powerbanks, Bluetooth speakers, 4K monitors, wireless printers, and official Logitech keyboards &amp; mice at DEVICE PRO Nigeria. Fast Lagos delivery &amp; secure Paystack checkout.">
+    content="Shop genuine factory-sealed smartphones, laptops, high-capacity powerbanks, Bluetooth speakers, 4K monitors, wireless printers, and official Logitech keyboards &amp; mice at DEVICE PRO Nigeria. Unified secure Paystack checkout.">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/images/logo-mark.svg">
@@ -17,143 +17,125 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
     rel="stylesheet">
 
-  <!-- DEVICE PRO Core & Gadget Storefront Stylesheets -->
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="/css/tokens.css?v=18">
   <link rel="stylesheet" href="/css/components.css?v=32">
-  <link rel="stylesheet" href="/css/homepage.css?v=36">
-  <link rel="stylesheet" href="/css/products.css?v=10">
-  <link rel="stylesheet" href="/css/footer.css?v=3">
-  <link rel="stylesheet" href="/css/gadget.css?v=1">
+  <link rel="stylesheet" href="/css/gadget.css?v=2">
 </head>
 
 <body class="devicepro-body gadget-page-body">
 
-  <!-- Accessible Skip Link -->
-  <a href="#gd-catalog-section" class="skip-to-content">Skip to gadget catalog</a>
+  <a href="#gadget-main" class="skip-to-content">Skip to main content</a>
 
   <!-- =========================================================================
-       SECTION 1: TOP INFORMATION BAR (DEVICE PRO NAVY STRIP)
+       1. TWO-TIER MODERN DARK HEADER (DEVICE PRO BRAND COLORS)
        ========================================================================= -->
-  <aside class="top-info-bar" aria-label="Business Information">
-    <div class="layout-container top-info-inner">
-      <div class="top-info-left">
-        <span class="info-item">
-          <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-          <span>No 13 adepele street, computervillage, ikeja, lagos.</span>
-        </span>
-      </div>
+  <header class="gd-header-wrapper" role="banner">
+    <!-- Row 1: Brand + Category Search Bar + Utility Icons -->
+    <div class="gd-header-top">
+      <div class="gd-container gd-header-top-inner">
+        <a href="/gadget" class="gd-brand-link" aria-label="DEVICE PRO Gadgets Store">
+          <span class="gd-brand-pill">
+            <img src="/images/logo.svg" alt="DEVICE PRO" class="gd-brand-logo-img">
+          </span>
+        </a>
 
-      <div class="top-info-right">
-        <span class="info-item">
-          <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path
-              d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-            </path>
-          </svg>
-          <a href="tel:+2348033882268" class="info-link">+234 803 388 2268</a>
-        </span>
-
-        <span class="info-separator" aria-hidden="true">|</span>
-
-        <span class="info-item">
-          <svg class="info-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
-          </svg>
-          <a href="mailto:deviceprosales@gmail.com" class="info-link">deviceprosales@gmail.com</a>
-        </span>
-
-        <div class="top-social-links" aria-label="Social Media">
-          <a href="https://facebook.com" target="_blank" rel="noopener" aria-label="Facebook" class="social-icon-link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-            </svg>
-          </a>
-          <a href="https://twitter.com" target="_blank" rel="noopener" aria-label="Twitter" class="social-icon-link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path
-                d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z">
-              </path>
-            </svg>
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon-link">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        <form id="gd-header-search-form" class="gd-search-bar-form" role="search" aria-label="Search gadgets">
+          <select id="gd-search-cat-select" class="gd-search-cat-select" aria-label="Filter category">
+            <option value="all">All Categories</option>
+            <option value="smartphones">Smartphones</option>
+            <option value="laptops">Laptops</option>
+            <option value="logitech">Logitech Gear</option>
+            <option value="powerbanks">Powerbanks</option>
+            <option value="speakers">Speakers</option>
+            <option value="monitors">Monitors</option>
+            <option value="printers">Printers</option>
+            <option value="audio">Audio</option>
+            <option value="accessories">Hubs &amp; GaN</option>
+          </select>
+          <input type="search" id="gd-header-search-input" class="gd-search-input"
+            placeholder="Search iPhone, MacBook, Logitech MX, Powerbanks, Monitors, Printers..." autocomplete="off">
+          <button type="submit" class="gd-search-submit-btn" aria-label="Search gadgets">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </button>
+        </form>
+
+        <div class="gd-header-actions">
+          <a href="/login?redirect=/profile" class="gd-icon-btn" aria-label="My Account" title="My Profile"
+            data-user-profile-btn>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
             </svg>
           </a>
+
+          <a href="/" class="gd-icon-btn" aria-label="DEVICE PRO Solar Store" title="Switch to Solar Store">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+            </svg>
+          </a>
+
+          <button type="button" class="gd-icon-btn" data-trigger-cart aria-label="Shopping Cart" title="View Cart">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span class="cart-badge" aria-label="0 items in cart">0</span>
+          </button>
+
+          <button type="button" class="gd-icon-btn gd-mobile-toggle" id="mobile-menu-btn" aria-label="Open menu">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
-  </aside>
 
-  <!-- =========================================================================
-       SECTION 2: MAIN NAVIGATION (UNIFIED DEVICE PRO WHITE NAVBAR)
-       ========================================================================= -->
-  <header class="products-header" role="banner">
-    <div class="layout-container products-header-inner">
-      <a href="/" class="brand-logo-link" aria-label="DEVICE PRO Homepage">
-        <img src="/images/logo.svg" alt="DEVICE PRO - Clean Energy & Tech Solutions" class="brand-logo-img">
-      </a>
+    <!-- Row 2: All Categories Dropdown + Horizontal Links + Hotline -->
+    <div class="gd-header-bottom">
+      <div class="gd-container gd-header-bottom-inner">
+        <div class="gd-all-cats-wrap">
+          <button type="button" class="gd-all-cats-btn" id="gd-all-cats-toggle" aria-expanded="false">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <span>All Categories</span>
+          </button>
+          <div class="gd-all-cats-dropdown" id="gd-all-cats-dropdown" role="menu">
+            <!-- Populated dynamically by gadget-store.js -->
+          </div>
+        </div>
 
-      <nav class="products-nav" aria-label="Primary Navigation">
-        <a href="/" class="p-nav-link">Home</a>
-        <a href="/products" class="p-nav-link">Solar Products</a>
-        <a href="/gadget" class="p-nav-link active" aria-current="page">Gadgets</a>
-        <a href="/packages" class="p-nav-link">Solar Package</a>
-        <a href="/calculator" class="p-nav-link">Calculator</a>
-        <a href="/about" class="p-nav-link">About</a>
-        <a href="/contact" class="p-nav-link">Contacts</a>
-      </nav>
+        <nav class="gd-main-nav" aria-label="Store Navigation">
+          <a href="/" class="gd-nav-link">Solar Home</a>
+          <a href="/gadget" class="gd-nav-link active">Gadgets</a>
+          <a href="#gd-bestselling-section" class="gd-nav-link">Best Sellers</a>
+          <a href="#gd-hotdeals-section" class="gd-nav-link">Hot Deals</a>
+          <a href="#gd-explorer-section" class="gd-nav-link" data-jump-cat="logitech">Logitech</a>
+          <a href="/products" class="gd-nav-link">Solar Products</a>
+          <a href="/checkout" class="gd-nav-link">Checkout</a>
+        </nav>
 
-      <div class="products-header-actions">
-        <button type="button" class="header-circle-btn" data-trigger-search aria-label="Search gadgets">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        </button>
-
-        <button type="button" class="header-circle-btn" data-trigger-cart aria-label="Shopping Cart">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-          <span class="cart-badge" aria-label="0 items in cart">0</span>
-        </button>
-
-        <a href="/login?redirect=/profile" class="header-circle-btn header-user-btn" aria-label="My Profile"
-          title="My Profile" data-user-profile-btn>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
+        <a href="tel:+2348033882268" class="gd-nav-hotline">
+          <span>⚡</span>
+          <span>Same-Day Lagos Delivery • +234 803 388 2268</span>
         </a>
-
-        <a href="/checkout" class="btn-get-quote-yellow">
-          Checkout <span class="arrow" aria-hidden="true">→</span>
-        </a>
-
-        <button type="button" class="mobile-nav-toggle" id="mobile-menu-btn" aria-label="Open navigation menu">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
       </div>
     </div>
   </header>
@@ -161,105 +143,87 @@
   <main id="gadget-main">
 
     <!-- =======================================================================
-         SECTION 3: MODERN ARCHITECTURAL BENTO HERO
+         2. ASYMMETRIC HERO BENTO (LEFT 3-SLIDE SHOWCASE + RIGHT 2 STACKED PROMOS)
          ======================================================================= -->
-    <section class="gd-hero" aria-label="DEVICE PRO Gadgets & Tech Store">
+    <section class="gd-hero-section" aria-label="Featured Tech Promotions">
       <div class="gd-container">
-        <div class="gd-hero-grid">
-          <!-- Left: Headline, Instant Search & Quick Category Chips -->
-          <div>
-            <div class="gd-hero-eyebrow">
-              <span class="gd-pulse-dot" aria-hidden="true"></span>
-              <span>DEVICE PRO Tech Hub • Ikeja Computer Village &amp; Nationwide</span>
+        <div class="gd-hero-bento-grid">
+          <!-- Left: Multi-Slide Featured Hero Banner -->
+          <div class="gd-hero-slider" id="gd-hero-slider">
+            <!-- Slide 1 -->
+            <div class="gd-hero-slide active" data-slide="0">
+              <div>
+                <span class="gd-hero-kicker">★ DEVICE PRO Official Tech Hub</span>
+                <h1 class="gd-hero-heading">Flagship Tech &amp; Smart Devices</h1>
+                <p class="gd-hero-copy">
+                  Factory-sealed smartphones, pro laptops, 250W PD powerbanks, 4K monitors, wireless printers, and
+                  official Logitech workspace hardware.
+                </p>
+                <a href="#gd-explorer-section" class="gd-btn-hero" data-jump-cat="all">Shop Now →</a>
+              </div>
+              <div class="gd-hero-visual">
+                <img src="/images/gadgets/hero-gadgets-showcase.jpg" alt="DEVICE PRO Flagship Gadgets Showcase">
+              </div>
             </div>
 
-            <h1 class="gd-hero-title">
-              Flagship <span>Gadgets</span> &amp; Pro Workspace Hardware.
-            </h1>
-
-            <p class="gd-hero-subtitle">
-              Shop 100% factory-sealed smartphones, ultrabook laptops, 250W PD powerbanks, waterproof Bluetooth
-              speakers, 4K monitors, wireless printers, and official Logitech MX keyboards &amp; mice — powered by
-              DEVICE PRO's unified secure checkout.
-            </p>
-
-            <!-- Instant Search Form -->
-            <form id="gd-hero-search-form" class="gd-hero-search-wrap" role="search" aria-label="Search gadgets">
-              <svg class="gd-hero-search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input type="search" id="gd-hero-search-input" class="gd-hero-search-input"
-                placeholder="Search Logitech MX, iPhone 16, MacBook, Powerbank, Monitor, Printer..."
-                autocomplete="off">
-              <button type="submit" class="gd-hero-search-btn">Search</button>
-            </form>
-
-            <!-- Quick Filter Pills -->
-            <div class="gd-hero-quick-chips" aria-label="Quick categories">
-              <button type="button" class="gd-quick-chip" data-quick-cat="logitech">Logitech MX Gear</button>
-              <button type="button" class="gd-quick-chip" data-quick-cat="smartphones">5G Smartphones</button>
-              <button type="button" class="gd-quick-chip" data-quick-cat="laptops">Pro Laptops</button>
-              <button type="button" class="gd-quick-chip" data-quick-cat="powerbanks">PD Powerbanks</button>
-              <button type="button" class="gd-quick-chip" data-quick-cat="monitors">4K Monitors</button>
-              <button type="button" class="gd-quick-chip" data-quick-cat="printers">Wireless Printers</button>
-              <button type="button" class="gd-quick-chip" data-quick-cat="speakers">Bluetooth Speakers</button>
+            <!-- Slide 2 -->
+            <div class="gd-hero-slide" data-slide="1">
+              <div>
+                <span class="gd-hero-kicker">★ Logitech Master Series</span>
+                <h2 class="gd-hero-heading">Precision Logitech MX Keyboards &amp; Mice</h2>
+                <p class="gd-hero-copy">
+                  Sculpted ergonomics, 8,000 DPI Darkfield glass tracking, MagSpeed scrolling, and smart illuminated
+                  keys built for high-output teams.
+                </p>
+                <a href="/gadget/logitech-mx-master-3s-wireless-mouse" class="gd-btn-hero">Explore MX Series →</a>
+              </div>
+              <div class="gd-hero-visual is-product">
+                <img src="/images/gadgets/logitech-mx-keyboard.jpg" alt="Logitech MX Keys S Illuminated Keyboard">
+              </div>
             </div>
 
-            <!-- Trust Metrics -->
-            <div class="gd-hero-trust-row">
-              <div class="gd-hero-trust-item">
-                <span class="gd-hero-trust-icon" aria-hidden="true">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                </span>
-                <span><strong>100% Genuine</strong> Sealed OEM Units</span>
+            <!-- Slide 3 -->
+            <div class="gd-hero-slide" data-slide="2">
+              <div>
+                <span class="gd-hero-kicker">★ Uninterrupted Mobile Power</span>
+                <h2 class="gd-hero-heading">250W Laptop PD Powerbanks &amp; 4K Gear</h2>
+                <p class="gd-hero-copy">
+                  Keep your MacBook, EliteBook, Starlink Mini, and 5G smartphones charged anywhere across Nigeria with
+                  Anker Prime, Oraimo &amp; Baseus.
+                </p>
+                <a href="/gadget/anker-prime-27650mah-250w-powerbank" class="gd-btn-hero">Shop Powerbanks →</a>
               </div>
-              <div class="gd-hero-trust-item">
-                <span class="gd-hero-trust-icon" aria-hidden="true">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
-                </span>
-                <span><strong>Same-Day</strong> Lagos Express Dispatch</span>
+              <div class="gd-hero-visual is-product">
+                <img src="/images/gadgets/powerbank-pd-digital.jpg" alt="Anker Prime 250W Digital Powerbank">
               </div>
-              <div class="gd-hero-trust-item">
-                <span class="gd-hero-trust-icon" aria-hidden="true">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-                </span>
-                <span><strong>Unified Checkout</strong> with Solar Orders</span>
-              </div>
+            </div>
+
+            <!-- Slider Pagination Dots -->
+            <div class="gd-slider-dots" role="tablist" aria-label="Hero slides">
+              <button type="button" class="gd-slider-dot active" data-dot="0" aria-label="Slide 1"></button>
+              <button type="button" class="gd-slider-dot" data-dot="1" aria-label="Slide 2"></button>
+              <button type="button" class="gd-slider-dot" data-dot="2" aria-label="Slide 3"></button>
             </div>
           </div>
 
-          <!-- Right: Modern Bento Feature Grid -->
-          <div class="gd-hero-bento">
-            <a href="/gadget/apple-macbook-air-15-m3" class="gd-bento-main" aria-label="Explore Flagship Tech Lineup">
-              <img src="/images/gadgets/hero-gadgets-showcase.jpg"
-                alt="DEVICE PRO Modern Tech & Gadgets Ecosystem" class="gd-bento-main-img">
-              <div class="gd-bento-main-overlay">
-                <div>
-                  <span class="gd-bento-tag">2026 Pro Collection</span>
-                  <h2 class="gd-bento-main-title">Build Your Complete Modern Desk &amp; Mobile Setup</h2>
-                </div>
-                <span class="gd-btn-gold" style="padding:8px 14px; font-size:0.78rem;">Explore →</span>
+          <!-- Right: 2 Stacked Promo Cards -->
+          <div class="gd-hero-side-stack">
+            <a href="/gadget/logitech-mx-master-3s-wireless-mouse" class="gd-side-promo tone-blue">
+              <div>
+                <div class="gd-side-eyebrow">Special Discount</div>
+                <h3 class="gd-side-title">UP TO 20% OFF<br>Logitech MX</h3>
+                <span class="gd-side-link">Shop Now →</span>
               </div>
+              <img src="/images/gadgets/logitech-mx-mouse.jpg" alt="Logitech MX Master 3S Mouse">
             </a>
 
-            <a href="/gadget/logitech-mx-master-3s-wireless-mouse" class="gd-bento-mini">
-              <img src="/images/gadgets/logitech-mx-mouse.jpg" alt="Logitech MX Master 3S" class="gd-bento-mini-img">
+            <a href="/gadget/sony-wh-1000xm5-wireless-anc-headphones" class="gd-side-promo tone-gold">
               <div>
-                <div class="gd-bento-mini-brand">Logitech Official</div>
-                <div class="gd-bento-mini-name">MX Master 3S Mouse</div>
-                <div class="gd-bento-mini-price">₦168,000</div>
+                <div class="gd-side-eyebrow">Hot Deals</div>
+                <h3 class="gd-side-title">UP TO 18% OFF<br>ANC Headphones</h3>
+                <span class="gd-side-link">Shop Now →</span>
               </div>
-            </a>
-
-            <a href="/gadget/anker-prime-27650mah-250w-powerbank" class="gd-bento-mini">
-              <img src="/images/gadgets/powerbank-pd-digital.jpg" alt="Anker Prime 250W Powerbank" class="gd-bento-mini-img">
-              <div>
-                <div class="gd-bento-mini-brand">Anker Prime</div>
-                <div class="gd-bento-mini-name">27,650mAh 250W PD</div>
-                <div class="gd-bento-mini-price">₦215,000</div>
-              </div>
+              <img src="/images/gadgets/audio-headphones-anc.jpg" alt="Sony WH-1000XM5 Headphones">
             </a>
           </div>
         </div>
@@ -267,67 +231,180 @@
     </section>
 
     <!-- =======================================================================
-         SECTION 4: STICKY INTERACTIVE CATEGORY PILL RAIL
+         3. THREE-COLUMN CATEGORY PROMO BANNER STRIP
          ======================================================================= -->
-    <section class="gd-category-rail-section" aria-label="Gadget Categories">
+    <section class="gd-triple-banners" aria-label="Featured Gadget Categories">
       <div class="gd-container">
-        <div class="gd-category-rail" id="gd-category-rail">
+        <div class="gd-triple-grid">
+          <a href="#gd-explorer-section" class="gd-mini-banner b1" data-jump-cat="smartphones">
+            <div>
+              <h3 class="gd-mini-banner-title">5G Smartphones</h3>
+              <p class="gd-mini-banner-sub">iPhone 16 Pro Max, Galaxy S25 Ultra &amp; Redmi</p>
+              <span class="gd-mini-banner-cta">Shop Now →</span>
+            </div>
+            <img src="/images/gadgets/phone-flagship-titanium.jpg" alt="Flagship Smartphones">
+          </a>
+
+          <a href="#gd-explorer-section" class="gd-mini-banner b2" data-jump-cat="laptops">
+            <div>
+              <h3 class="gd-mini-banner-title">Pro Laptops</h3>
+              <p class="gd-mini-banner-sub">MacBook Air M3, HP EliteBook &amp; ThinkPad</p>
+              <span class="gd-mini-banner-cta">Shop Now →</span>
+            </div>
+            <img src="/images/gadgets/laptop-ultrabook-silver.jpg" alt="Pro Laptops">
+          </a>
+
+          <a href="#gd-explorer-section" class="gd-mini-banner b3" data-jump-cat="monitors">
+            <div>
+              <h3 class="gd-mini-banner-title">4K Monitors &amp; Printers</h3>
+              <p class="gd-mini-banner-sub">Dell UltraSharp, LG 165Hz, HP &amp; Epson</p>
+              <span class="gd-mini-banner-cta">Shop Now →</span>
+            </div>
+            <img src="/images/gadgets/monitor-4k-ultrasharp.jpg" alt="4K Monitors & Printers">
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         4. BEST SELLING PRODUCTS (HOT COLLECTION CARD + 4 PRODUCTS)
+         ======================================================================= -->
+    <section class="gd-section" id="gd-bestselling-section" aria-label="Best Selling Products">
+      <div class="gd-container">
+        <div class="gd-section-head">
+          <h2 class="gd-section-title">Best Selling Products</h2>
+          <a href="#gd-explorer-section" class="gd-view-all-btn" data-jump-cat="all">View All →</a>
+        </div>
+        <div class="gd-bestselling-grid" id="gd-bestselling-grid">
           <!-- Populated dynamically by gadget-store.js -->
         </div>
       </div>
     </section>
 
     <!-- =======================================================================
-         SECTION 5: OFFICIAL LOGITECH WORKSPACE SPOTLIGHT
+         5. TRENDING THIS WEEK (5-COLUMN PRODUCT ROW)
          ======================================================================= -->
-    <section class="gd-spotlight-section" id="gd-spotlight-section" aria-label="Logitech Workspace Spotlight">
+    <section class="gd-section" id="gd-trending-section" aria-label="Trending This Week">
       <div class="gd-container">
-        <div class="gd-spotlight-card">
-          <div>
-            <span class="gd-spotlight-badge">★ Official Logitech Master Series</span>
-            <h2 class="gd-spotlight-title">Precision Logitech Keyboards, Mice &amp; 4K Webcams.</h2>
-            <p class="gd-spotlight-desc">
-              Upgrade your engineering, coding, and executive desk with whisper-quiet MX Master 3S mice, smart
-              illuminated MX Keys S keyboards, minimalist Pebble 2 combos, and tournament-grade G PRO X Superlight 2
-              wireless gear.
-            </p>
-            <div class="gd-spotlight-actions">
-              <button type="button" class="gd-btn-gold" data-quick-cat="logitech">Shop All Logitech Gear →</button>
-              <a href="/gadget/logitech-mx-keys-s-wireless-keyboard" class="gd-btn-outline-white">Explore MX Keys S</a>
+        <div class="gd-section-head">
+          <h2 class="gd-section-title">Trending This Week</h2>
+          <a href="#gd-explorer-section" class="gd-view-all-btn" data-jump-cat="all">View All →</a>
+        </div>
+        <div class="gd-five-grid" id="gd-trending-grid">
+          <!-- Populated dynamically by gadget-store.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         6. DUAL MID-PAGE PROMOTIONAL BANNERS
+         ======================================================================= -->
+    <section class="gd-section" aria-label="Featured Mid-Page Offers">
+      <div class="gd-container">
+        <div class="gd-dual-banners-grid">
+          <a href="#gd-explorer-section" class="gd-dual-banner left-banner" data-jump-cat="speakers">
+            <div>
+              <div class="gd-dual-kicker">UP TO 20% OFF • WATERPROOF HI-FI</div>
+              <h2 class="gd-dual-title">Unbeatable Audio &amp; Bluetooth Speakers</h2>
+              <span class="gd-dual-cta">Shop Speakers →</span>
             </div>
+            <img src="/images/gadgets/speaker-bluetooth-navy.jpg" alt="JBL and Sony Bluetooth Speakers">
+          </a>
+
+          <a href="#gd-explorer-section" class="gd-dual-banner right-banner" data-jump-cat="printers">
+            <div>
+              <div class="gd-dual-kicker">SOLAR &amp; OFFICE READY</div>
+              <h2 class="gd-dual-title">Wireless Printers &amp; EcoTank Deals</h2>
+              <span class="gd-dual-cta">Shop Printers →</span>
+            </div>
+            <img src="/images/gadgets/printer-wireless-mfp.jpg" alt="Wireless Office Printers">
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         7. HOT DEALS (TALL VERTICAL BANNER LEFT + 4x2 EIGHT-PRODUCT GRID RIGHT)
+         ======================================================================= -->
+    <section class="gd-section" id="gd-hotdeals-section" aria-label="Hot Deals">
+      <div class="gd-container">
+        <div class="gd-hotdeals-layout">
+          <div class="gd-hotdeals-tall-banner">
+            <div>
+              <span class="gd-hero-kicker" style="margin-bottom:10px;">Limited Showroom Stock</span>
+              <h3>Hot Deals</h3>
+              <p>
+                Verified Lagos showroom discounts on sealed flagships, Logitech wireless sets, 100W GaN chargers, and
+                4K monitors — direct Paystack checkout.
+              </p>
+              <a href="#gd-explorer-section" class="gd-btn-hero" style="padding:9px 16px; font-size:0.8rem;"
+                data-jump-sort="discount">Shop All Deals →</a>
+            </div>
+            <img src="/images/gadgets/phone-pro-obsidian.jpg" alt="Hot Flagship Deals">
           </div>
 
-          <div class="gd-spotlight-Showcase">
-            <a href="/gadget/logitech-mx-master-3s-wireless-mouse" class="gd-spot-item">
-              <img src="/images/gadgets/logitech-mx-mouse.jpg" alt="Logitech MX Master 3S Mouse">
-              <span class="gd-spot-item-name">Logitech MX Master 3S (8K DPI)</span>
-              <span class="gd-spot-item-price">₦168,000</span>
-            </a>
-            <a href="/gadget/logitech-mx-keys-s-wireless-keyboard" class="gd-spot-item">
-              <img src="/images/gadgets/logitech-mx-keyboard.jpg" alt="Logitech MX Keys S Keyboard">
-              <span class="gd-spot-item-name">Logitech MX Keys S Illuminated</span>
-              <span class="gd-spot-item-price">₦185,000</span>
-            </a>
+          <div class="gd-hotdeals-grid" id="gd-hotdeals-grid">
+            <!-- 8 dark product cards populated by gadget-store.js -->
           </div>
         </div>
       </div>
     </section>
 
     <!-- =======================================================================
-         SECTION 6: SMART FILTER TOOLBAR & MODERN PRODUCT GRID
+         8. COLLECTION LIST (CIRCULAR MEDALLIONS WITH SCROLL ARROWS)
          ======================================================================= -->
-    <section class="gd-catalog-section" id="gd-catalog-section" aria-label="Gadget Product Catalogue">
+    <section class="gd-section" id="gd-collections-section" aria-label="Collection List">
       <div class="gd-container">
-        <div class="gd-toolbar">
-          <div class="gd-toolbar-top">
-            <div class="gd-results-meta">
-              <h2 class="gd-results-title" id="gd-results-title">All Gadgets</h2>
-              <span class="gd-results-count" id="gd-results-count">28 products</span>
-              <button type="button" class="gd-reset-btn" id="gd-reset-filters-btn">✕ Clear Filters</button>
+        <div class="gd-section-head">
+          <h2 class="gd-section-title">Collection List</h2>
+          <div class="gd-circle-arrows">
+            <button type="button" class="gd-arrow-btn" id="gd-circle-prev" aria-label="Scroll collections left">‹</button>
+            <button type="button" class="gd-arrow-btn" id="gd-circle-next" aria-label="Scroll collections right">›</button>
+          </div>
+        </div>
+        <div class="gd-collection-strip" id="gd-collection-strip">
+          <!-- Populated dynamically by gadget-store.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         9. RECOMMENDED FOR YOU (TABS + 3x3 COMPACT HORIZONTAL CARDS)
+         ======================================================================= -->
+    <section class="gd-section" id="gd-recommended-section" aria-label="Recommended for You">
+      <div class="gd-container">
+        <div class="gd-section-head" style="margin-bottom:10px;">
+          <h2 class="gd-section-title">Recommended for You</h2>
+        </div>
+
+        <div class="gd-rec-tabs" id="gd-rec-tabs" role="tablist">
+          <button type="button" class="gd-rec-tab active" data-rec-tab="all" role="tab">All Gadgets</button>
+          <button type="button" class="gd-rec-tab" data-rec-tab="logitech" role="tab">Logitech Gear</button>
+          <button type="button" class="gd-rec-tab" data-rec-tab="mobile" role="tab">Phones &amp; Laptops</button>
+          <button type="button" class="gd-rec-tab" data-rec-tab="power" role="tab">Powerbanks &amp; Hubs</button>
+          <button type="button" class="gd-rec-tab" data-rec-tab="desk" role="tab">Monitors, Printers &amp; Audio</button>
+        </div>
+
+        <div class="gd-rec-grid" id="gd-rec-grid">
+          <!-- 9 compact horizontal cards populated by gadget-store.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         10. INTERACTIVE FULL CATALOGUE EXPLORER (ALL 28 PRODUCTS + FILTERS)
+         ======================================================================= -->
+    <section class="gd-explorer-section" id="gd-explorer-section" aria-label="Complete Gadget Catalogue Explorer">
+      <div class="gd-container">
+        <div class="gd-explorer-shell">
+          <div class="gd-explorer-bar">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <h2 class="gd-section-title" id="gd-explorer-title">Explore All Gadgets</h2>
+              <span class="gd-badge gd-badge-gold" id="gd-explorer-count">28 items</span>
             </div>
 
-            <div class="gd-toolbar-controls">
-              <select id="gd-price-select" class="gd-select" aria-label="Filter by price range">
+            <div class="gd-explorer-controls">
+              <select id="gd-price-select" class="gd-dark-select" aria-label="Filter by price">
                 <option value="all">All Prices</option>
                 <option value="under-150k">Under ₦150,000</option>
                 <option value="150k-400k">₦150,000 – ₦400,000</option>
@@ -335,62 +412,67 @@
                 <option value="over-1m">Above ₦1,000,000</option>
               </select>
 
-              <select id="gd-sort-select" class="gd-select" aria-label="Sort gadgets">
+              <select id="gd-sort-select" class="gd-dark-select" aria-label="Sort products">
                 <option value="featured">Sort: Featured</option>
                 <option value="price-asc">Price: Low to High</option>
                 <option value="price-desc">Price: High to Low</option>
                 <option value="rating">Top Rated</option>
                 <option value="discount">Biggest Savings</option>
               </select>
+
+              <button type="button" class="gd-brand-pill" id="gd-reset-filters-btn"
+                style="display:none; border-color:#EF4444; color:#FCA5A5;">✕ Reset</button>
             </div>
           </div>
 
-          <div class="gd-brand-filter-row" id="gd-brand-filter-row" aria-label="Filter by brand">
-            <!-- Populated dynamically by gadget-store.js -->
-          </div>
-        </div>
+          <div class="gd-brand-pills" id="gd-brand-pills"></div>
 
-        <!-- Dynamic Product Grid -->
-        <div class="gd-product-grid" id="gd-product-grid">
-          <!-- Populated dynamically by gadget-store.js -->
+          <div class="gd-explorer-grid" id="gd-explorer-grid">
+            <!-- Filtered catalog populated by gadget-store.js -->
+          </div>
         </div>
       </div>
     </section>
 
     <!-- =======================================================================
-         SECTION 7: DEVICE PRO TECH ASSURANCE STRIP
+         11. LATEST TECH GUIDES (3-COLUMN EDITORIAL ROW — MATCHING REFERENCE)
          ======================================================================= -->
-    <section class="gd-assurance-section" aria-label="Why Buy Gadgets from DEVICE PRO">
+    <section class="gd-blog-section" aria-label="Latest Tech Guides">
       <div class="gd-container">
-        <div class="gd-assurance-grid">
-          <div class="gd-assurance-card">
-            <div class="gd-assurance-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+        <h2 class="gd-blog-heading-center">Latest Tech Guides</h2>
+        <div class="gd-blog-grid">
+          <article class="gd-blog-card">
+            <div class="gd-blog-img-wrap">
+              <img src="/images/gadgets/monitor-4k-ultrasharp.jpg" alt="4K USB-C Dual Monitor Setup">
             </div>
-            <h3>Verified OEM Authenticity</h3>
-            <p>Every phone, laptop, printer, monitor, and Logitech peripheral is 100% genuine with verifiable serial numbers.</p>
-          </div>
-          <div class="gd-assurance-card">
-            <div class="gd-assurance-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+            <div class="gd-blog-body">
+              <span class="gd-blog-date">NOVEMBER 2026 • WORKSPACE</span>
+              <h3 class="gd-blog-title">Single-Cable 4K Setup: Pairing Dell UltraSharp with Logitech MX Gear</h3>
+              <a href="/gadget/dell-ultrasharp-27-4k-usbc-hub-monitor" class="gd-blog-cta">Explore Setup →</a>
             </div>
-            <h3>Unified Solar + Gadget Checkout</h3>
-            <p>Combine solar equipment and tech gadgets in one cart and pay securely via Paystack or Direct Bank Transfer.</p>
-          </div>
-          <div class="gd-assurance-card">
-            <div class="gd-assurance-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          </article>
+
+          <article class="gd-blog-card">
+            <div class="gd-blog-img-wrap">
+              <img src="/images/gadgets/powerbank-pd-digital.jpg" alt="250W PD Laptop Powerbank Backup">
             </div>
-            <h3>Ikeja Showroom &amp; Nationwide</h3>
-            <p>Walk-in inspection at No. 13 Adepele Street, Computer Village, Ikeja — plus tracked nationwide courier delivery.</p>
-          </div>
-          <div class="gd-assurance-card">
-            <div class="gd-assurance-icon" aria-hidden="true">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            <div class="gd-blog-body">
+              <span class="gd-blog-date">NOVEMBER 2026 • MOBILE POWER</span>
+              <h3 class="gd-blog-title">How 250W PD Powerbanks Keep MacBooks &amp; Starlink Running Off-Grid</h3>
+              <a href="/gadget/anker-prime-27650mah-250w-powerbank" class="gd-blog-cta">View Powerbank →</a>
             </div>
-            <h3>Dedicated Tech Desk</h3>
-            <p>Need help pairing a laptop powerbank, 4K monitor, or solar-friendly printer? Our specialists assist instantly.</p>
-          </div>
+          </article>
+
+          <article class="gd-blog-card">
+            <div class="gd-blog-img-wrap">
+              <img src="/images/gadgets/printer-wireless-mfp.jpg" alt="Solar Friendly Ink Tank Printers">
+            </div>
+            <div class="gd-blog-body">
+              <span class="gd-blog-date">NOVEMBER 2026 • SOLAR + OFFICE</span>
+              <h3 class="gd-blog-title">Why 12W Heat-Free EcoTank Printers Are Best for Solar &amp; Inverter Offices</h3>
+              <a href="/gadget/epson-ecotank-l3250-wifi-all-in-one-printer" class="gd-blog-cta">See EcoTank →</a>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -398,74 +480,66 @@
   </main>
 
   <!-- =========================================================================
-       SHARED DEVICE PRO FOOTER
+       12. SLEEK 4-COLUMN DARK FOOTER (DEVICE PRO NAVY)
        ========================================================================= -->
-  <footer class="products-footer" role="contentinfo">
-    <div class="footer-container">
-      <div class="footer-grid-columns">
-        <div class="footer-col-brand">
-          <a href="/" class="footer-logo-link" aria-label="DEVICE PRO Home">
-            <img src="/images/logo.svg" alt="DEVICE PRO" class="footer-logo-img" style="filter: brightness(0) invert(1);">
-          </a>
-          <p class="footer-brand-bio">
-            Nigeria's trusted destination for Tier-1 solar energy systems and flagship tech hardware — engineered for
-            uninterrupted productivity.
+  <footer class="gd-footer" role="contentinfo">
+    <div class="gd-container">
+      <div class="gd-footer-grid">
+        <div>
+          <span class="gd-brand-pill">
+            <img src="/images/logo.svg" alt="DEVICE PRO" class="gd-brand-logo-img" style="height:30px;">
+          </span>
+          <p class="gd-footer-text">
+            Nigeria's trusted engineering &amp; tech store for Tier-1 solar systems and factory-sealed gadgets.
+            Showroom: No 13 Adepele Street, Computer Village, Ikeja, Lagos.
           </p>
         </div>
 
         <div>
-          <h3 class="footer-col-title">Gadget Store</h3>
-          <ul class="footer-links-list">
-            <li><a href="/gadget?category=smartphones">Smartphones</a></li>
-            <li><a href="/gadget?category=laptops">Laptops</a></li>
-            <li><a href="/gadget?category=logitech">Logitech Keyboards &amp; Mice</a></li>
-            <li><a href="/gadget?category=powerbanks">High-Wattage Powerbanks</a></li>
-            <li><a href="/gadget?category=monitors">4K &amp; Gaming Monitors</a></li>
-            <li><a href="/gadget?category=printers">Wireless Printers</a></li>
+          <h3 class="gd-footer-title">Gadget Categories</h3>
+          <ul class="gd-footer-links">
+            <li><a href="#gd-explorer-section" data-jump-cat="smartphones">Smartphones</a></li>
+            <li><a href="#gd-explorer-section" data-jump-cat="laptops">Laptops</a></li>
+            <li><a href="#gd-explorer-section" data-jump-cat="logitech">Logitech Keyboards &amp; Mice</a></li>
+            <li><a href="#gd-explorer-section" data-jump-cat="powerbanks">PD Powerbanks</a></li>
+            <li><a href="#gd-explorer-section" data-jump-cat="monitors">4K &amp; Gaming Monitors</a></li>
+            <li><a href="#gd-explorer-section" data-jump-cat="printers">Wireless Printers</a></li>
           </ul>
         </div>
 
         <div>
-          <h3 class="footer-col-title">Solar Solutions</h3>
-          <ul class="footer-links-list">
+          <h3 class="gd-footer-title">DEVICE PRO Store</h3>
+          <ul class="gd-footer-links">
             <li><a href="/">Solar Homepage</a></li>
             <li><a href="/products">Solar Equipment</a></li>
-            <li><a href="/packages">Turnkey Packages</a></li>
+            <li><a href="/packages">Turnkey Solar Packages</a></li>
             <li><a href="/calculator">Solar Sizing Calculator</a></li>
-            <li><a href="/projects">Completed Projects</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h3 class="footer-col-title">Contact &amp; Showroom</h3>
-          <div class="footer-contact-items">
-            <div class="footer-contact-item">No 13 Adepele Street, Computer Village, Ikeja, Lagos.</div>
-            <div class="footer-contact-item"><a href="tel:+2348033882268" style="color:inherit;">+234 803 388 2268</a></div>
-            <div class="footer-contact-item"><a href="mailto:deviceprosales@gmail.com" style="color:inherit;">deviceprosales@gmail.com</a></div>
-          </div>
-        </div>
-
-        <div>
-          <h3 class="footer-col-title">Customer Care</h3>
-          <ul class="footer-links-list">
-            <li><a href="/checkout">Secure Checkout</a></li>
+            <li><a href="/checkout">Unified Secure Checkout</a></li>
             <li><a href="/tracking">Track Your Order</a></li>
-            <li><a href="/profile">My Account</a></li>
-            <li><a href="/shipping-policy">Delivery Policy</a></li>
-            <li><a href="/terms">Terms &amp; Warranty</a></li>
           </ul>
+        </div>
+
+        <div>
+          <h3 class="gd-footer-title">Tech Drop Alerts</h3>
+          <p class="gd-footer-text" style="margin-top:0;">
+            Get instant alerts on new flagship drops, Logitech restocks, and Lagos flash deals.
+          </p>
+          <form class="gd-newsletter-form" id="gd-newsletter-form">
+            <input type="email" id="gd-newsletter-email" placeholder="Enter your email" required aria-label="Email address">
+            <button type="submit" aria-label="Subscribe">→</button>
+          </form>
         </div>
       </div>
 
-      <div class="footer-bottom-bar" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:0.8rem; color:rgba(255,255,255,0.65);">
+      <div class="gd-footer-bottom">
         <span>© 2026 DEVICE PRO Nigeria Limited. All rights reserved.</span>
-        <span>Secure Payments Powered by Paystack &amp; Direct Bank Transfer</span>
+        <span>Unified Solar &amp; Gadget Checkout • Paystack &amp; Direct Bank Transfer</span>
       </div>
     </div>
   </footer>
 
   <!-- =========================================================================
-       UNIVERSAL SHOPPING CART DRAWER (LINKED DIRECTLY TO /checkout)
+       UNIVERSAL SHOPPING CART DRAWER (SHARED WITH MAIN /checkout)
        ========================================================================= -->
   <aside id="cart-drawer" class="drawer" aria-labelledby="cart-drawer-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
@@ -488,40 +562,37 @@
     </div>
   </aside>
 
-  <!-- Modal Backdrop -->
   <div id="modal-backdrop" class="modal-backdrop"></div>
 
   <!-- Mobile Navigation Drawer -->
   <nav id="mobile-nav-drawer" class="drawer" aria-labelledby="mobile-nav-title" aria-modal="true" role="dialog">
     <div class="drawer-header">
-      <img src="/images/logo.svg" alt="DEVICE PRO" style="height:36px;" id="mobile-nav-title">
+      <img src="/images/logo.svg" alt="DEVICE PRO" style="height:34px;" id="mobile-nav-title">
       <button type="button" class="modal-close-btn" data-close-drawer aria-label="Close menu">✕</button>
     </div>
     <div class="drawer-body">
-      <div class="mobile-nav-links-list">
-        <a href="/" class="m-nav-link" data-close-drawer>Home</a>
-        <a href="/products" class="m-nav-link" data-close-drawer>Solar Products</a>
-        <a href="/gadget" class="m-nav-link active" data-close-drawer>Gadgets &amp; Tech</a>
-        <a href="/packages" class="m-nav-link" data-close-drawer>Solar Package</a>
-        <a href="/projects" class="m-nav-link" data-close-drawer>Projects</a>
-        <a href="/calculator" class="m-nav-link" data-close-drawer>Calculator</a>
-        <a href="/about" class="m-nav-link" data-close-drawer>About</a>
-        <a href="/contact" class="m-nav-link" data-close-drawer>Contacts</a>
-        <hr class="mobile-divider">
-        <a href="/checkout" class="btn-get-quote-yellow" style="justify-content:center; width:100%;" data-close-drawer>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <a href="/" class="nav-link" data-close-drawer>Solar Home</a>
+        <a href="/gadget" class="nav-link active" data-close-drawer>Gadgets &amp; Tech</a>
+        <a href="/products" class="nav-link" data-close-drawer>Solar Products</a>
+        <a href="/packages" class="nav-link" data-close-drawer>Solar Packages</a>
+        <a href="/calculator" class="nav-link" data-close-drawer>Solar Calculator</a>
+        <a href="/about" class="nav-link" data-close-drawer>About</a>
+        <a href="/contact" class="nav-link" data-close-drawer>Contacts</a>
+        <hr style="border:none; border-top:1px solid #E2E8F0; margin:6px 0;">
+        <a href="/checkout" class="gd-btn-hero" style="justify-content:center; width:100%;" data-close-drawer>
           Go to Secure Checkout →
         </a>
       </div>
     </div>
   </nav>
 
-  <!-- Toast Notification Container -->
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <!-- Scripts -->
   <script src="/js/cart.js?v=3"></script>
   <script src="/js/gadget-catalog.js?v=1"></script>
-  <script src="/js/gadget-store.js?v=1"></script>
+  <script src="/js/gadget-store.js?v=2"></script>
   <script src="/js/main.js?v=28"></script>
 </body>
 
