@@ -224,6 +224,209 @@
         'Optional Grip Tape & PTFE Aperture Door'
       ]
     },
+    {
+      id: 'dp-gad-logi-lift',
+      slug: 'logitech-lift-vertical-ergonomic-mouse',
+      name: 'Logitech Lift Vertical Ergonomic Wireless Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'Ergonomic Mice',
+      price: 115000,
+      originalPrice: 135000,
+      rating: 4.8,
+      reviewCount: 57,
+      stockCount: 12,
+      badge: 'Ergonomic 57°',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: '57° Natural Handshake • SmartWheel • Quiet Clicks • Multi-OS',
+      image: '/images/gadgets/logitech-mx-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-mx-mouse.jpg',
+        '/images/gadgets/logitech-mx-keyboard.jpg',
+        '/images/gadgets/hero-gadgets-showcase.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Graphite (Right Hand)', priceDelta: 0 },
+        { label: 'Off-White (Right Hand)', priceDelta: 3000 },
+        { label: 'Rose Pink (Right Hand)', priceDelta: 3000 },
+        { label: 'Graphite (Left Hand)', priceDelta: 5000 }
+      ],
+      highlights: [
+        '57-degree vertical ergonomic angle promotes natural forearm posture and reduces wrist fatigue',
+        'SmartWheel speed-scroll switches between line-by-line precision and rapid scrolling',
+        'Whisper-quiet clicks let you work without disturbing colleagues or family',
+        'Customizable thumb buttons via Logi Options+ with one-tap shortcuts',
+        'Connect up to 3 devices via Bluetooth Low Energy or Logi Bolt USB receiver'
+      ],
+      description: 'When desk life gets heavy, lift yourself up. Specially designed for small to medium hands, the Logitech Lift Vertical Ergonomic Mouse places your hand into an optimal 57-degree handshake posture. Featuring textured rubber grip, whisper-quiet clicks, and up to 2 years battery life on a single AA battery.',
+      specs: [
+        { key: 'Ergonomic Angle', val: '57° Natural Handshake Posture' },
+        { key: 'Sensor', val: 'Logitech Advanced Optical (400 – 4,000 DPI)' },
+        { key: 'Scroll Wheel', val: 'SmartWheel (Precision + Speed Scroll)' },
+        { key: 'Connectivity', val: 'Bluetooth Low Energy + Logi Bolt USB Receiver' },
+        { key: 'Battery Life', val: 'Up to 24 Months on 1x AA Battery (Included)' },
+        { key: 'Hand Compatibility', val: 'Optimized for Small-to-Medium Hands (Right & Left Editions)' }
+      ],
+      boxContents: [
+        'Logitech Lift Vertical Ergonomic Mouse',
+        'Logi Bolt USB Receiver',
+        '1x AA Battery (Pre-installed)',
+        'User Documentation & Warranty Card'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-anywhere3s',
+      slug: 'logitech-mx-anywhere-3s-wireless-mouse',
+      name: 'Logitech MX Anywhere 3S Compact Wireless Performance Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'MX Master Series',
+      price: 128000,
+      originalPrice: 150000,
+      rating: 4.9,
+      reviewCount: 82,
+      stockCount: 16,
+      badge: 'Travel Pro',
+      badgeTone: 'blue',
+      featured: true,
+      shortSpec: '8K DPI Tracks on Glass • MagSpeed Wheel • Quiet Clicks • USB-C',
+      image: '/images/gadgets/logitech-mx-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-mx-mouse.jpg',
+        '/images/gadgets/hero-gadgets-showcase.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Graphite', priceDelta: 0 },
+        { label: 'Pale Gray', priceDelta: 3000 },
+        { label: 'Rose Pink', priceDelta: 3000 }
+      ],
+      highlights: [
+        'Compact pocket-ready form factor engineered for work anywhere — coffee shops, flights, or home desk',
+        '8,000 DPI Darkfield sensor tracks on any surface, including transparent glass',
+        'MagSpeed electromagnetic scroll wheel scrolls 1,000 lines per second',
+        'Quiet Clicks technology delivers tactile response with 90% less distraction',
+        'Up to 70 days battery life per full charge with USB-C quick charging'
+      ],
+      description: 'The master of mobility. The Logitech MX Anywhere 3S packs flagship MX Master precision into an ultra-portable, compact silhouette. With 8K DPI tracking on glass, silent clicks, MagSpeed scrolling, and multi-device Logi Flow support, it is the premier mouse for mobile professionals.',
+      specs: [
+        { key: 'Sensor', val: 'Darkfield High Precision Optical (200 – 8,000 DPI)' },
+        { key: 'Scroll Wheel', val: 'MagSpeed Electromagnetic Steel with Auto-Shift' },
+        { key: 'Buttons', val: '6 Programmable Buttons (Quiet Click)' },
+        { key: 'Connectivity', val: 'Bluetooth Low Energy (Logi Bolt Compatible)' },
+        { key: 'Battery', val: 'Rechargeable Li-Po (500 mAh) — up to 70 days' },
+        { key: 'Port', val: 'USB-C Fast Charging (1 min = 3 hours use)' }
+      ],
+      boxContents: [
+        'Logitech MX Anywhere 3S Mouse',
+        'USB-C Charging Cable (USB-A to USB-C)',
+        'User Documentation & 1-Year Warranty Card'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-g502x',
+      slug: 'logitech-g502-x-plus-lightspeed-mouse',
+      name: 'Logitech G502 X PLUS LIGHTSPEED Wireless RGB Gaming Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'Logitech G Gaming',
+      price: 245000,
+      originalPrice: 280000,
+      rating: 5.0,
+      reviewCount: 94,
+      stockCount: 8,
+      badge: 'Esports Legend',
+      badgeTone: 'gold',
+      featured: false,
+      shortSpec: 'LIGHTFORCE Hybrid Switches • HERO 25K Sensor • LIGHTSYNC RGB',
+      image: '/images/gadgets/logitech-mx-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-mx-mouse.jpg',
+        '/images/gadgets/hero-gadgets-showcase.jpg'
+      ],
+      warranty: '1-Year Official Logitech Warranty',
+      variants: [
+        { label: 'Black Edition', priceDelta: 0 },
+        { label: 'White Edition', priceDelta: 5000 }
+      ],
+      highlights: [
+        'Reinvented icon: World-famous G502 shape upgraded with groundbreaking gaming tech',
+        'LIGHTFORCE optical-mechanical hybrid switches deliver speed, reliability, and crisp feedback',
+        'HERO 25K sub-micron gaming sensor with 1:1 tracking and zero smoothing or acceleration',
+        '8-LED customizable LIGHTSYNC RGB lighting with active play detection',
+        'Dual-mode hyper-fast scroll wheel and reversible DPI-shift button'
+      ],
+      description: 'The legend reborn. Logitech G502 X PLUS combines the world’s most popular gaming mouse design with hybrid optical-mechanical switches, sub-micron HERO 25K precision tracking, upgraded LIGHTSPEED wireless with 68% faster response, and vibrant 8-zone RGB lighting.',
+      specs: [
+        { key: 'Sensor', val: 'HERO 25K Optical (100 – 25,600 DPI, 400+ IPS)' },
+        { key: 'Switches', val: 'LIGHTFORCE Optical-Mechanical Hybrid' },
+        { key: 'Lighting', val: '8-Zone LIGHTSYNC RGB with Play Detection' },
+        { key: 'Wireless Tech', val: 'Pro-Grade LIGHTSPEED Wireless' },
+        { key: 'Battery Life', val: 'Up to 120 Hours (RGB Off) / 37 Hours (RGB On)' },
+        { key: 'Weight', val: '106 grams optimized ergonomic chassis' }
+      ],
+      boxContents: [
+        'Logitech G502 X PLUS Wireless Gaming Mouse',
+        'DPI-Shift Button Cover',
+        'USB-C Charging Cable',
+        'LIGHTSPEED USB-A Receiver & Extension Adapter',
+        'User Documentation & Official Warranty'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-c920',
+      slug: 'logitech-c920-pro-hd-webcam',
+      name: 'Logitech C920 HD Pro Webcam (Full HD 1080p Stereo Audio)',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'Webcams & Streaming',
+      price: 105000,
+      originalPrice: 125000,
+      rating: 4.8,
+      reviewCount: 118,
+      stockCount: 22,
+      badge: 'Meeting Ready',
+      badgeTone: 'green',
+      featured: false,
+      shortSpec: 'Full HD 1080p@30fps • Dual Stereo Mics • Auto Light Correction',
+      image: '/images/gadgets/logitech-mx-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-mx-mouse.jpg',
+        '/images/gadgets/monitor-4k-ultrasharp.jpg'
+      ],
+      warranty: '1-Year Official Logitech Warranty',
+      variants: [
+        { label: 'Standard C920 Pro HD', priceDelta: 0 },
+        { label: 'With Privacy Shutter', priceDelta: 4000 }
+      ],
+      highlights: [
+        'Remarkable Full HD 1080p video calling and recording at 30 fps',
+        'Five-element glass lens captures razor-sharp images with clear color fidelity',
+        'RightLight 2 technology automatically fine-tunes brightness in dim or harsh lighting',
+        'Dual built-in stereo microphones capture natural, clear audio from every angle',
+        'Universal tripod-ready mounting clip fits laptops, LCD monitors, and desks'
+      ],
+      description: 'The standard for professional remote work, Zoom conferences, and content streaming. The Logitech C920 HD Pro Webcam delivers crisp 1080p video, intelligent autofocus, stereo sound, and automated light adjustment so you always look and sound your best.',
+      specs: [
+        { key: 'Resolution & FPS', val: 'Full HD 1080p/30fps or 720p/30fps' },
+        { key: 'Focus Type', val: 'Automatic Precision Autofocus' },
+        { key: 'Lens', val: 'Full HD 5-Element Glass Lens' },
+        { key: 'Field of View (FoV)', val: '78° Diagonal FoV' },
+        { key: 'Microphone', val: 'Built-in Dual Stereo Mics with Noise Reduction' },
+        { key: 'Connection', val: 'USB-A Plug-and-Play (1.5 m Cable)' }
+      ],
+      boxContents: [
+        'Logitech C920 HD Pro Webcam with Attached 1.5m Cable',
+        'Tripod-Ready Mounting Clip',
+        'User Documentation & 1-Year Official Warranty'
+      ]
+    },
 
     // =========================================================================
     // 2. SMARTPHONES
@@ -1389,6 +1592,10 @@
     }));
   }
 
+  function getLogitech() {
+    return GADGETS.filter(g => g.brand.toLowerCase() === 'logitech' || g.category === 'logitech');
+  }
+
   function getBrands() {
     const counts = {};
     GADGETS.forEach(g => {
@@ -1407,6 +1614,7 @@
     getAll,
     getBySlug,
     getByCategory,
+    getLogitech,
     getRelated,
     getCategoriesWithCounts,
     getBrands
