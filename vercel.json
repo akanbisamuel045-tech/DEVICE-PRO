@@ -99,16 +99,28 @@
       "destination": "/gadget-shop.html"
     },
     {
+      "source": "/gadget/logitech",
+      "destination": "/gadget-logitech.html"
+    },
+    {
+      "source": "/gadgets/logitech",
+      "destination": "/gadget-logitech.html"
+    },
+    {
+      "source": "/gadget-logitech",
+      "destination": "/gadget-logitech.html"
+    },
+    {
       "source": "/gadget/devicepro",
-      "destination": "/gadget-devicepro.html"
+      "destination": "/gadget-logitech.html"
     },
     {
       "source": "/gadgets/devicepro",
-      "destination": "/gadget-devicepro.html"
+      "destination": "/gadget-logitech.html"
     },
     {
       "source": "/gadget-devicepro",
-      "destination": "/gadget-devicepro.html"
+      "destination": "/gadget-logitech.html"
     },
     {
       "source": "/gadget-detail",

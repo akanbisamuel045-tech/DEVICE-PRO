@@ -4090,7 +4090,8 @@ async function generateSitemapXml() {
     { loc: '/solutions', priority: '0.9', changefreq: 'weekly' },
     { loc: '/products', priority: '0.9', changefreq: 'daily' },
     { loc: '/gadget', priority: '0.9', changefreq: 'daily' },
-    { loc: '/gadget/devicepro', priority: '0.9', changefreq: 'daily' },
+    { loc: '/gadget/logitech', priority: '0.9', changefreq: 'daily' },
+    { loc: '/gadget/devicepro', priority: '0.8', changefreq: 'daily' },
     { loc: '/gadget/shop', priority: '0.9', changefreq: 'daily' },
     { loc: '/packages', priority: '0.9', changefreq: 'weekly' },
     { loc: '/projects', priority: '0.8', changefreq: 'weekly' },
@@ -4246,7 +4247,7 @@ app.get(['/black-friday', '/black-friday.html'], (req, res) => safeSendFile(res,
 app.get(['/black-friday-detail', '/black-friday-detail.html', '/black-friday/:id'], (req, res) => safeSendFile(res, 'public/black-friday-detail.html'));
 app.get(['/black-friday-itel-500w', '/black-friday-itel-450w', '/black-friday-itel-500w.html'], (req, res) => safeSendFile(res, 'public/black-friday-itel-500w.html'));
 app.get(['/gadget', '/gadget.html', '/gadgets', '/gadgets.html'], (req, res) => safeSendFile(res, 'public/gadget.html'));
-app.get(['/gadget/devicepro', '/gadgets/devicepro', '/gadget-devicepro', '/gadget-devicepro.html'], (req, res) => safeSendFile(res, 'public/gadget-devicepro.html'));
+app.get(['/gadget/logitech', '/gadgets/logitech', '/gadget-logitech', '/gadget-logitech.html', '/gadget/devicepro', '/gadgets/devicepro', '/gadget-devicepro', '/gadget-devicepro.html'], (req, res) => safeSendFile(res, 'public/gadget-logitech.html'));
 app.get(['/gadget/shop', '/gadgets/shop', '/gadget-shop', '/gadget-shop.html'], (req, res) => safeSendFile(res, 'public/gadget-shop.html'));
 app.get(['/gadget-detail', '/gadget-detail.html', '/gadget/:slug', '/gadgets/:slug'], (req, res) => safeSendFile(res, 'public/gadget-detail.html'));
 app.get('/', (req, res) => safeSendFile(res, 'public/index.html'));

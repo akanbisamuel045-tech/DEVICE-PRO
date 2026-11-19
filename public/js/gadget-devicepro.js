@@ -1,5 +1,5 @@
 /**
- * DEVICE PRO — Dedicated Logitech Brand Store Controller (/gadget/devicepro)
+ * DEVICE PRO — Dedicated Logitech Brand Store Controller (/gadget/logitech)
  * Showcases only official Logitech products (MX Master, Keyboards, G PRO, Webcams).
  * Interactive sub-categories, price filter, sorting, instant search,
  * 1-click MX Executive Desk Suite bundle, and direct checkout via DeviceProCart.
