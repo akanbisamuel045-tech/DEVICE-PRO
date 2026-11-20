@@ -432,6 +432,615 @@
     // 2. SMARTPHONES
     // =========================================================================
     {
+      id: 'dp-gad-logi-b100',
+      slug: 'logitech-b100-optical-usb-mouse',
+      name: 'Logitech B100 Optical USB Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'corded',
+      partNumber: '910-003357',
+      modelCode: 'B100',
+      color: 'Black-Grey',
+      connectivityType: 'USB-A Corded (1.8m)',
+      price: 6480,
+      originalPrice: 8500,
+      rating: 4.8,
+      reviewCount: 38,
+      stockCount: 30,
+      badge: '30 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: '800 DPI optical precision • Full-size ambidextrous shape • 1.8m USB cord',
+      image: '/images/gadgets/logitech-b100-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-b100-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Black-Grey (P/N 910-003357)', priceDelta: 0 }
+      ],
+      highlights: [
+        'Precise 800 DPI optical tracking for smooth cursor control and accurate text selection',
+        'Comfortable full-size ambidextrous design crafted for either left- or right-handed use',
+        'Simple plug-and-play setup: just plug the USB-A cable into your PC or laptop with zero software needed',
+        'Built to Logitech’s renowned quality standards with durable click switches and tactile scroll wheel',
+        '30 units ready in Lagos warehouse for same-day dispatch'
+      ],
+      description: 'The Logitech B100 Optical USB Mouse delivers dependable everyday computing essentials. With an ambidextrous curved shape that keeps your hand comfortable all day long, high-precision 800 DPI optical tracking, and zero-setup USB connectivity, it is the trusted workhorse for corporate offices, call centers, and home desktops.',
+      specs: [
+        { key: 'Official Part Number (P/N)', val: '910-003357' },
+        { key: 'Warehouse Inventory', val: '30 Units Available (Lagos Stock)' },
+        { key: 'Sensor Technology', val: 'Optical Tracking (800 DPI)' },
+        { key: 'Number of Buttons', val: '3 (Left, Right, Middle Click with Scroll Wheel)' },
+        { key: 'Connectivity', val: 'USB-A Corded Cable (1.8m / 5.9 ft)' },
+        { key: 'Form Factor', val: 'Full-Size Ambidextrous (Left & Right Hand)' },
+        { key: 'Official Model', val: 'Logitech B100 Optical Mouse EMEA28i-935' },
+        { key: 'Compatibility', val: 'Windows 10/11, macOS, Linux, ChromeOS' }
+      ],
+      boxContents: [
+        'Logitech B100 Optical USB Mouse (Black-Grey)',
+        'Attached 1.8m USB-A Cable',
+        'Official Documentation & Warranty Information'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m90',
+      slug: 'logitech-m90-optical-usb-mouse',
+      name: 'Logitech Mouse M90',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'corded',
+      partNumber: '910-001793',
+      modelCode: 'M90',
+      color: 'Grey',
+      connectivityType: 'USB-A Corded',
+      price: 6560,
+      originalPrice: 8900,
+      rating: 4.7,
+      reviewCount: 42,
+      stockCount: 30,
+      badge: '30 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: '1,000 DPI high-definition tracking • Symmetrical curved palm grip • USB plug-and-play',
+      image: '/images/gadgets/logitech-m90-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m90-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Grey (P/N 910-001793)', priceDelta: 0 }
+      ],
+      highlights: [
+        '1,000 DPI high-definition optical tracking for responsive and smooth cursor navigation',
+        'Full-size ambidextrous comfort ensures natural palm resting during long work hours',
+        'Direct plug-and-play USB connection with instant driver recognition across all operating systems',
+        'Precision stepped optical scroll wheel for line-by-line document reading',
+        '30 units ready in Lagos warehouse for immediate dispatch'
+      ],
+      description: 'Logitech M90 gives you just the basics for comfortable, reliable control of your computer. There is no software to install and because it is corded, you can just plug the cable into a USB port and use it right away. Full-size ambidextrous comfort means your hand rests naturally whether you are right- or left-handed.',
+      specs: [
+        { key: 'Official Part Number (P/N)', val: '910-001793' },
+        { key: 'Warehouse Inventory', val: '30 Units Available (Lagos Stock)' },
+        { key: 'Sensor Resolution', val: '1,000 DPI High-Definition Optical' },
+        { key: 'Buttons', val: '3 Buttons (Left/Right Click, Clickable Scroll Wheel)' },
+        { key: 'Connection', val: 'USB-A Corded' },
+        { key: 'Ergonomics', val: 'Symmetrical Ambidextrous' },
+        { key: 'Regional Spec', val: 'EMEA28i-935 M90' },
+        { key: 'OS Support', val: 'Windows 11/10/8/7, macOS, ChromeOS, Linux Kernel 2.6+' }
+      ],
+      boxContents: [
+        'Logitech Mouse M90 (Grey)',
+        'User Documentation',
+        'DEVICE PRO Authenticity & Warranty Guarantee'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m100',
+      slug: 'logitech-m100-optical-usb-mouse',
+      name: 'Logitech Mouse M100',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'corded',
+      partNumber: '910-006652',
+      modelCode: 'M100',
+      color: 'Black',
+      connectivityType: 'USB-A Corded',
+      price: 8620,
+      originalPrice: 11500,
+      rating: 4.8,
+      reviewCount: 56,
+      stockCount: 20,
+      badge: '20 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: '1,000 DPI optical tracking • Full-size comfort • Akoya Hangtab Retail Box',
+      image: '/images/gadgets/logitech-m100-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m100-mouse.jpg',
+        '/images/gadgets/logitech-m100-alt.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Black (P/N 910-006652)', priceDelta: 0 }
+      ],
+      highlights: [
+        'Accurate 1,000 DPI optical sensor ensures smooth tracking on desks and mousepads',
+        'Full-size symmetrical body sculpted for fatigue-free extended office shifts',
+        'Akoya Hangtab official retail packaging with authentic serial numbers',
+        'Rigid, durable click switches rated for millions of cycles',
+        '20 units available in Lagos warehouse for immediate order fulfillment'
+      ],
+      description: 'The Logitech M100 is the benchmark for durable everyday corded mice. Packaged in official factory-sealed Akoya Hangtab retail boxes, it features a responsive 1,000 DPI optical engine, ambidextrous contouring, and zero-latency USB connectivity for professional workstation environments.',
+      specs: [
+        { key: 'Official Part Number (P/N)', val: '910-006652' },
+        { key: 'Warehouse Inventory', val: '20 Units Available (Lagos Stock)' },
+        { key: 'Packaging', val: 'Akoya Hangtab Box M100 EMEA28i-935' },
+        { key: 'Sensor Resolution', val: '1,000 DPI' },
+        { key: 'Interface', val: 'USB-A Corded' },
+        { key: 'Buttons', val: '3 Buttons (Left, Right, Middle click scroll)' },
+        { key: 'Cable Length', val: '1.8 m' },
+        { key: 'Supported Systems', val: 'Windows, macOS, ChromeOS, Linux' }
+      ],
+      boxContents: [
+        'Logitech Mouse M100 (Black)',
+        'Akoya Hangtab Retail Packaging',
+        'User Guide & Warranty Card'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m170',
+      slug: 'logitech-m170-wireless-mouse',
+      name: 'Logitech M170 Wireless Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'wireless',
+      partNumber: '910-004642',
+      modelCode: 'M170',
+      color: 'Black / Grey',
+      connectivityType: '2.4GHz Wireless (Nano Receiver)',
+      price: 14700,
+      originalPrice: 18500,
+      rating: 4.8,
+      reviewCount: 64,
+      stockCount: 10,
+      badge: '10 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: '2.4GHz Wireless (10m range) • 12-Month Battery • Tiny USB Nano Receiver',
+      image: '/images/gadgets/logitech-m170-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m170-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Black/Grey (P/N 910-004642)', priceDelta: 0 }
+      ],
+      highlights: [
+        'Rock-solid 2.4GHz wireless connection up to 10 meters (33 ft) with zero dropouts',
+        '12-month battery life on a single AA battery with automatic sleep power saving',
+        'Plug-and-play simplicity: plug the tiny nano receiver into your laptop and start clicking',
+        'Compact and portable form factor fits easily into any laptop bag or backpack',
+        '10 units in stock in Lagos for quick dispatch'
+      ],
+      description: 'Logitech M170 Wireless Mouse offers reliable wireless freedom at an affordable price. With a 10-meter operational radius, 12-month battery longevity, and an ambidextrous shape that can reassign left and right button functions via software, it is the ideal everyday travel companion for students and business pros.',
+      specs: [
+        { key: 'Official Part Number (P/N)', val: '910-004642' },
+        { key: 'Warehouse Inventory', val: '10 Units Available (Lagos Stock)' },
+        { key: 'Wireless Technology', val: 'Advanced 2.4 GHz Wireless' },
+        { key: 'Wireless Range', val: '10 meters (33 feet)' },
+        { key: 'Sensor Resolution', val: '1,000 DPI Optical' },
+        { key: 'Battery Details', val: '1 x AA (Included) — up to 12 months' },
+        { key: 'Receiver Type', val: 'Logitech USB Nano Receiver' },
+        { key: 'Weight', val: '70.5 g with battery' }
+      ],
+      boxContents: [
+        'Logitech M170 Wireless Mouse',
+        'USB Nano Receiver',
+        '1 AA Battery (Pre-installed)',
+        'User Documentation'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m171',
+      slug: 'logitech-m171-wireless-mouse',
+      name: 'Logitech M171 Wireless Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'wireless',
+      partNumber: '910-004424 / 910-004640 / 910-006866 / 910-004641',
+      modelCode: 'M171',
+      color: 'Black, Blue, Blue-Grey, Red',
+      connectivityType: '2.4GHz Wireless (Nano Receiver)',
+      price: 15490,
+      originalPrice: 19800,
+      rating: 4.8,
+      reviewCount: 92,
+      stockCount: 60,
+      badge: '60 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: '2.4GHz Wireless (10m) • 4 Vibrant Colors • 12-Month Battery • Nano Receiver',
+      image: '/images/gadgets/logitech-m171-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m171-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Black-K (P/N 910-004424 - 20 in stock)', priceDelta: 0 },
+        { label: 'Blue-K (P/N 910-004640 - 20 in stock)', priceDelta: 0 },
+        { label: 'Blue-Grey (P/N 910-006866 - 10 in stock)', priceDelta: 0 },
+        { label: 'Red-K (P/N 910-004641 - 10 in stock)', priceDelta: 0 }
+      ],
+      highlights: [
+        '60 total units in stock across 4 vibrant color finishes (Black, Blue, Blue-Grey, Red)',
+        'Reliable 2.4GHz wireless connection up to 10 meters with plug-and-play USB receiver',
+        '12 months of worry-free use on a single pre-installed AA battery with on/off switch',
+        'Ambidextrous shape with compact contouring fits naturally in small-to-medium hands',
+        'Smooth optical tracking for precision navigation on virtually all flat surfaces'
+      ],
+      description: 'The Logitech M171 Wireless Mouse combines playful modern aesthetics with dependable Swiss engineering. Available in Black, Blue, Blue-Grey, and Red variants, this compact wireless mouse provides up to a year of battery life and a strong 10-meter wireless link through its ultra-compact USB receiver.',
+      specs: [
+        { key: 'Official Part Numbers (P/N)', val: '910-004424 (Black), 910-004640 (Blue), 910-006866 (Blue-Grey), 910-004641 (Red)' },
+        { key: 'Warehouse Inventory', val: '60 Units Total (20 Black, 20 Blue, 10 Blue-Grey, 10 Red)' },
+        { key: 'Wireless Standard', val: '2.4 GHz USB Nano Receiver' },
+        { key: 'Operating Range', val: 'Up to 10 m (33 ft)' },
+        { key: 'Sensor Resolution', val: '1,000 DPI Optical' },
+        { key: 'Battery', val: '1x AA Battery (up to 12 months)' },
+        { key: 'On/Off Switch', val: 'Yes, integrated power switch for battery saving' },
+        { key: 'System Requirements', val: 'Windows 10/11, macOS 10.8+, ChromeOS, Linux' }
+      ],
+      boxContents: [
+        'Logitech M171 Wireless Mouse in Chosen Color',
+        'USB Nano Receiver',
+        '1 AA Battery (Pre-installed)',
+        'Quick Start Guide'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m185',
+      slug: 'logitech-m185-wireless-mouse',
+      name: 'Logitech Wireless Mouse M185',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'wireless',
+      partNumber: '910-002235 / 910-002237',
+      modelCode: 'M185 TERRA',
+      color: 'Swift Grey, Red',
+      connectivityType: '2.4GHz Wireless (Nano Receiver)',
+      price: 14970,
+      originalPrice: 19000,
+      rating: 4.8,
+      reviewCount: 88,
+      stockCount: 40,
+      badge: '40 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: 'Contoured ergonomic shape • 1-Year Battery • Plug-and-forget nano receiver',
+      image: '/images/gadgets/logitech-m185-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m185-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Swift Grey (P/N 910-002235 - 20 in stock)', priceDelta: 0 },
+        { label: 'Red (P/N 910-002237 - 20 in stock)', priceDelta: 0 }
+      ],
+      highlights: [
+        '40 units ready in Lagos warehouse (20 Swift Grey, 20 Red)',
+        'Contoured ergonomic profile designed to keep hands comfortable through long working hours',
+        'Plug-and-forget nano receiver stays in your USB port with virtually no lag or dropouts',
+        '1-year battery life with smart sleep mode and physical power switch',
+        'Smooth, responsive optical tracking cursor control'
+      ],
+      description: 'A simple, reliable wireless mouse with plug-and-play wireless. You get the reliability of a cord with wireless convenience and freedom—fast data transmission and virtually no delays or dropouts. The contoured shape follows the natural curve of your hand, so you can stay productive longer.',
+      specs: [
+        { key: 'Official Part Numbers (P/N)', val: '910-002235 (Swift Grey), 910-002237 (Red)' },
+        { key: 'Warehouse Inventory', val: '40 Units Total (20 Swift Grey, 20 Red in Lagos)' },
+        { key: 'Series / Spec', val: 'M185 TERRA EMEA28i-935' },
+        { key: 'Sensor Resolution', val: '1,000 DPI Optical' },
+        { key: 'Wireless Connection', val: '2.4GHz USB Nano Receiver' },
+        { key: 'Battery Life', val: '12-Month Battery Life (1x AA)' },
+        { key: 'Dimensions', val: '99 x 60 x 39 mm (75.2 g)' },
+        { key: 'Compatibility', val: 'Windows, macOS, ChromeOS, Linux' }
+      ],
+      boxContents: [
+        'Logitech Wireless Mouse M185 (Swift Grey or Red)',
+        'USB Nano Receiver',
+        '1 AA Battery (Pre-installed)',
+        'User Documentation'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m196',
+      slug: 'logitech-m196-bluetooth-mouse',
+      name: 'Logitech M196 Bluetooth Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'bluetooth',
+      partNumber: '910-007459 / 910-007460 / 910-007461',
+      modelCode: 'M196',
+      color: 'Graphite, Off-White, Rose',
+      connectivityType: 'Bluetooth 5.0 Low Energy (No Dongle)',
+      price: 15580,
+      originalPrice: 20000,
+      rating: 4.9,
+      reviewCount: 45,
+      stockCount: 60,
+      badge: '60 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: 'Instant Bluetooth pairing • No USB port needed • 12-Month Battery • Recycled Plastic',
+      image: '/images/gadgets/logitech-m196-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m196-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Graphite (P/N 910-007459 - 20 in stock)', priceDelta: 0 },
+        { label: 'Off-White (P/N 910-007460 - 20 in stock)', priceDelta: 0 },
+        { label: 'Rose / Lilac (P/N 910-007461 - 20 in stock)', priceDelta: 0 }
+      ],
+      highlights: [
+        '60 total units available in Lagos warehouse across Graphite, Off-White, and Rose',
+        'Connects in seconds directly via Bluetooth Low Energy — no USB dongle required, freeing up laptop ports',
+        'Smooth optical tracking and line-by-line scrolling for fluid document navigation',
+        '12-month battery life on a single AA with auto-sleep power management',
+        'Eco-conscious build: crafted with certified post-consumer recycled plastic'
+      ],
+      description: 'Meet Logitech M196, the reliable Bluetooth mouse that frees up your workspace. Connects in seconds with a fast, reliable Bluetooth connection—no dongle or USB port required. Designed with an ambidextrous shape, smooth optical tracking, and up to 12 months of battery life, it is the perfect pairing for modern ultra-thin laptops and tablets.',
+      specs: [
+        { key: 'Official Part Numbers (P/N)', val: '910-007459 (Graphite), 910-007460 (Off-White), 910-007461 (Rose)' },
+        { key: 'Warehouse Inventory', val: '60 Units Total (20 Graphite, 20 Off-White, 20 Rose in Lagos)' },
+        { key: 'Connectivity', val: 'Bluetooth 5.0 Low Energy (BLE)' },
+        { key: 'Wireless Range', val: '10 m (33 ft)' },
+        { key: 'Sensor Resolution', val: '1,000 DPI Optical' },
+        { key: 'Battery', val: '1x AA Battery (12 months estimated life)' },
+        { key: 'Sustainability', val: 'Up to 67% post-consumer recycled plastic' },
+        { key: 'Compatibility', val: 'Windows 10/11, macOS 11+, iPadOS 14+, Android 12+, ChromeOS' }
+      ],
+      boxContents: [
+        'Logitech M196 Bluetooth Mouse',
+        '1 AA Battery (Pre-installed)',
+        'User Documentation'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m220',
+      slug: 'logitech-m220-silent-wireless-mouse',
+      name: 'Logitech M220 Silent Wireless Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'silent',
+      partNumber: '910-004878',
+      modelCode: 'M220 SILENT TERRA',
+      color: 'Charcoal',
+      connectivityType: '2.4GHz Wireless (Nano Receiver)',
+      price: 15080,
+      originalPrice: 19500,
+      rating: 4.9,
+      reviewCount: 76,
+      stockCount: 20,
+      badge: '20 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: 'SilentTouch 90% Noise Reduction • 18-Month Battery • Quiet Mark Certified',
+      image: '/images/gadgets/logitech-m220-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m220-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Charcoal (P/N 910-004878)', priceDelta: 0 }
+      ],
+      highlights: [
+        'Over 90% click noise reduction with SilentTouch technology while keeping satisfying click feel',
+        'Awarded Quiet Mark certification for ultra-quiet workspace environments',
+        'Exceptional 18-month battery life with smart automatic sleep and hardware on/off switch',
+        '2.4GHz USB nano receiver provides a reliable 10-meter wireless operating radius',
+        '20 units available in Lagos warehouse for immediate dispatch'
+      ],
+      description: 'With the same click feel and over 90% noise reduction on the click sound, Logitech M220 Silent delivers a quiet experience for you and those around you. It features an 18-month battery life with auto-sleep, powerful 10-meter wireless range with 128-bit encryption between mouse and receiver, and smooth optical tracking.',
+      specs: [
+        { key: 'Official Part Number (P/N)', val: '910-004878' },
+        { key: 'Warehouse Inventory', val: '20 Units Available (Lagos Stock)' },
+        { key: 'Silent Technology', val: 'SilentTouch (>90% Click Noise Reduction)' },
+        { key: 'Certifications', val: 'Quiet Mark Certified' },
+        { key: 'Wireless Connection', val: '2.4 GHz USB Nano Receiver' },
+        { key: 'Sensor Resolution', val: '1,000 DPI Optical' },
+        { key: 'Battery Longevity', val: 'Up to 18 Months (1x AA)' },
+        { key: 'Operating Systems', val: 'Windows, macOS, ChromeOS, Linux' }
+      ],
+      boxContents: [
+        'Logitech M220 Silent Wireless Mouse (Charcoal)',
+        'USB Nano Receiver',
+        '1 AA Battery (Pre-installed)',
+        'User Documentation'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m240',
+      slug: 'logitech-m240-silent-bluetooth-mouse',
+      name: 'Logitech M240 Silent Bluetooth Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'silent',
+      partNumber: '910-007119',
+      modelCode: 'M240',
+      color: 'Graphite',
+      connectivityType: 'Fast Pair Bluetooth + Logi Bolt Compatible',
+      price: 23820,
+      originalPrice: 30000,
+      rating: 4.9,
+      reviewCount: 68,
+      stockCount: 20,
+      badge: '20 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: 'Fast Pair Bluetooth • 90% SilentTouch Clicks • 18-Month Battery • Logi Bolt Ready',
+      image: '/images/gadgets/logitech-m240-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m240-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Graphite (P/N 910-007119)', priceDelta: 0 }
+      ],
+      highlights: [
+        'Instant Fast Pair Bluetooth Low Energy connection with zero dongle required',
+        'SilentTouch technology removes 90% of clicking distractions for ultimate focus',
+        '18-month battery endurance with auto-standby power conservation',
+        'Compatible with Logi Bolt USB receivers for high-security enterprise setups',
+        '20 units ready in Lagos warehouse for immediate dispatch'
+      ],
+      description: 'Meet the Logitech M240 Silent, the reliable Bluetooth mouse that clears your desk space. Pairs in seconds with a fast, easy Bluetooth connection—no dongle or port required. Ultra-quiet SilentTouch clicks deliver the same satisfying click feel with 90% less noise, supported by 18-month battery endurance.',
+      specs: [
+        { key: 'Official Part Number (P/N)', val: '910-007119' },
+        { key: 'Warehouse Inventory', val: '20 Units Available (Lagos Stock)' },
+        { key: 'Connectivity', val: 'Bluetooth Low Energy (Fast Pair) & Logi Bolt Receiver Ready' },
+        { key: 'Noise Reduction', val: 'SilentTouch 90% Quieter' },
+        { key: 'Sensor Resolution', val: '400 – 4,000 DPI (Configurable via Logi Options+)' },
+        { key: 'Battery', val: '1x AA Battery (18 months battery life)' },
+        { key: 'Color', val: 'Graphite' },
+        { key: 'OS Support', val: 'Windows, macOS, iPadOS, ChromeOS, Android, Linux' }
+      ],
+      boxContents: [
+        'Logitech M240 Silent Bluetooth Mouse (Graphite)',
+        '1 AA Battery (Pre-installed)',
+        'User Documentation & Warranty Information'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m350s',
+      slug: 'logitech-pebble-mouse-2-m350s-bluetooth',
+      name: 'Logitech Pebble Mouse 2 M350s',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'bluetooth',
+      partNumber: '910-007015',
+      modelCode: 'M350s',
+      color: 'Tonal Graphite',
+      connectivityType: 'Bluetooth Low Energy Easy-Switch (3 Devices)',
+      price: 35630,
+      originalPrice: 45000,
+      rating: 4.9,
+      reviewCount: 54,
+      stockCount: 10,
+      badge: '10 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: 'Ultra-slim pebble design • Easy-Switch 3 devices • Silent clicks • 24-Month Battery',
+      image: '/images/gadgets/logitech-pebble-m350s-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-pebble-m350s-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Tonal Graphite (P/N 910-007015)', priceDelta: 0 }
+      ],
+      highlights: [
+        'Defy boring with an iconic, minimalist round pebble silhouette that slips into any pocket',
+        'Easy-Switch Bluetooth button toggles instantly across 3 devices (e.g., MacBook, iPad, PC)',
+        'SilentTouch clicks reduce noise by 90% for quiet cafés, libraries, and meetings',
+        'Customizable middle button with Logi Options+ for one-click shortcuts (e.g. Spotify, emoji menu)',
+        'Incredible 2-year (24-month) battery life on a single AA battery',
+        '10 units available in Lagos warehouse for immediate dispatch'
+      ],
+      description: 'Defy boring with the Logitech Pebble Mouse 2 M350s. Its iconic slim, rounded pebble shape looks stunning on any desk and fits effortlessly into your pocket or bag. Hop across 3 computers, tablets, or phones with the press of an Easy-Switch button, while customizable app shortcuts and SilentTouch clicks keep you productive in quiet style.',
+      specs: [
+        { key: 'Official Part Number (P/N)', val: '910-007015' },
+        { key: 'Warehouse Inventory', val: '10 Units Available (Lagos Stock)' },
+        { key: 'Form Factor', val: 'Ultra-Slim Minimalist Ambidextrous Pebble' },
+        { key: 'Multi-Device', val: 'Easy-Switch across up to 3 Devices simultaneously' },
+        { key: 'Connectivity', val: 'Bluetooth 5.1 Low Energy + Logi Bolt Compatible' },
+        { key: 'Clicks', val: 'SilentTouch Technology (90% Quieter)' },
+        { key: 'Customization', val: 'Logi Options+ Customizable Middle Button' },
+        { key: 'Battery Endurance', val: '24 Months (1x AA included)' }
+      ],
+      boxContents: [
+        'Logitech Pebble Mouse 2 M350s (Tonal Graphite)',
+        '1 AA Alkaline Battery (Pre-installed)',
+        'User Documentation & Authenticity Card'
+      ]
+    },
+    {
+      id: 'dp-gad-logi-m650l',
+      slug: 'logitech-signature-m650-l-wireless-mouse',
+      name: 'Logitech Signature M650 L Wireless Mouse',
+      brand: 'Logitech',
+      category: 'logitech',
+      categoryLabel: 'Logitech Gear',
+      subCategory: 'performance',
+      partNumber: '910-006236 / 910-006239',
+      modelCode: 'M650 L',
+      color: 'Graphite (Right & Left Hand Options)',
+      connectivityType: 'Bluetooth Low Energy + Logi Bolt USB Receiver',
+      price: 44730,
+      originalPrice: 56000,
+      rating: 4.9,
+      reviewCount: 78,
+      stockCount: 20,
+      badge: '20 In Stock',
+      badgeTone: 'green',
+      featured: true,
+      shortSpec: 'SmartWheel precision scrolling • Right & Left Hand Large sizes • Logi Bolt + BT',
+      image: '/images/gadgets/logitech-m650l-mouse.jpg',
+      images: [
+        '/images/gadgets/logitech-m650l-mouse.jpg',
+        '/images/gadgets/logitech-official-logo.jpg'
+      ],
+      warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
+      variants: [
+        { label: 'Graphite Large — Right Hand (P/N 910-006236 - 10 in stock)', priceDelta: 0 },
+        { label: 'Graphite Large — Left Hand (P/N 910-006239 - 10 in stock)', priceDelta: 0 }
+      ],
+      highlights: [
+        '20 units available in Lagos warehouse (10 Right-Hand Large, 10 Left-Hand Large)',
+        'SmartWheel scrolling automatically shifts between line-by-line precision and super-fast free spin',
+        'Tailored Large form factor with soft rubberized side thumb grips for medium-to-large hands',
+        'SilentTouch clicks minimize 90% of noise while maintaining tactile confirmation',
+        'Customizable side buttons via Logi Options+ (forward, back, copy, paste)',
+        'Dual connectivity: Bluetooth Low Energy + Logi Bolt secure USB receiver with 24-month battery'
+      ],
+      description: 'Upgrade your desk setup for all-day comfort and productivity with the Logitech Signature M650 L. Featuring SmartWheel scrolling that delivers line-by-line precision when you need it and super-fast scrolling when you want to fly through long pages. Tailored specifically for large hands with both right- and left-handed dedicated models, SilentTouch clicks, and dual Logi Bolt + Bluetooth connectivity.',
+      specs: [
+        { key: 'Official Part Numbers (P/N)', val: '910-006236 (Right Hand Large), 910-006239 (Left Hand Large)' },
+        { key: 'Warehouse Inventory', val: '20 Units Total (10 Right-Hand, 10 Left-Hand in Lagos)' },
+        { key: 'Scroll Wheel', val: 'SmartWheel (Precision + Super-Fast Free Spin)' },
+        { key: 'Sizing & Ergonomics', val: 'Large Size (Hand length > 19cm) with Contoured Thumb Rest' },
+        { key: 'Hand Options', val: 'Right-Handed & Left-Handed Dedicated Ergonomics' },
+        { key: 'Noise Reduction', val: 'SilentTouch 90% Less Noise' },
+        { key: 'Connectivity', val: 'Logi Bolt USB Receiver + Bluetooth Low Energy' },
+        { key: 'Battery Longevity', val: 'Up to 24 Months on 1x AA Battery' }
+      ],
+      boxContents: [
+        'Logitech Signature M650 L Wireless Mouse',
+        'Logi Bolt USB Receiver',
+        '1 AA Battery',
+        'User Documentation'
+      ]
+    },
+    {
       id: 'dp-gad-sam-s25u',
       slug: 'samsung-galaxy-s25-ultra-5g',
       name: 'Samsung Galaxy S25 Ultra 5G (Titanium Frame • S-Pen)',

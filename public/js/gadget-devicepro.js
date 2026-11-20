@@ -60,11 +60,16 @@
     function buildLogitechCard(item) {
       const url = `/gadget/${encodeURIComponent(item.slug)}`;
       const discount = Catalog.getDiscountPct(item.price, item.originalPrice);
+      const stockBadgeText = item.stockCount ? `${item.stockCount} in Stock` : 'In Stock';
+      const pnBadge = item.partNumber
+        ? `<div style="font-size:0.65rem; font-family:monospace; color:#0284C7; font-weight:700; margin:0 0 3px; letter-spacing:-0.2px;">P/N: ${item.partNumber.split(' / ')[0]}</div>`
+        : '';
+      const tagStyle = item.partNumber ? 'background:#ECFDF5; color:#047857; border:1px solid #A7F3D0;' : '';
 
       return `
         <article class="nv-prod-card" data-slug="${item.slug}">
           <div class="nv-prod-stage">
-            <span class="nv-prod-cat-tag">${item.badge || 'Logitech Official'}</span>
+            <span class="nv-prod-cat-tag" style="${tagStyle}">${item.badge || 'Logitech Official'}</span>
             <button type="button" class="nv-prod-cart-icon" data-add-slug="${item.slug}" title="Add to Cart" aria-label="Add ${item.name} to cart">
               ${CART_ICON}
             </button>
@@ -77,12 +82,13 @@
             ${item.originalPrice > item.price ? `<span class="nv-prod-old">${Catalog.formatNaira(item.originalPrice)}</span>` : ''}
             ${discount > 0 ? `<span style="font-size:0.68rem; font-weight:800; color:#00B8FC; background:rgba(0,184,252,0.12); padding:2px 6px; border-radius:4px;">-${discount}%</span>` : ''}
           </div>
+          ${pnBadge}
           <h3 class="nv-prod-title"><a href="${url}">${item.name}</a></h3>
           <p style="font-size:0.72rem; color:#6B7280; margin:0 0 6px; line-height:1.35; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">${item.shortSpec || ''}</p>
           <div class="nv-prod-rating">
             <span class="nv-stars" aria-hidden="true">★★★★★</span>
             <span>${item.rating.toFixed(1)} (${item.reviewCount})</span>
-            <span style="margin-left:auto; font-size:0.68rem; color:#16A34A; font-weight:700;">In Stock</span>
+            <span style="margin-left:auto; font-size:0.68rem; color:#16A34A; font-weight:700;">${stockBadgeText}</span>
           </div>
         </article>
       `;
@@ -95,6 +101,15 @@
       const spec = (item.shortSpec || '').toLowerCase();
       const sub = (item.subCategory || '').toLowerCase();
 
+      if (subcat === 'instock') {
+        return Boolean(item.partNumber);
+      }
+      if (subcat === 'corded') {
+        return sub === 'corded' || spec.includes('cord') || name.includes('b100') || name.includes('m90') || name.includes('m100');
+      }
+      if (subcat === 'wireless') {
+        return (sub === 'wireless' || sub === 'bluetooth' || sub === 'silent' || s.includes('wireless') || s.includes('bluetooth') || name.includes('wireless') || name.includes('bluetooth') || s.includes('lightspeed')) && !name.includes('combo') && !name.includes('keyboard');
+      }
       if (subcat === 'mx') {
         return s.includes('mx') || name.includes('mx') || sub.includes('mx');
       }
@@ -108,7 +123,7 @@
         return s.includes('webcam') || s.includes('brio') || s.includes('c920') || name.includes('webcam');
       }
       if (subcat === 'ergo') {
-        return s.includes('lift') || s.includes('ergo') || name.includes('ergonomic') || spec.includes('ergonomic');
+        return s.includes('lift') || s.includes('ergo') || s.includes('m650') || name.includes('ergonomic') || spec.includes('ergonomic');
       }
       return true;
     }
@@ -132,7 +147,11 @@
       }
 
       if (state.priceRange !== 'all') {
-        if (state.priceRange === 'under-150k') list = list.filter(g => g.price < 150000);
+        if (state.priceRange === 'under-20k') list = list.filter(g => g.price < 20000);
+        else if (state.priceRange === '20k-50k') list = list.filter(g => g.price >= 20000 && g.price <= 50000);
+        else if (state.priceRange === '50k-150k') list = list.filter(g => g.price > 50000 && g.price <= 150000);
+        else if (state.priceRange === 'over-150k') list = list.filter(g => g.price > 150000);
+        else if (state.priceRange === 'under-150k') list = list.filter(g => g.price < 150000);
         else if (state.priceRange === '150k-200k') list = list.filter(g => g.price >= 150000 && g.price <= 200000);
         else if (state.priceRange === 'over-200k') list = list.filter(g => g.price > 200000);
       }
@@ -143,7 +162,10 @@
       else if (state.sort === 'discount') list.sort((a, b) => Catalog.getDiscountPct(b.price, b.originalPrice) - Catalog.getDiscountPct(a.price, a.originalPrice));
 
       const subcatLabels = {
-        all: 'All Logitech Products',
+        all: 'All Logitech Products (20 Models in Stock)',
+        instock: 'Warehouse In-Stock Mice (Lagos Inventory)',
+        wireless: 'Logitech Wireless & Bluetooth Mice',
+        corded: 'Logitech Corded USB Office Mice',
         mx: 'Logitech MX Master Performance Series',
         keyboards: 'Logitech Keyboards & Desk Combos',
         gaming: 'Logitech G Esports Gaming Peripherals',

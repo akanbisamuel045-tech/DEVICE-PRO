@@ -52,8 +52,13 @@
     const bcCat = document.getElementById('nv-bc-cat');
     const bcName = document.getElementById('nv-bc-name');
     if (bcCat) {
-      bcCat.textContent = product.categoryLabel;
-      bcCat.href = `/gadget/shop?category=${encodeURIComponent(product.category)}`;
+      if (product.brand && product.brand.toLowerCase() === 'logitech') {
+        bcCat.textContent = 'Logitech Store';
+        bcCat.href = '/gadget/logitech';
+      } else {
+        bcCat.textContent = product.categoryLabel;
+        bcCat.href = `/gadget/shop?category=${encodeURIComponent(product.category)}`;
+      }
     }
     if (bcName) bcName.textContent = product.name;
 
@@ -94,13 +99,36 @@
     const ratingEl = document.getElementById('nv-detail-rating-text');
     const stockEl = document.getElementById('nv-detail-stock-text');
     const warrantyEl = document.getElementById('nv-detail-warranty-text');
+    const pnPill = document.getElementById('nv-detail-pn-pill');
+    const invBanner = document.getElementById('nv-detail-inventory-banner');
+    const invText = document.getElementById('nv-detail-inventory-text');
 
     if (brandPill) brandPill.textContent = product.brand;
     if (catPill) catPill.textContent = product.categoryLabel;
     if (titleEl) titleEl.textContent = product.name;
     if (ratingEl) ratingEl.textContent = `${product.rating.toFixed(1)} (${product.reviewCount} verified reviews)`;
-    if (stockEl) stockEl.textContent = `In Stock (${product.stockCount || 10} ready in Lagos)`;
     if (warrantyEl) warrantyEl.textContent = product.warranty;
+
+    if (pnPill) {
+      if (product.partNumber) {
+        pnPill.textContent = `P/N: ${product.partNumber.split(' / ')[0]}`;
+        pnPill.style.display = 'inline-flex';
+      } else {
+        pnPill.style.display = 'none';
+      }
+    }
+
+    if (stockEl) {
+      const count = product.stockCount || 10;
+      stockEl.textContent = `${count} Units In Stock`;
+    }
+
+    if (invBanner && invText) {
+      const count = product.stockCount || 10;
+      const isLogi = (product.brand && product.brand.toLowerCase() === 'logitech');
+      invText.innerHTML = `<strong>${count} Units Available in Stock</strong> — Factory-sealed original ${isLogi ? 'Logitech' : ''} hardware ready for same-day dispatch from our Computer Village, Lagos warehouse.`;
+      invBanner.style.display = 'flex';
+    }
 
     // Variants
     const variantBlock = document.getElementById('nv-variant-block');
