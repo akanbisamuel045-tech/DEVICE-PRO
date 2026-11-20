@@ -104,23 +104,32 @@
       if (subcat === 'instock') {
         return Boolean(item.partNumber);
       }
-      if (subcat === 'corded') {
-        return sub === 'corded' || spec.includes('cord') || name.includes('b100') || name.includes('m90') || name.includes('m100');
+      if (subcat === 'mice') {
+        return (sub === 'corded' || sub === 'wireless' || sub === 'bluetooth' || sub === 'silent' || sub === 'performance' || sub.includes('mouse') || sub.includes('mice') || s.includes('mouse') || name.includes('mouse') || s.includes('m650') || s.includes('m170') || s.includes('m171') || s.includes('m185') || s.includes('m196') || s.includes('m220') || s.includes('m240') || s.includes('m350s') || s.includes('b100') || s.includes('m90') || s.includes('m100') || s.includes('g502') || s.includes('g102') || s.includes('superlight') || s.includes('lift') || s.includes('anywhere')) && !s.includes('mousepad') && !name.includes('mousepad') && !name.includes('combo') && !s.includes('combo');
       }
-      if (subcat === 'wireless') {
-        return (sub === 'wireless' || sub === 'bluetooth' || sub === 'silent' || s.includes('wireless') || s.includes('bluetooth') || name.includes('wireless') || name.includes('bluetooth') || s.includes('lightspeed')) && !name.includes('combo') && !name.includes('keyboard');
+      if (subcat === 'keyboards') {
+        return s.includes('keyboard') || s.includes('keys') || s.includes('combo') || name.includes('keyboard') || name.includes('combo') || s.includes('k120') || s.includes('k250') || s.includes('mk120') || s.includes('mk235') || s.includes('mk270') || s.includes('mk295') || s.includes('mk330') || s.includes('mk345') || s.includes('mk540') || s.includes('g413');
+      }
+      if (subcat === 'headsets') {
+        return sub === 'headsets' || s.includes('headset') || name.includes('headset') || s.includes('h390') || s.includes('h110') || s.includes('zone') || s.includes('g321') || s.includes('g522');
+      }
+      if (subcat === 'webcams') {
+        return sub === 'webcams' || s.includes('webcam') || s.includes('brio') || s.includes('c920') || s.includes('c270') || name.includes('webcam');
+      }
+      if (subcat === 'gaming') {
+        return sub === 'gaming' || s.includes('gaming') || name.includes('gaming') || s.includes('g-pro') || s.includes('g502') || s.includes('g102') || s.includes('g413') || s.includes('g321') || s.includes('g522') || s.includes('g240') || name.includes('esports');
       }
       if (subcat === 'mx') {
         return s.includes('mx') || name.includes('mx') || sub.includes('mx');
       }
-      if (subcat === 'keyboards') {
-        return s.includes('keyboard') || s.includes('keys') || s.includes('combo') || name.includes('keyboard') || name.includes('combo');
+      if (subcat === 'presenter') {
+        return s.includes('presenter') || s.includes('r400') || s.includes('mousepad') || s.includes('g240') || name.includes('presenter');
       }
-      if (subcat === 'gaming') {
-        return s.includes('g-pro') || s.includes('g502') || name.includes('gaming') || name.includes('esports');
+      if (subcat === 'corded') {
+        return sub === 'corded' || spec.includes('cord') || name.includes('b100') || name.includes('m90') || name.includes('m100') || name.includes('k120') || name.includes('mk120');
       }
-      if (subcat === 'webcams') {
-        return s.includes('webcam') || s.includes('brio') || s.includes('c920') || name.includes('webcam');
+      if (subcat === 'wireless') {
+        return (sub === 'wireless' || sub === 'bluetooth' || sub === 'silent' || s.includes('wireless') || s.includes('bluetooth') || name.includes('wireless') || name.includes('bluetooth') || s.includes('lightspeed')) && !name.includes('combo') && !name.includes('keyboard') && !name.includes('headset');
       }
       if (subcat === 'ergo') {
         return s.includes('lift') || s.includes('ergo') || s.includes('m650') || name.includes('ergonomic') || spec.includes('ergonomic');
@@ -162,14 +171,17 @@
       else if (state.sort === 'discount') list.sort((a, b) => Catalog.getDiscountPct(b.price, b.originalPrice) - Catalog.getDiscountPct(a.price, a.originalPrice));
 
       const subcatLabels = {
-        all: 'All Logitech Products (20 Models in Stock)',
-        instock: 'Warehouse In-Stock Mice (Lagos Inventory)',
-        wireless: 'Logitech Wireless & Bluetooth Mice',
+        all: 'All Logitech Products (44 Models Available)',
+        instock: 'Lagos Warehouse Verified Stock (36 Models • 828 Units In Stock)',
+        mice: 'Logitech Corded, Wireless & Silent Mice (18 Models • 320 Units In Stock)',
+        keyboards: 'Logitech Keyboards & Desktop Combos (13 Models • 175 Units In Stock)',
+        headsets: 'Logitech USB, Stereo & Wireless Headsets (6 Models • 250 Units In Stock)',
+        webcams: 'Logitech HD & 4K Ultra HD Webcams (5 Models • 40 Units In Stock)',
+        gaming: 'Logitech G Esports Gaming Peripherals (8 Models In Stock)',
+        mx: 'Logitech MX Master Performance Series (5 Flagships)',
+        presenter: 'Logitech Wireless Presenters & Gaming Accessories (2 Models)',
         corded: 'Logitech Corded USB Office Mice',
-        mx: 'Logitech MX Master Performance Series',
-        keyboards: 'Logitech Keyboards & Desk Combos',
-        gaming: 'Logitech G Esports Gaming Peripherals',
-        webcams: 'Logitech HD & 4K Streaming Webcams',
+        wireless: 'Logitech Wireless & Bluetooth Mice',
         ergo: 'Logitech Vertical Ergonomic Hardware'
       };
 
@@ -187,7 +199,7 @@
           <div style="grid-column:1/-1; text-align:center; padding:48px 16px; color:#6B7280;">
             <p style="margin:0 0 14px; color:#111111; font-size:1rem; font-weight:700;">No matching Logitech products found.</p>
             <button type="button" class="nv-logi-pill-btn" id="nv-logi-empty-reset" style="margin:0 auto;">
-              <span>Reset &amp; Show All 9 Logitech Items</span>
+              <span>Reset &amp; Show All 44 Logitech Items</span>
               <span class="nv-circle-arrow">→</span>
             </button>
           </div>
