@@ -171,18 +171,16 @@
       else if (state.sort === 'discount') list.sort((a, b) => Catalog.getDiscountPct(b.price, b.originalPrice) - Catalog.getDiscountPct(a.price, a.originalPrice));
 
       const subcatLabels = {
-        all: 'All Logitech Products (44 Models Available)',
+        all: 'All In-Stock Logitech Products (36 Models • 828 Units)',
         instock: 'Lagos Warehouse Verified Stock (36 Models • 828 Units In Stock)',
-        mice: 'Logitech Corded, Wireless & Silent Mice (18 Models • 320 Units In Stock)',
-        keyboards: 'Logitech Keyboards & Desktop Combos (13 Models • 175 Units In Stock)',
+        mice: 'Logitech Corded, Wireless & Silent Mice (13 Models • 350 Units In Stock)',
+        keyboards: 'Logitech Keyboards & Desktop Combos (11 Models • 175 Units In Stock)',
         headsets: 'Logitech USB, Stereo & Wireless Headsets (6 Models • 250 Units In Stock)',
-        webcams: 'Logitech HD & 4K Ultra HD Webcams (5 Models • 40 Units In Stock)',
-        gaming: 'Logitech G Esports Gaming Peripherals (8 Models In Stock)',
-        mx: 'Logitech MX Master Performance Series (5 Flagships)',
+        webcams: 'Logitech HD & 4K Ultra HD Webcams (4 Models • 40 Units In Stock)',
+        gaming: 'Logitech G Esports Gaming Peripherals (6 Models In Stock)',
         presenter: 'Logitech Wireless Presenters & Gaming Accessories (2 Models)',
         corded: 'Logitech Corded USB Office Mice',
-        wireless: 'Logitech Wireless & Bluetooth Mice',
-        ergo: 'Logitech Vertical Ergonomic Hardware'
+        wireless: 'Logitech Wireless & Bluetooth Mice'
       };
 
       let heading = subcatLabels[state.subcat] || 'Logitech Gear';
@@ -199,7 +197,7 @@
           <div style="grid-column:1/-1; text-align:center; padding:48px 16px; color:#6B7280;">
             <p style="margin:0 0 14px; color:#111111; font-size:1rem; font-weight:700;">No matching Logitech products found.</p>
             <button type="button" class="nv-logi-pill-btn" id="nv-logi-empty-reset" style="margin:0 auto;">
-              <span>Reset &amp; Show All 44 Logitech Items</span>
+              <span>Reset &amp; Show All 36 In-Stock Logitech Items</span>
               <span class="nv-circle-arrow">→</span>
             </button>
           </div>
@@ -305,8 +303,8 @@
     // 1-Click Executive Bundle Add
     if (bundleBtn) {
       bundleBtn.addEventListener('click', () => {
-        const keyboard = Catalog.getBySlug('logitech-mx-keys-s-wireless-keyboard');
-        const mouse = Catalog.getBySlug('logitech-mx-master-3s-wireless-mouse');
+        const keyboard = Catalog.getBySlug('logitech-mx-keys-s-combo');
+        const mouse = Catalog.getBySlug('logitech-signature-m650-l-wireless-mouse');
 
         if (window.DeviceProCart) {
           const items = window.DeviceProCart.getItems();
@@ -341,7 +339,7 @@
             });
           }
           window.DeviceProCart.saveItems(items);
-          window.DeviceProCart.showToast('Added Logitech MX Executive Suite (MX Keys S + MX Master 3S) to cart!');
+          window.DeviceProCart.showToast('Added Logitech MX Keys S Executive Suite to cart!');
           window.DeviceProCart.openDrawer();
         } else {
           window.location.href = '/checkout';

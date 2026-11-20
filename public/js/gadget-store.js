@@ -160,7 +160,7 @@
 
     if (row1El) {
       const slugs1 = [
-        'logitech-mx-master-3s-wireless-mouse',
+        'logitech-signature-m650-l-wireless-mouse',
         'samsung-galaxy-s25-ultra-5g',
         'apple-airpods-pro-2-usbc',
         'jbl-charge-5-portable-bluetooth-speaker'
@@ -216,12 +216,12 @@
     const arrivalPool = [
       'sony-wh-1000xm5-wireless-anc-headphones',
       'hp-elitebook-840-g10-core-i7',
-      'logitech-mx-keys-s-wireless-keyboard',
+      'logitech-mx-keys-s-combo',
       'lg-ultragear-27-qhd-165hz-gaming-monitor',
       'anker-prime-100w-gan-3-port-charger',
       'lenovo-thinkpad-x1-carbon-gen-11',
       'epson-ecotank-l3250-wifi-all-in-one-printer',
-      'logitech-g-pro-x-superlight-2-gaming-mouse',
+      'logitech-g502-hero-gaming-mouse',
       'samsung-smart-monitor-m8-32-4k'
     ].map(s => Catalog.getBySlug(s)).filter(Boolean);
 
@@ -256,7 +256,7 @@
     if (bsRow2) {
       const bsSlugs = [
         'oraimo-traveler-40000mah-65w-powerbank',
-        'logitech-pebble-2-combo-keyboard-mouse',
+        'logitech-pebble-mouse-2-m350s-bluetooth',
         'ugreen-revodok-pro-9in1-usbc-docking-hub'
       ];
       const orangePromoCard = `
@@ -284,7 +284,7 @@
     if (previewGrid) {
       const previewSlugs = [
         'apple-iphone-16-pro-max-256gb',
-        'logitech-mx-keys-s-wireless-keyboard',
+        'logitech-mx-keys-s-combo',
         'anker-737-powercore-24000mah-140w',
         'epson-ecotank-l3250-wifi-all-in-one-printer'
       ];
