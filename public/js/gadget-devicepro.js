@@ -399,6 +399,139 @@
       }
     };
 
+    
+    // =========================================================================
+    // HERO SLIDE CARD & HERO CARDS CONTROLLER
+    // =========================================================================
+    (function initHeroCarousel() {
+      const carouselEl = document.getElementById('nv-hero-carousel');
+      if (!carouselEl) return;
+
+      const slides = carouselEl.querySelectorAll('.nv-hero-slide');
+      const dots = carouselEl.querySelectorAll('.nv-hero-dot');
+      const prevBtn = document.getElementById('nv-hero-prev');
+      const nextBtn = document.getElementById('nv-hero-next');
+      const curCounter = carouselEl.querySelector('#nv-hero-counter .cur');
+      const totCounter = carouselEl.querySelector('#nv-hero-counter .tot');
+      const heroCards = document.querySelectorAll('.nv-hero-card');
+
+      if (!slides.length) return;
+      if (totCounter) totCounter.textContent = String(slides.length).padStart(2, '0');
+
+      let current = 0;
+      let timer = null;
+
+      function goToSlide(idx) {
+        current = (idx + slides.length) % slides.length;
+        slides.forEach((s, i) => s.classList.toggle('active', i === current));
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        if (curCounter) curCounter.textContent = String(current + 1).padStart(2, '0');
+      }
+
+      function nextSlide() {
+        goToSlide(current + 1);
+      }
+
+      function prevSlide() {
+        goToSlide(current - 1);
+      }
+
+      function startAutoPlay() {
+        stopAutoPlay();
+        timer = setInterval(nextSlide, 5000);
+      }
+
+      function stopAutoPlay() {
+        if (timer) {
+          clearInterval(timer);
+          timer = null;
+        }
+      }
+
+      if (nextBtn) {
+        nextBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          nextSlide();
+          startAutoPlay();
+        });
+      }
+
+      if (prevBtn) {
+        prevBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          prevSlide();
+          startAutoPlay();
+        });
+      }
+
+      dots.forEach((dot, idx) => {
+        dot.addEventListener('click', (e) => {
+          e.preventDefault();
+          goToSlide(idx);
+          startAutoPlay();
+        });
+      });
+
+      carouselEl.addEventListener('mouseenter', stopAutoPlay);
+      carouselEl.addEventListener('mouseleave', startAutoPlay);
+
+      // Touch Swipe Support
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      carouselEl.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+        stopAutoPlay();
+      }, { passive: true });
+
+      carouselEl.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchEndX - touchStartX;
+        if (Math.abs(diff) > 40) {
+          if (diff < 0) nextSlide();
+          else prevSlide();
+        }
+        startAutoPlay();
+      }, { passive: true });
+
+      // Interactive Hero Cards wiring
+      heroCards.forEach(card => {
+        card.addEventListener('click', () => {
+          const filter = card.getAttribute('data-hero-filter');
+          const slideTarget = card.getAttribute('data-slide-target');
+
+          heroCards.forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+
+          if (slideTarget !== null) {
+            goToSlide(parseInt(slideTarget, 10));
+          }
+
+          if (filter) {
+            state.subcat = filter;
+            subcatTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-subcat') === filter));
+            renderProducts();
+          }
+
+          const catSection = document.getElementById('logitech-catalogue');
+          if (catSection) {
+            catSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+
+      // Quick scroll links inside slides
+      document.querySelectorAll('[data-scroll-catalogue]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const catSection = document.getElementById('logitech-catalogue');
+          if (catSection) catSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      startAutoPlay();
+    })();
+
     renderProducts();
   });
 })();
