@@ -82,9 +82,16 @@ button {
 
 .nv-container {
   width: 100%;
-  max-width: 1180px;
+  max-width: 1480px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 24px;
+}
+
+@media (min-width: 1600px) {
+  .nv-container {
+    max-width: 1560px;
+    padding: 0 32px;
+  }
 }
 
 /* =============================================================================
@@ -3116,7 +3123,7 @@ button {
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
   aspect-ratio: 2.48 / 1;
   min-height: 280px;
-  max-height: 560px;
+  max-height: 640px;
 }
 
 .nv-hero-slides-track {
