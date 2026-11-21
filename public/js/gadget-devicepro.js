@@ -83,7 +83,7 @@
       const discount = Catalog.getDiscountPct(item.price, item.originalPrice);
       const stockBadgeText = item.stockCount ? `${item.stockCount} in Stock` : 'In Stock';
       const pnBadge = item.partNumber
-        ? `<div style="font-size:0.65rem; font-family:monospace; color:#0284C7; font-weight:700; margin:0 0 3px; letter-spacing:-0.2px;">P/N: ${item.partNumber.split(' / ')[0]}</div>`
+        ? `<div style="font-size:0.75rem; font-family:monospace; color:#0284C7; font-weight:700; margin:0 0 3px; letter-spacing:-0.2px;">P/N: ${item.partNumber.split(' / ')[0]}</div>`
         : '';
       const tagStyle = item.partNumber ? 'background:#ECFDF5; color:#047857; border:1px solid #A7F3D0;' : '';
 
@@ -101,15 +101,15 @@
           <div class="nv-prod-prices">
             <span class="nv-prod-price">${Catalog.formatNaira(item.price)}</span>
             ${item.originalPrice > item.price ? `<span class="nv-prod-old">${Catalog.formatNaira(item.originalPrice)}</span>` : ''}
-            ${discount > 0 ? `<span style="font-size:0.68rem; font-weight:800; color:#00B8FC; background:rgba(0,184,252,0.12); padding:2px 6px; border-radius:4px;">-${discount}%</span>` : ''}
+            ${discount > 0 ? `<span style="font-size:0.75rem; font-weight:800; color:#00B8FC; background:rgba(0,184,252,0.12); padding:2px 7px; border-radius:4px;">-${discount}%</span>` : ''}
           </div>
           ${pnBadge}
           <h3 class="nv-prod-title"><a href="${url}">${item.name}</a></h3>
-          <p style="font-size:0.72rem; color:#6B7280; margin:0 0 6px; line-height:1.35; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">${item.shortSpec || ''}</p>
+          <p style="font-size:0.80rem; color:#6B7280; margin:0 0 6px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">${item.shortSpec || ''}</p>
           <div class="nv-prod-rating">
             <span class="nv-stars" aria-hidden="true">★★★★★</span>
             <span>${item.rating.toFixed(1)} (${item.reviewCount})</span>
-            <span style="margin-left:auto; font-size:0.68rem; color:#16A34A; font-weight:700;">${stockBadgeText}</span>
+            <span style="margin-left:auto; font-size:0.76rem; color:#16A34A; font-weight:700;">${stockBadgeText}</span>
           </div>
           <div class="nv-prod-action-row">
             <button type="button" class="nv-prod-buy-btn" data-buy-slug="${item.slug}" aria-label="Buy ${item.name} now">

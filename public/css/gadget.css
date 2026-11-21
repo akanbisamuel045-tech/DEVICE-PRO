@@ -33,7 +33,7 @@
 }
 
 html {
-  font-size: 14px;
+  font-size: 16.8px; /* Scaled 20% from 14px for optimal readability across all desktop and mobile displays */
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -934,13 +934,13 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 8px 12px;
+  gap: 8px;
+  padding: 9px 14px;
   border-radius: 8px;
   border: 1px solid #060910;
   background: #060910;
   color: #FFFFFF;
-  font-size: 0.78rem;
+  font-size: 0.84rem;
   font-weight: 700;
   letter-spacing: 0.01em;
   cursor: pointer;
