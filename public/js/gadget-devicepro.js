@@ -57,6 +57,27 @@
       }
     }
 
+    function buyProductNow(slug) {
+      const g = Catalog.getBySlug(slug);
+      if (!g) return;
+      if (window.DeviceProCart && typeof window.DeviceProCart.addItem === 'function') {
+        window.DeviceProCart.addItem({
+          id: g.id,
+          slug: g.slug,
+          name: g.name,
+          brand: g.brand,
+          category: g.categoryLabel,
+          price: g.price,
+          image: g.image,
+          specifications: g.shortSpec,
+          quantity: 1
+        });
+        window.location.href = '/checkout';
+      } else {
+        window.location.href = `/gadget/${encodeURIComponent(g.slug)}`;
+      }
+    }
+
     function buildLogitechCard(item) {
       const url = `/gadget/${encodeURIComponent(item.slug)}`;
       const discount = Catalog.getDiscountPct(item.price, item.originalPrice);
@@ -89,6 +110,12 @@
             <span class="nv-stars" aria-hidden="true">★★★★★</span>
             <span>${item.rating.toFixed(1)} (${item.reviewCount})</span>
             <span style="margin-left:auto; font-size:0.68rem; color:#16A34A; font-weight:700;">${stockBadgeText}</span>
+          </div>
+          <div class="nv-prod-action-row">
+            <button type="button" class="nv-prod-buy-btn" data-buy-slug="${item.slug}" aria-label="Buy ${item.name} now">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+              <span>Buy Now</span>
+            </button>
           </div>
         </article>
       `;
@@ -213,6 +240,13 @@
           e.preventDefault();
           e.stopPropagation();
           addToSharedCart(btn.getAttribute('data-add-slug'));
+        });
+      });
+      gridEl.querySelectorAll('[data-buy-slug]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          buyProductNow(btn.getAttribute('data-buy-slug'));
         });
       });
     }
@@ -413,7 +447,6 @@
       const nextBtn = document.getElementById('nv-hero-next');
       const curCounter = carouselEl.querySelector('#nv-hero-counter .cur');
       const totCounter = carouselEl.querySelector('#nv-hero-counter .tot');
-      const heroCards = document.querySelectorAll('.nv-hero-card');
 
       if (!slides.length) return;
       if (totCounter) totCounter.textContent = String(slides.length).padStart(2, '0');
@@ -493,32 +526,6 @@
         }
         startAutoPlay();
       }, { passive: true });
-
-      // Interactive Hero Cards wiring
-      heroCards.forEach(card => {
-        card.addEventListener('click', () => {
-          const filter = card.getAttribute('data-hero-filter');
-          const slideTarget = card.getAttribute('data-slide-target');
-
-          heroCards.forEach(c => c.classList.remove('active'));
-          card.classList.add('active');
-
-          if (slideTarget !== null) {
-            goToSlide(parseInt(slideTarget, 10));
-          }
-
-          if (filter) {
-            state.subcat = filter;
-            subcatTabs.forEach(t => t.classList.toggle('active', t.getAttribute('data-subcat') === filter));
-            renderProducts();
-          }
-
-          const catSection = document.getElementById('logitech-catalogue');
-          if (catSection) {
-            catSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        });
-      });
 
       // Quick scroll links inside slides
       document.querySelectorAll('[data-scroll-catalogue]').forEach(btn => {

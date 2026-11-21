@@ -923,6 +923,51 @@ button {
   letter-spacing: 1px;
 }
 
+.nv-prod-action-row {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #F3F4F6;
+}
+
+.nv-prod-buy-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #060910;
+  background: #060910;
+  color: #FFFFFF;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nv-prod-buy-btn svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.nv-prod-buy-btn:hover {
+  background: var(--accent-orange, #FF6B00);
+  border-color: var(--accent-orange, #FF6B00);
+  color: #FFFFFF;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(255, 107, 0, 0.28);
+}
+
+.nv-prod-buy-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.nv-prod-buy-btn:active {
+  transform: translateY(0);
+}
+
 /* Deep Indigo/Violet Countdown Banner (Exact Color & Layout Match!) */
 .nv-countdown-banner {
   margin: 26px 0;
