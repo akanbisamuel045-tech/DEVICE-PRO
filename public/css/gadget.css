@@ -3068,10 +3068,10 @@ button {
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: #020713;
-  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.16);
-  min-height: 380px;
-  max-height: 520px;
-  aspect-ratio: 21 / 9;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+  aspect-ratio: 2.48 / 1;
+  min-height: 280px;
+  max-height: 560px;
 }
 
 .nv-hero-slides-track {
@@ -3086,15 +3086,13 @@ button {
   inset: 0;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: scale(1.02);
+  transition: opacity 0.5s ease-in-out;
   z-index: 1;
 }
 
 .nv-hero-slide.active {
   opacity: 1;
   visibility: visible;
-  transform: scale(1);
   z-index: 2;
 }
 
@@ -3105,6 +3103,7 @@ button {
   position: relative;
   text-decoration: none;
   color: inherit;
+  cursor: pointer;
 }
 
 .nv-slide-img {
@@ -3113,22 +3112,13 @@ button {
   object-fit: cover;
   object-position: center;
   display: block;
-  transform: scale(1);
-  transition: transform 6s ease-out;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
-.nv-hero-slide.active .nv-slide-img {
-  transform: scale(1.04);
-}
-
+/* Ensure no text or gradient overlays appear on the hero card */
 .nv-slide-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(3, 7, 18, 0.88) 0%, rgba(3, 7, 18, 0.52) 50%, rgba(3, 7, 18, 0.08) 100%);
-  display: flex;
-  align-items: center;
-  padding: 40px 52px;
-  z-index: 2;
+  display: none !important;
 }
 
 .nv-slide-content {
@@ -3412,26 +3402,15 @@ button {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .nv-hero-slide-card {
-    min-height: 340px;
-    aspect-ratio: 16 / 9;
-  }
-  .nv-slide-overlay {
-    padding: 30px 36px;
+    min-height: 240px;
+    aspect-ratio: 2.45 / 1;
   }
 }
 
 @media (max-width: 768px) {
   .nv-hero-slide-card {
-    min-height: 320px;
-    aspect-ratio: 16 / 10;
-  }
-  .nv-slide-overlay {
-    padding: 24px 20px;
-    background: linear-gradient(180deg, rgba(3, 7, 18, 0.45) 0%, rgba(3, 7, 18, 0.9) 100%);
-    align-items: flex-end;
-  }
-  .nv-slide-content {
-    max-width: 100%;
+    min-height: 180px;
+    aspect-ratio: 2.25 / 1;
   }
   .nv-hero-arrow {
     width: 36px;
@@ -3441,8 +3420,9 @@ button {
   .nv-hero-arrow.prev { left: 10px; }
   .nv-hero-arrow.next { right: 10px; }
   .nv-hero-controls-bar {
-    bottom: 12px;
+    bottom: 10px;
     right: 12px;
+    padding: 4px 10px;
   }
   .nv-hero-cards-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3451,6 +3431,10 @@ button {
 }
 
 @media (max-width: 500px) {
+  .nv-hero-slide-card {
+    min-height: 150px;
+    aspect-ratio: 2.1 / 1;
+  }
   .nv-hero-cards-grid {
     grid-template-columns: 1fr;
   }
