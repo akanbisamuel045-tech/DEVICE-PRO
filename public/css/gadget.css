@@ -2924,6 +2924,39 @@ button {
   .nv-logi-stats-strip {
     display: none !important;
   }
+
+  /* Move explorer controls filter options right under the section heading on mobile view */
+  .nv-sec-head {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .nv-sec-head > div:first-child {
+    width: 100% !important;
+  }
+
+  .nv-explorer-controls {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .nv-explorer-controls .nv-select {
+    flex: 1 1 calc(50% - 6px) !important;
+    min-width: 130px !important;
+    padding: 8px 10px !important;
+    font-size: 0.82rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .nv-explorer-controls #nv-logi-reset,
+  .nv-explorer-controls #nv-shop-reset {
+    flex: 0 0 auto !important;
+  }
 }
 
 /* Logitech Sub-Category Filter Navigation */
