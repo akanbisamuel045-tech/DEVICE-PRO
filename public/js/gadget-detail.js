@@ -110,12 +110,8 @@
     if (warrantyEl) warrantyEl.textContent = product.warranty;
 
     if (pnPill) {
-      if (product.partNumber) {
-        pnPill.textContent = `P/N: ${product.partNumber.split(' / ')[0]}`;
-        pnPill.style.display = 'inline-flex';
-      } else {
-        pnPill.style.display = 'none';
-      }
+      pnPill.style.display = 'none';
+      pnPill.textContent = '';
     }
 
     if (stockEl) {

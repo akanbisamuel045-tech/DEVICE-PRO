@@ -32,7 +32,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'corded',
-      partNumber: '910-003357',
       modelCode: 'B100',
       color: 'Black-Grey',
       connectivityType: 'USB-A Corded (1.8m)',
@@ -52,7 +51,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black-Grey (P/N 910-003357)', priceDelta: 0 }
+        { label: 'Black-Grey', priceDelta: 0 }
       ],
       highlights: [
         'Precise 800 DPI optical tracking for smooth cursor control and accurate text selection',
@@ -63,7 +62,6 @@
       ],
       description: 'The Logitech B100 Optical USB Mouse delivers dependable everyday computing essentials. With an ambidextrous curved shape that keeps your hand comfortable all day long, high-precision 800 DPI optical tracking, and zero-setup USB connectivity, it is the trusted workhorse for corporate offices, call centers, and home desktops.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-003357' },
         { key: 'Warehouse Inventory', val: '30 Units Available (Lagos Stock)' },
         { key: 'Sensor Technology', val: 'Optical Tracking (800 DPI)' },
         { key: 'Number of Buttons', val: '3 (Left, Right, Middle Click with Scroll Wheel)' },
@@ -86,7 +84,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'corded',
-      partNumber: '910-001793',
       modelCode: 'M90',
       color: 'Grey',
       connectivityType: 'USB-A Corded',
@@ -106,7 +103,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Grey (P/N 910-001793)', priceDelta: 0 }
+        { label: 'Grey', priceDelta: 0 }
       ],
       highlights: [
         '1,000 DPI high-definition optical tracking for responsive and smooth cursor navigation',
@@ -117,7 +114,6 @@
       ],
       description: 'Logitech M90 gives you just the basics for comfortable, reliable control of your computer. There is no software to install and because it is corded, you can just plug the cable into a USB port and use it right away. Full-size ambidextrous comfort means your hand rests naturally whether you are right- or left-handed.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-001793' },
         { key: 'Warehouse Inventory', val: '30 Units Available (Lagos Stock)' },
         { key: 'Sensor Resolution', val: '1,000 DPI High-Definition Optical' },
         { key: 'Buttons', val: '3 Buttons (Left/Right Click, Clickable Scroll Wheel)' },
@@ -140,7 +136,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'corded',
-      partNumber: '910-006652',
       modelCode: 'M100',
       color: 'Black',
       connectivityType: 'USB-A Corded',
@@ -161,7 +156,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 910-006652)', priceDelta: 0 }
+        { label: 'Black', priceDelta: 0 }
       ],
       highlights: [
         'Accurate 1,000 DPI optical sensor ensures smooth tracking on desks and mousepads',
@@ -172,7 +167,6 @@
       ],
       description: 'The Logitech M100 is the benchmark for durable everyday corded mice. Packaged in official factory-sealed Akoya Hangtab retail boxes, it features a responsive 1,000 DPI optical engine, ambidextrous contouring, and zero-latency USB connectivity for professional workstation environments.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-006652' },
         { key: 'Warehouse Inventory', val: '20 Units Available (Lagos Stock)' },
         { key: 'Packaging', val: 'Akoya Hangtab Box M100 EMEA28i-935' },
         { key: 'Sensor Resolution', val: '1,000 DPI' },
@@ -195,7 +189,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'wireless',
-      partNumber: '910-004642',
       modelCode: 'M170',
       color: 'Black / Grey',
       connectivityType: '2.4GHz Wireless (Nano Receiver)',
@@ -215,7 +208,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black/Grey (P/N 910-004642)', priceDelta: 0 }
+        { label: 'Black/Grey', priceDelta: 0 }
       ],
       highlights: [
         'Rock-solid 2.4GHz wireless connection up to 10 meters (33 ft) with zero dropouts',
@@ -226,7 +219,6 @@
       ],
       description: 'Logitech M170 Wireless Mouse offers reliable wireless freedom at an affordable price. With a 10-meter operational radius, 12-month battery longevity, and an ambidextrous shape that can reassign left and right button functions via software, it is the ideal everyday travel companion for students and business pros.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-004642' },
         { key: 'Warehouse Inventory', val: '10 Units Available (Lagos Stock)' },
         { key: 'Wireless Technology', val: 'Advanced 2.4 GHz Wireless' },
         { key: 'Wireless Range', val: '10 meters (33 feet)' },
@@ -250,7 +242,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'wireless',
-      partNumber: '910-004424 / 910-004640 / 910-006866 / 910-004641',
       modelCode: 'M171',
       color: 'Black, Blue, Blue-Grey, Red',
       connectivityType: '2.4GHz Wireless (Nano Receiver)',
@@ -270,10 +261,10 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black-K (P/N 910-004424 - 20 in stock)', priceDelta: 0 },
-        { label: 'Blue-K (P/N 910-004640 - 20 in stock)', priceDelta: 0 },
-        { label: 'Blue-Grey (P/N 910-006866 - 10 in stock)', priceDelta: 0 },
-        { label: 'Red-K (P/N 910-004641 - 10 in stock)', priceDelta: 0 }
+        { label: 'Black-K (20 in stock)', priceDelta: 0 },
+        { label: 'Blue-K (20 in stock)', priceDelta: 0 },
+        { label: 'Blue-Grey (10 in stock)', priceDelta: 0 },
+        { label: 'Red-K (10 in stock)', priceDelta: 0 }
       ],
       highlights: [
         '60 total units in stock across 4 vibrant color finishes (Black, Blue, Blue-Grey, Red)',
@@ -284,7 +275,6 @@
       ],
       description: 'The Logitech M171 Wireless Mouse combines playful modern aesthetics with dependable Swiss engineering. Available in Black, Blue, Blue-Grey, and Red variants, this compact wireless mouse provides up to a year of battery life and a strong 10-meter wireless link through its ultra-compact USB receiver.',
       specs: [
-        { key: 'Official Part Numbers (P/N)', val: '910-004424 (Black), 910-004640 (Blue), 910-006866 (Blue-Grey), 910-004641 (Red)' },
         { key: 'Warehouse Inventory', val: '60 Units Total (20 Black, 20 Blue, 10 Blue-Grey, 10 Red)' },
         { key: 'Wireless Standard', val: '2.4 GHz USB Nano Receiver' },
         { key: 'Operating Range', val: 'Up to 10 m (33 ft)' },
@@ -308,7 +298,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'wireless',
-      partNumber: '910-002235 / 910-002237',
       modelCode: 'M185 TERRA',
       color: 'Swift Grey, Red',
       connectivityType: '2.4GHz Wireless (Nano Receiver)',
@@ -328,8 +317,8 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Swift Grey (P/N 910-002235 - 20 in stock)', priceDelta: 0 },
-        { label: 'Red (P/N 910-002237 - 20 in stock)', priceDelta: 0 }
+        { label: 'Swift Grey (20 in stock)', priceDelta: 0 },
+        { label: 'Red (20 in stock)', priceDelta: 0 }
       ],
       highlights: [
         '40 units ready in Lagos warehouse (20 Swift Grey, 20 Red)',
@@ -340,7 +329,6 @@
       ],
       description: 'A simple, reliable wireless mouse with plug-and-play wireless. You get the reliability of a cord with wireless convenience and freedom—fast data transmission and virtually no delays or dropouts. The contoured shape follows the natural curve of your hand, so you can stay productive longer.',
       specs: [
-        { key: 'Official Part Numbers (P/N)', val: '910-002235 (Swift Grey), 910-002237 (Red)' },
         { key: 'Warehouse Inventory', val: '40 Units Total (20 Swift Grey, 20 Red in Lagos)' },
         { key: 'Series / Spec', val: 'M185 TERRA EMEA28i-935' },
         { key: 'Sensor Resolution', val: '1,000 DPI Optical' },
@@ -364,7 +352,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'bluetooth',
-      partNumber: '910-007459 / 910-007460 / 910-007461',
       modelCode: 'M196',
       color: 'Graphite, Off-White, Rose',
       connectivityType: 'Bluetooth 5.0 Low Energy (No Dongle)',
@@ -384,9 +371,9 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Graphite (P/N 910-007459 - 20 in stock)', priceDelta: 0 },
-        { label: 'Off-White (P/N 910-007460 - 20 in stock)', priceDelta: 0 },
-        { label: 'Rose / Lilac (P/N 910-007461 - 20 in stock)', priceDelta: 0 }
+        { label: 'Graphite (20 in stock)', priceDelta: 0 },
+        { label: 'Off-White (20 in stock)', priceDelta: 0 },
+        { label: 'Rose / Lilac (20 in stock)', priceDelta: 0 }
       ],
       highlights: [
         '60 total units available in Lagos warehouse across Graphite, Off-White, and Rose',
@@ -397,7 +384,6 @@
       ],
       description: 'Meet Logitech M196, the reliable Bluetooth mouse that frees up your workspace. Connects in seconds with a fast, reliable Bluetooth connection—no dongle or USB port required. Designed with an ambidextrous shape, smooth optical tracking, and up to 12 months of battery life, it is the perfect pairing for modern ultra-thin laptops and tablets.',
       specs: [
-        { key: 'Official Part Numbers (P/N)', val: '910-007459 (Graphite), 910-007460 (Off-White), 910-007461 (Rose)' },
         { key: 'Warehouse Inventory', val: '60 Units Total (20 Graphite, 20 Off-White, 20 Rose in Lagos)' },
         { key: 'Connectivity', val: 'Bluetooth 5.0 Low Energy (BLE)' },
         { key: 'Wireless Range', val: '10 m (33 ft)' },
@@ -420,7 +406,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'silent',
-      partNumber: '910-004878',
       modelCode: 'M220 SILENT TERRA',
       color: 'Charcoal',
       connectivityType: '2.4GHz Wireless (Nano Receiver)',
@@ -440,7 +425,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Charcoal (P/N 910-004878)', priceDelta: 0 }
+        { label: 'Charcoal', priceDelta: 0 }
       ],
       highlights: [
         'Over 90% click noise reduction with SilentTouch technology while keeping satisfying click feel',
@@ -451,7 +436,6 @@
       ],
       description: 'With the same click feel and over 90% noise reduction on the click sound, Logitech M220 Silent delivers a quiet experience for you and those around you. It features an 18-month battery life with auto-sleep, powerful 10-meter wireless range with 128-bit encryption between mouse and receiver, and smooth optical tracking.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-004878' },
         { key: 'Warehouse Inventory', val: '20 Units Available (Lagos Stock)' },
         { key: 'Silent Technology', val: 'SilentTouch (>90% Click Noise Reduction)' },
         { key: 'Certifications', val: 'Quiet Mark Certified' },
@@ -475,7 +459,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'silent',
-      partNumber: '910-007119',
       modelCode: 'M240',
       color: 'Graphite',
       connectivityType: 'Fast Pair Bluetooth + Logi Bolt Compatible',
@@ -495,7 +478,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Graphite (P/N 910-007119)', priceDelta: 0 }
+        { label: 'Graphite', priceDelta: 0 }
       ],
       highlights: [
         'Instant Fast Pair Bluetooth Low Energy connection with zero dongle required',
@@ -506,7 +489,6 @@
       ],
       description: 'Meet the Logitech M240 Silent, the reliable Bluetooth mouse that clears your desk space. Pairs in seconds with a fast, easy Bluetooth connection—no dongle or port required. Ultra-quiet SilentTouch clicks deliver the same satisfying click feel with 90% less noise, supported by 18-month battery endurance.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-007119' },
         { key: 'Warehouse Inventory', val: '20 Units Available (Lagos Stock)' },
         { key: 'Connectivity', val: 'Bluetooth Low Energy (Fast Pair) & Logi Bolt Receiver Ready' },
         { key: 'Noise Reduction', val: 'SilentTouch 90% Quieter' },
@@ -529,7 +511,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'bluetooth',
-      partNumber: '910-007015',
       modelCode: 'M350s',
       color: 'Tonal Graphite',
       connectivityType: 'Bluetooth Low Energy Easy-Switch (3 Devices)',
@@ -549,7 +530,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Tonal Graphite (P/N 910-007015)', priceDelta: 0 }
+        { label: 'Tonal Graphite', priceDelta: 0 }
       ],
       highlights: [
         'Defy boring with an iconic, minimalist round pebble silhouette that slips into any pocket',
@@ -561,7 +542,6 @@
       ],
       description: 'Defy boring with the Logitech Pebble Mouse 2 M350s. Its iconic slim, rounded pebble shape looks stunning on any desk and fits effortlessly into your pocket or bag. Hop across 3 computers, tablets, or phones with the press of an Easy-Switch button, while customizable app shortcuts and SilentTouch clicks keep you productive in quiet style.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-007015' },
         { key: 'Warehouse Inventory', val: '10 Units Available (Lagos Stock)' },
         { key: 'Form Factor', val: 'Ultra-Slim Minimalist Ambidextrous Pebble' },
         { key: 'Multi-Device', val: 'Easy-Switch across up to 3 Devices simultaneously' },
@@ -584,7 +564,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'performance',
-      partNumber: '910-006236 / 910-006239',
       modelCode: 'M650 L',
       color: 'Graphite (Right & Left Hand Options)',
       connectivityType: 'Bluetooth Low Energy + Logi Bolt USB Receiver',
@@ -604,8 +583,8 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Graphite Large — Right Hand (P/N 910-006236 - 10 in stock)', priceDelta: 0 },
-        { label: 'Graphite Large — Left Hand (P/N 910-006239 - 10 in stock)', priceDelta: 0 }
+        { label: 'Graphite Large — Right Hand (10 in stock)', priceDelta: 0 },
+        { label: 'Graphite Large — Left Hand (10 in stock)', priceDelta: 0 }
       ],
       highlights: [
         '20 units available in Lagos warehouse (10 Right-Hand Large, 10 Left-Hand Large)',
@@ -617,7 +596,6 @@
       ],
       description: 'Upgrade your desk setup for all-day comfort and productivity with the Logitech Signature M650 L. Featuring SmartWheel scrolling that delivers line-by-line precision when you need it and super-fast scrolling when you want to fly through long pages. Tailored specifically for large hands with both right- and left-handed dedicated models, SilentTouch clicks, and dual Logi Bolt + Bluetooth connectivity.',
       specs: [
-        { key: 'Official Part Numbers (P/N)', val: '910-006236 (Right Hand Large), 910-006239 (Left Hand Large)' },
         { key: 'Warehouse Inventory', val: '20 Units Total (10 Right-Hand, 10 Left-Hand in Lagos)' },
         { key: 'Scroll Wheel', val: 'SmartWheel (Precision + Super-Fast Free Spin)' },
         { key: 'Sizing & Ergonomics', val: 'Large Size (Hand length > 19cm) with Contoured Thumb Rest' },
@@ -641,7 +619,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-013451',
       modelCode: 'K250',
       color: 'Graphite',
       connectivityType: '2.4GHz Wireless + Bluetooth (US Int\'l)',
@@ -661,7 +638,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Graphite (P/N 920-013451)', priceDelta: 0 },
+        { label: 'Graphite', priceDelta: 0 },
       ],
       highlights: [
         'Seamless dual-mode wireless connectivity via 2.4GHz USB receiver or direct Bluetooth',
@@ -672,7 +649,6 @@
       ],
       description: 'Logitech K250 Wireless Keyboard provides versatile desktop productivity. Featuring dual connectivity via Bluetooth and 2.4GHz wireless, a full-size US international layout with responsive low-profile scissor keys, and robust spill resistance.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-013451' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Keyboard Layout', val: 'US International (INTNL-973)' },
         { key: 'Connectivity', val: '2.4GHz USB Receiver + Bluetooth Dual Mode' },
@@ -695,7 +671,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-008685',
       modelCode: 'MK540 ADVANCED',
       color: 'Black',
       connectivityType: '2.4GHz Logitech Unifying Wireless',
@@ -715,7 +690,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Standard Combo (P/N 920-008685)', priceDelta: 0 },
+        { label: 'Standard Combo', priceDelta: 0 },
       ],
       highlights: [
         'Familiar instantly comfortable typing experience with integrated palm rest and adjustable tilt legs',
@@ -726,7 +701,6 @@
       ],
       description: 'Logitech MK540 Advanced is an instantly familiar wireless keyboard and mouse combo built for precision, comfort, and reliability. The full-size keyboard features familiar key shape, number pad, media keys, and an integrated textured palm rest.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-008685' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Layout', val: 'US International (INTNL-973)' },
         { key: 'Wireless Connection', val: 'Logitech Unifying USB Receiver (2.4GHz)' },
@@ -750,7 +724,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-003989',
       modelCode: 'MK330 CR',
       color: 'Black',
       connectivityType: '2.4GHz Wireless (Nano Receiver)',
@@ -770,7 +743,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Standard Combo (P/N 920-003989)', priceDelta: 0 },
+        { label: 'Standard Combo', priceDelta: 0 },
       ],
       highlights: [
         '11 hotkeys and 4 programmable F-keys give instant control over music, video, internet and email',
@@ -781,7 +754,6 @@
       ],
       description: 'Logitech Wireless Combo MK330 puts entertainment and productivity at your fingertips. With 11 dedicated multimedia hotkeys, low-profile quiet keys, and a comfortable optical mouse, this combo makes computing effortless.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-003989' },
         { key: 'Warehouse Inventory', val: '20 Units In Stock (Lagos Stock)' },
         { key: 'Layout', val: 'US International (INTNL-973 CR)' },
         { key: 'Hotkeys', val: '11 Multimedia Hotkeys + 4 Programmable F-keys' },
@@ -804,7 +776,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-009800',
       modelCode: 'MK295 SILENT',
       color: 'Graphite',
       connectivityType: '2.4GHz Wireless with SilentTouch',
@@ -824,7 +795,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Graphite (P/N 920-009800)', priceDelta: 0 },
+        { label: 'Graphite', priceDelta: 0 },
       ],
       highlights: [
         'Innovative SilentTouch technology removes over 90% of distracting click and typing sounds',
@@ -835,7 +806,6 @@
       ],
       description: 'Stay focused and eliminate distractions with Logitech MK295 Silent Wireless Combo featuring SilentTouch—an exclusive Logitech technology that eliminates over 90% of keyboard and mouse noise without compromising tactile feel.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-009800' },
         { key: 'Warehouse Inventory', val: '20 Units In Stock (Lagos Stock)' },
         { key: 'Silent Technology', val: 'SilentTouch (>90% Click & Type Noise Reduction)' },
         { key: 'Layout', val: 'US International Full-Size with Numpad' },
@@ -857,7 +827,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-002562',
       modelCode: 'MK120',
       color: 'Black',
       connectivityType: 'Dual USB-A Corded (Keyboard + Mouse)',
@@ -877,7 +846,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 920-002562)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Durable spill-resistant keyboard paired with smooth 1,000 DPI high-definition optical mouse',
@@ -888,7 +857,6 @@
       ],
       description: 'Logitech Desktop MK120 is the durable corporate standard. A comfortable, quiet keyboard and high-definition optical mouse combination that gives you long-lasting build quality and effortless USB plug-and-play simplicity.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-002562' },
         { key: 'Warehouse Inventory', val: '30 Units In Stock (Lagos Stock)' },
         { key: 'Interface', val: '2x USB-A Corded Cables' },
         { key: 'Mouse Sensor', val: '1,000 DPI Optical Tracking' },
@@ -910,7 +878,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-002508',
       modelCode: 'K120',
       color: 'Black',
       connectivityType: 'USB-A Corded (1.5m)',
@@ -930,7 +897,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 920-002508)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Low-profile whisper-quiet keys with standard full-size layout and full numeric keypad',
@@ -941,7 +908,6 @@
       ],
       description: 'Logitech Keyboard K120 is built for business reliability. Featuring quiet keys that barely make a sound, standard layout with F-keys and number pad, thin sleek profile, and rugged spill-resistant design.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-002508' },
         { key: 'Warehouse Inventory', val: '30 Units In Stock (Lagos Stock)' },
         { key: 'Layout', val: 'US International (INTNL-973)' },
         { key: 'Connectivity', val: 'USB-A Wired Cable (1.5m)' },
@@ -962,7 +928,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-007931',
       modelCode: 'MK235',
       color: 'Grey',
       connectivityType: '2.4GHz Wireless (Nano Receiver)',
@@ -982,7 +947,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Grey (P/N 920-007931)', priceDelta: 0 },
+        { label: 'Grey', priceDelta: 0 },
       ],
       highlights: [
         'Durable build with anti-fading treatment on each key so letters never wear away',
@@ -993,7 +958,6 @@
       ],
       description: 'Logitech MK235 Wireless Keyboard and Mouse Combo is simple, durable, and reliable. Built to withstand spills with treated keys that prevent fading, long-lasting battery life, and strong wireless connectivity.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-007931' },
         { key: 'Warehouse Inventory', val: '15 Units In Stock (Lagos Stock)' },
         { key: 'Layout', val: 'US International (INTNL-973 Grey Keys Grey Bottom)' },
         { key: 'Battery', val: '36 Months (2x AAA Keyboard), 12 Months (1x AA Mouse)' },
@@ -1016,7 +980,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-004509',
       modelCode: 'MK270',
       color: 'Black',
       connectivityType: '2.4GHz Wireless (Logitech Nano Receiver)',
@@ -1036,7 +999,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Standard Combo (P/N 920-004509)', priceDelta: 0 },
+        { label: 'Standard Combo', priceDelta: 0 },
       ],
       highlights: [
         'The world’s best-selling wireless keyboard and mouse combo for dependable daily computing',
@@ -1047,7 +1010,6 @@
       ],
       description: 'Logitech Wireless Combo MK270 brings together the convenience of wireless connectivity with the reliability of a cord. Packed with 8 multimedia hotkeys and robust battery life, it delivers everyday computing convenience.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-004509' },
         { key: 'Warehouse Inventory', val: '15 Units In Stock (Lagos Stock)' },
         { key: 'Layout', val: 'US International (INTNL-973)' },
         { key: 'Shortcuts', val: '8 Dedicated Multimedia Hotkeys' },
@@ -1070,7 +1032,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-006489',
       modelCode: 'MK345 KALUGA',
       color: 'Black',
       connectivityType: '2.4GHz Wireless (Nano Receiver)',
@@ -1090,7 +1051,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 920-006489)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Generously sized palm rest and contoured right-handed mouse for optimal ergonomic support',
@@ -1101,7 +1062,6 @@
       ],
       description: 'Boost your comfort and productivity with the Logitech MK345 Wireless Combo. Featuring a spacious palm rest, full-size keyboard layout, and a precision contoured right-handed mouse with wide scroll wheel.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-006489' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Layout', val: 'US International (INTNL-973 KALUGA AVALON CR)' },
         { key: 'Palm Rest', val: 'Integrated Textured Full-Width Palm Rest' },
@@ -1124,7 +1084,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'keyboards',
-      partNumber: '920-011614',
       modelCode: 'MX Keys S Combo',
       color: 'Graphite',
       connectivityType: 'Bluetooth Low Energy + Logi Bolt USB Receiver',
@@ -1145,7 +1104,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Graphite Flagship Combo (P/N 920-011614)', priceDelta: 0 },
+        { label: 'Graphite Flagship Combo', priceDelta: 0 },
       ],
       highlights: [
         'The ultimate productivity suite: includes MX Keys S illuminated keyboard, MX Master 3S mouse, and premium palm rest',
@@ -1156,7 +1115,6 @@
       ],
       description: 'Logitech MX Keys S Combo combines the precision of MX Keys S keyboard with the unmatched control of the MX Master 3S mouse and a cushioned palm rest. Built for creators and developers who demand peak workflow performance.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-011614' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Included Hardware', val: 'MX Keys S Keyboard + MX Master 3S Mouse + MX Palm Rest' },
         { key: 'Backlighting', val: 'Smart Proximity Sensor Backlight (Auto-adjusting)' },
@@ -1181,7 +1139,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'headsets',
-      partNumber: '981-000406',
       modelCode: 'H390 COMFORT',
       color: 'Black',
       connectivityType: 'USB-A Wired with In-line Controls',
@@ -1201,7 +1158,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black USB-A (P/N 981-000406)', priceDelta: 0 },
+        { label: 'Black USB-A', priceDelta: 0 },
       ],
       highlights: [
         'Massive stock: 200 units available in Lagos warehouse for immediate corporate call center or remote work orders',
@@ -1212,7 +1169,6 @@
       ],
       description: 'Logitech H390 USB Headset is the trusted standard for enterprise call centers, customer support agents, and remote professionals. Featuring laser-tuned audio drivers, noise-canceling microphone, convenient in-line controls, and simple USB plug-and-play.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '981-000406' },
         { key: 'Warehouse Inventory', val: '200 Units In Stock (Lagos Stock)' },
         { key: 'Connection', val: 'USB-A (1.9m / 6.2 ft cable)' },
         { key: 'Microphone', val: 'Bidirectional Noise-Canceling (Rotating Boom)' },
@@ -1234,7 +1190,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'headsets',
-      partNumber: '981-001213',
       modelCode: 'Zone Vibe 100',
       color: 'Graphite',
       connectivityType: 'Bluetooth 5.2 Wireless (Multipoint)',
@@ -1254,7 +1209,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Graphite (P/N 981-001213)', priceDelta: 0 },
+        { label: 'Graphite', priceDelta: 0 },
       ],
       highlights: [
         'Ultra-lightweight design (just 185 grams) with breathable knitted fabric and memory foam ear cushions',
@@ -1265,7 +1220,6 @@
       ],
       description: 'Express your personal style with Logitech Zone Vibe 100 wireless headphones. Perfect for working from home, video conferencing, or relaxing to music with rich 40mm drivers, flip-to-mute mic, and featherweight all-day comfort.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '981-001213' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Wireless Connection', val: 'Bluetooth 5.2 (Up to 30m / 100ft range)' },
         { key: 'Battery Life', val: 'Up to 20 hours listening / 18 hours talk time' },
@@ -1288,7 +1242,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'headsets',
-      partNumber: '981-001407',
       modelCode: 'Zone 300',
       color: 'Black',
       connectivityType: 'Bluetooth 5.3 Wireless (Multipoint)',
@@ -1308,7 +1261,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 981-001407)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Dual beamforming microphones with noise-suppressing algorithms ensure your voice is heard clearly',
@@ -1319,7 +1272,6 @@
       ],
       description: 'Logitech Zone 300 is an essential wireless headset with great audio and reliable voice clarity for daily office and remote collaboration. Lightweight, stylish, and engineered for long battery life.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '981-001407' },
         { key: 'Warehouse Inventory', val: '20 Units In Stock (Lagos Stock)' },
         { key: 'Wireless Version', val: 'Bluetooth 5.3 (Multipoint support for 2 devices)' },
         { key: 'Microphones', val: 'Dual Beamforming Noise-Suppressing Mics' },
@@ -1340,7 +1292,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'headsets',
-      partNumber: '981-000271',
       modelCode: 'H110',
       color: 'Silver/Grey',
       connectivityType: 'Dual 3.5mm Audio Jacks (Mic + Headphone)',
@@ -1360,7 +1311,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Silver/Grey (P/N 981-000271)', priceDelta: 0 },
+        { label: 'Silver/Grey', priceDelta: 0 },
       ],
       highlights: [
         'Versatile stereo headset with separate 3.5 mm audio-in and audio-out microphone ports',
@@ -1371,7 +1322,6 @@
       ],
       description: 'Logitech Stereo Headset H110 is a simple, reliable headset for everyday computers with separate 3.5 mm microphone-in and audio-out ports. Clear stereo audio and noise-canceling microphone make it perfect for VoIP calling and schooling.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '981-000271' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Connector', val: 'Dual 3.5mm Analog Audio Jacks' },
         { key: 'Microphone', val: '180-degree Rotating Noise-Canceling Mic' },
@@ -1392,7 +1342,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'headsets',
-      partNumber: '981-001563',
       modelCode: 'G321',
       color: 'Black',
       connectivityType: '2.4GHz LIGHTSPEED Wireless + Bluetooth',
@@ -1412,7 +1361,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 981-001563)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Pro-grade 2.4GHz LIGHTSPEED wireless delivers ultra-low latency gaming audio',
@@ -1423,7 +1372,6 @@
       ],
       description: 'Logitech G321 Wireless Gaming Headset brings competitive-grade audio performance to your battlestation. With dual LIGHTSPEED 2.4GHz and Bluetooth wireless, breathable ear cushions, and crystal-clear voice comms.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '981-001563' },
         { key: 'Warehouse Inventory', val: '5 Units In Stock (Lagos Stock)' },
         { key: 'Audio Technology', val: 'LIGHTSPEED Wireless + Bluetooth Low Latency' },
         { key: 'Frequency Response', val: '20 Hz – 20 kHz' },
@@ -1445,7 +1393,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'headsets',
-      partNumber: '981-001544',
       modelCode: 'G522',
       color: 'Black',
       connectivityType: '2.4GHz LIGHTSPEED Pro Wireless',
@@ -1465,7 +1412,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 981-001544)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Pro-grade 50mm PRO-G drivers deliver accurate soundscapes and powerful positional bass',
@@ -1476,7 +1423,6 @@
       ],
       description: 'Logitech G522 Wireless Gaming Headset is engineered for serious competitive esports players. Featuring advanced PRO-G 50mm audio drivers, real-time Blue VO!CE microphone filters, DTS Headphone:X 2.0 surround sound, and lag-free LIGHTSPEED wireless.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '981-001544' },
         { key: 'Warehouse Inventory', val: '5 Units In Stock (Lagos Stock)' },
         { key: 'Driver Diameter', val: '50mm Hybrid Mesh PRO-G Drivers' },
         { key: 'Surround Sound', val: 'DTS Headphone:X 2.0 7.1 Surround' },
@@ -1500,7 +1446,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'webcams',
-      partNumber: '960-001585',
       modelCode: 'Brio 100',
       color: 'Graphite',
       connectivityType: 'USB-A Wired with Built-in Privacy Shutter',
@@ -1520,7 +1465,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Graphite (P/N 960-001585)', priceDelta: 0 },
+        { label: 'Graphite', priceDelta: 0 },
       ],
       highlights: [
         'Crisp Full HD 1080p resolution brings sharper clarity and lifelike detail to your video calls',
@@ -1531,7 +1476,6 @@
       ],
       description: 'Look, sound, and feel better on every video call with Logitech Brio 100. Featuring Full HD 1080p streaming, automatic light correction, built-in microphone, and an easy-sliding privacy shutter.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '960-001585' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Resolution', val: '1080p Full HD @ 30fps / 720p HD @ 30fps' },
         { key: 'Diagonal Field of View', val: '58 degrees' },
@@ -1552,7 +1496,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'webcams',
-      partNumber: '960-001063',
       modelCode: 'C270 WIN 10',
       color: 'Black',
       connectivityType: 'USB-A Wired (1.5m cable)',
@@ -1572,7 +1515,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Standard HD (P/N 960-001063)', priceDelta: 0 },
+        { label: 'Standard HD', priceDelta: 0 },
       ],
       highlights: [
         'Crisp widescreen HD 720p video calls at a smooth 30 frames per second',
@@ -1583,7 +1526,6 @@
       ],
       description: 'Logitech HD Webcam C270 gives you sharp, smooth conference calling in widescreen 720p format. Automatic light correction shows you in natural, vibrant colors, while the built-in noise-reducing mic keeps communication crystal-clear.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '960-001063' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Max Resolution', val: '720p / 30fps' },
         { key: 'Field of View', val: '60 degrees' },
@@ -1604,7 +1546,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'webcams',
-      partNumber: '960-001252',
       modelCode: 'C920S PRO',
       color: 'Black',
       connectivityType: 'USB-A Wired with Detachable Privacy Shutter',
@@ -1624,7 +1565,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'C920S with Privacy Shutter (P/N 960-001252)', priceDelta: 0 },
+        { label: 'C920S with Privacy Shutter', priceDelta: 0 },
       ],
       highlights: [
         'Full HD 1080p video calling at 30 fps with premium 5-element glass lens and autofocus',
@@ -1635,7 +1576,6 @@
       ],
       description: 'Logitech C920S Pro HD Webcam delivers remarkably crisp and detailed Full HD video (1080p at 30fps) with a full HD glass lens, 78° field of view, and HD auto light correction—plus dual mics for clear stereo sound and a privacy shutter.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '960-001252' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Resolution', val: '1080p/30fps – 720p/30fps' },
         { key: 'Lens', val: 'Full HD Glass Lens with Premium Autofocus' },
@@ -1657,7 +1597,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'presenter',
-      partNumber: '910-001356',
       modelCode: 'R400',
       color: 'Black',
       connectivityType: '2.4GHz Wireless with Brilliant Red Laser Pointer',
@@ -1677,7 +1616,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 910-001356)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Brilliant red laser pointer makes it easy for your audience to see exactly what you\'re pointing to',
@@ -1688,7 +1627,6 @@
       ],
       description: 'Logitech Wireless Presenter R400 helps you make your point with confidence. Intuitive slideshow controls and a brilliant red laser pointer let you move freely through your presentations from up to 15 meters away.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-001356' },
         { key: 'Warehouse Inventory', val: '5 Units In Stock (Lagos Stock)' },
         { key: 'Laser Class', val: 'Class 2 Laser (Brilliant Red)' },
         { key: 'Wireless Range', val: '15 meters (50 feet) 2.4 GHz' },
@@ -1712,7 +1650,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'gaming',
-      partNumber: '910-005471',
       modelCode: 'G502 HERO',
       color: 'Black',
       connectivityType: 'USB-A Wired with Braided Cable',
@@ -1732,7 +1669,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Standard Edition (P/N 910-005471)', priceDelta: 0 },
+        { label: 'Standard Edition', priceDelta: 0 },
       ],
       highlights: [
         'Next-gen HERO 25K optical sensor delivers sub-micron tracking with zero smoothing or acceleration',
@@ -1743,7 +1680,6 @@
       ],
       description: 'Logitech G502 HERO features our most advanced HERO 25K optical sensor with sub-micron tracking, customizable LIGHTSYNC RGB lighting, up to 5 individual 3.6g weights, and 11 programmable buttons.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-005471' },
         { key: 'Warehouse Inventory', val: '10 Units In Stock (Lagos Stock)' },
         { key: 'Sensor', val: 'HERO 25K (100 – 25,600 DPI)' },
         { key: 'Max Acceleration / Speed', val: '>40G / >400 IPS' },
@@ -1765,7 +1701,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'gaming',
-      partNumber: '910-005823',
       modelCode: 'G102 LIGHTSYNC',
       color: 'Black',
       connectivityType: 'USB-A Wired (2m cable)',
@@ -1785,7 +1720,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 910-005823)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Gaming-grade optical sensor with adjustable 200 – 8,000 DPI sensitivity',
@@ -1796,7 +1731,6 @@
       ],
       description: 'Make the most of your game time with Logitech G102 gaming mouse featuring LIGHTSYNC technology, a gaming-grade 8,000 DPI sensor, and a classic 6-button design with crisp metal-spring actuation.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '910-005823' },
         { key: 'Warehouse Inventory', val: '20 Units In Stock (Lagos Stock)' },
         { key: 'Sensor', val: 'Gaming-Grade Optical (200 – 8,000 DPI)' },
         { key: 'Lighting', val: 'LIGHTSYNC RGB Color Wave (16.8M colors)' },
@@ -1816,7 +1750,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'gaming',
-      partNumber: '920-010437',
       modelCode: 'G413 SE',
       color: 'Black',
       connectivityType: 'USB-A Corded (1.8m)',
@@ -1836,7 +1769,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Black (P/N 920-010437)', priceDelta: 0 },
+        { label: 'Black', priceDelta: 0 },
       ],
       highlights: [
         'Tactile mechanical switches provide subtle feedback through the actuation moment for competitive precision',
@@ -1847,7 +1780,6 @@
       ],
       description: 'Meet the Logitech G413 SE full-size mechanical gaming keyboard. Built for game performance with tactile mechanical switches, 6-key rollover anti-ghosting, PBT keycaps, and a durable black brushed aluminum alloy top case.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '920-010437' },
         { key: 'Warehouse Inventory', val: '5 Units In Stock (Lagos Stock)' },
         { key: 'Switches', val: 'Tactile Mechanical Switches (Actuation distance: 1.9 mm)' },
         { key: 'Keycaps', val: 'Heat and Wear Resistant PBT Keycaps' },
@@ -1869,7 +1801,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'gaming',
-      partNumber: '943-000785',
       modelCode: 'G240',
       color: 'Black',
       connectivityType: 'Accessories / Surface',
@@ -1889,7 +1820,7 @@
       ],
       warranty: '1-Year Official Logitech & DEVICE PRO Warranty',
       variants: [
-        { label: 'Standard Cloth (P/N 943-000785)', priceDelta: 0 },
+        { label: 'Standard Cloth', priceDelta: 0 },
       ],
       highlights: [
         'Moderate surface friction gives the right amount of resistance to mouse feet when starting or stopping low-DPI maneuvers',
@@ -1900,7 +1831,6 @@
       ],
       description: 'The cloth surface of the Logitech G240 provides ideal surface friction for low-DPI gaming, improving mouse control and precise cursor placement. Matched to Logitech G mouse sensors with a non-slip rubber base.',
       specs: [
-        { key: 'Official Part Number (P/N)', val: '943-000785' },
         { key: 'Warehouse Inventory', val: '8 Units In Stock (Lagos Stock)' },
         { key: 'Dimensions', val: '340 mm x 280 mm x 1 mm (13.4 x 11.0 x 0.04 in)' },
         { key: 'Weight', val: '90 g approx' },
@@ -2993,7 +2923,6 @@
       category: 'logitech',
       categoryLabel: 'Logitech Gear',
       subCategory: 'webcams',
-      partNumber: '960-001559',
       modelCode: 'EMEA28i-935',
       color: 'Graphite',
       connectivityType: 'USB-C Detachable (1.5m)',
@@ -3002,10 +2931,10 @@
       rating: 4.9,
       reviewCount: 43,
       stockCount: 10,
-      badge: 'P/N: 960-001559',
+      badge: '4K Ultra HD',
       badgeTone: 'gold',
       featured: true,
-      shortSpec: '4K UHD@30fps / 1080p@60fps • Show Mode Tilt • Dual Beamforming Mics • P/N: 960-001559',
+      shortSpec: '4K UHD@30fps / 1080p@60fps • Show Mode Tilt • Dual Beamforming Mics',
       image: '/images/gadgets/logitech-mx-brio-4k-webcam.jpg',
       images: [
         '/images/gadgets/logitech-mx-brio-4k-webcam.jpg',
@@ -3021,9 +2950,8 @@
         'Integrated twist privacy shutter & dual noise-reducing beamforming microphones',
         'Certified for Microsoft Teams, Zoom, Google Meet & OBS Studio'
       ],
-      description: 'Command every boardroom call and live presentation with Logitech’s flagship 4K webcam. Factory-sealed official warehouse stock with P/N 960-001559, crafted in sleek machined aluminum.',
+      description: 'Command every boardroom call and live presentation with Logitech’s flagship 4K webcam. Factory-sealed official warehouse stock, crafted in sleek machined aluminum.',
       specs: [
-        { key: 'Part Number', val: '960-001559' },
         { key: 'Model Code', val: 'EMEA28i-935' },
         { key: 'Video Resolution', val: '4K UHD @ 30fps / 1080p Full HD @ 60fps' },
         { key: 'Microphones', val: 'Dual Beamforming Noise-Reducing Mics' },

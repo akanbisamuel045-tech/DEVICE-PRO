@@ -82,10 +82,7 @@
       const url = `/gadget/${encodeURIComponent(item.slug)}`;
       const discount = Catalog.getDiscountPct(item.price, item.originalPrice);
       const stockBadgeText = item.stockCount ? `${item.stockCount} in Stock` : 'In Stock';
-      const pnBadge = item.partNumber
-        ? `<div style="font-size:0.75rem; font-family:monospace; color:#0284C7; font-weight:700; margin:0 0 3px; letter-spacing:-0.2px;">P/N: ${item.partNumber.split(' / ')[0]}</div>`
-        : '';
-      const tagStyle = item.partNumber ? 'background:#ECFDF5; color:#047857; border:1px solid #A7F3D0;' : '';
+      const tagStyle = 'background:#ECFDF5; color:#047857; border:1px solid #A7F3D0;';
 
       return `
         <article class="nv-prod-card" data-slug="${item.slug}">
@@ -103,7 +100,6 @@
             ${item.originalPrice > item.price ? `<span class="nv-prod-old">${Catalog.formatNaira(item.originalPrice)}</span>` : ''}
             ${discount > 0 ? `<span style="font-size:0.75rem; font-weight:800; color:#00B8FC; background:rgba(0,184,252,0.12); padding:2px 7px; border-radius:4px;">-${discount}%</span>` : ''}
           </div>
-          ${pnBadge}
           <h3 class="nv-prod-title"><a href="${url}">${item.name}</a></h3>
           <p style="font-size:0.80rem; color:#6B7280; margin:0 0 6px; line-height:1.4; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden;">${item.shortSpec || ''}</p>
           <div class="nv-prod-rating">
@@ -129,7 +125,7 @@
       const sub = (item.subCategory || '').toLowerCase();
 
       if (subcat === 'instock') {
-        return Boolean(item.partNumber);
+        return (item.stockCount && item.stockCount > 0) || item.inStock !== false;
       }
       if (subcat === 'mice') {
         return (sub === 'corded' || sub === 'wireless' || sub === 'bluetooth' || sub === 'silent' || sub === 'performance' || sub.includes('mouse') || sub.includes('mice') || s.includes('mouse') || name.includes('mouse') || s.includes('m650') || s.includes('m170') || s.includes('m171') || s.includes('m185') || s.includes('m196') || s.includes('m220') || s.includes('m240') || s.includes('m350s') || s.includes('b100') || s.includes('m90') || s.includes('m100') || s.includes('g502') || s.includes('g102') || s.includes('superlight') || s.includes('lift') || s.includes('anywhere')) && !s.includes('mousepad') && !name.includes('mousepad') && !name.includes('combo') && !s.includes('combo');

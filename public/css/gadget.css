@@ -2836,23 +2836,24 @@ button {
   line-height: 1;
 }
 
-/* Trust / Value Stat Bar */
+/* Trust / Value Stat Bar - Strictly Horizontal */
 .nv-logi-stats-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 28px;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
 .nv-logi-stat-box {
   background: #FFFFFF;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  padding: 14px 16px;
+  padding: 10px 14px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   transition: all 0.2s ease;
+  min-width: 0;
 }
 
 .nv-logi-stat-box:hover {
@@ -2862,9 +2863,9 @@ button {
 }
 
 .nv-logi-stat-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: rgba(0, 184, 252, 0.12);
   color: #0084B4;
   display: inline-flex;
@@ -2874,15 +2875,43 @@ button {
 }
 
 .nv-logi-stat-title {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
   color: var(--ink-black);
   display: block;
+  white-space: nowrap;
 }
 
 .nv-logi-stat-desc {
   font-size: 0.72rem;
   color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ensure horizontal layout across all screen sizes (never stack vertically) */
+@media (max-width: 991px) {
+  .nv-logi-stats-strip {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 2px 2px 6px;
+  }
+  .nv-logi-stats-strip::-webkit-scrollbar {
+    display: none;
+  }
+  .nv-logi-stat-box {
+    flex: 0 0 auto;
+    min-width: 210px;
+    padding: 10px 14px;
+  }
 }
 
 /* Logitech Sub-Category Filter Navigation */
@@ -3047,18 +3076,12 @@ button {
     grid-template-columns: 1fr;
     padding: 28px 22px;
   }
-  .nv-logi-stats-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .nv-logi-tech-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 600px) {
-  .nv-logi-stats-strip {
-    grid-template-columns: 1fr;
-  }
   .nv-logi-tech-grid {
     grid-template-columns: 1fr;
   }
