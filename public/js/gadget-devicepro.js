@@ -194,14 +194,14 @@
       else if (state.sort === 'discount') list.sort((a, b) => Catalog.getDiscountPct(b.price, b.originalPrice) - Catalog.getDiscountPct(a.price, a.originalPrice));
 
       const subcatLabels = {
-        all: 'All In-Stock Logitech Products (36 Models • 828 Units)',
-        instock: 'Lagos Warehouse Verified Stock (36 Models • 828 Units In Stock)',
-        mice: 'Logitech Corded, Wireless & Silent Mice (13 Models • 350 Units In Stock)',
-        keyboards: 'Logitech Keyboards & Desktop Combos (11 Models • 175 Units In Stock)',
-        headsets: 'Logitech USB, Stereo & Wireless Headsets (6 Models • 250 Units In Stock)',
-        webcams: 'Logitech HD & 4K Ultra HD Webcams (4 Models • 40 Units In Stock)',
-        gaming: 'Logitech G Esports Gaming Peripherals (6 Models In Stock)',
-        presenter: 'Logitech Wireless Presenters & Gaming Accessories (2 Models)',
+        all: 'All In-Stock Logitech Products',
+        instock: 'Lagos Warehouse Verified Stock',
+        mice: 'Logitech Corded, Wireless & Silent Mice',
+        keyboards: 'Logitech Keyboards & Desktop Combos',
+        headsets: 'Logitech USB, Stereo & Wireless Headsets',
+        webcams: 'Logitech HD & 4K Ultra HD Webcams',
+        gaming: 'Logitech G Esports Gaming Peripherals',
+        presenter: 'Logitech Wireless Presenters & Gaming Accessories',
         corded: 'Logitech Corded USB Office Mice',
         wireless: 'Logitech Wireless & Bluetooth Mice'
       };
