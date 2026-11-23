@@ -206,7 +206,21 @@
           `Total: ${Catalog.formatNaira(total)}\n` +
           `Link: ${window.location.href}`
         );
-        waBtn.href = `https://wa.me/2348033882268?text=${msg}`;
+        waBtn.href = `https://wa.me/2348084523355?text=${msg}`;
+      }
+
+      const bulkBtn = document.getElementById('nv-btn-bulk-discount');
+      if (bulkBtn) {
+        const variant = getActiveVariant();
+        const variantStr = variant ? ` (Variant: ${variant.label})` : '';
+        const bulkMsg = encodeURIComponent(
+          `Hello DEVICE PRO! I want to purchase in bulk / wholesale:\n` +
+          `Product: ${product.name}${variantStr}\n` +
+          `Unit Price: ${Catalog.formatNaira(unitPrice)}\n` +
+          `Link: ${window.location.href}\n\n` +
+          `Please provide your market bulk discount / distributor volume pricing quote.`
+        );
+        bulkBtn.href = `https://wa.me/2348084523355?text=${bulkMsg}`;
       }
     }
 
