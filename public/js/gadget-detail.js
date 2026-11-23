@@ -25,7 +25,7 @@
     }
 
     const slug = resolveSlug();
-    const product = Catalog.getBySlug(slug) || Catalog.GADGETS[0];
+    const product = Catalog.getBySlug(slug) || (typeof Catalog.getLogitech === 'function' ? Catalog.getLogitech()[0] : Catalog.GADGETS[0]);
 
     let selectedVariantIndex = 0;
     let quantity = 1;
@@ -71,6 +71,7 @@
     if (mainImg) {
       mainImg.src = images[0];
       mainImg.alt = product.name;
+      mainImg.style.opacity = '1';
     }
     if (galleryBadge) {
       galleryBadge.textContent = product.badge || 'Genuine Sealed';

@@ -9,7 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/gadget.css?v=15">
+  <link rel="stylesheet" href="/css/gadget.css?v=16">
+  <script src="/js/gadget-catalog.js?v=16"></script>
 </head>
 <body class="nuvio-gadget-body gadget-detail-body">
   <a href="#main-content" class="skip-to-content">Skip to content</a>
@@ -98,7 +99,7 @@
         <div class="nv-gallery-col">
           <div class="nv-gallery-main">
             <span class="nv-pill-tag orange" id="nv-gallery-badge" style="position:absolute; top:14px; left:14px;">Genuine Sealed</span>
-            <img id="nv-gallery-main-img" src="/images/gadgets/phone-flagship-titanium.jpg" alt="Product image">
+            <img id="nv-gallery-main-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 500 500'%3E%3Crect width='100%25' height='100%25' fill='%23FFFFFF'/%3E%3C/svg%3E" alt="Product image" style="opacity:0; transition:opacity 0.2s ease;">
           </div>
           <div class="nv-gallery-thumbs" id="nv-gallery-thumbs"></div>
         </div>
@@ -188,6 +189,44 @@
           </div>
         </div>
       </section>
+
+      <!-- Instant Product Hydration Script (Zero Flash of Wrong Product) -->
+      <script>
+        (function() {
+          try {
+            var Catalog = window.DeviceProGadgets;
+            if (!Catalog) return;
+            var params = new URLSearchParams(window.location.search);
+            var slug = params.get('slug') || params.get('id');
+            if (!slug) {
+              var parts = window.location.pathname.split('/').filter(Boolean);
+              if (parts.length >= 2 && (parts[0] === 'gadget' || parts[0] === 'gadgets')) {
+                slug = decodeURIComponent(parts[1]);
+              }
+            }
+            var prod = Catalog.getBySlug(slug) || (Catalog.getLogitech ? Catalog.getLogitech()[0] : Catalog.GADGETS[0]);
+            if (prod) {
+              document.title = prod.name + ' | DEVICE PRO Gadgets Nigeria';
+              var img = document.getElementById('nv-gallery-main-img');
+              if (img) {
+                img.src = prod.image || (prod.images && prod.images[0]) || '';
+                img.alt = prod.name;
+                img.style.opacity = '1';
+              }
+              var t = document.getElementById('nv-detail-title');
+              if (t) t.textContent = prod.name;
+              var b = document.getElementById('nv-detail-brand');
+              if (b) b.textContent = prod.brand;
+              var c = document.getElementById('nv-detail-cat');
+              if (c) c.textContent = prod.categoryLabel;
+              var p = document.getElementById('nv-detail-price-val');
+              if (p) p.textContent = Catalog.formatNaira(prod.price);
+              var bcName = document.getElementById('nv-bc-name');
+              if (bcName) bcName.textContent = prod.name;
+            }
+          } catch(e) {}
+        })();
+      </script>
 
       <!-- Tabs: Overview, Specs, In the Box -->
       <section class="nv-tabs-card" aria-label="Product specifications and details">
@@ -291,8 +330,8 @@
   <div class="toast-container" id="toast-container"></div>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
-  <script src="/js/cart.js?v=15"></script>
-  <script src="/js/gadget-catalog.js?v=15"></script>
-  <script src="/js/gadget-detail.js?v=15"></script>
+  <script src="/js/cart.js?v=16"></script>
+  <script src="/js/gadget-catalog.js?v=16"></script>
+  <script src="/js/gadget-detail.js?v=16"></script>
 </body>
 </html>
