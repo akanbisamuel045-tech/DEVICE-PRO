@@ -2890,8 +2890,8 @@ button {
   text-overflow: ellipsis;
 }
 
-/* Ensure horizontal layout across all screen sizes (never stack vertically) */
-@media (max-width: 991px) {
+/* Tablet horizontal layout for stat strip */
+@media (min-width: 769px) and (max-width: 991px) {
   .nv-logi-stats-strip {
     display: flex;
     flex-direction: row;
@@ -2911,6 +2911,18 @@ button {
     flex: 0 0 auto;
     min-width: 210px;
     padding: 10px 14px;
+  }
+}
+
+/* Mobile View: Remove logi-stat-strip completely & Reduce text font-size by 20% */
+@media (max-width: 768px) {
+  html {
+    font-size: 13.44px !important; /* Scaled down exactly 20% from desktop 16.8px (16.8 * 0.8 = 13.44px) */
+  }
+
+  /* Completely remove logi-stat-strip from mobile view */
+  .nv-logi-stats-strip {
+    display: none !important;
   }
 }
 
